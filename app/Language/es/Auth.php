@@ -116,4 +116,5 @@ return [
 
     // Permisos
     'unknownPermission' => '{0} no es un permiso válido.',
+    
 ];

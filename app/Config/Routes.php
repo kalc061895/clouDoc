@@ -5,7 +5,9 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+
+ $routes->get('/', 'Home::index');
+
 /**
  * Si necesitas manejarel login y register de forma particular
  * 
