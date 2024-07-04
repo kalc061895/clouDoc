@@ -7,26 +7,99 @@
 <?php
 $auth = service('auth');
 $user = $auth->user();
+
+// Obtener que menu es el que esta activo
+$menuActive = 2;
+
 ?>
 <?= $this->section('username'); ?>
 <?= $user->username; ?>
 <?= $this->endSection(); ?>
 
+
+
+
 <?= $this->section('profile'); ?>
-<img src="../assets/images/profile/<?=$user->photo?>" class="rounded-circle" width="80" height="80" alt="" />
+<img src="../assets/images/profile/<?= $user->photo ?>" class="rounded-circle" width="80" height="80" alt="" />
 <div class="ms-3">
     <h5 class="mb-1 fs-4"><?= $user->username; ?></h5>
-    <span class="mb-1 d-block"><?= $user->cargo ;?></span>
+    <span class="mb-1 d-block"><?= $user->cargo; ?></span>
     <p class="mb-0 d-flex align-items-center gap-2">
-        <i class="ti ti-mail fs-4"></i> <?= $user->email ;?>
+        <i class="ti ti-mail fs-4"></i> <?= $user->email; ?>
     </p>
 </div>
 <?= $this->endSection(); ?>
 
+<!-- Menu Vertical -->
+<?= $this->section('menuVertical'); ?>
+
+<?php foreach ($menu as $item) : ?>
+
+    <?php if ($item['type'] =='primary') : ?>
+        <!-- MENU DE TODO---------------------------------- -->
+        <li class="nav-small-cap">
+            <iconify-icon icon="solar:menu-dots-linear" class="mini-icon"></iconify-icon>
+            <span class="hide-menu"><?= $item['name'] ?></span>
+        </li>
+    <?php else : ?>
+        <li class="sidebar-item">
+            <a class="sidebar-link <?= ($item['id']==$menuActive)?' active ':''?>" href="<?= $item['url'] ?>"  aria-expanded="false">
+                <iconify-icon icon="solar:<?= $item['icon'] ?>"></iconify-icon>
+                <span class="hide-menu"><?= $item['name'] ?></span>
+            </a>
+        </li>
+    <?php endif ?>
+
+
+
+<?php endforeach ?>
+
+
+<!-- MENU DE TODO---------------------------------- -->
+<li class="nav-small-cap">
+    <iconify-icon icon="solar:menu-dots-linear" class="mini-icon"></iconify-icon>
+    <span class="hide-menu">Personal</span>
+</li>
+
+<!-- NORMAL ---------------------------------- -->
+<li class="sidebar-item">
+    <a class="sidebar-link" href="#" id="get-url" aria-expanded="false">
+        <iconify-icon icon="solar:screencast-2-linear"></iconify-icon>
+        <span class="hide-menu">Modern</span>
+    </a>
+</li>
+
+<!-- CON SUB MENU ---------------------------------- -->
+<li class="sidebar-item">
+    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+        <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
+        <span class="hide-menu">Blog</span>
+    </a>
+    <ul aria-expanded="false" class="collapse first-level">
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="blog-posts.html">
+                <span class="icon-small"></span>
+                <span class="hide-menu">Blog Posts</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a class="sidebar-link" href="blog-detail.html">
+                <span class="icon-small"></span>
+                <span class="hide-menu">Blog Details</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+<?= $this->endSection(); ?>
+
+<!-- Menu Horizontal -->
+<?= $this->section('menuHorizontal'); ?>
+
+<?= $this->endSection(); ?>
 
 
 <?= $this->section('content'); ?>
-
 
 <div class="row">
     <div class="col-lg-3 col-md-6">

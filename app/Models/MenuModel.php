@@ -56,4 +56,8 @@ class MenuModel extends Model
     {
         return $this->where('parent_id', $parentId)->where('status', 'active')->findAll();
     }
+    public function getAll()
+    {
+        return $this->orderBy('order ASC')->findAll();
+    }
 }

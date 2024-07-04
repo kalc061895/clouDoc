@@ -71,26 +71,26 @@
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)">
                                             <iconify-icon icon="solar:user-linear" class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.myProfile')?>
+                                            <?= lang('Main.myProfile') ?>
                                         </a>
                                         <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)">
                                             <iconify-icon icon="solar:inbox-linear" class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.myImbox')?>
+                                            <?= lang('Main.myImbox') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)">
                                             <iconify-icon icon="solar:settings-linear" class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.profileSettings')?>
+                                            <?= lang('Main.profileSettings') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)">
                                             <iconify-icon icon="solar:login-2-linear" class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.logout')?>
+                                            <?= lang('Main.logout') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <div class="p-2">
                                             <button type="button" class="btn d-block w-100 btn-info">
-                                                <?= lang('Main.myProfile')?>
+                                                <?= lang('Main.myProfile') ?>
                                             </button>
                                         </div>
                                     </div>
@@ -98,6 +98,16 @@
                             </div>
                             <!-- End User profile text-->
                         </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="<?= base_url('/') ?>#" aria-expanded="false">
+                                <iconify-icon icon="solar:home-linear"></iconify-icon>
+                                <span class="hide-menu"><?= lang('Main.dashboard') ?></span>
+                            </a>
+                        </li>
+                        <!-- Menu Vertical -->
+                        <?= $this->renderSection('menuVertical'); ?>
+                        <?= $this->renderSection('menuHorizontal'); ?>
+
                         <!-- User Profile-->
                         <!-- ---------------------------------- -->
                         <!-- Home -->
@@ -115,6 +125,8 @@
                                 <span class="hide-menu">Modern</span>
                             </a>
                         </li>
+
+
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="index2.html" aria-expanded="false">
                                 <iconify-icon icon="solar:atom-linear"></iconify-icon>
@@ -143,7 +155,7 @@
                     <!-- item-->
                     <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Email"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
                     <!-- item-->
-                    <a href="authentication-login.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
+                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
                 </div>
             </div>
         </aside>
@@ -829,33 +841,21 @@
                                     <!-- ------------------------------- -->
                                     <li class="nav-item dropdown nav-icon-hover-bg dark rounded-circle">
                                         <a class="nav-link" href="javascript:void(0)" id="drop2" aria-expanded="false">
-                                            <img src="../assets/images/flag/icon-flag-en.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                            <img src="../assets/images/flag/icon-flag-pe.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up overflow-hidden" aria-labelledby="drop2">
                                             <div class="message-body">
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="../assets/images/flag/icon-flag-en.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="../assets/images/flag/icon-flag-pe.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
-                                                    <p class="mb-0 fs-3">English (UK)</p>
+                                                    <p class="mb-0 fs-3"><?= lang('Main.languageES')?></p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="../assets/images/flag/icon-flag-cn.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="../assets/images/flag/icon-flag-us.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
-                                                    <p class="mb-0 fs-3">中国人 (Chinese)</p>
-                                                </a>
-                                                <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
-                                                    <div class="position-relative">
-                                                        <img src="../assets/images/flag/icon-flag-fr.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
-                                                    </div>
-                                                    <p class="mb-0 fs-3">français (French)</p>
-                                                </a>
-                                                <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
-                                                    <div class="position-relative">
-                                                        <img src="../assets/images/flag/icon-flag-sa.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
-                                                    </div>
-                                                    <p class="mb-0 fs-3">عربي (Arabic)</p>
+                                                    <p class="mb-0 fs-3"><?= lang('Main.languageEN')?></p>
                                                 </a>
                                             </div>
                                         </div>
@@ -877,10 +877,10 @@
                                             <div class="profile-dropdown position-relative" data-simplebar>
                                                 <div class="py-3 px-7 pb-0">
                                                     <h5 class="mb-0 fs-5"><?= lang('Main.userProfile');
-                                                    ?></h5>
+                                                                            ?></h5>
                                                 </div>
                                                 <div class="d-flex align-items-center py-9 mx-7 border-bottom">
-                                                   <?= $this->renderSection('profile') ;?>
+                                                    <?= $this->renderSection('profile'); ?>
                                                 </div>
                                                 <div class="message-body">
                                                     <a href="page-user-profile.html" class="py-8 px-7 mt-8 d-flex align-items-center">
@@ -888,8 +888,8 @@
                                                             <iconify-icon icon="solar:user-circle-line-duotone"></iconify-icon>
                                                         </span>
                                                         <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myProfile');?></h6>
-                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.profileSettings') ;?></span>
+                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myProfile'); ?></h6>
+                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.profileSettings'); ?></span>
                                                         </div>
                                                     </a>
                                                     <a href="app-email.html" class="py-8 px-7 d-flex align-items-center">
@@ -897,8 +897,8 @@
                                                             <iconify-icon icon="solar:inbox-line-line-duotone"></iconify-icon>
                                                         </span>
                                                         <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myImbox')?></h6>
-                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.imboxDecription')?></span>
+                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myImbox') ?></h6>
+                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.imboxDecription') ?></span>
                                                         </div>
                                                     </a>
                                                     <a href="app-kanban.html" class="py-8 px-7 d-flex align-items-center">
@@ -906,13 +906,13 @@
                                                             <iconify-icon icon="solar:checklist-minimalistic-line-duotone"></iconify-icon>
                                                         </span>
                                                         <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?=lang('Main.myTask');?></h6>
-                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.taskList')?></span>
+                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myTask'); ?></h6>
+                                                            <span class="fs-2 d-block text-body-secondary"><?= lang('Main.taskList') ?></span>
                                                         </div>
                                                     </a>
                                                 </div>
                                                 <div class="d-grid py-4 px-7 pt-8">
-                                                    <a href="authentication-login.html" class="btn btn-info"><?= lang('Main.logout')?></a>
+                                                    <a href="<?= base_url('logout') ?>" class="btn btn-info"><?= lang('Main.logout') ?></a>
                                                 </div>
                                             </div>
 
@@ -1004,7 +1004,7 @@
                                                         <iconify-icon icon="solar:cart-large-2-linear" class="text-success fs-5"></iconify-icon>
                                                     </div>
                                                     <div class="d-inline-block">
-                                                        <h6 class="mb-0"><?= lang('Main.userProfile')?> </h6>
+                                                        <h6 class="mb-0"><?= lang('Main.userProfile') ?> </h6>
                                                         <span class="fs-11 d-block text-muted">learn more information</span>
                                                     </div>
                                                 </a>
