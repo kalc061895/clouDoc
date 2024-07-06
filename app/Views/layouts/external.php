@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" dir="ltr" data-bs-theme="dark" data-color-theme="Blue_Theme" data-layout="vertical">
+<html lang="es" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
 
 
 <head>
@@ -14,7 +14,7 @@
   <!-- Core Css -->
   <link rel="stylesheet" href="../assets/css/styles.css" />
 
-  <title><?= $this->renderSection('title') ;?></title>
+  <title><?= $this->renderSection('title'); ?></title>
   <!-- Owl Carousel  -->
   <link rel="stylesheet" href="../assets/libs/aos/dist/aos.css" />
 </head>
@@ -30,7 +30,7 @@
         <div class="container">
           <nav class="navbar navbar-expand-md navbar-light ps-0">
             <!-- Logo will be here -->
-            <a class="navbar-brand" href="<?= base_url('')?>">
+            <a class="navbar-brand" href="<?= base_url('') ?>">
               <img src="../assets/images/logos/dark-logo.svg" alt="img-fluid" />
             </a>
 
@@ -42,18 +42,18 @@
             <!-- This is the navigation menu -->
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
               <ul class="navbar-nav ms-auto stylish-nav">
-                
+
                 <li class="nav-item">
-                  <a class="nav-link " href="<?= base_url('/nuevoexpediente')?>"><?= lang('External.nuevoT')?></a>
+                  <a class="nav-link " href="<?= base_url('/nuevoexpediente') ?>"><?= lang('External.nuevoT') ?></a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link " href="<?= base_url('/buscarexpediente')?>"><?= lang('External.buscarT')?></a>
+                  <a class="nav-link " href="<?= base_url('/buscarexpediente') ?>"><?= lang('External.buscarT') ?></a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link " href="<?= base_url('/tupaexpediente')?>"><?= lang('External.tupaT')?></a>
+                  <a class="nav-link " href="<?= base_url('/tupaexpediente') ?>"><?= lang('External.tupaT') ?></a>
                 </li>
                 <li class="nav-item ms-3 mt-2 mt-md-0">
-                  <a class="btn btn-secondary" href="<?=base_url('/login')?>"><iconify-icon icon='solar:user-linear'></iconify-icon> <?= lang('Auth.login')?></a>
+                  <a class="btn btn-secondary" href="<?= base_url('/login') ?>"><iconify-icon icon='solar:user-linear'></iconify-icon> <?= lang('Auth.login') ?></a>
                 </li>
               </ul>
             </div>
@@ -64,28 +64,28 @@
       <!-- mobile sidebar -->
       <div class="offcanvas offcanvas-start" tabindex="-1" id="right-sidebar" aria-labelledby="offcanvasExampleLabel">
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasExampleLabel"><?= lang('External.menu')?></h5>
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel"><?= lang('External.menu') ?></h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
           <ul class="navbar-nav stylish-nav">
-            
+
             <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('/nuevoexpediente')?>"><?= lang('External.nuevoTramite')?></a>
+              <a class="nav-link" href="<?= base_url('/nuevoexpediente') ?>"><?= lang('External.nuevoTramite') ?></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('/buscarexpediente')?>" ><?= lang('External.buscarTramite')?></a>
+              <a class="nav-link" href="<?= base_url('/buscarexpediente') ?>"><?= lang('External.buscarTramite') ?></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?= base_url('/tupaexpediente')?>" ><?= lang('External.tupaTramite')?></a>
+              <a class="nav-link" href="<?= base_url('/tupaexpediente') ?>"><?= lang('External.tupaTramite') ?></a>
             </li>
             <li class="nav-item mt-4">
-              <a class="btn btn-secondary w-100" href="<?= base_url('/login')?>"><?= lang('Auth.login')?></a>
+              <a class="btn btn-secondary w-100" href="<?= base_url('/login') ?>"><?= lang('Auth.login') ?></a>
             </li>
           </ul>
         </div>
       </div>
-      <?= $this->renderSection('content') ;?>  
+      <?= $this->renderSection('content'); ?>
 
       <!-- start footer -->
       <footer class="text-center py-5">
@@ -96,8 +96,8 @@
                 <img src="../assets/images/logos/favicon.png" alt="logo" />
               </span>
               <div class="mt-2">
-                <span><?=lang('External.rights')?>
-                  <a href="#" class="text-primary"><?= lang('External.owner')?></a>
+                <span><?= lang('External.rights') ?>
+                  <a href="#" class="text-primary"><?= lang('External.owner') ?></a>
                 </span>
               </div>
             </div>

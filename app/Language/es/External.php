@@ -16,11 +16,11 @@ return [
     
     // menu
     'menu' => 'Opciones',
-    'nuevoT' => 'Nuevo',
+    'nuevoT' => 'Nuevo Trámite',
     'buscarT' => 'Seguimiento',
     'tupaT' => 'TUPA',
     'nuevoTramite' => 'Nuevo Expediente',
-    'buscarTramite' => 'Seguimiento de Expediente',
+    'buscarTramite' => 'Buscar Expediente',
     'tupaTramite' => 'Procedimientos TUPA',
     
 
