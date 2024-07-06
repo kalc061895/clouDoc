@@ -24,7 +24,7 @@
             <div>
                 <h5 class="text-white fs-3 mb-1"><?= lang('Main.welcomeMessage'); ?></h5>
                 <h6 class="text-white fs-2 mb-0">
-                    <?= lang('welcomeDecription'); ?>
+                    <?= lang('Main.welcomeDecription'); ?>
                 </h6>
             </div>
             <button type="button" class="btn-close btn-close-white fs-2 m-0 ms-auto shadow-none" data-bs-dismiss="toast" aria-label="Close"></button>

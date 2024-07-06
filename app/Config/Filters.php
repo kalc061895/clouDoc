@@ -73,7 +73,20 @@ class Filters extends BaseFilters
             // 'csrf',
             // 'invalidchars',
             // se agrega para proteger las rutas
-            'session'=> ['except' => ['login*','register','auth/a/*','logut']]
+            'session' => [
+                'except' =>
+                [
+                    'login*',
+                    'register',
+                    'auth/a/*',
+                    'logut',
+                    'nuevotramite',// Formulario de Registro de Expediente
+                    'buscartramite',// Formulario de Seguimiento
+                    'tupatramite',// TUPA - Listado de procedimientos y requisitos
+                                    // de los diferentes tramites
+                    '', // pagina principal de tramite
+                ]
+            ]
         ],
         'after' => [
             // 'honeypot',
