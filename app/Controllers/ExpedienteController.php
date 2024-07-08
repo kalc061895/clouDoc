@@ -53,7 +53,78 @@ class ExpedienteController extends BaseController
         return view('external/busqueda_expediente');
     }
 
-    
+    public function nuevoTramite()
+    {
+        helper(['form', 'url']);
+        
+        $validation = \Config\Services::validation();
+
+        $input = $this->validate([
+            'tipoNew' => 'required',
+            'tipoDocNew' => 'required',
+            'numDocNew' => 'required',
+            'input1' => 'required',
+            'telefonoNew' => 'required',
+            'correoNew' => 'required|valid_email',
+            'direccionNew' => 'required',
+            'tipoDocExp' => 'required',
+            'numDocExp' => 'required',
+            'folioDocExp' => 'required',
+            'asuntoDocExp' => 'required',
+            'anexoExp' => [
+                'uploaded[anexoExp]',
+                'mime_in[anexoExp,image/jpg,image/jpeg,image/png,application/pdf]',
+                'max_size[anexoExp,4096]',
+            ],
+        ]);
+
+        if (!$input) {
+            return view('external_form', [
+                'validation' => $this->validator,
+            ]);
+        } else {
+            // Subir el archivo
+            $file = $this->request->getFile('anexoExp');
+            if ($file->isValid() && !$file->hasMoved()) {
+                $filePath = $this->uploadToGoogleDrive($file);
+                if (!$filePath) {
+                    // Si no hay conexión, guardar localmente
+                    $file->move(WRITEPATH . 'uploads');
+                    $filePath = WRITEPATH . 'uploads/' . $file->getName();
+                }
+            }
+            // Aquí puedes guardar los datos en la base de datos
+        }
+    }
+
+    private function uploadToGoogleDrive($file)
+    {
+        try {
+            $client = new Client();
+            $client->setAuthConfig(APPPATH . 'Config/credentials.json');
+            $client->addScope(Drive::DRIVE_FILE);
+
+            $service = new Drive($client);
+
+            $fileMetadata = new DriveFile([
+                'name' => $file->getName()
+            ]);
+
+            $content = file_get_contents($file->getTempName());
+
+            $driveFile = $service->files->create($fileMetadata, [
+                'data' => $content,
+                'mimeType' => $file->getMimeType(),
+                'uploadType' => 'multipart',
+                'fields' => 'id',
+            ]);
+
+            return 'https://drive.google.com/uc?export=view&id=' . $driveFile->id;
+        } catch (\Exception $e) {
+            // Manejar errores de conexión
+            return false;
+        }
+    }
     public function infoExpediente()
     {
         $set = array(
