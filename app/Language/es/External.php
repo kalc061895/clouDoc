@@ -39,5 +39,28 @@ return [
     'noFound'=>'No se pudo encontrar el expediente {0} en la base ded datos.',
     'searchingText'=>'Buscando',
 
+    // New Exp Page
+    'titleNew'=> 'Registrar Nuevo Expediente',
+    'dataTitleNew'=> 'Datos del Solicitante',
+    'expedienteTitleNew'=> 'Datos del Documento',
+    'descriptionNew'=> 'Completar el formulario. *(campos obligatorios) ',
+    'personaNew'=> 'Persona Natural',
+    'juridicaNew'=> 'Persona Juridica',
+    'entidadNew'=> 'Entidad Publica',
+    'tipoNew'=> 'Tipo de Persona',
+    'docTipoNew'=> 'Tipo de Documento',
+    'docNew'=> 'Nro. de Documento',
+    'nombreNew'=> 'Nombre completo',
+    'telefonoNew'=> 'Nro. Telefono',
+    'correoNew'=> 'Correo Electrónico',
+    'direccionNew'=> 'Dirección',
+
+    'tipoDocExp'=> 'Tipo de Documento',
+    'numDocExp'=> 'Nro. de Documento',
+    'folioDocExp'=> 'Nro. de Folios',
+    'asuntoDocExp'=> 'Asunto ',
+    'anexoExp'=> 'Adjuntar Expediente',
+    'anexoHelpExp'=> 'El tamaño máximo acceptado es 20 MB, un solo archivo en formato .Pdf ',
+    'sendButton'=> 'Enviar Documento',
 
 ];

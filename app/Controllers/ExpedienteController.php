@@ -28,17 +28,32 @@ class ExpedienteController extends BaseController
     {
         //$data['expedientes'] = $this->expedienteModel->findAll();
         $expedienteForm = new ExpedienteForm();
-        return view(
-            'external/formulario_expediente',
-            ['content'=>$expedienteForm->render()]
+        $set = array(
+            'tipoDocumento'=> [
+                ['id'=>1,'nombre'=>'DNI'],
+                ['id'=>2,'nombre'=>'RUC'],
+                ['id'=>3,'nombre'=>'Carnet de Extranjería']
+            ],
+            'tipoExpediente'=> [
+                ['id'=>1,'nombre'=>'SOLICITUD'],
+                ['id'=>2,'nombre'=>'INFORME'],
+                ['id'=>3,'nombre'=>'OFICIO'],
+                ['id'=>4,'nombre'=>'OTRO'],
+            ],
+            'content'=>$expedienteForm->render()
         );
+        return view('external/formulario_expediente', $set);
     }
     
     public function buscarExpediente()
     {
         //$data['expedientes'] = $this->expedienteModel->findAll();
+        
+        
         return view('external/busqueda_expediente');
     }
+
+    
     public function infoExpediente()
     {
         $set = array(

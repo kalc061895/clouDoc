@@ -1,7 +1,8 @@
-<form action="<?= base_url('expediente/save') ?>" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="numero_expediente">Número de Expediente</label>
+<form class="floating-labels mt-4 pt-2" action="<?= base_url('expediente/save') ?>" method="post" enctype="multipart/form-data">
+    <div class="form-group mb-4">
         <input type="text" class="form-control" id="numero_expediente" name="numero_expediente" required>
+        <span class="bar"></span>
+        <label for="numero_expediente">Número de Expediente</label>
     </div>
     <div class="form-group">
         <label for="procedencia">Procedencia</label>
