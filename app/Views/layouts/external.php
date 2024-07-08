@@ -17,6 +17,9 @@
   <title><?= $this->renderSection('title'); ?></title>
   <!-- Owl Carousel  -->
   <link rel="stylesheet" href="../assets/libs/aos/dist/aos.css" />
+
+  <?= $this->renderSection('pageStyles') ;?>
+
 </head>
 
 <body>
@@ -119,6 +122,7 @@
   <script src="../assets/js/iconify-icon%401.0.8/dist/iconify-icon.min.js"></script>
   <script src="../assets/libs/aos/dist/aos.js"></script>
   <script src="../assets/js/landingpage/landingpage.js"></script>
+  <?= $this->renderSection('pageScripts') ;?>
 </body>
 
 

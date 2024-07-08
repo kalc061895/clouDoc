@@ -26,6 +26,18 @@ return [
 
     // HOME PAGE INFO
     'rights'=>'Todos Los derechos reservados.',
-    'owner'=>'OTI - RSSR'
-    
+    'owner'=>'OTI - RSSR',
+
+    // search page
+    'titleSearch'=>'Buscar Expediente',
+    'codeSearch'=>'Numero de Expediente',
+    'helpCodeSearch'=>'Ejm. 00047852',
+    'yearSearch'=>'Año',
+    'captchaSearch'=>'Captcha',
+    'exampleSearch'=>'Ejemplo: (00145-2024)',
+    'buttonSearch'=>'Buscar',
+    'noFound'=>'No se pudo encontrar el expediente {0} en la base ded datos.',
+    'searchingText'=>'Buscando',
+
+
 ];

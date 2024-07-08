@@ -1,16 +1,11 @@
 <?= $this->extend('layouts/external') ;?>
 
 <?= $this->section('title') ;?>
-    <?= lang('Exrternal.nuevotramite')?>
+    <?= lang('External.tupaExpediente')?>
+    
 <?= $this->endSection() ;?>
 
 <?= $this->section('content') ;?>
-<!-- CODE HERE -->
-
-<div class="row">
-    <div class="col-xl-12">
-        <?= $content?>
-    </div>
-</div>
+ aqui va el contenido de la seccion de tupa
 <?= $this->endSection() ;?>
 

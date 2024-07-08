@@ -10,7 +10,7 @@
             <div class="col-xl-5 col-xxl-4">
                 <div class="authentication-login min-vh-100 bg-body row justify-content-center">
                     <div class="col-12">
-                        <a href="index.html" class="text-nowrap logo-img d-block px-4 py-9 w-100">
+                        <a href="<?= base_url('/')?>" class="text-nowrap logo-img d-block px-4 py-9 w-100">
                             <img src="../assets/images/logos/dark-logo.svg" class="dark-logo" alt="Logo-Dark" />
                             <img src="../assets/images/logos/light-logo.svg" class="light-logo" alt="Logo-light" />
                         </a>

@@ -31,7 +31,7 @@
                 <h4 class="fs-5 mt-5 mb-3"><?= lang('External.opciones') ?></h4>
                 <?=view('components/cardbg', ['bgColor' => 'primary', 'icon' => 'pen-new-square-line-duotone', 'title' => lang('External.nuevoTramite'), 'amount' => '$900.00k', 'url'=>base_url('/nuevoexpediente')]) ?>
                 <?=view('components/cardbg', ['bgColor' => 'danger', 'icon' => 'card-search-line-duotone', 'title' => lang('External.buscarTramite'), 'amount' => '$284.50k', 'url'=>base_url('/buscarexpediente')]) ?>
-                <?=view('components/cardbg', ['bgColor' => 'info', 'icon' => 'clipboard-list-line-duotone', 'title' => lang('External.tupaTramite'), 'amount' => '$650.80k']) ?>
+                <?=view('components/cardbg', ['bgColor' => 'info', 'icon' => 'clipboard-list-line-duotone', 'title' => lang('External.tupaTramite'), 'amount' => '$650.80k','url'=>base_url('/tupaexpediente')]) ?>
                 
 
                 <p class="fs-5 mb-5 text-dark fw-normal w-85">

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Libraries\ExpedienteForm;
 //use App\Models\ExpedienteModel;
 //use App\Models\AnexoModel;
 class ExpedienteController extends BaseController
@@ -22,6 +23,35 @@ class ExpedienteController extends BaseController
         //$data['expedientes'] = $this->expedienteModel->findAll();
         
         return view('external/homepage');
+    }
+    public function nuevoExpediente()
+    {
+        //$data['expedientes'] = $this->expedienteModel->findAll();
+        $expedienteForm = new ExpedienteForm();
+        return view(
+            'external/formulario_expediente',
+            ['content'=>$expedienteForm->render()]
+        );
+    }
+    
+    public function buscarExpediente()
+    {
+        //$data['expedientes'] = $this->expedienteModel->findAll();
+        return view('external/busqueda_expediente');
+    }
+    public function infoExpediente()
+    {
+        $set = array(
+            'expediente'=>$this->request->getPost(),
+        );
+        //$data['expedientes'] = $this->expedienteModel->findAll();
+        return view('external/info_expediente',$set);
+    }
+
+    public function tupaExpediente()
+    {
+        //$data['expedientes'] = $this->expedienteModel->findAll();
+        return view('external/lista_tupa_expediente');
     }
 
     public function create()

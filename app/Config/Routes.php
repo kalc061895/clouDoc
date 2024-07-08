@@ -29,4 +29,5 @@ service('auth')->routes($routes);
 $routes->get('/','ExpedienteController::index');
 $routes->get('/nuevoexpediente','ExpedienteController::nuevoexpediente');
 $routes->get('/buscarexpediente','ExpedienteController::buscarexpediente');
+$routes->post('/buscarexpediente','ExpedienteController::infoexpediente');
 $routes->get('/tupaexpediente','ExpedienteController::tupaexpediente');
