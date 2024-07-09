@@ -5,10 +5,14 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class Configuracion extends BaseController
+class ConfigController extends BaseController
 {
     public function index()
     {
         //
+    }
+    public function menus(){
+
+        return view("config/menus");
     }
 }

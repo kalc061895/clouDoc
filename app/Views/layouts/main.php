@@ -44,7 +44,7 @@
 
             <div>
                 <div class="brand-logo d-flex align-items-center">
-                    <a href="index.html" class="text-nowrap logo-img">
+                    <a href="<?= base_url('/') ?>" class="text-nowrap logo-img">
                         <img src="../assets/images/logos/dark-logo.svg" alt="Logo" class="dark-logo" />
                         <img src="../assets/images/logos/light-logo.svg" alt="Logo" class="light-logo" />
                     </a>
@@ -849,13 +849,13 @@
                                                     <div class="position-relative">
                                                         <img src="../assets/images/flag/icon-flag-pe.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
-                                                    <p class="mb-0 fs-3"><?= lang('Main.languageES')?></p>
+                                                    <p class="mb-0 fs-3"><?= lang('Main.languageES') ?></p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
                                                         <img src="../assets/images/flag/icon-flag-us.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
-                                                    <p class="mb-0 fs-3"><?= lang('Main.languageEN')?></p>
+                                                    <p class="mb-0 fs-3"><?= lang('Main.languageEN') ?></p>
                                                 </a>
                                             </div>
                                         </div>
@@ -937,7 +937,7 @@
                         <nav class="sidebar-nav scroll-sidebar">
                             <div class="offcanvas-header justify-content-between ps-0 pt-0">
                                 <div class="brand-logo d-flex align-items-center">
-                                    <a href="index.html" class="text-nowrap logo-img">
+                                    <a href="<?= base_url('/') ?>" class="text-nowrap logo-img">
                                         <img src="../assets/images/logos/dark-logo.svg" alt="Logo" class="dark-logo" />
                                         <img src="../assets/images/logos/light-logo.svg" alt="Logo" class="light-logo" />
                                     </a>
@@ -1057,7 +1057,7 @@
                                 </a>
                             </li>
                             <li class="nav-item d-none d-xl-flex align-items-center">
-                                <a href="../horizontal/index.html" class="text-nowrap nav-link">
+                                <a href="../horizontal/<?= base_url('/') ?>" class="text-nowrap nav-link">
 
                                     <img src="../assets/images/logos/light-logo.svg" alt="Logo" />
                                 </a>
@@ -1440,7 +1440,7 @@
                             </li>
                         </ul>
                         <div class="d-block d-xl-none">
-                            <a href="index.html" class="text-nowrap nav-link">
+                            <a href="<?= base_url('/') ?>" class="text-nowrap nav-link">
                                 <img src="../assets/images/logos/light-logo.svg" alt="Logo" />
                             </a>
                         </div>
@@ -1620,7 +1620,7 @@
                                 </a>
                                 <ul aria-expanded="false" class="collapse first-level">
                                     <li class="sidebar-item">
-                                        <a href="index.html" class="sidebar-link">
+                                        <a href="<?= base_url('/') ?>" class="sidebar-link">
                                             <i class="ti ti-aperture"></i>
                                             <span class="hide-menu">Dashboard 1</span>
                                         </a>
@@ -1810,7 +1810,7 @@
                                         </a>
                                     </li>
                                     <li class="sidebar-item">
-                                        <a href="../landingpage/index.html" class="sidebar-link">
+                                        <a href="../landingpage/<?= base_url('/') ?>" class="sidebar-link">
                                             <i class="ti ti-app-window"></i>
                                             <span class="hide-menu">Landing Page</span>
                                         </a>
@@ -1826,14 +1826,15 @@
             </aside>
 
             <div class="body-wrapper">
-                <div class="container-fluid">
+                <div class="container-fluid content-main">
+                    <?= $this->renderSection('content'); ?>
                     <div class="d-md-flex align-items-center justify-content-between mb-7">
                         <div class="mb-4 mb-md-0">
                             <h4 class="fs-6 mb-0">Dashboard</h4>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-0">
                                     <li class="breadcrumb-item">
-                                        <a class="text-muted text-decoration-none" href="index.html">Home</a>
+                                        <a class="text-muted text-decoration-none" href="<?= base_url('/') ?>">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                                 </ol>
@@ -1853,7 +1854,7 @@
                         </div>
                     </div>
 
-                    <?= $this->renderSection('content'); ?>
+
 
                 </div>
             </div>
@@ -2122,6 +2123,35 @@
     <script src="../assets/js/iconify-icon%401.0.8/dist/iconify-icon.min.js"></script>
     <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../assets/js/dashboards/dashboard.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Al hacer clic en un enlace con clase 'open-here'
+            $('.open-here').on('click', function(event) {
+                event.preventDefault(); // Evita la acción por defecto del enlace (redireccionar)
+
+                var url = $(this).attr('href'); // Obtiene la URL del enlace
+                loadContent(url); // Llama a la función para cargar el contenido
+            });
+
+            // Función para cargar el contenido desde la URL y mostrar en 'content-main'
+            function loadContent(url) {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function(response) {
+                        $('.content-main').html(response); // Inserta el contenido en el div con clase 'content-main'
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar el contenido:', error);
+                    }
+                });
+            }
+        });
+    </script>
+    <?= $this->renderSection('pageScripts'); ?>
 </body>
 
 </html>

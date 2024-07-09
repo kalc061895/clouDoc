@@ -31,3 +31,15 @@ $routes->get('/nuevoexpediente','ExpedienteController::nuevoexpediente');
 $routes->get('/buscarexpediente','ExpedienteController::buscarexpediente');
 $routes->post('/buscarexpediente','ExpedienteController::infoexpediente');
 $routes->get('/tupaexpediente','ExpedienteController::tupaexpediente');
+
+
+/**
+ * Configuracion de la Tabla menu
+ * 
+ */
+$routes->get('configuracion/menus', 'ConfigController::menus');
+$routes->get('menus', 'MenuController::index');
+$routes->get('menus/(:num)', 'MenuController::show/$1');
+$routes->post('menus', 'MenuController::create');
+$routes->put('menus/(:num)', 'MenuController::update/$1');
+$routes->delete('menus/(:num)', 'MenuController::delete/$1');

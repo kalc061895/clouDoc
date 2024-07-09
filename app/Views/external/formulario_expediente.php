@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/external'); ?>
 
 <?= $this->section('title'); ?>
-<?= lang('Exrternal.nuevotramite') ?>
+<?= lang('External.nuevoTramite') ?>
 <?= $this->endSection(); ?>
 
 <?= $this->section('pageStyles'); ?>

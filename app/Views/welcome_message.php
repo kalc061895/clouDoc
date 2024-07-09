@@ -43,7 +43,7 @@ $menuActive = 2;
         </li>
     <?php else : ?>
         <li class="sidebar-item">
-            <a class="sidebar-link <?= ($item['id']==$menuActive)?' active ':''?>" href="<?= $item['url'] ?>"  aria-expanded="false">
+            <a class="sidebar-link open-here <?= ($item['id']==$menuActive)?' active ':''?>" href="<?= $item['url'] ?>"  aria-expanded="false">
                 <iconify-icon icon="solar:<?= $item['icon'] ?>"></iconify-icon>
                 <span class="hide-menu"><?= $item['name'] ?></span>
             </a>

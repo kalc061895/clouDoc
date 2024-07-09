@@ -11,7 +11,7 @@ class MenuModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
+        protected $protectFields    = true;
     protected $allowedFields = [
         'type', 'parent_id', 'name', 'abbr', 'url', 'icon', 'status', 'separator'
     ];
