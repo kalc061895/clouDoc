@@ -34,14 +34,37 @@ class MenuController extends Controller
 
     public function create()
     {
-        $data = $this->request->getJSON();
+        // Obtener el cuerpo de la solicitud
+        $json = $this->request->getBody();
+
+        // Intentar decodificar el JSON
+        $data = json_decode($json, true);
+
+        // Verificar si hubo un error al decodificar el JSON
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->failValidationError('Error en el formato JSON: ' . json_last_error_msg());
+        }
+
+        // Verificar si los datos decodificados están vacíos
         if (empty($data)) {
             return $this->failValidationError('No se proporcionaron datos válidos.');
         }
-        $menuId = $this->menuModel->insert($data); // Insertar nuevo menú
+
+        // Insertar nuevo menú en la base de datos
+        $menuId = $this->menuModel->insert($data);
+
+        // Verificar si la inserción fue exitosa
+        if (!$menuId) {
+            return $this->failServerError('Error al insertar el menú.');
+        }
+
+        // Obtener el menú recién insertado
         $menu = $this->menuModel->find($menuId);
-        return $this->respondCreated($menu); // Responder con el menú creado en formato JSON
+
+        // Responder con el menú creado en formato JSON
+        return $this->respondCreated($menu);
     }
+
 
     public function update($id)
     {

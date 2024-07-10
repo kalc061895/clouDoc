@@ -30,6 +30,7 @@ return [
 
     // search page
     'titleSearch'=>'Buscar Expediente',
+    'titleLargeSearch'=>'Búsqueda de Expedientes  - Trámite Virtual',
     'codeSearch'=>'Numero de Expediente',
     'helpCodeSearch'=>'Ejm. 00047852',
     'yearSearch'=>'Año',
@@ -41,6 +42,7 @@ return [
 
     // New Exp Page
     'titleNew'=> 'Registrar Nuevo Expediente',
+    'titleLargeNew'=> 'Trámite Documentario Virtual',
     'dataTitleNew'=> 'Datos del Solicitante',
     'expedienteTitleNew'=> 'Datos del Documento',
     'descriptionNew'=> 'Completar el formulario. *(campos obligatorios) ',
