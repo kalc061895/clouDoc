@@ -113,7 +113,7 @@
                                 </h4>
                             </div>
                             <div class="card-body">
-                                <form id="externalForm" class="floating-labels mt-4 pt-2" action="<?= site_url('nuevoexpediente') ?>" method="post" enctype="multipart/form-data">
+                                <form id="expedienteForm" class="floating-labels mt-4 pt-2" action="<?= site_url('nuevoexpediente') ?>" method="post" enctype="multipart/form-data">
 
                                     <div class="row">
                                         <div class="col-md-4">
@@ -158,18 +158,19 @@
                                                 </small>
                                             </div>
                                         </div>
-                                        <div class="col-12 justify-content-center">
-                                            <div class="form-group mb-4">
-                                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                                    <i class="ti ti-send fs-4"></i>
-                                                    <?= lang('External.sendButton') ?>
-                                                </button>
-                                            </div>
 
-                                        </div>
                                     </div>
 
                                 </form>
+                                <div class="col-12 justify-content-center">
+                                    <div class="form-group mb-4">
+                                        <button type="button" class="btn btn-primary btn-lg w-100" id="submitAll">
+                                            <i class="ti ti-send fs-4"></i>
+                                            <?= lang('External.sendButton') ?>
+                                        </button>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,64 +192,19 @@
 
 <script>
     $(document).ready(function() {
+        $('#submitAll').click(function(event) {
 
-
-
-        $('#externalForm').submit(function(event) {
             event.preventDefault(); // Prevenir el envío normal del formulario
 
-            let isValid = true;
-            let errorMessage = '';
-
-            // Validación del primer formulario
-            const tipoNew = $('#tipoNew').val();
-            const tipoDocNew = $('#tipoDocNew').val();
-            const numDocNew = $('#numDocNew').val();
-            const nombreNew = $('#nombreNew').val();
-            const telefonoNew = $('#telefonoNew').val();
-            const correoNew = $('#correoNew').val();
-            const direccionNew = $('#direccionNew').val();
-
-            if (!tipoNew || !tipoDocNew || !numDocNew || !nombreNew || !telefonoNew || !correoNew || !direccionNew) {
-                isValid = false;
-                errorMessage += 'Por favor, complete todos los campos del primer formulario.\n';
-            }
-
-            // Validación del segundo formulario
-            const tipoDocExp = $('#tipoDocExp').val();
-            const numDocExp = $('#numDocExp').val();
-            const folioDocExp = $('#folioDocExp').val();
-            const asuntoDocExp = $('#asuntoDocExp').val();
-            const anexoExp = $('#anexoExp').val();
-
-            if (!tipoDocExp || !numDocExp || !folioDocExp || !asuntoDocExp || !anexoExp) {
-                isValid = false;
-                errorMessage += 'Por favor, complete todos los campos del segundo formulario.\n';
-            }
-
-            if (!isValid) {
-                alert(errorMessage);
-                return;
-            }
-
-            // Enviar el formulario mediante AJAX
-            var formData = new FormData(this);
-            formData.append('tipoNew', tipoNew);
-            formData.append('tipoDocNew', tipoDocNew);
-            formData.append('numDocNew', numDocNew);
-            formData.append('nombreNew', nombreNew);
-            formData.append('telefonoNew', telefonoNew);
-            formData.append('correoNew', correoNew);
-            formData.append('direccionNew', direccionNew);
-            formData.append('tipoDocExp', tipoDocExp);
-            formData.append('numDocExp', numDocExp);
-            formData.append('folioDocExp', folioDocExp);
-            formData.append('asuntoDocExp', asuntoDocExp);
-            formData.append('anexoExp', $('#anexoExp')[0].files[0]);
+            var formData1 = $('#entidadForm').serialize();
+            var formData2 = new FormData($('#expedienteForm')[0]);
+            $.each($('#externalForm').serializeArray(), function(_, kv) {
+                formData2.append(kv.name, kv.value);
+            });
             $.ajax({
-                url: $(this).attr('action'),
+                url: "<?= base_url('/nuevoexpediente') ?>",
                 type: 'POST',
-                data: formData,
+                data: formData2,
                 contentType: false,
                 processData: false,
                 success: function(response) {

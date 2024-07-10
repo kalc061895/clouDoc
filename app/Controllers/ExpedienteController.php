@@ -91,8 +91,6 @@ class ExpedienteController extends BaseController
             'correo_electronico' => $this->request->getPost('correoNew'),
             'direccion' => $this->request->getPost('direccionNew'),
         ];
-        print_r($entidadData);
-        return 0;
         $this->entidadModel->save($entidadData);
         $entidadId = $this->entidadModel->insertID();
         
