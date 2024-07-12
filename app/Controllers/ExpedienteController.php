@@ -8,6 +8,8 @@ use App\Libraries\ExpedienteForm;
 use App\Models\EntidadModel;
 use CodeIgniter\Files\File;
 use App\Models\ExpedientesModel;
+use App\Models\TipoExpedienteModel;
+
 class ExpedienteController extends BaseController
 {
     protected $expedienteModel;
@@ -29,6 +31,10 @@ class ExpedienteController extends BaseController
     }
     public function nuevoExpediente()
     {
+        $tipo_expediente = new TipoExpedienteModel();
+
+
+
         //$data['expedientes'] = $this->expedienteModel->findAll();
         $expedienteForm = new ExpedienteForm();
         $set = array(
@@ -37,12 +43,7 @@ class ExpedienteController extends BaseController
                 ['id' => 2, 'nombre' => 'RUC'],
                 ['id' => 3, 'nombre' => 'Carnet de Extranjería']
             ],
-            'tipoExpediente' => [
-                ['id' => 1, 'nombre' => 'SOLICITUD'],
-                ['id' => 2, 'nombre' => 'INFORME'],
-                ['id' => 3, 'nombre' => 'OFICIO'],
-                ['id' => 4, 'nombre' => 'OTRO'],
-            ],
+            'tipoExpediente' => $tipo_expediente->findAll(),
             'content' => $expedienteForm->render()
         );
         return view('external/formulario_expediente', $set);
@@ -91,9 +92,9 @@ class ExpedienteController extends BaseController
             'correo_electronico' => $this->request->getPost('correoNew'),
             'direccion' => $this->request->getPost('direccionNew'),
         ];
-        $this->entidadModel->save($entidadData);
+        $id = $this->entidadModel->insert($entidadData);
         $entidadId = $this->entidadModel->insertID();
-        
+
         // Manejo del archivo
         $anexoExp = $this->request->getFile('anexoExp');
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
@@ -108,16 +109,31 @@ class ExpedienteController extends BaseController
         }
 
         $expedienteData = [
-            'tipo_documento' => $this->request->getPost('tipoDocExp'),
+            'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
             'numero_documento' => $this->request->getPost('numDocExp'),
-            'folio' => $this->request->getPost('folioDocExp'),
+            'numero_expediente' => 'temp',
+            'folios' => $this->request->getPost('folioDocExp'),
             'asunto' => $this->request->getPost('asuntoDocExp'),
             'anexo' => $newName,
             'entidad_id' => $entidadId,
         ];
 
         $this->expedienteModel->save($expedienteData);
-        print_r( $this->expedienteModel->find($this->expedienteModel->insertID()));
+        $expedienteArray = $this->expedienteModel->find($this->expedienteModel->insertID());
+        $entidadArray = $this->entidadModel->find($expedienteArray['entidad_id']);
+        
         //return json_encode($this->expedienteModel->toArray(), JSON_UNESCAPED_UNICODE);
+        $set = array(
+            'status' => 'success',
+            'html' => view(
+                'external/resumen_expediente',
+                [
+                    'entidad' => $entidadArray,
+                    'expediente' => $expedienteArray,
+                    'documento' => '',
+                ]
+            ),
+        );
+        return json_encode($set);
     }
 }

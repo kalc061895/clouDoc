@@ -64,5 +64,14 @@ return [
     'anexoExp'=> 'Adjuntar Expediente',
     'anexoHelpExp'=> 'El tamaño máximo acceptado es 20 MB, un solo archivo en formato .Pdf ',
     'sendButton'=> 'Enviar Documento',
+    
+    // Envio corrrecto
+    'titleSuccess'=> 'Información de su Expediente',
+    'emisorSuccess'=> 'Remitente',
+    'numeroSuccess'=> 'Numero de Expediente',
+    'tipoSuccess'=> 'Tipo externo',
+    'fechaSuccess'=> 'Fecha de Recepcion',
+    'infoSuccess'=> 'Información adicional',
+
 
 ];
