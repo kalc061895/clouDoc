@@ -72,6 +72,7 @@ return [
     'tipoSuccess'=> 'Tipo externo',
     'fechaSuccess'=> 'Fecha de Recepcion',
     'infoSuccess'=> 'Información adicional',
-
+    'docuSuccess'=> 'Tipo de Documento',
+    'adjuntoSuccess'=> 'Ver Adjunto',
 
 ];

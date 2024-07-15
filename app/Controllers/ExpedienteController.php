@@ -9,6 +9,8 @@ use App\Models\EntidadModel;
 use CodeIgniter\Files\File;
 use App\Models\ExpedientesModel;
 use App\Models\TipoExpedienteModel;
+use App\Models\AdjuntoModel;
+
 
 class ExpedienteController extends BaseController
 {
@@ -77,6 +79,7 @@ class ExpedienteController extends BaseController
 
     public function create()
     {
+
         return view('external/create');
     }
 
@@ -95,11 +98,45 @@ class ExpedienteController extends BaseController
         $id = $this->entidadModel->insert($entidadData);
         $entidadId = $this->entidadModel->insertID();
 
+
+
+        $expedienteData = [
+            'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
+            'numero_documento' => $this->request->getPost('numDocExp'),
+            'numero_expediente' => 'temp',
+            'folios' => $this->request->getPost('folioDocExp'),
+            'asunto' => $this->request->getPost('asuntoDocExp'),
+            'anexo' => '',
+            'entidad_id' => $entidadId,
+        ];
+
+        $this->expedienteModel->save($expedienteData);
+        $expedienteArray = $this->expedienteModel->find($this->expedienteModel->insertID());
+        $entidadArray = $this->entidadModel->find($expedienteArray['entidad_id']);
+
         // Manejo del archivo
+        $_adjunto = new AdjuntoModel();
         $anexoExp = $this->request->getFile('anexoExp');
+
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             $newName = $anexoExp->getRandomName();
             $anexoExp->move(WRITEPATH . 'uploads', $newName);
+            
+            $localPath = WRITEPATH . 'uploads/' . $newName;
+            // Obtener el número de orden para el nuevo adjunto
+            $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
+            ->countAllResults() + 1;
+            
+            $drivePath = 'algundirreccion de google';
+            // Guardar la información en la base de datos
+            $data = [
+                'expediente_id' => $expedienteArray['id'],
+                'local_path' => $localPath,
+                'drive_path' => $drivePath,
+                'orden' => $orden,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $_adjunto->insert($data);
         } else {
             $response = [
                 'status' => 'error',
@@ -108,21 +145,10 @@ class ExpedienteController extends BaseController
             return $this->response->setJSON($response);
         }
 
-        $expedienteData = [
-            'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
-            'numero_documento' => $this->request->getPost('numDocExp'),
-            'numero_expediente' => 'temp',
-            'folios' => $this->request->getPost('folioDocExp'),
-            'asunto' => $this->request->getPost('asuntoDocExp'),
-            'anexo' => $newName,
-            'entidad_id' => $entidadId,
-        ];
-
-        $this->expedienteModel->save($expedienteData);
-        $expedienteArray = $this->expedienteModel->find($this->expedienteModel->insertID());
-        $entidadArray = $this->entidadModel->find($expedienteArray['entidad_id']);
-        
         //return json_encode($this->expedienteModel->toArray(), JSON_UNESCAPED_UNICODE);
+        $adjunto = $_adjunto->find($_adjunto->insertID());
+        $_namew = $this->do_upload('anexoExp');
+        //$adjunto = $_documento->find($expedienteArray['tipo_expediente_id']);
         $set = array(
             'status' => 'success',
             'html' => view(
@@ -130,10 +156,13 @@ class ExpedienteController extends BaseController
                 [
                     'entidad' => $entidadArray,
                     'expediente' => $expedienteArray,
-                    'documento' => '',
+                    'documento' => $_namew,
+                    'adjunto' => $adjunto,
                 ]
             ),
         );
         return json_encode($set);
     }
+
+
 }
