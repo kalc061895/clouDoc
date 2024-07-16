@@ -53,7 +53,7 @@ class CreateMovimientosTable extends Migration
             ],
             'created_at' => [
                 'type' => 'DATETIME',
-                'null' => true,
+                'default' => 'CURRENT_TIMESTAMP',
             ],
             'updated_at' => [
                 'type' => 'DATETIME',

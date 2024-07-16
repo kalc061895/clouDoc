@@ -131,7 +131,7 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group mb-4">
-                                                    <input type="text" class="form-control" id="numDocExp" required name="numDocExp">
+                                                    <input type="text" class="form-control" id="numDocExp" name="numDocExp">
                                                     <span class="bar"></span>
                                                     <label for="numDocExp"><?= lang('External.numDocExp') ?>*</label>
                                                 </div>

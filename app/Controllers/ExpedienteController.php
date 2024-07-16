@@ -175,45 +175,6 @@ class ExpedienteController extends BaseController
         $dompdf->render();
         $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
     }
-    public function generateReceiptPDF2($expedienteId)
-    {
-        // Configurar opciones de Dompdf
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-
-        // Inicializar Dompdf con opciones
-        $dompdf = new Dompdf($options);
-
-        // Obtener la información del expediente desde la base de datos
-        $expediente = $this->expedienteModel->find($expedienteId);
-
-        // Verificar si se obtuvo el expediente
-        if (!$expediente) {
-            throw new \Exception('Expediente no encontrado');
-        }
-
-        // Contenido del PDF
-        $html = view('pdf/pdf_template', ['expediente' => $expediente]);
-        $html = 'hola';
-        // Verificar si la vista fue renderizada correctamente
-        if (!$html) {
-            throw new \Exception('Error al renderizar la vista');
-        }
-
-        // Cargar HTML en Dompdf
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A5', 'portrait');
-
-        // Renderizar PDF
-        $dompdf->render();
-
-        // Descargar el PDF
-        header("Content-type: application/pdf");
-        header("Content-Disposition: inline; filename=factura.pdf");
-        //echo $dompdf->output();
-        $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
-    }
 
     public function sendReceiptEmail($expedienteId)
     {
