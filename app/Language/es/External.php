@@ -75,4 +75,10 @@ return [
     'docuSuccess'=> 'Tipo de Documento',
     'adjuntoSuccess'=> 'Ver Adjunto',
 
+    //tupaExpediente
+    'titleTupa'=> 'TUPA - Red de Salud San Román',
+    'faqTitleTupa'=> 'Preguntas y Solicitudes Frecuentes',
+    'descriptionTupa'=> 'Descubre trámites o consultas comunes',
+
+
 ];

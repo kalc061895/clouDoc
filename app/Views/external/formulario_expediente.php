@@ -14,9 +14,9 @@
 <?= $this->section('content'); ?>
 <!-- CODE HERE -->
 
-<div class="row justify-content-center">
+<div class="row justify-content-center m-0">
 
-    <div class="col-12">
+    <div class="col-12 w-100">
         <div class="card mb-0">
             <div class="text-bg-primary p-4 rounded-3 rounded-bottom-0">
                 <div class="text-center text-white display-6">
@@ -150,7 +150,7 @@
                                                     <label for="asuntoDocExp"><?= lang('External.asuntoDocExp') ?>*</label>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="form-group mb-4">
                                                     <input type="file" class="form-control form-control-file" id="anexoExp" required name="anexoExp" accept=".pdf">
                                                     <span class="bar"></span>
@@ -160,7 +160,6 @@
                                                     </small>
                                                 </div>
                                             </div>
-
                                             <div class="col-12 justify-content-center">
                                                 <div class="form-group mb-4">
                                                     <button type="submit" class="btn btn-primary btn-lg w-100">
@@ -207,7 +206,7 @@
                 );
                 return;
             }
-            var formData = new FormData( $('#expedienteForm')[0]); // Crea un objeto FormData con el formulario
+            var formData = new FormData($('#expedienteForm')[0]); // Crea un objeto FormData con el formulario
             // formData.append('tipoNew', 'tipoNew');
             // formData.append('tipoDocNew', 'tipoDocNew');
             // formData.append('numDocNew', 'tipoDocNew');
@@ -216,9 +215,9 @@
             // formData.append('correoNew', 'value2');
             // formData.append('direccionNew', 'value2');
             Swal.fire(
-                        "Enviando",
-                        "<div class='d-flex justify-content-center'><div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div></div>",
-                    );
+                "Enviando",
+                "<div class='d-flex justify-content-center'><div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div></div>",
+            );
             $.ajax({
                 url: "<?= base_url('nuevoexpediente') ?>", // Cambia esto por la URL a la que quieres enviar el formulario
                 type: 'POST',
@@ -232,13 +231,13 @@
                         "Se registro correctamente su Expediente.",
                         "success"
                     );
-                    $('#formContent').attr('hidden','');
+                    $('#formContent').attr('hidden', '');
                     $('#formResponse').html(response.html);
                     $('#formResponse').removeAttr('hidden');
                     console.log(response.html); // Muestra la respuesta en la consola
                 },
                 error: function(xhr, status, error) {
-                    
+
                     Swal.fire(
                         "Alerta",
                         "Hubo un Error, Vuelva a intentarlo nuevamente.",
@@ -264,7 +263,13 @@
         }
     });
 </script>
+<script>
+    function print_constancia(params) {
+
+    }
+</script>
 <script src="../assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
 <script src="../assets/js/extra-libs/jqbootstrapvalidation/validation.js"></script>
 <script src="../assets/js/forms/custom-validation-init.js"></script>
+
 <?= $this->endSection(); ?>

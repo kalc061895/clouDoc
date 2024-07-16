@@ -10,9 +10,9 @@
                     <div class="card-body">
                         <img src="../assets/images/profile/user-3.jpg" class="rounded img-fluid" width="90">
                         <div class="mt-n2">
-                            <span class="badge text-bg-primary"><?= lang('External.emisorSuccess')?></span>
-                            <h3 class="card-title mt-3"><?= $entidad['nombre']?></h3>
-                            <p class="card-subtitle"><?= $entidad['correo_electronico']?></p>
+                            <span class="badge text-bg-primary"><?= lang('External.emisorSuccess') ?></span>
+                            <h3 class="card-title mt-3"><?= $entidad['nombre'] ?></h3>
+                            <p class="card-subtitle"><?= $entidad['correo_electronico'] ?></p>
                         </div>
                         <div class="row mt-3 justify-content-center">
                             <div class="col-md-6">
@@ -22,7 +22,7 @@
                                     </span>
                                     <div class="ms-2 text-start">
 
-                                        <h4 class="mb-0 fs-5">Exp: <?= $expediente['numero_expediente']?></h4>
+                                        <h4 class="mb-0 fs-5">Exp: <?= $expediente['numero_expediente'] ?></h4>
                                     </div>
                                 </div>
                             </div>
@@ -33,7 +33,7 @@
                                     </span>
                                     <div class="ms-2 text-start">
 
-                                        <h4 class="mb-0 fs-5"><?= substr($expediente['fecha_recepcion'],0,10)?></h4>
+                                        <h4 class="mb-0 fs-5"><?= substr($expediente['fecha_recepcion'], 0, 10) ?></h4>
                                     </div>
                                 </div>
                             </div>
@@ -42,7 +42,7 @@
                 </div>
 
                 <p class="card-text">
-                    <?= lang('External.infoSuccess')?>
+                    <?= lang('External.infoSuccess') ?>
                 </p>
 
                 <div class="vstack gap-3">
@@ -57,7 +57,22 @@
                             </p>
                         </div>
                     </div>
-                    
+
+                    <div class="hstack gap-6 border-bottom pb-3">
+                        <div class=" text-primary round-48 rounded-1 hstack justify-content-center">
+                            <i class="ti ti-files fs-7"></i>
+                        </div>
+                        <div>
+                            <h4 class="fs-4 mb-0"><?= $documento['nombre'] . " " . $expediente['numero_documento'] ?> :  <a href="<?= $adjunto['local_path'] ?>" target="_blank" class="
+                                "> <i class="ti ti-file-text fs-4"></i>  Exp_<?= $expediente['numero_expediente'] ?>.pdf
+                                </a>
+                            </h4>
+                            <p class="mb-0">
+                                <?= lang('External.docuSuccess') ?>
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="hstack gap-6 border-bottom pb-3">
                         <div class="text-primary round-48 rounded-1 hstack justify-content-center">
                             <i class="ti ti-tag fs-7"></i>
@@ -70,33 +85,16 @@
                         </div>
                     </div>
 
-                    <div class="hstack gap-6 border-bottom pb-3">
-                        <div class="bg-primary-subtle text-primary round-48 rounded-1 hstack justify-content-center">
-                            <i class="ti ti-brand-dribbble fs-7"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0">
-                                <?= lang('External.docuSuccess') ?>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="hstack gap-6 border-bottom pb-3">
-                        <div class="bg-primary-subtle text-primary round-48 rounded-1 hstack justify-content-center">
-                            <i class="ti ti-brand-dribbble fs-7"></i>
-                        </div>
-                        <div>
-                            <h4 class="fs-4 mb-0"><?= $adjunto['local_path']." ".$adjunto['drive_path'] ?></h4>
-                            <p class="mb-0">
-                                <?= lang('External.docuSuccess') ?>
-                            </p>
-                        </div>
-                    </div>
+                    
+                </div>
+                <div class="btn-group me-2 mb-2 w-100 " role="group" aria-label="First group">
+                    <a href="<?= base_url('/cargoexpediente/'.$expediente['id'])?>" target="_blank" class="btn bg-primary-subtle btn-lg" >
+                        <i class="ti ti-printer"></i> Imprimir
+                    </a>
+                    <a href="<?= base_url('/nuevoexpediente')?>" class="btn bg-secondary-subtle btn-lg" >
+                        <i class="ti ti-arrow-right"></i> Nuevo </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<?= print_r($expediente) ?>
-<?= print_r($entidad) ?>
-<?= print_r($adjunto) ?>

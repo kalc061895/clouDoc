@@ -14,11 +14,23 @@ class CreateInsertExpedeinteTrigger extends Migration
             BEFORE INSERT ON expedientes
             FOR EACH ROW
             BEGIN
-                DECLARE last_number INT;
+                DECLARE last_number INT DEFAULT 0;
                 DECLARE new_number VARCHAR(10);
+                DECLARE current_year INT;
 
-                -- Obtener el último número de expediente
-                SELECT MAX(CAST(numero_expediente AS UNSIGNED)) INTO last_number FROM expedientes;
+                -- Obtener el año actual
+                SET current_year = YEAR(CURDATE());
+
+                -- Obtener el último número de expediente del año actual
+                SELECT MAX(CAST(numero_expediente AS UNSIGNED)) 
+                INTO last_number 
+                FROM expedientes 
+                WHERE YEAR(fecha_recepcion) = current_year;
+
+                -- Si no se encuentra un número, asignar 0 (para luego incrementar a 1)
+                IF last_number IS NULL THEN
+                    SET last_number = 0;
+                END IF;
 
                 -- Incrementar el número
                 SET new_number = LPAD(last_number + 1, 6, '0');

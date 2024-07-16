@@ -14,7 +14,7 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-12 mb-0">
-            <div class="card">
+            <div class="card m-0">
                 <div class="text-bg-primary p-4 rounded-3 rounded-bottom-0">
                     <div class="text-center text-white display-6">
                         <?= lang('External.titleLargeSearch') ?>

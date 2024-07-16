@@ -10,7 +10,8 @@ use CodeIgniter\Files\File;
 use App\Models\ExpedientesModel;
 use App\Models\TipoExpedienteModel;
 use App\Models\AdjuntoModel;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class ExpedienteController extends BaseController
 {
@@ -121,12 +122,12 @@ class ExpedienteController extends BaseController
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             $newName = $anexoExp->getRandomName();
             $anexoExp->move(WRITEPATH . 'uploads', $newName);
-            
+
             $localPath = WRITEPATH . 'uploads/' . $newName;
             // Obtener el número de orden para el nuevo adjunto
             $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
-            ->countAllResults() + 1;
-            
+                ->countAllResults() + 1;
+
             $drivePath = 'algundirreccion de google';
             // Guardar la información en la base de datos
             $data = [
@@ -145,10 +146,10 @@ class ExpedienteController extends BaseController
             return $this->response->setJSON($response);
         }
 
-        //return json_encode($this->expedienteModel->toArray(), JSON_UNESCAPED_UNICODE);
         $adjunto = $_adjunto->find($_adjunto->insertID());
-        $_namew = $this->do_upload('anexoExp');
-        //$adjunto = $_documento->find($expedienteArray['tipo_expediente_id']);
+
+        $_documento = new TipoExpedienteModel();
+        $documento = $_documento->find($expedienteArray['tipo_expediente_id']);
         $set = array(
             'status' => 'success',
             'html' => view(
@@ -156,13 +157,87 @@ class ExpedienteController extends BaseController
                 [
                     'entidad' => $entidadArray,
                     'expediente' => $expedienteArray,
-                    'documento' => $_namew,
+                    'documento' => $documento,
                     'adjunto' => $adjunto,
                 ]
             ),
+            //'pdf' => $this->generateReceiptPDF($expedienteArray['id'])
         );
         return json_encode($set);
     }
 
+    public function generateReceiptPDF($expedienteId)
+    {
+        $dompdf = new Dompdf();
+        $expediente = $this->expedienteModel->find($expedienteId);
+        $dompdf->loadHtml(view('pdf/pdf_template',['expediente'=> $expediente]));
+        $dompdf->setPaper('A5', 'portrait');
+        $dompdf->render();
+        $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
+    }
+    public function generateReceiptPDF2($expedienteId)
+    {
+        // Configurar opciones de Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
 
+        // Inicializar Dompdf con opciones
+        $dompdf = new Dompdf($options);
+
+        // Obtener la información del expediente desde la base de datos
+        $expediente = $this->expedienteModel->find($expedienteId);
+
+        // Verificar si se obtuvo el expediente
+        if (!$expediente) {
+            throw new \Exception('Expediente no encontrado');
+        }
+
+        // Contenido del PDF
+        $html = view('pdf/pdf_template', ['expediente' => $expediente]);
+        $html = 'hola';
+        // Verificar si la vista fue renderizada correctamente
+        if (!$html) {
+            throw new \Exception('Error al renderizar la vista');
+        }
+
+        // Cargar HTML en Dompdf
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A5', 'portrait');
+
+        // Renderizar PDF
+        $dompdf->render();
+
+        // Descargar el PDF
+        header("Content-type: application/pdf");
+        header("Content-Disposition: inline; filename=factura.pdf");
+        //echo $dompdf->output();
+        $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
+    }
+
+    public function sendReceiptEmail($expedienteId)
+    {
+        // Obtener la información del expediente desde la base de datos
+        $expediente = $this->expedienteModel->find($expedienteId);
+
+        // Generar el PDF
+        $this->generateReceiptPDF($expedienteId);
+
+        // Configuración del email
+        $email = \Config\Services::email();
+        $email->setFrom('tuemail@ejemplo.com', 'Tu Nombre');
+        $email->setTo($expediente['correo']);
+        $email->setSubject('Constancia de Presentación');
+        $email->setMessage('Adjunto encontrarás la constancia de presentación de tu documento.');
+
+        // Adjuntar el PDF
+        $email->attach('receipts/' . $expedienteId . '.pdf');
+
+        // Enviar el email
+        if ($email->send()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

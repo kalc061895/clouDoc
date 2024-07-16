@@ -81,6 +81,7 @@ class Filters extends BaseFilters
                     'auth/a/*',
                     'logut',
                     'nuevoexpediente',// Formulario de Registro de Expediente
+                    'cargoexpediente/*',// TUPA - Listado de procedimientos y requisitos
                     'buscarexpediente',// Formulario de Seguimiento
                     'tupaexpediente',// TUPA - Listado de procedimientos y requisitos
                                     // de los diferentes tramites
