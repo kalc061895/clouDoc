@@ -9,6 +9,7 @@ use App\Models\EntidadModel;
 use CodeIgniter\Files\File;
 use App\Models\ExpedientesModel;
 use App\Models\TipoExpedienteModel;
+use App\Models\TipoDocumentoModel;
 use App\Models\AdjuntoModel;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -35,28 +36,20 @@ class ExpedienteController extends BaseController
     public function nuevoExpediente()
     {
         $tipo_expediente = new TipoExpedienteModel();
-
-
-
-        //$data['expedientes'] = $this->expedienteModel->findAll();
+        $tipo_documento = new TipoDocumentoModel();
         $expedienteForm = new ExpedienteForm();
+
         $set = array(
-            'tipoDocumento' => [
-                ['id' => 1, 'nombre' => 'DNI'],
-                ['id' => 2, 'nombre' => 'RUC'],
-                ['id' => 3, 'nombre' => 'Carnet de Extranjería']
-            ],
+            'tipoDocumento' => $tipo_documento->findAll(),
             'tipoExpediente' => $tipo_expediente->findAll(),
             'content' => $expedienteForm->render()
         );
+
         return view('external/formulario_expediente', $set);
     }
 
     public function buscarExpediente()
-    {
-        //$data['expedientes'] = $this->expedienteModel->findAll();
-
-
+    {   
         return view('external/busqueda_expediente');
     }
 
@@ -65,11 +58,27 @@ class ExpedienteController extends BaseController
     // resultado de la busqueda de un Expediente
     public function infoExpediente()
     {
-        $set = array(
-            'expediente' => $this->request->getPost(),
-        );
-        //$data['expedientes'] = $this->expedienteModel->findAll();
-        return view('external/info_expediente', $set);
+        //inputcode
+        //inputanio
+        $expedienteArray = $this->expedienteModel->find($this->request->getPost('id'));
+
+        $entidadArray = $this->entidadModel->find($expedienteArray['entidad_id']);
+
+        // Manejo del archivo
+        $_adjunto = new AdjuntoModel();
+
+        $adjunto = $_adjunto->where($expedienteArray['entidad_id']);
+        
+        $_documento = new TipoExpedienteModel();
+        $documento = $_documento->find($expedienteArray['tipo_expediente_id']);
+        $data = [
+            'entidad' => $entidadArray,
+            'expediente' => $expedienteArray,
+            'documento' => $documento,
+            'adjunto' => $adjunto,
+        ];
+
+        return view('external/info_expediente', $data);
     }
 
     public function tupaExpediente()
