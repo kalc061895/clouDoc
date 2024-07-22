@@ -1,40 +1,33 @@
 <?php
 
-namespace App\Database\Migrations;
+namespace App\Database\Seeds;
 
-use CodeIgniter\Database\Migration;
+use CodeIgniter\Database\Seeder;
 
-class CreateMenuGroupUserTable extends Migration
+class GroupUserSeeder extends Seeder
 {
-    public function up()
+    public function run()
     {
-        $this->forge->addField([
-            'id' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'unsigned' => true,
-                'auto_increment' => true,
+        // Datos de los grupos de usuarios
+        $data = [
+            [
+                'name' => 'SuperAdmin',
             ],
-            'menu_id' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'unsigned' => true,
+            [
+                'name' => 'Admin',
             ],
-            'group_user_id' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'unsigned' => true,
+            [
+                'name' => 'MesaDePartes',
             ],
-        ]);
+            [
+                'name' => 'Oficina',
+            ],
+            [
+                'name' => 'Area',
+            ],
+        ];
 
-        $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('menu_id', 'menus', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('group_user_id', 'group_user', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('menu_group_user', true);
-    }
-
-    public function down()
-    {
-        $this->forge->dropTable('menu_group_user', true);
+        // Insertar los datos en la base de datos
+        $this->db->table('group_user')->insertBatch($data);
     }
 }

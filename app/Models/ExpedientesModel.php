@@ -13,10 +13,10 @@ class ExpedientesModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'numero_expediente','procedencia','fecha_recepcion',
-        'folios','tipo_expediente_id','tipo_documento','numero_documento',
-        'entidad_id','asunto','descripcion','atencion_oficina_id',
-        'observacion','activo'
+        'numero_expediente', 'procedencia', 'fecha_recepcion',
+        'folios', 'tipo_expediente_id', 'tipo_documento', 'numero_documento',
+        'entidad_id', 'asunto', 'descripcion', 'atencion_oficina_id',
+        'observacion', 'activo'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -26,7 +26,7 @@ class ExpedientesModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -48,4 +48,69 @@ class ExpedientesModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getNuevosExpedientesExternos()
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.*');
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->orderBy('expedientes.numero_expediente DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+    public function detalleExpediente($id) {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+
+        $builder->select(
+            'numero_expediente,expedientes.fecha_recepcion as recibido,folios,asunto,
+            entidad.nombre as remitente,num_documento,telefono,correo_electronico,
+            local_path,drive_path,
+            tipo_expediente.nombre as tipoexpediente'
+        );
+        $builder->where('expedientes.id',
+            $id
+        );
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+        $builder->join(
+            'adjuntos',
+            'expedientes.id = adjuntos.expediente_id',
+            'inner'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'tipo_expediente.id = expedientes.tipo_expediente_id',
+            'inner'
+        );
+
+        $builder->orderBy('expedientes.numero_expediente DESC');
+        $builder->groupBy('numero_expediente');
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
 }

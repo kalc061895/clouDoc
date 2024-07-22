@@ -207,13 +207,7 @@
                 return;
             }
             var formData = new FormData($('#expedienteForm')[0]); // Crea un objeto FormData con el formulario
-            // formData.append('tipoNew', 'tipoNew');
-            // formData.append('tipoDocNew', 'tipoDocNew');
-            // formData.append('numDocNew', 'tipoDocNew');
-            // formData.append('nombreNew', 'value2');
-            // formData.append('telefonoNew', 'value2');
-            // formData.append('correoNew', 'value2');
-            // formData.append('direccionNew', 'value2');
+            
             Swal.fire(
                 "Enviando",
                 "<div class='d-flex justify-content-center'><div class='spinner-border' role='status'><span class='visually-hidden'>Loading...</span></div></div>",

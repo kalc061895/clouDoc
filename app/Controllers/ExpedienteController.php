@@ -130,9 +130,9 @@ class ExpedienteController extends BaseController
 
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             $newName = $anexoExp->getRandomName();
-            $anexoExp->move(WRITEPATH . 'uploads', $newName);
+            $anexoExp->move('uploads', $newName);
 
-            $localPath = WRITEPATH . 'uploads/' . $newName;
+            $localPath = 'uploads/' . $newName;
             // Obtener el número de orden para el nuevo adjunto
             $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
                 ->countAllResults() + 1;
@@ -174,6 +174,7 @@ class ExpedienteController extends BaseController
         );
         return json_encode($set);
     }
+    
 
     public function generateReceiptPDF($expedienteId)
     {

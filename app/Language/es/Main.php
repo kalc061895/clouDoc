@@ -26,7 +26,7 @@ return [
     
     
     //Errors
-    'errorTitle404'=> 'Opps!!',
+    'errorTitle404'=> 'Error!!',
     'errorBody404'=> 'No se pudo encontrar la página que estas buscando.',
     'errorAction404'=> 'Volver al inicio',
     'maintenanceTitle'=> 'Página en Mantenimiento',
@@ -38,6 +38,24 @@ return [
     // Language
     'languageEN'=> 'Inglés',
     'languageES'=> 'Español',
+
+
+
+    // Mesa de partes
+    'expedienteRecibidoTitle' => 'Nuevos Expedientes Recibidos',
+
+    'expediente' => 'Nro. Exp.',
+    'remitente' => 'Remitente',
+    'asunto' => 'Asunto',
+    'TipoExpediente' => 'Tipo',
+    'estado' => 'Estado',
+    'fecha' => 'Fecha',
+    'opciones' => 'Opciones',
+    
+    'NoLeido' => 'Sin Revisar',
+    'revisar' => 'Revisar',
+    'recibir' => 'Recibir',
+
 ];
 
 
