@@ -3,7 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-
+use CodeIgniter\Database\RawSql;
 class CreateInsertExpedeinteTrigger extends Migration
 {
     public function up()

@@ -3,7 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-
+use CodeIgniter\Database\RawSql;
 class CreateMovimientosTable extends Migration
 {
     public function up()
@@ -41,7 +41,7 @@ class CreateMovimientosTable extends Migration
             ],
             'fecha_envio' => [
                 'type' => 'DATETIME',
-                'null' => true,
+                'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'fecha_recepcion' => [
                 'type' => 'DATETIME',
@@ -53,7 +53,7 @@ class CreateMovimientosTable extends Migration
             ],
             'created_at' => [
                 'type' => 'DATETIME',
-                'null' => true,
+                'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'updated_at' => [
                 'type' => 'DATETIME',
