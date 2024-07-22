@@ -58,7 +58,7 @@
                                 </td>
                                 <td>
                                     <div class="button-group">
-                                        <button type="button" class="btn btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?=$item->id?>)" ><i class="ti ti-eye fs-5"></i> </button>
+                                        <button type="button" class="btn btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> </button>
                                         <button type="button" class="btn btn-rounded btn-success" title="<?= lang('Main.recibir') ?>"><i class="ti ti-check fs-5"></i></button>
 
                                     </div>
@@ -71,7 +71,7 @@
         </div>
     </div>
 </div>
-<script src="../assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+
 <script>
     $("#expedientesTable").DataTable({
         order: [
@@ -83,26 +83,41 @@
     });
 
     function RevisarExpediente(expediente_id) {
+        Swal.fire({
+            type: "info",
+            html: "<div class='d-flex justify-content-center'>" +
+                "<div class='spinner-border text-primary' role='status'>" +
+                "<span class='visually-hidden'>Loading...</span>" +
+                "</div>" +
+                "</div>",
+            showConfirmButton: false,
+            showCloseButton: false,
+            showCancelButton: false,
+        });
         $.ajax({
             url: '<?= base_url('mesa_de_partes/detalle') ?>',
             type: 'GET',
             dataType: 'json',
             data: {
-                id:expediente_id
+                id: expediente_id
             },
             success: function(response) {
                 $('#detalleExpedienteLabel').text(response.title);
                 $('#detalleExpedienteBody').html(response.body);
                 $('#detalleExpediente').modal('show');
-            }
+                Swal.close();
+            },
+            error: function(e){
+                Swal.fire({
+                    type: "error",
+                    html: "Vuelva a Intentarlo nuevamente",
+                    showConfirmButton: true,
+                });
+            },
         });
     }
 </script>
 
-<!-- Primary header modal -->
-<button type="button" class="btn mb-1 bg-primary-subtle text-primary px-4 fs-4 " data-bs-toggle="modal" data-bs-target="#detalleExpediente">
-    Primary Header
-</button>
 <!-- Primary Header Modal -->
 <div id="detalleExpediente" class="modal fade mw-100" tabindex="-1" aria-labelledby="detalleExpedienteLabel vertical-center-modal staticBackdropLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-scrollable modal-xl">
@@ -129,10 +144,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                    Close
+                    <?=lang('Main.cerrar')?>
                 </button>
                 <button type="button" class="btn bg-primary-subtle text-primary ">
-                    Save changes
+                    <?= lang('Main.cancelar')?>
                 </button>
             </div>
         </div>

@@ -12,8 +12,10 @@
 
     <!-- Core Css -->
     <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="stylesheet" href="../assets/libs/sweetalert2/dist/sweetalert2.min.css">
 
     <title><?= $this->renderSection('title'); ?></title>
+    <?= $this->renderSection('pageStyles'); ?>
 </head>
 
 <body>
@@ -2125,6 +2127,10 @@
     <script src="../assets/js/dashboards/dashboard.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+    <script src="../assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="../assets/js/forms/sweet-alert.init.js"></script>
+    <script src="../assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/plugins/toastr-init.js"></script>
     <script>
         $(document).ready(function() {
             // Al hacer clic en un enlace con clase 'open-here'
