@@ -45,3 +45,10 @@ $routes->get('menus/(:num)', 'MenuController::show/$1');
 $routes->post('menus', 'MenuController::create');
 $routes->put('menus/(:num)', 'MenuController::update/$1');
 $routes->delete('menus/(:num)', 'MenuController::delete/$1');
+
+/**
+ * Opciones de Mesa de Partes
+ */
+$routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpedientes');
+$routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
+

@@ -33,7 +33,7 @@
                                     </span>
                                     <div class="ms-2 text-start">
 
-                                        <h4 class="mb-0 fs-5"><?= substr($expediente['fecha_recepcion'], 0, 10) ?></h4>
+                                        <h4 class="mb-0 fs-5"><?= substr($expediente['fecha_recepcion'], 0, 16) ?></h4>
                                     </div>
                                 </div>
                             </div>

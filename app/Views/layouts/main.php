@@ -1826,7 +1826,7 @@
             </aside>
 
             <div class="body-wrapper">
-                <div class="container-fluid content-main">
+                <div class="container-fluid content-main mw-100">
                     <?= $this->renderSection('content'); ?>
                     <div class="d-md-flex align-items-center justify-content-between mb-7">
                         <div class="mb-4 mb-md-0">
