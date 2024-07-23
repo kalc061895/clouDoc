@@ -50,11 +50,37 @@ return [
     'TipoExpediente' => 'Tipo',
     'estado' => 'Estado',
     'fecha' => 'Fecha',
+    'folios' => 'Folios',
     'opciones' => 'Opciones',
     
     'NoLeido' => 'Sin Revisar',
     'revisar' => 'Revisar',
     'recibir' => 'Recibir',
+
+    //derivar expediente
+    'derivar'=> 'Derivar Expediente',
+    'derivarOficina'=> 'Derivar a :',
+    'accion'=> 'Accion:',
+    'prioridad'=> 'Prioridad:',
+    'nombreAdjunto'=> 'Titulo de Adjunto',
+    'adjunto'=> 'Archivos Adjuntos',
+    'rechazar'=> 'Rechazar Expediente',
+    'observacion'=> 'Observación',
+
+    //observar expediente
+    'observar'=> 'Observar Expediente',
+
+    //atender expediente
+    'atender'=> 'Atender Expediente',
+    'descripcion'=> 'Descripción de Atención:',
+    // 'nombreAdjunto'=> 'Titulo de Adjunto',
+    // 'adjunto'=> 'Archivos Adjuntos',
+    'finalizar'=> 'Atender y Finalizar',
+
+    // General
+    'cerrar'=> 'Cerrar',
+    'cancelar'=> 'Cancelar',
+    'guardar'=> 'Guardar',
 
 ];
 

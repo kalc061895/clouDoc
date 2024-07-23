@@ -5,17 +5,21 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\ExpedientesModel;
+use App\Models\AccionModel;
+use App\Models\OficinaModel;
+
 class TramiteController extends BaseController
 {
     public function index()
     {
         //
     }
-    public function getNuevosExpedientes(): String {
+    public function getNuevosExpedientes(): String
+    {
 
         $tramiteModel = new ExpedientesModel();
         $set = [
-            'expediente'=>$tramiteModel->getNuevosExpedientesExternos(),
+            'expediente' => $tramiteModel->getNuevosExpedientesExternos(),
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
@@ -26,10 +30,21 @@ class TramiteController extends BaseController
         $expedienteModel = new ExpedientesModel();
         $expediente = $expedienteModel->detalleExpediente($id);
 
+        $oficinaModel = new OficinaModel();
+        $accionModel = new AccionModel();
+
         if ($expediente) {
             $response = [
-                'title' => 'Detalle del Expediente: '.$expediente[0]->numero_expediente,
-                'body' => view('tramite/detalle_expediente', ['expediente' => $expediente])
+                'title' => 'Detalle del Expediente: ' . $expediente[0]->numero_expediente,
+                'body' => view(
+                    'tramite/detalle_expediente',
+                    [
+                        'expediente' => $expediente,
+                        'oficina' => $oficinaModel->findAll(),
+                        'accion' => $accionModel->findAll(),
+
+                    ]
+                )
             ];
         } else {
             $response = [
@@ -40,6 +55,4 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
-
-
 }

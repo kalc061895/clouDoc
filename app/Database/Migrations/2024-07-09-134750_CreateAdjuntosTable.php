@@ -3,7 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-
+use CodeIgniter\Database\RawSql;
 class CreateAdjuntosTable extends Migration
 {
     public function up()
@@ -35,7 +35,7 @@ class CreateAdjuntosTable extends Migration
             ],
             'created_at' => [
                 'type' => 'DATETIME',
-                'null' => true,
+                'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'updated_at' => [
                 'type' => 'DATETIME',

@@ -3,7 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
-
+use CodeIgniter\Database\RawSql;
 class CreateExpedientesTable extends Migration
 {
     public function up()
@@ -26,6 +26,7 @@ class CreateExpedientesTable extends Migration
             ],
             'fecha_recepcion' => [
                 'type' => 'DATETIME',
+                'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'folios' => [
                 'type' => 'INT',
@@ -78,7 +79,7 @@ class CreateExpedientesTable extends Migration
             ],
             'created_at' => [
                 'type' => 'DATETIME',
-                'null' => true,
+                'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'updated_at' => [
                 'type' => 'DATETIME',
