@@ -49,7 +49,7 @@ class ExpedienteController extends BaseController
     }
 
     public function buscarExpediente()
-    {   
+    {
         return view('external/busqueda_expediente');
     }
 
@@ -68,7 +68,7 @@ class ExpedienteController extends BaseController
         $_adjunto = new AdjuntoModel();
 
         $adjunto = $_adjunto->where($expedienteArray['entidad_id']);
-        
+
         $_documento = new TipoExpedienteModel();
         $documento = $_documento->find($expedienteArray['tipo_expediente_id']);
         $data = [
@@ -172,37 +172,107 @@ class ExpedienteController extends BaseController
             ),
             //'pdf' => $this->generateReceiptPDF($expedienteArray['id'])
         );
+        $this->sendReceiptEmail($expedienteArray, $entidadArray);
         return json_encode($set);
     }
-    
+
 
     public function generateReceiptPDF($expedienteId)
     {
         $dompdf = new Dompdf();
         $expediente = $this->expedienteModel->find($expedienteId);
-        $dompdf->loadHtml(view('pdf/pdf_template',['expediente'=> $expediente]));
+        $dompdf->loadHtml(view('pdf/pdf_template', ['expediente' => $expediente]));
         $dompdf->setPaper('A5', 'portrait');
         $dompdf->render();
         $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
     }
 
-    public function sendReceiptEmail($expedienteId)
+    public function sendReceiptEmail($_expediente, $_entidad)
     {
-        // Obtener la información del expediente desde la base de datos
-        $expediente = $this->expedienteModel->find($expedienteId);
 
         // Generar el PDF
-        $this->generateReceiptPDF($expedienteId);
+        //$this->generateReceiptPDF($expedienteId);
 
         // Configuración del email
         $email = \Config\Services::email();
-        $email->setFrom('tuemail@ejemplo.com', 'Tu Nombre');
-        $email->setTo($expediente['correo']);
-        $email->setSubject('Constancia de Presentación');
-        $email->setMessage('Adjunto encontrarás la constancia de presentación de tu documento.');
+        $email->setFrom('mesadepartes.rssr@gmail.com', 'ClouDoc - Trámite Documentario Virtual');
+        $email->setTo($_entidad['correo_electronico']);
+        $email->setSubject('Cargo de Trámite Virtual - Exp:' . $_expediente['numero_expediente']);
+        $message = '
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Envío de Expediente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmación de Envío de Expediente</h1>
+        </div>
+        <div class="content">
+            <p>Estimado/a,</p>
+            <p>Hemos recibido correctamente su expediente.</p>
+            <p><strong>Número de Expediente:</strong> ' . $_expediente['numero_expediente'] . '</p>
+            <p>Adjunto encontrará la constancia de presentación de su documento.</p>
+            <p>Para seguir el estado de su expediente, haga clic en el siguiente enlace:</p>
+            <p><a href="https://example.com/seguimiento?expediente=' . $_expediente['numero_expediente'] . '" class="btn">Seguir Expediente</a></p>
+        </div>
+        <div class="footer">
+            <p>Gracias por utilizar nuestro sistema de trámite virtual.</p>
+        </div>
+    </div>
+</body>
+</html>';
 
+        $email->setMessage($message);
+        $email->setMailType('html');
         // Adjuntar el PDF
-        $email->attach('receipts/' . $expedienteId . '.pdf');
+        //$email->attach('receipts/' . $expedienteId . '.pdf');
 
         // Enviar el email
         if ($email->send()) {
