@@ -12,6 +12,6 @@ class Home extends BaseController
         $set = array(
             "menu"=> $menu->getAll(),
         );
-        return view('welcome_message',$set);
+        return view('dashboard',$set);
     }
 }

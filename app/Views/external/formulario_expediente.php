@@ -217,7 +217,7 @@
                 type: 'POST',
                 data: formData,
                 contentType: false, // Es necesario establecer en false para evitar que jQuery configure el tipo de contenido
-                processData: false, // Es necesario establecer en false para que jQuery no procese los datos
+                processData: false, // Es necesar0io establecer en false para que jQuery no procese los datos
                 success: function(response) {
                     response = JSON.parse(response);
                     Swal.fire(

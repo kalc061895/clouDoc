@@ -55,4 +55,35 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
+    public function postDerivarExpediente()
+    {
+        $id = $this->request->getGet('id');
+        $expedienteModel = new ExpedientesModel();
+        $expediente = $expedienteModel->detalleExpediente($id);
+
+        $oficinaModel = new OficinaModel();
+        $accionModel = new AccionModel();
+
+        if ($expediente) {
+            $response = [
+                'title' => 'Detalle del Expediente: ' . $expediente[0]->numero_expediente,
+                'body' => view(
+                    'tramite/detalle_expediente',
+                    [
+                        'expediente' => $expediente,
+                        'oficina' => $oficinaModel->findAll(),
+                        'accion' => $accionModel->findAll(),
+
+                    ]
+                )
+            ];
+        } else {
+            $response = [
+                'title' => 'Error',
+                'body' => 'Expediente no encontrado'
+            ];
+        }
+
+        return $this->response->setJSON($response);
+    }
 }
