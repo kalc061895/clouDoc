@@ -8,7 +8,12 @@ return [
     
     'appTitle' => '☁️CloudDoc - Sistema de Trámite Virtual',
     
-    
+    // Dashboard
+    'totalExpedientes'=> 'Total de Expedientes',
+    'totalExpedientesHoy'=> 'Expedientes Hoy',
+    'totalAtendidos'=> 'Expedientes Atendidos',
+    'totalEnEspera'=> 'Expedientes en Espera',
+    'almacenamientoDrive'=> 'Tamaño de Almacenamiento',
 
 
     // Profile

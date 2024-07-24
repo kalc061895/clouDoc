@@ -181,9 +181,21 @@ class ExpedienteController extends BaseController
     {
         $dompdf = new Dompdf();
         $expediente = $this->expedienteModel->find($expedienteId);
-        $dompdf->loadHtml(view('pdf/pdf_template', ['expediente' => $expediente]));
+        $entidad = $this->entidadModel->find($expediente['entidad_id']);
+
+        
+        $dompdf->loadHtml(
+            view(
+                'pdf/pdf_template',
+                [
+                    'expediente' => $expediente,
+                    'entidad' => $entidad
+                ]
+            )
+        );
         $dompdf->setPaper('A5', 'portrait');
         $dompdf->render();
+        $this->response->setHeader('Content-Type', 'application/pdf');
         $dompdf->stream('cargo_' . $expedienteId . '.pdf', ['Attachment' => 0]);
     }
 
@@ -199,75 +211,76 @@ class ExpedienteController extends BaseController
         $email->setTo($_entidad['correo_electronico']);
         $email->setSubject('Cargo de Trámite Virtual - Exp:' . $_expediente['numero_expediente']);
         $message = '
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmación de Envío de Expediente</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .content {
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .content p {
-            margin: 10px 0;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-top: 20px;
-            background-color: #007bff;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Confirmación de Envío de Expediente</h1>
-        </div>
-        <div class="content">
-            <p>Estimado/a,</p>
-            <p>Hemos recibido correctamente su expediente.</p>
-            <p><strong>Número de Expediente:</strong> ' . $_expediente['numero_expediente'] . '</p>
-            <p>Adjunto encontrará la constancia de presentación de su documento.</p>
-            <p>Para seguir el estado de su expediente, haga clic en el siguiente enlace:</p>
-            <p><a href="https://example.com/seguimiento?expediente=' . $_expediente['numero_expediente'] . '" class="btn">Seguir Expediente</a></p>
-        </div>
-        <div class="footer">
-            <p>Gracias por utilizar nuestro sistema de trámite virtual.</p>
-        </div>
-    </div>
-</body>
-</html>';
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Confirmación de Recepción de Expediente</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        background-color: #f4f4f9;
+                    }
+                    .container {
+                        background-color: #ffffff;
+                        padding: 20px;
+                        border-radius: 5px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .header h1 {
+                        margin: 0;
+                    }
+                    .content {
+                        font-size: 16px;
+                        line-height: 1.5;
+                    }
+                    .content p {
+                        margin: 10px 0;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #888;
+                    }
+                    .btn {
+                        display: inline-block;
+                        padding: 10px 20px;
+                        margin-top: 20px;
+                        background-color: #007bff;
+                        color: #ffffff;
+                        text-decoration: none;
+                        border-radius: 5px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Confirmación de Envío de Expediente</h1>
+                    </div>
+                    <div class="content">
+                        <p>Estimado/a, ' . $_entidad['nombre'] . '</p>
+                        <p>Hemos recibido correctamente su expediente. El cual será evaluado y derivado a la oficina correspondiente para su respuesta o conocimiento.</p>
+                        <p><strong>Número de Expediente:</strong> ' . $_expediente['numero_expediente'] . '</p>
+                        <p>Adjunto encontrará la constancia de presentación de su documento.</p>
+                        <p>Para seguir el estado de su expediente, haga clic en el siguiente enlace:</p>
+                        <p><a href="' . base_url('/buscarexpediente') . '?id=' . $_expediente['numero_expediente'] . '" >Seguir Expediente</a></p>        </div>
+                    <div class="footer">
+                        <p>Red de salud San Román</p>
+                        <p>Cel: 991175569 - Av. Huancane Km 2 - Juliaca</p>
+                        <p>Gracias por utilizar nuestro Sistema de Trámite Virtual. ClouDoc - QuillaSoftware</p>
+                    </div>
+                </div>
+            </body>
+            </html>';
 
         $email->setMessage($message);
         $email->setMailType('html');
