@@ -146,9 +146,6 @@
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     <?=lang('Main.cerrar')?>
                 </button>
-                <button type="button" class="btn bg-primary-subtle text-primary ">
-                    <?= lang('Main.cancelar')?>
-                </button>
             </div>
         </div>
         <!-- /.modal-content -->

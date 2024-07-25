@@ -33,10 +33,16 @@ class CreateMovimientosTable extends Migration
                 'unsigned'   => true,
                 'null'       => false,
             ],
+            'prioridad' => [
+                'type'       => 'ENUM',
+                'constraint' => ['NORMAL', 'URGENTE', 'MUY  URGENTE'],
+                'default'    => 'NORMAL',
+                'null'       => false,
+            ],
             'estado' => [
                 'type'       => 'ENUM',
-                'constraint' => ['espera', 'recibido', 'derivado', 'en proceso', 'finalizado', 'rechazado'],
-                'default'    => 'espera',
+                'constraint' => ['ESPERA', 'RECIBIDO', 'DERIVADO', 'EN POROCESO', 'FINALIZADO', 'ATENDIDO'],
+                'default'    => 'ESPERA',
                 'null'       => false,
             ],
             'fecha_envio' => [

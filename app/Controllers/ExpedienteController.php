@@ -50,34 +50,42 @@ class ExpedienteController extends BaseController
 
     public function buscarExpediente()
     {
-        return view('external/busqueda_expediente');
+
+
+        $set=[
+            'anios'  =>  $this->expedienteModel->getAnios(),
+            'exp_id'  =>  $this->request->getGet('id')??'',
+        ];
+        return view('external/busqueda_expediente',$set);
     }
 
 
 
     // resultado de la busqueda de un Expediente
     public function infoExpediente()
-    {
-        //inputcode
-        //inputanio
-        $expedienteArray = $this->expedienteModel->find($this->request->getPost('id'));
+    {   
+        
+        $_expedienteModel = new ExpedientesModel();
+        $expedienteArray = $_expedienteModel->getBuscarExpediente($this->request->getPost('inputCode'), $this->request->getPost('inputAnio'));
 
-        $entidadArray = $this->entidadModel->find($expedienteArray['entidad_id']);
+        
+        $entidadArray = $this->entidadModel->find($expedienteArray[0]->remitente_id);
 
         // Manejo del archivo
         $_adjunto = new AdjuntoModel();
 
-        $adjunto = $_adjunto->where($expedienteArray['entidad_id']);
+        $adjunto = $_adjunto->where('expediente_id',$expedienteArray[0]->id)->get()->getResultObject();
 
+        //return print_r($adjunto);
         $_documento = new TipoExpedienteModel();
-        $documento = $_documento->find($expedienteArray['tipo_expediente_id']);
+        $documento = $_documento->find($expedienteArray[0]->tipoexpediente_id);
         $data = [
             'entidad' => $entidadArray,
             'expediente' => $expedienteArray,
             'documento' => $documento,
             'adjunto' => $adjunto,
         ];
-
+        //return print_r($data);
         return view('external/info_expediente', $data);
     }
 
@@ -250,15 +258,6 @@ class ExpedienteController extends BaseController
                         font-size: 14px;
                         color: #888;
                     }
-                    .btn {
-                        display: inline-block;
-                        padding: 10px 20px;
-                        margin-top: 20px;
-                        background-color: #007bff;
-                        color: #ffffff;
-                        text-decoration: none;
-                        border-radius: 5px;
-                    }
                 </style>
             </head>
             <body>
@@ -294,4 +293,5 @@ class ExpedienteController extends BaseController
             return false;
         }
     }
+    
 }

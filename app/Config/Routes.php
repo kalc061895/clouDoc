@@ -51,5 +51,5 @@ $routes->delete('menus/(:num)', 'MenuController::delete/$1');
  */
 $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpedientes');
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
-$routes->get('mesa_de_partes/derivar', 'TramiteController::getDerivarExpediente');
+$routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
 

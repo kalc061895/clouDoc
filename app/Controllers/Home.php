@@ -30,7 +30,8 @@ class Home extends BaseController
         // menu filtardo por grupo de usuario usuario
         $menu = new MenuModel();
         $set = array(
-            "menu"=> $menu->getAll(),
+            //"menu"=> $menu->findAll(),
+            "menu"=> $menu->getMenusByRole(),
             //"dasboard"=> $dashboard,
             //"menu"=> $menu->getMenuUsuario(),
         );

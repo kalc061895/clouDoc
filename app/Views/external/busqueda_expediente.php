@@ -38,7 +38,7 @@
 
                                     <form class="floating-labels mt-4 pt-2" action="<?= base_url('/buscarexpediente') ?>" id="searchForm">
                                         <div class="form-group mb-4">
-                                            <input type="text" class="form-control" id="inputCode" autofocus required name="codeEspediente">
+                                            <input type="text" class="form-control" id="inputCode" autofocus required name="codeExpediente" value="<?= $exp_id ?>">
                                             <span class="bar"></span>
                                             <label for="inputCode"><?= lang('External.codeSearch') ?></label>
                                             <span class="help-block">
@@ -46,15 +46,13 @@
                                             </span>
                                         </div>
                                         <div class="form-group mb-4">
-                                            <select class="form-control form-select" id="inputanio" required name="yearExpediente">
-                                                <option></option>
-                                                <option>2024</option>
-                                                <option>2023</option>
-                                                <option>2023</option>
-                                                <option>2022</option>
+                                            <select class="form-control form-select" id="inputAnio" required name="yearExpediente">
+                                                <?php foreach ($anios as $item) : ?>
+                                                    <option value="<?= $item['nombre'] ?>"> <?= $item['nombre'] ?> </option>
+                                                <?php endforeach ?>
                                             </select>
                                             <span class="bar"></span>
-                                            <label for="inputanio"><?= lang('External.yearSearch') ?></label>
+                                            <label for="inputAnio"><?= lang('External.yearSearch') ?></label>
                                         </div>
                                         <div class="col-md-12 d-grid gap-2">
                                             <button type="submit" class="btn waves-effect waves-light bg-primary-subtle text-primary rounded-pill">
@@ -88,7 +86,7 @@
             e.preventDefault();
 
             var inputCode = $('#inputCode').val();
-            var inputanio = $('#inputanio').val();
+            var inputAnio = $('#inputAnio').val();
             //Auto Close Timer
 
             Swal.fire({
@@ -110,7 +108,7 @@
                 type: 'POST',
                 data: {
                     inputCode: inputCode,
-                    inputanio: inputanio
+                    inputAnio: inputAnio
                 },
                 success: function(response) {
                     Swal.close();
