@@ -17,6 +17,12 @@ class CreateAdjuntosTable extends Migration
             'expediente_id' => [
                 'type'       => 'INT',
                 'unsigned'   => true,
+                'null'       => true,
+            ],
+            'movimiento_id' => [
+                'type'       => 'INT',
+                'unsigned'   => true,
+                'null'       => true,
             ],
             'local_path' => [
                 'type'       => 'VARCHAR',
@@ -45,6 +51,7 @@ class CreateAdjuntosTable extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('expediente_id', 'expedientes', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('movimiento_id', 'movimientos', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('adjuntos');
     }
 

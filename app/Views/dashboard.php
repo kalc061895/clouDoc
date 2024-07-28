@@ -54,43 +54,6 @@ $menuActive = 2;
 
 <?php endforeach ?>
 
-
-<!-- MENU DE TODO---------------------------------- -->
-<li class="nav-small-cap">
-    <iconify-icon icon="solar:menu-dots-linear" class="mini-icon"></iconify-icon>
-    <span class="hide-menu">Personal</span>
-</li>
-
-<!-- NORMAL ---------------------------------- -->
-<li class="sidebar-item">
-    <a class="sidebar-link" href="#" id="get-url" aria-expanded="false">
-        <iconify-icon icon="solar:screencast-2-linear"></iconify-icon>
-        <span class="hide-menu">Modern</span>
-    </a>
-</li>
-
-<!-- CON SUB MENU ---------------------------------- -->
-<li class="sidebar-item">
-    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-        <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
-        <span class="hide-menu">Blog</span>
-    </a>
-    <ul aria-expanded="false" class="collapse first-level">
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="blog-posts.html">
-                <span class="icon-small"></span>
-                <span class="hide-menu">Blog Posts</span>
-            </a>
-        </li>
-        <li class="sidebar-item">
-            <a class="sidebar-link" href="blog-detail.html">
-                <span class="icon-small"></span>
-                <span class="hide-menu">Blog Details</span>
-            </a>
-        </li>
-    </ul>
-</li>
-
 <?= $this->endSection(); ?>
 
 <!-- Menu Horizontal -->
@@ -105,7 +68,9 @@ $menuActive = 2;
     <div class="col-lg-3 col-md-6">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title fs-4 fw-normal mb-3">Daily Sales</h4>
+                <h4 class="card-title fs-4 fw-normal mb-3">
+                    <?=lang('Main.totalExpedientes')?>
+                </h4>
                 <h2 class="mb-3 fs-9 fw-light">$56,908</h2>
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <i class="fas fa-caret-down text-warning fs-5"></i>
@@ -117,12 +82,11 @@ $menuActive = 2;
             </div>
         </div>
     </div>
-
     <div class="col-lg-3 col-md-6">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title fs-4 fw-normal mb-3">
-                    Electric Usage
+                    <?=lang('Main.totalExpedientesHoy')?>
                 </h4>
                 <h2 class="mb-3 fs-9 fw-light">
                     10.578 <span class="fs-5 fw-medium">Kwh</span>
@@ -141,7 +105,7 @@ $menuActive = 2;
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title fs-4 fw-normal mb-3">
-                    Internet Bandwidth
+                    <?= lang('Main.almacenamientoDrive')?>
                 </h4>
                 <h2 class="mb-3 fs-9 fw-light">
                     14.897 <span class="fs-5 fw-medium">Gb</span>

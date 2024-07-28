@@ -101,63 +101,24 @@
                             <!-- End User profile text-->
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="<?= base_url('/') ?>#" aria-expanded="false">
+                            <a class="sidebar-link" href="<?= base_url('/inicio') ?>" aria-expanded="false">
                                 <iconify-icon icon="solar:home-linear"></iconify-icon>
                                 <span class="hide-menu"><?= lang('Main.dashboard') ?></span>
                             </a>
                         </li>
                         <!-- Menu Vertical -->
                         <?= $this->renderSection('menuVertical'); ?>
-                        <?= $this->renderSection('menuHorizontal'); ?>
-
-                        <!-- User Profile-->
-                        <!-- ---------------------------------- -->
-                        <!-- Home -->
-                        <!-- ---------------------------------- -->
-                        <li class="nav-small-cap">
-                            <iconify-icon icon="solar:menu-dots-linear" class="mini-icon"></iconify-icon>
-                            <span class="hide-menu">Personal</span>
-                        </li>
-                        <!-- ---------------------------------- -->
-                        <!-- Dashboard -->
-                        <!-- ---------------------------------- -->
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#" id="get-url" aria-expanded="false">
-                                <iconify-icon icon="solar:screencast-2-linear"></iconify-icon>
-                                <span class="hide-menu">Modern</span>
-                            </a>
-                        </li>
-
-
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="index2.html" aria-expanded="false">
-                                <iconify-icon icon="solar:atom-linear"></iconify-icon>
-                                <span class="hide-menu">Awesome</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="index3.html" aria-expanded="false">
-                                <iconify-icon icon="solar:box-minimalistic-linear"></iconify-icon>
-                                <span class="hide-menu">Classy</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="index4.html" aria-expanded="false">
-                                <iconify-icon icon="solar:buildings-2-linear"></iconify-icon>
-                                <span class="hide-menu">Analytical</span>
-                            </a>
-                        </li>
 
                     </ul>
                 </nav>
 
                 <div class="sidebar-footer hide-menu">
                     <!-- item-->
-                    <a href="page-account-settings.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Settings"><iconify-icon icon="solar:settings-linear"></iconify-icon></a>
+                    <a href="page-account-settings.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.profileSettings')?>"><iconify-icon icon="solar:settings-linear"></iconify-icon></a>
                     <!-- item-->
-                    <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Email"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
+                    <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.myImbox')?>"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
                     <!-- item-->
-                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
+                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.logout')?>"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
                 </div>
             </div>
         </aside>
@@ -1610,6 +1571,7 @@
                                 <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                                 <span class="hide-menu">Home</span>
                             </li>
+                            <?= $this->renderSection('menuHorizontal'); ?>
                             <!-- =================== -->
                             <!-- Dashboard -->
                             <!-- =================== -->
@@ -1830,34 +1792,6 @@
             <div class="body-wrapper">
                 <div class="container-fluid content-main mw-100">
                     <?= $this->renderSection('content'); ?>
-                    <div class="d-md-flex align-items-center justify-content-between mb-7">
-                        <div class="mb-4 mb-md-0">
-                            <h4 class="fs-6 mb-0">Dashboard</h4>
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item">
-                                        <a class="text-muted text-decoration-none" href="<?= base_url('/') ?>">Home</a>
-                                    </li>
-                                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                                </ol>
-                            </nav>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between gap-6">
-                            <select class="form-select border fs-3" aria-label="Default select example">
-                                <option selected>November 2024</option>
-                                <option value="1">February 2024</option>
-                                <option value="2">March 2024</option>
-                                <option value="3">April 2024</option>
-                            </select>
-                            <button class="btn btn-success d-flex align-items-center gap-1 fs-3 py-2 px-9">
-                                <i class="ti ti-plus fs-4"></i>
-                                Create
-                            </button>
-                        </div>
-                    </div>
-
-
-
                 </div>
             </div>
             <button class="btn btn-primary p-3 rounded-circle d-flex align-items-center justify-content-center customizer-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
@@ -1867,26 +1801,26 @@
             <div class="offcanvas customizer offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
                 <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
                     <h4 class="offcanvas-title fw-semibold" id="offcanvasExampleLabel">
-                        Settings
+                        Configuración
                     </h4>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body" data-simplebar style="height: calc(100vh - 80px)">
-                    <h6 class="fw-semibold fs-4 mb-2">Theme</h6>
+                    <h6 class="fw-semibold fs-4 mb-2">Tema</h6>
 
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <input type="radio" class="btn-check light-layout" name="theme-layout" id="light-layout" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="light-layout">
-                            <i class="icon ti ti-brightness-up fs-7 me-2"></i>Light
+                            <i class="icon ti ti-brightness-up fs-7 me-2"></i>Claro
                         </label>
 
                         <input type="radio" class="btn-check dark-layout" name="theme-layout" id="dark-layout" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="dark-layout">
-                            <i class="icon ti ti-moon fs-7 me-2"></i>Dark
+                            <i class="icon ti ti-moon fs-7 me-2"></i>Oscuro
                         </label>
                     </div>
 
-                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Theme Direction</h6>
+                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Orientacion del Tema</h6>
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <input type="radio" class="btn-check" name="direction-l" id="ltr-layout" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="ltr-layout">
@@ -1899,7 +1833,7 @@
                         </label>
                     </div>
 
-                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Theme Colors</h6>
+                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Color de Tema</h6>
 
                     <div class="d-flex flex-row flex-wrap gap-3 customizer-box color-pallete" role="group">
                         <input type="radio" class="btn-check" name="color-theme-layout" id="Blue_Theme" autocomplete="off" />
@@ -1945,7 +1879,7 @@
                         </label>
                     </div>
 
-                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Layout Type</h6>
+                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Tipo de Menu</h6>
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <div>
                             <input type="radio" class="btn-check" name="page-layout" id="vertical-layout" autocomplete="off" />
@@ -1961,47 +1895,47 @@
                         </div>
                     </div>
 
-                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Container Option</h6>
+                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Modo de Presentación</h6>
 
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <input type="radio" class="btn-check" name="layout" id="boxed-layout" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="boxed-layout">
-                            <i class="icon ti ti-layout-distribute-vertical fs-7 me-2"></i>Boxed
+                            <i class="icon ti ti-layout-distribute-vertical fs-7 me-2"></i>Ajustado
                         </label>
 
                         <input type="radio" class="btn-check" name="layout" id="full-layout" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="full-layout">
-                            <i class="icon ti ti-layout-distribute-horizontal fs-7 me-2"></i>Full
+                            <i class="icon ti ti-layout-distribute-horizontal fs-7 me-2"></i>Completo
                         </label>
                     </div>
 
-                    <h6 class="fw-semibold fs-4 mb-2 mt-5">Sidebar Type</h6>
+                    <h6 class="fw-semibold fs-4 mb-2 mt-5">Barra Lateral</h6>
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <a href="javascript:void(0)" class="fullsidebar">
                             <input type="radio" class="btn-check" name="sidebar-type" id="full-sidebar" autocomplete="off" />
                             <label class="btn p-9 btn-outline-primary rounded-2" for="full-sidebar">
-                                <i class="icon ti ti-layout-sidebar-right fs-7 me-2"></i>Full
+                                <i class="icon ti ti-layout-sidebar-right fs-7 me-2"></i>Abierto
                             </label>
                         </a>
                         <div>
                             <input type="radio" class="btn-check" name="sidebar-type" id="mini-sidebar" autocomplete="off" />
                             <label class="btn p-9 btn-outline-primary rounded-2" for="mini-sidebar">
-                                <i class="icon ti ti-layout-sidebar fs-7 me-2"></i>Collapse
+                                <i class="icon ti ti-layout-sidebar fs-7 me-2"></i>Cerrado
                             </label>
                         </div>
                     </div>
 
-                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Card With</h6>
+                    <h6 class="mt-5 fw-semibold fs-4 mb-2">Cards con</h6>
 
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
                         <input type="radio" class="btn-check" name="card-layout" id="card-with-border" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="card-with-border">
-                            <i class="icon ti ti-border-outer fs-7 me-2"></i>Border
+                            <i class="icon ti ti-border-outer fs-7 me-2"></i>Borde
                         </label>
 
                         <input type="radio" class="btn-check" name="card-layout" id="card-without-border" autocomplete="off" />
                         <label class="btn p-9 btn-outline-primary rounded-2" for="card-without-border">
-                            <i class="icon ti ti-border-none fs-7 me-2"></i>Shadow
+                            <i class="icon ti ti-border-none fs-7 me-2"></i>Sombra
                         </label>
                     </div>
                 </div>

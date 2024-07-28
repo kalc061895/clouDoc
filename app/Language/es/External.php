@@ -38,7 +38,7 @@ return [
     'exampleSearch'=>'Ejemplo: (00145-2024)',
     'buttonSearch'=>'Buscar',
     'noFound'=>'No se pudo encontrar el expediente {0} en la base ded datos.',
-    'searchingText'=>'Buscando',
+    'searching'=>'Buscando...',
 
     // New Exp Page
     'titleNew'=> 'Registrar Nuevo Expediente',

@@ -282,6 +282,19 @@ class MenuSeeder extends Seeder
                 'icon' => 'fa-deskpro',
                 'status' => 'active',
                 'separator' => null,
+                'order' => 100,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'type' => 'secondary',
+                'parent_id' => 21, // ID del menú 'MESA DE PARTES'
+                'name' => 'Derivados',
+                'abbr' => null,
+                'url' => '/mesa_de_partes/para_despacho',
+                'icon' => 'fa-envelope-open',
+                'status' => 'active',
+                'separator' => null,
                 'order' => 120,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -289,10 +302,10 @@ class MenuSeeder extends Seeder
             [
                 'type' => 'secondary',
                 'parent_id' => 21, // ID del menú 'MESA DE PARTES'
-                'name' => 'Para Despacho',
+                'name' => 'Observados',
                 'abbr' => null,
-                'url' => '/mesa_de_partes/para_despacho',
-                'icon' => 'fa-envelope-open',
+                'url' => '/mesa_de_partes/observados',
+                'icon' => 'fa-project-diagram',
                 'status' => 'active',
                 'separator' => null,
                 'order' => 130,
@@ -302,9 +315,9 @@ class MenuSeeder extends Seeder
             [
                 'type' => 'secondary',
                 'parent_id' => 21, // ID del menú 'MESA DE PARTES'
-                'name' => 'En Proyecto',
+                'name' => 'Todos',
                 'abbr' => null,
-                'url' => '/mesa_de_partes/en_proyecto',
+                'url' => '/mesa_de_partes/todos_expediente',
                 'icon' => 'fa-project-diagram',
                 'status' => 'active',
                 'separator' => null,

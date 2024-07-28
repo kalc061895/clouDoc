@@ -9,7 +9,7 @@ class AniosSeeder extends Seeder
     public function run()
     {
         $data = [];
-        for ($year = 2023; $year <= 2030; $year++) {
+        for ($year = 2023; $year <= 2024; $year++) {
             $data[] = [
                 'nombre'      => $year,
                 'abreviatura' => (string) $year,

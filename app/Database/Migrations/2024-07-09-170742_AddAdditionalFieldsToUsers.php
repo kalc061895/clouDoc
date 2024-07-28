@@ -24,13 +24,14 @@ class AddAdditionalFieldsToUsers extends Migration
     public function up()
     {
         $fields = [
-            'first_name' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
-            'last_name' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
-            'mother_name' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
+            'nombres' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
+            'paterno' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
+            'materno' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
             'dni' => ['type' => 'VARCHAR', 'constraint' => '15', 'null' => true],
-            'position' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
-            'telephone' => ['type' => 'VARCHAR', 'constraint' => '20', 'null' => true],
-            'office_id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'null' => true],
+            'cargo' => ['type' => 'VARCHAR', 'constraint' => '100', 'null' => true],
+            'telefono' => ['type' => 'VARCHAR', 'constraint' => '20', 'null' => true],
+            'oficina_id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'null' => true],
+            'persona_id' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'null' => true],
         ];
 
         $this->forge->addColumn($this->tables['users'], $fields);
@@ -39,13 +40,14 @@ class AddAdditionalFieldsToUsers extends Migration
     public function down()
     {
         $fields = [
-            'first_name',
-            'last_name',
-            'mother_name',
+            'nombres',
+            'paterno',
+            'materno',
             'dni',
-            'position',
-            'telephone',
+            'cargo',
+            'telefono',
             'office_id',
+            'person_id',
         ];
 
         $this->forge->dropColumn($this->tables['users'], $fields);

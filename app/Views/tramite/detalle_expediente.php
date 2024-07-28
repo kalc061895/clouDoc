@@ -32,7 +32,7 @@
                         <div class="accordion-body px-3 fw-normal">
 
                             <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/derivar') ?>" method="POST" id="formDerivar">
-
+                                <input type="text" name="id" value="<?= $expediente[0]->id?>" hidden>
                                 <div class="form-group mb-4">
                                     <select class="form-control form-select" id="oficinaDerivar" name="oficinaDerivar" required>
                                         <option></option>
@@ -115,4 +115,32 @@
     $('.floating-labels .form-control').on('focus blur', function(e) {
         $(this).parents('.form-group').toggleClass('focused', (e.type === 'focus' || this.value.length > 0));
     }).trigger('blur');
+
+    // funcion para derivar
+    $('#formDerivar').on('submit', function(event) {
+        event.preventDefault(); // Prevenir la acción predeterminada del formulario
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false, // Evitar que jQuery procese los datos
+            contentType: false, // Evitar que jQuery establezca el tipo de contenido
+            success: function(response) {
+                // Manejar la respuesta del servidor aquí
+                console.log(response);
+                // Puedes mostrar un mensaje de éxito o redirigir a otra página, etc.
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores aquí
+                console.error(error);
+                // Puedes mostrar un mensaje de error, etc.
+            }
+        });
+    });
+    
+
+
 </script>

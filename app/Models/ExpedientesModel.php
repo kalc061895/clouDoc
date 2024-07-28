@@ -55,6 +55,7 @@ class ExpedientesModel extends Model
 
         $builder = $db->table('expedientes');
         $builder->select('expedientes.*,entidad.*');
+        $builder->where('movimientos.id', null);
         $builder->join(
             'movimientos',
             'expedientes.id = movimientos.expediente_id',
@@ -77,7 +78,7 @@ class ExpedientesModel extends Model
         $builder = $db->table('expedientes');
 
         $builder->select(
-            'numero_expediente,expedientes.fecha_recepcion as recibido,folios,asunto,
+            'expedientes.id as id,numero_expediente,expedientes.fecha_recepcion as recibido,folios,asunto,
             entidad.nombre as remitente,num_documento,telefono,correo_electronico,
             local_path,drive_path,
             tipo_expediente.nombre as tipoexpediente'
@@ -112,5 +113,55 @@ class ExpedientesModel extends Model
         $query = $builder->get();
 
         return $query->getResultObject();
+    }
+    public function getBuscarExpediente($numero_expediente,$anio) {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+
+        $builder->select(
+            'expedientes.id as id,numero_expediente,expedientes.fecha_recepcion as recibido,folios,asunto,
+            entidad.nombre as remitente, entidad.id as remitente_id,num_documento,telefono,correo_electronico, numero_documento,
+            local_path,drive_path,
+            tipo_expediente.nombre as tipoexpediente,
+            tipo_expediente.id as tipoexpediente_id'
+        );
+
+        //$builder->where('YEAR(expedientes.fecha_recepcion)',$anio);
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+        $builder->join(
+            'adjuntos',
+            'expedientes.id = adjuntos.expediente_id',
+            'inner'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'tipo_expediente.id = expedientes.tipo_expediente_id',
+            'inner'
+        );
+        $builder->where('numero_expediente',$numero_expediente);
+        
+        $query = $builder->get();
+        return $query->getResultObject();
+    }
+
+    public function getAnios() {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('anios');
+        $builder->orderBy('nombre DESC');
+
+        $query = $builder->get();
+
+        return $query->getResultArray();
     }
 }
