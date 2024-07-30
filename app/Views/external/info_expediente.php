@@ -26,7 +26,7 @@
                         <!-- Comment Row -->
                         <div class="d-flex gap-9 comment-row mb-5">
                             <span class="flex-shrink-0">
-                                <img src="../assets/images/profile/user-5.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                <img src="assets/images/profile/user-5.jpg" alt="user" width="56" height="56" class="rounded-circle" />
                             </span>
                             <div class="comment-text w-100">
                                 <div class="hstack justify-content-between gap-6 mb-6">
@@ -61,7 +61,7 @@
                         <!-- Comment Row -->
                         <div class="d-flex gap-9 comment-row mb-5">
                             <span class="flex-shrink-0">
-                                <img src="../assets/images/profile/user-3.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                <img src="assets/images/profile/user-3.jpg" alt="user" width="56" height="56" class="rounded-circle" />
                             </span>
                             <div class="comment-text">
                                 <div class="hstack justify-content-between gap-6 mb-6">
@@ -99,7 +99,7 @@
                         <!-- Comment Row -->
                         <div class="d-flex gap-9 comment-row mb-5">
                             <span class="flex-shrink-0">
-                                <img src="../assets/images/profile/user-7.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                <img src="assets/images/profile/user-7.jpg" alt="user" width="56" height="56" class="rounded-circle" />
                             </span>
                             <div class="comment-text">
                                 <div class="hstack justify-content-between gap-6 mb-6">
@@ -137,7 +137,7 @@
                         <!-- Comment Row -->
                         <div class="d-flex gap-9 comment-row mb-5">
                             <span class="flex-shrink-0">
-                                <img src="../assets/images/profile/user-8.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                <img src="assets/images/profile/user-8.jpg" alt="user" width="56" height="56" class="rounded-circle" />
                             </span>
                             <div class="comment-text">
                                 <div class="hstack justify-content-between gap-6 mb-6">
@@ -344,7 +344,7 @@
 
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="../assets/images/profile/user-3.jpg" class="rounded img-fluid" width="90">
+                            <img src="assets/images/profile/user-3.jpg" class="rounded img-fluid" width="90">
                             <div class="mt-n2">
                                 <span class="badge text-bg-primary"><?= lang('External.emisorSuccess') ?></span>
                                 <h3 class="card-title mt-3"><?= $entidad['nombre'] ?></h3>

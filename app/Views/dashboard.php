@@ -20,7 +20,7 @@ $menuActive = 2;
 
 
 <?= $this->section('profile'); ?>
-<img src="../assets/images/profile/<?= $user->photo ?>" class="rounded-circle" width="80" height="80" alt="" />
+<img src="assets/images/profile/<?= $user->photo ?>" class="rounded-circle" width="80" height="80" alt="" />
 <div class="ms-3">
     <h5 class="mb-1 fs-4"><?= $user->username; ?></h5>
     <span class="mb-1 d-block"><?= $user->cargo; ?></span>
@@ -43,7 +43,7 @@ $menuActive = 2;
         </li>
     <?php else : ?>
         <li class="sidebar-item">
-            <a class="sidebar-link open-here <?= ($item['id']==$menuActive)?' active ':''?>" href="<?= $item['url'] ?>"  aria-expanded="false">
+            <a class="sidebar-link open-here <?= ($item['id']==$menuActive)?' active ':''?>" href="<?= base_url('/'.$item['url']) ?>"  aria-expanded="false">
                 <iconify-icon icon="solar:<?= $item['icon'] ?>"></iconify-icon>
                 <span class="hide-menu"><?= $item['name'] ?></span>
             </a>

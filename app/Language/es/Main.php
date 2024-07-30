@@ -25,6 +25,28 @@ return [
     'myTask' => 'Mis tareas',
     'taskList' => 'Por hacer y tareas diarías',
     'logout' => 'Cerrar Sessión',
+    
+    // Uuario Settings
+    'titleUsuarioTable' => 'Configuración de Usuarios',
+    'nuevoUsuario' => 'Nuevo Usuario',
+    'editarUsuario' => 'Editar',
+    'eliminarUsuario' => 'Eliminar',
+    'apellidoNombre' => 'Apellidos y Nombres',
+    'cargoUsuario' => 'Cargo',
+    'oficinaUsuario' => 'Oficina',
+    'estadoUsuario' => 'Estado',
+    'opciones' => 'Opciones',
+    'nombres'=> 'Nombres',
+    'paterno'=> 'Ap. Paterno',
+    'materno'=> 'Ap. Materno',
+    'nombreUsuario'=> 'Nombre de Usuario',
+    'contrasena'=> 'Contraseña',
+    'ccontrasena'=> 'Confirmar Contraseña',
+    'grupoUsuario'=> 'Tipo de Usuario',
+    
+
+
+
 
     // Menu
     'dashboard'=> 'Inicio',

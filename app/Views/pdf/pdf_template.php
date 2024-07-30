@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=}, initial-scale=1.0">
     <title>Resumen de Expediente</title>
-    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
     <style>
         .card-body {
             flex: 1 1 auto;
@@ -102,7 +102,7 @@
 
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="../assets/images/profile/user-3.jpg" class="rounded img-fluid" width="90">
+                            <img src="assets/images/profile/user-3.jpg" class="rounded img-fluid" width="90">
                             <div class="mt-n2">
                                 <span class="badge text-bg-primary"><?= lang('External.emisorSuccess') ?></span>
                                 <h3 class="card-title mt-3"><?= $entidad['nombre'] ?></h3>
