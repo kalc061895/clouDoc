@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+
 
 <div class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
@@ -39,7 +39,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="../assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
+                                        <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
                                         <div class="ms-3">
                                             <h6 class="fs-4 fw-semibold mb-0"><?= $item->nombre ?></h6>
                                             <span class="fw-normal"><?= $item->correo_electronico ?></span>

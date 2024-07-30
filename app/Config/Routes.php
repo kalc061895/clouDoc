@@ -46,6 +46,9 @@ $routes->post('menus', 'MenuController::create');
 $routes->put('menus/(:num)', 'MenuController::update/$1');
 $routes->delete('menus/(:num)', 'MenuController::delete/$1');
 
+
+$routes->get('configuracion/usuarios', 'UserController::index');
+$routes->get('configuracion/guardarusuario', 'UserController::store');
 /**
  * Opciones de Mesa de Partes
  */

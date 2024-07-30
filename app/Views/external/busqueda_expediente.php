@@ -5,7 +5,7 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('pageStyles'); ?>
-<link rel="stylesheet" href="../assets/libs/sweetalert2/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
 <?= $this->endSection(); ?>
 
 
@@ -140,6 +140,6 @@
     }).trigger('blur');
 </script>
 
-<script src="../assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
-<script src="../assets/js/forms/sweet-alert.init.js"></script>
+<script src="assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
+<script src="assets/js/forms/sweet-alert.init.js"></script>
 <?= $this->endSection(); ?>

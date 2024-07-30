@@ -50,7 +50,7 @@
       Swal.fire({
         title: "Govinda!",
         text: "Recently joined twitter",
-        imageUrl: "../assets/images/profile/user-2.jpg",
+        imageUrl: "assets/images/profile/user-2.jpg",
       });
     });
 
@@ -172,7 +172,7 @@
         width: 600,
         padding: "3em",
         background:
-          "var(--bs-body-bg) url(../assets/images/backgrounds/active-bg.png)",
+          "var(--bs-body-bg) url(assets/images/backgrounds/active-bg.png)",
         backdrop: `
                           rgba(0,0,123,0.4)
                           url("https://bootstrapdemos.wrappixel.com/monster/dist/assets/images/backgrounds/nyan-cat.gif")
