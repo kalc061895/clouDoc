@@ -30,7 +30,7 @@
                         <tbody>
                             <?php foreach ($users as $item) : ?>
                                 <!-- start row -->
-                                <tr>
+                                <tr data-id="<?= $item->id ?>">
                                     <td>
                                         <div class="d-flex align-items-center gap-6">
                                             <img src="assets/images/profile/user-4.jpg" width="45" class="rounded-circle" />
@@ -63,7 +63,7 @@
 
 
 <script>
-    $('#zero_config').DataTable({
+    var tabla_usuario = $('#zero_config').DataTable({
             order: [
                 [0, "asc"]
             ],
@@ -88,12 +88,12 @@
             </div>
             <div class="modal-body">
                 <form id="userForm">
-                    <input type="text" hidden name="idusuario" name="idusuario">
+                    <input type="text" hidden name="idusuario">
                     <div class="row">
                         <h4 class="card-title mb-4"><?= lang('Main.infoPersonal') ?></h4>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="nombres" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="nombres" />
                                 <label>
                                     <i class="ti ti-user me-2 fs-4"></i> <?= lang('Main.nombres') ?>
                                 </label>
@@ -102,7 +102,7 @@
                         <div class="col-md-4">
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="paterno" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="paterno" />
                                 <label>
                                     <?= lang('Main.paterno') ?>
                                 </label>
@@ -110,7 +110,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="materno" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="materno" />
                                 <label>
                                     <?= lang('Main.materno') ?>
                                 </label>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="dni" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="dni" />
                                 <label>
                                     <i class="ti ti-credit-card me-2 fs-4"></i> <?= lang('Main.dni') ?>
                                 </label>
@@ -126,7 +126,7 @@
                         </div>
                         <div class="col-md-5">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="email" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="email" />
                                 <label>
                                     <i class="ti ti-user me-2 fs-4"></i> <?= lang('Main.email') ?>
                                 </label>
@@ -135,7 +135,7 @@
 
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="telefono" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="telefono" />
                                 <label>
                                     <i class="ti ti-user me-2 fs-4"></i> <?= lang('Main.telefono') ?>
                                 </label>
@@ -144,7 +144,7 @@
 
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" name="cargo" />
                                 <label>
                                     <i class="ti ti-user me-2 fs-4"></i> <?= lang('Main.cargoUsuario') ?>
                                 </label>
@@ -155,7 +155,7 @@
                         <div class="col-md-6">
                             <div class="mb-3 ">
                                 <label class="form-label"><?= lang('Main.oficinaUsuario') ?></label>
-                                <select class="form-select" name="oficina_id">
+                                <select class="form-select" required name="oficina_id">
                                     <?php print_r($oficina); ?>
                                     <?php foreach ($oficina as $item) : ?>
 
@@ -168,9 +168,9 @@
                         <div class="col-md-3">
                             <div class="mb-3 ">
                                 <label class="form-label"><?= lang('Main.grupoUsuario') ?></label>
-                                <select class="form-select" name="group_user">
+                                <select class="form-select" required name="group_user">
                                     <?php foreach ($grupousuario as $item) : ?>
-                                        <option value="<?= $item->id ?>"><?= $item->name ?></option>
+                                        <option value="<?= $item->name ?>"><?= $item->name ?></option>
                                     <?php endforeach ?>
 
                                 </select>
@@ -179,7 +179,7 @@
                         <div class="col-md-3">
                             <div class="mb-3 ">
                                 <label class="form-label"><?= lang('Main.estado') ?></label>
-                                <select class="form-select" name="group_user">
+                                <select class="form-select" required name="estado">
                                     <option value="1">Activo</option>
                                     <option value="0">Inactivo</option>
                                 </select>
@@ -189,7 +189,7 @@
 
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-sm" placeholder="Username" />
+                                <input type="text" class="form-control form-control-sm" placeholder="Username" required name="username" />
                                 <label>
                                     <i class="ti ti-user me-2 fs-4"></i> <?= lang('Main.nombreUsuario') ?>
                                 </label>
@@ -197,17 +197,17 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control form-control-sm" placeholder="Password" name="password"/>
+                                <input type="password" class="form-control form-control-sm" placeholder="Password" required name="password" />
                                 <label>
-                                    <i class="ti ti-lock me-2 fs-4"></i><?= lang('Main.contrasena')?>
+                                    <i class="ti ti-lock me-2 fs-4"></i><?= lang('Main.contrasena') ?>
                                 </label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input type="password" class="form-control form-control-sm" placeholder="CPassword" name="cpassword"/>
+                                <input type="password" class="form-control form-control-sm" placeholder="CPassword" required name="cpassword" />
                                 <label>
-                                    <i class="ti ti-lock me-2 fs-4"></i><?= lang('Main.ccontrasena')?>
+                                    <i class="ti ti-lock me-2 fs-4"></i><?= lang('Main.ccontrasena') ?>
                                 </label>
                             </div>
                         </div>
@@ -255,13 +255,24 @@
             type: 'POST',
             data: formData,
             success: function(response) {
-                $('#modalUserForm').hide();
-                table.ajax.reload();
+                $('#modalUserForm').modal('hide');
+                Swal.fire(
+                    "<?= lang('Main.confirmarCreacion')?>",
+                    '',
+                    "success"
+                );
+            },
+            error:function(error) {
+                Swal.fire(
+                    "<?= lang('Main.errorCreacion')?>",
+                    '',
+                    "error"
+                );
             }
         });
     });
 
-    function editar_usuario() {
+    function editar_usuario(id) {
         var userId = $(this).data('id');
         $.ajax({
             url: "<?= base_url('/configuracion/') ?>" + userId,
@@ -275,5 +286,42 @@
                 $('#modalUserForm').show();
             }
         });
+    }
+
+    function eliminar_usuario(id) {
+        Swal.fire({
+            title: "<?= lang('Main.confirmarEliminar') ?>",
+            text: "<?= lang('Main.cuerpoEliminar') ?>",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "<?= lang('Main.si') ?>",
+            cancelButtonText: "<?= lang('Main.no') ?>",
+        }).then((result) => {
+            if (result.value) {
+                var userId = id;
+                $.ajax({
+                    url: "<?= base_url('/configuracion/eliminarusuario') ?>",
+                    data: {
+                        id: userId
+                    },
+                    type: 'POST',
+                    success: function(response) {
+                        tabla_usuario.row(id).remove().draw();
+                        $('#userId').val(response.id);
+                        Swal.fire("<?= lang('Main.confirmacionEliminar') ?>");
+                    },
+                    error: function(error) {
+                        Swal.fire(
+                            'Error!',
+                            'Hubo un problema al eliminar el elemento.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+
     }
 </script>

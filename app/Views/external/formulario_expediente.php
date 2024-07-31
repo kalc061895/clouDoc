@@ -5,8 +5,7 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('pageStyles'); ?>
-<link rel="stylesheet" href="assets/libs/dropzone/dist/min/dropzone.min.css">
-<link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
+
 <?= $this->endSection(); ?>
 
 
@@ -262,7 +261,7 @@
 
     }
 </script>
-<script src="assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
+
 <script src="assets/js/extra-libs/jqbootstrapvalidation/validation.js"></script>
 <script src="assets/js/forms/custom-validation-init.js"></script>
 

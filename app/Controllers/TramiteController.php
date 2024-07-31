@@ -70,7 +70,7 @@ class TramiteController extends BaseController
         $set = [
             'expediente_id' => $this->request->getPost('id'),
             //'accion'=> $this->request->getPost('accionDerivar'),
-            'oficina_procedencia_id' => $_usuario['oficina_id'],
+            'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $this->request->getPost('oficinaDerivar'),
             'numero_movimiento' => $ultimoMovimiento ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
             'estado' => 'ESPERA',
@@ -84,8 +84,7 @@ class TramiteController extends BaseController
 
         $set_adjunto =[
             'movimiento_id'=> $nuevoMovimiento->insertID(),
-            ''=> $this->request->getPost(''),
-        ];
+         ];
         $expedienteModel = new ExpedientesModel();
         $expediente = $expedienteModel->detalleExpediente($id);
 

@@ -16,7 +16,6 @@
 
     <title><?= $this->renderSection('title'); ?></title>
     <!-- Owl Carousel  -->
-    <link rel="stylesheet" href="assets/libs/aos/dist/aos.css" />
 
     <?= $this->renderSection('pageStyles'); ?>
 

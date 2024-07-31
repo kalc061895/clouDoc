@@ -43,24 +43,30 @@ class AuthGroups extends ShieldAuthGroups
     public array $groups = [
         'superadmin' => [
             'title'       => 'Super Admin',
-            'description' => 'Control completo del sitio.',
+            'description' => 'Control completo de las configuracion.',
         ],
         'admin' => [
             'title'       => 'Admin',
-            'description' => 'Day to day administrators of the site.',
+            'description' => 'Gestión de oficinas, usuarios, areas, y otros ',
         ],
-        'developer' => [
-            'title'       => 'Developer',
-            'description' => 'Site programmers.',
+        'tramite' => [
+            'title'       => 'Trámite Documentario',
+            'description' => 'Recepción y derivación de documentos recepcionados a nivel externo e interno',
         ],
         'user' => [
             'title'       => 'User',
-            'description' => 'General users of the site. Often customers.',
+            'description' => 'Usuario Normal',
         ],
-        'beta' => [
-            'title'       => 'Beta User',
-            'description' => 'Has access to beta-level features.',
+        'oficina' => [
+            'title'       => 'Encargados de Oficina',
+            'description' => 'Gestión de Documentos Derivados a la Oficina',
         ],
+        'area' => [
+            'title'       => 'Encargados de Areas de Oficinas',
+            'description' => 'Gestion de Documentos derivados por jefaturas',
+        ],
+        'title'       => 'Trámite Documentario',
+            'description' => 'Recepción y derivación de documentos recepcionados a nivel externo e interno',
     ];
 
     /**

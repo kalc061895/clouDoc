@@ -48,7 +48,9 @@ $routes->delete('menus/(:num)', 'MenuController::delete/$1');
 
 
 $routes->get('configuracion/usuarios', 'UserController::index');
-$routes->get('configuracion/guardarusuario', 'UserController::store');
+$routes->post('configuracion/guardarusuario', 'UserController::store');
+$routes->post('configuracion/eliminarusuario', 'UserController::delete');
+
 /**
  * Opciones de Mesa de Partes
  */

@@ -46,8 +46,11 @@ class UserController extends Controller
 
     public function store()
     {
+
+        //print_r($this->request->getPost());
+        //return 0;
         // Get the User Provider (UserModel by default)
-        $users = auth()->getProvider();
+        $users = new UsuarioModel();
 
         $user = new User([
             'username' => $this->request->getPost('username'),
@@ -60,17 +63,17 @@ class UserController extends Controller
             'cargo' => $this->request->getPost('cargo'),
             'telefono' => $this->request->getPost('telefono'),
             'oficina_id' => $this->request->getPost('oficina_id'),
-            //'person_id' => $this->request->getPost('person_id'),
+            'active' => $this->request->getPost('estado'),
         ]);
 
         $users->save($user);
 
         // To get the complete user object with ID, we need to get from the database
         $user = $users->findById($users->getInsertID());
-
         // Add to default group
         //$users->addToDefaultGroup($user);
-        $users->addGroup($this->request->getPost('group_user'));
+        //$users->addGroup($this->request->getPost('group_user'));
+        $user->addGroup($this->request->getPost('group_user') ?? 'user');
     }
 
     public function edit($id)
@@ -91,6 +94,7 @@ class UserController extends Controller
             'position' => $this->request->getPost('position'),
             'telephone_number' => $this->request->getPost('telephone_number'),
             'office_id' => $this->request->getPost('office_id'),
+            'active' => $this->request->getPost('estado'),
         ];
 
         if ($this->request->getPost('password')) {
@@ -101,9 +105,11 @@ class UserController extends Controller
         return redirect()->to('/users');
     }
 
-    public function delete($id)
-    {
-        $this->userModel->delete($id);
-        return redirect()->to('/users');
+    public function delete()
+    {   
+        $id = $this->request->getPost('id');
+        $users = auth()->getProvider();
+        $users->delete($id, true);
+        return json_encode($users);
     }
 }
