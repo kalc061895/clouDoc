@@ -50,7 +50,9 @@ return [
     'grupoUsuario'=> 'Tipo de Usuario',
     
     'confirmarCreacion'=> 'Usuario Creado Correctamente',
+    'confirmarActualizacion'=> 'Usuario Actualizado Correctamente',
     'errorCreacion'=> 'Error al momento de crear el usuario',
+    'errorActualizacion'=> 'Error al momento de actualizar el usuario',
 
     'confirmarEliminar'=> '¿Estas seguro de eliminar?',
     'cuerpoEliminar'=> 'No se podrá reestablecer',

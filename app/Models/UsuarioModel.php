@@ -37,4 +37,33 @@ class UsuarioModel extends ShieldUserModel
         $query = $builder->get();
         return $query->getResultObject();
     }
+    public function getGroup($userId)
+    {
+        $db = \Config\Database::connect();
+
+        return $db->table('auth_groups_users')->select('auth_groups_users.group')
+            ->where('auth_groups_users.user_id', $userId)
+            ->get()->getResultObject();
+    }
+    public function actualizarGrupo($userId, $grupo)
+    {
+        $db = \Config\Database::connect();
+
+        // Verifica si el usuario ya tiene un grupo asignado
+        $existingGroup = $db->table('auth_groups_users')
+            ->where('user_id', $userId)
+            ->get()
+            ->getRow();
+
+        if ($existingGroup) {
+            // Actualiza el grupo del usuario si ya tiene uno asignado
+            return $db->table('auth_groups_users')
+                ->where('user_id', $userId)
+                ->update(['group' => $grupo]);
+        } else {
+            // Inserta un nuevo grupo para el usuario si no tiene uno asignado
+            return $db->table('auth_groups_users')
+                ->insert(['user_id' => $userId, 'group' => $grupo]);
+        }
+    }
 }

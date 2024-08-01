@@ -34,7 +34,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-6">
                                             <img src="assets/images/profile/user-4.jpg" width="45" class="rounded-circle" />
-                                            <h6 class="mb-0"> <?= $item->nombres; ?></h6>
+                                            <h6 class="mb-0"> <?= $item->paterno . ' ' . $item->materno . ' ' . $item->nombres; ?></h6>
                                         </div>
 
                                     </td>
@@ -43,7 +43,7 @@
                                     <td><?= ($item->active) ? 'Activo' : 'Inactivo' ?></td>
                                     <td>
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-rounded btn-primary" onclick="nuevo_usuario(<?= $item->id ?>)"> <i class="ti ti-pencil"></i> <?= lang('Main.editarUsuario') ?></button>
+                                            <button type="button" class="btn btn-sm btn-rounded btn-primary" onclick="editar_usuario(<?= $item->id ?>)"> <i class="ti ti-pencil"></i> <?= lang('Main.editarUsuario') ?></button>
                                             <button type="button" class="btn btn-sm btn-rounded btn-danger" onclick="eliminar_usuario(<?= $item->id ?>)"> <i class="ti ti-trash"></i> <?= lang('Main.eliminarUsuario') ?></button>
                                         </div>
                                     </td>
@@ -235,6 +235,28 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+<div id='new_add' hidden>
+    <!-- start row -->
+    <tr data-id="" id="new_item">
+        <td>
+            <div class="d-flex align-items-center gap-6">
+                <img src="assets/images/profile/user-4.jpg" width="45" class="rounded-circle" />
+                <h6 class="mb-0"> </h6>
+            </div>
+
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-rounded btn-primary" onclick="nuevo_usuario()"> <i class="ti ti-pencil"></i> <?= lang('Main.editarUsuario') ?></button>
+                <button type="button" class="btn btn-sm btn-rounded btn-danger" onclick="eliminar_usuario()"> <i class="ti ti-trash"></i> <?= lang('Main.eliminarUsuario') ?></button>
+            </div>
+        </td>
+
+    </tr>
+</div>
 
 <script>
     $('#btnNuevoUsuario').on('click', function() {
@@ -248,42 +270,118 @@
         e.preventDefault();
         var formData = $(this).serialize();
 
-        //var url = $('#userId').val() ? 'path/to/your/api/updateUser' : 'path/to/your/api/addUser';
-        url = '<?= base_url('/configuracion/guardarusuario') ?>';
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                $('#modalUserForm').modal('hide');
-                Swal.fire(
-                    "<?= lang('Main.confirmarCreacion')?>",
-                    '',
-                    "success"
-                );
-            },
-            error:function(error) {
-                Swal.fire(
-                    "<?= lang('Main.errorCreacion')?>",
-                    '',
-                    "error"
-                );
-            }
-        });
+        if ($('#idusuario').val() === '') {
+
+
+            url = '<?= base_url('/configuracion/guardarusuario') ?>';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    item = JSON.parse(response);
+
+                    $('#userModal').modal('hide');
+                    tabla_usuario.row.add(
+                        $('<tr>').attr('data-id', item.id).append(
+                            $('<td>').html('<div class="d-flex align-items-center gap-6"><img src="assets/images/profile/user-4.jpg" width="45" class="rounded-circle" /><h6 class="mb-0">' + item.nombres + '</h6></div>'),
+                            $('<td>').text(item.cargo),
+                            $('<td>').text(item.nombre_oficina),
+                            $('<td>').text(item.active ? 'Activo' : 'Inactivo'),
+                            $('<td>').html('<div class="btn-group"><button type="button" class="btn btn-sm btn-rounded btn-primary" onclick="editar_usuario(' + item.id + ')"> <i class="ti ti-pencil"></i> Editar</button><button type="button" class="btn btn-sm btn-rounded btn-danger" onclick="eliminar_usuario(' + item.id + ')"> <i class="ti ti-trash"></i> Eliminar</button></div>')
+                        )
+                    ).draw();
+                    Swal.fire(
+                        "<?= lang('Main.confirmarCreacion') ?>",
+                        '',
+                        "success"
+                    );
+                },
+                error: function(error) {
+                    Swal.fire(
+                        "<?= lang('Main.errorCreacion') ?>",
+                        '',
+                        "error"
+                    );
+                }
+            });
+        } else {
+            url = '<?= base_url('/configuracion/actualizar') ?>';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    item = JSON.parse(response);
+
+                    $('#userModal').modal('hide');
+                    tabla_usuario.row(function(idx, data, node) {
+                            return $(node).data('id') === item.id;
+                        }).remove().draw();
+                    tabla_usuario.row.add(
+                        $('<tr>').attr('data-id', item.id).append(
+                            $('<td>').html('<div class="d-flex align-items-center gap-6"><img src="assets/images/profile/user-4.jpg" width="45" class="rounded-circle" /><h6 class="mb-0">' + item.nombres + '</h6></div>'),
+                            $('<td>').text(item.cargo),
+                            $('<td>').text(item.nombre_oficina),
+                            $('<td>').text(item.active ? 'Activo' : 'Inactivo'),
+                            $('<td>').html('<div class="btn-group"><button type="button" class="btn btn-sm btn-rounded btn-primary" onclick="editar_usuario(' + item.id + ')"> <i class="ti ti-pencil"></i> Editar</button><button type="button" class="btn btn-sm btn-rounded btn-danger" onclick="eliminar_usuario(' + item.id + ')"> <i class="ti ti-trash"></i> Eliminar</button></div>')
+                        )
+                    ).draw();
+                    Swal.fire(
+                        "<?= lang('Main.confirmarActualizacion') ?>",
+                        '',
+                        "success"
+                    );
+                },
+                error: function(error) {
+                    Swal.fire(
+                        "<?= lang('Main.errorActualizacion') ?>",
+                        '',
+                        "error"
+                    );
+                }
+            });
+        }
     });
 
     function editar_usuario(id) {
         var userId = $(this).data('id');
+        Swal.fire(
+            'Cargando...'
+        );
         $.ajax({
-            url: "<?= base_url('/configuracion/') ?>" + userId,
+            url: "<?= base_url('/configuracion/editar') ?>",
             type: 'GET',
+            data: {
+                id: id
+            },
             success: function(response) {
-                $('#userId').val(response.id);
-                $('#username').val(response.username);
-                $('#email').val(response.email);
-                $('#first_name').val(response.first_name);
-                $('#last_name').val(response.last_name);
-                $('#modalUserForm').show();
+                var usuario = JSON.parse(response);
+                // Rellenar el formulario con los datos del usuario
+                $('#userForm [name="idusuario"]').val(usuario.id);
+                $('#userForm [name="nombres"]').val(usuario.nombres);
+                $('#userForm [name="paterno"]').val(usuario.paterno);
+                $('#userForm [name="materno"]').val(usuario.materno);
+                $('#userForm [name="dni"]').val(usuario.dni);
+                $('#userForm [name="email"]').val(usuario.email);
+                $('#userForm [name="telefono"]').val(usuario.telefono);
+                $('#userForm [name="cargo"]').val(usuario.cargo);
+                $('#userForm [name="oficina_id"]').val(usuario.oficina_id).change();
+                $('#userForm [name="group_user"]').val(usuario.group_user).change();
+                $('#userForm [name="estado"]').val(usuario.estado).change();
+                $('#userForm [name="username"]').val(usuario.username);
+                $('#userForm [name="password"]').val(usuario.password);
+                $('#userForm [name="cpassword"]').val(usuario.password);
+                $('#userModal').modal('show');
+                Swal.close();
+
+            },
+            error: function(xhr, status, error) {
+                Swal.fire(
+                    'Error!',
+                    'Hubo un problema al acceder el elemento.',
+                    'error'
+                );
             }
         });
     }
@@ -308,8 +406,9 @@
                     },
                     type: 'POST',
                     success: function(response) {
-                        tabla_usuario.row(id).remove().draw();
-                        $('#userId').val(response.id);
+                        tabla_usuario.row(function(idx, data, node) {
+                            return $(node).data('id') === id;
+                        }).remove().draw();
                         Swal.fire("<?= lang('Main.confirmacionEliminar') ?>");
                     },
                     error: function(error) {

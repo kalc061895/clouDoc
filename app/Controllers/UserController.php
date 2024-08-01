@@ -74,39 +74,87 @@ class UserController extends Controller
         //$users->addToDefaultGroup($user);
         //$users->addGroup($this->request->getPost('group_user'));
         $user->addGroup($this->request->getPost('group_user') ?? 'user');
-    }
-
-    public function edit($id)
-    {
-        $data['user'] = $this->userModel->find($id);
-        return view('users/edit', $data);
-    }
-
-    public function update($id)
-    {
+        $oficina = new OficinaModel();
+        $nombre_oficina = $oficina->find($user->oficina_id);
         $data = [
-            'username' => $this->request->getPost('username'),
-            'email' => $this->request->getPost('email'),
-            'first_name' => $this->request->getPost('first_name'),
-            'last_name' => $this->request->getPost('last_name'),
-            'mother_maiden_name' => $this->request->getPost('mother_maiden_name'),
-            'id_number' => $this->request->getPost('id_number'),
-            'position' => $this->request->getPost('position'),
-            'telephone_number' => $this->request->getPost('telephone_number'),
-            'office_id' => $this->request->getPost('office_id'),
-            'active' => $this->request->getPost('estado'),
+            'id' => $user->id,
+            'nombres' => $user->paterno . " " . $user->materno . " " . $user->nombres,
+            'cargo' => $user->cargo,
+            'active' => $user->active,
+            'nombre_oficina' => $nombre_oficina['nombre'],
+        ];
+        return json_encode($data);
+    }
+
+    public function edit()
+    {
+        $id = $this->request->getGet('id');
+
+        $_user = new UsuarioModel();
+        $user = $_user->find($id);
+        $grupo = $_user->getGroup($id);
+
+        $data = [
+            'user' => $user,
+            'id' => $user->id,
+            'username' => $user->username,
+            'email'    => $user->email,
+            'password' => $user->password,
+            'nombres' => $user->nombres,
+            'paterno' => $user->paterno,
+            'materno' => $user->materno,
+            'dni' => $user->dni,
+            'cargo' => $user->cargo,
+            'telefono' => $user->telefono,
+            'group_user' => $grupo[0]->group,
+            'oficina_id' => $user->oficina_id,
+            'estado' => ($user->active) ? 1 : 0,
         ];
 
-        if ($this->request->getPost('password')) {
-            $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
-        }
+        return json_encode($data);
+    }
 
-        $this->userModel->update($id, $data);
-        return redirect()->to('/users');
+    public function update()
+    {
+        $users = NEW UsuarioModel();
+
+        $user = $users->findById($this->request->getPost('idusuario'));
+        $_password = $this->request->getPost('password');
+        $user->fill([
+            'username' => $this->request->getPost('username'),
+            'email'    => $this->request->getPost('email'),
+            'password' => $_password,
+            'nombres' => $this->request->getPost('nombres'),
+            'paterno' => $this->request->getPost('paterno'),
+            'materno' => $this->request->getPost('materno'),
+            'dni' => $this->request->getPost('dni'),
+            'cargo' => $this->request->getPost('cargo'),
+            'telefono' => $this->request->getPost('telefono'),
+            'oficina_id' => $this->request->getPost('oficina_id'),
+            'active' => $this->request->getPost('estado'),
+        ]);
+        $users->save($user);
+        $users->actualizarGrupo($user->id,$this->request->getPost('group_user') ?? 'user');
+        // To get the complete user object with ID, we need to get from the database
+        //$user = $users->findById($users->getUpdateID());
+        // Add to default group
+        //$users->addToDefaultGroup($user);
+        //$users->addGroup($this->request->getPost('group_user'));
+        //$user->addGroup($this->request->getPost('group_user') ?? 'user');
+        $oficina = new OficinaModel();
+        $nombre_oficina = $oficina->find($user->oficina_id);
+        $data = [
+            'id' => $user->id,
+            'nombres' => $user->paterno . " " . $user->materno . " " . $user->nombres,
+            'cargo' => $user->cargo,
+            'active' => $user->active,
+            'nombre_oficina' => $nombre_oficina['nombre'],
+        ];
+        return json_encode($data);
     }
 
     public function delete()
-    {   
+    {
         $id = $this->request->getPost('id');
         $users = auth()->getProvider();
         $users->delete($id, true);

@@ -67,7 +67,9 @@ class ExpedienteController extends BaseController
         
         $_expedienteModel = new ExpedientesModel();
         $expedienteArray = $_expedienteModel->getBuscarExpediente($this->request->getPost('inputCode'), $this->request->getPost('inputAnio'));
-
+        if (count($expedienteArray) < 1) {
+            return view('external/info_expediente',['expediente'=>false,'exp_id'=>$this->request->getPost('inputCode')]);
+        }
         
         $entidadArray = $this->entidadModel->find($expedienteArray[0]->remitente_id);
 
