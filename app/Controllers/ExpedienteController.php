@@ -81,12 +81,18 @@ class ExpedienteController extends BaseController
         //return print_r($adjunto);
         $_documento = new TipoExpedienteModel();
         $documento = $_documento->find($expedienteArray[0]->tipoexpediente_id);
+        $movimientoArray = $this->expedienteModel->getMovimientos($expedienteArray[0]->id);
+        
+        
+
         $data = [
             'entidad' => $entidadArray,
             'expediente' => $expedienteArray,
+            'movimiento' => $movimientoArray,
             'documento' => $documento,
-            'adjunto' => $adjunto,
+            'adjunto' => $adjunto
         ];
+        
         //return print_r($data);
         return view('external/info_expediente', $data);
     }

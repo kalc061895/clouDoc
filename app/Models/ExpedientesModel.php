@@ -153,6 +153,38 @@ class ExpedientesModel extends Model
         $query = $builder->get();
         return $query->getResultObject();
     }
+    public function getMovimientos($id_expediente) {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('movimientos');
+
+        $builder->select(
+            '
+            movimientos.id,
+            movimientos.numero_movimiento,
+            oficinas.nombre as oficina_destino,
+            movimientos.observacion,
+            movimientos.prioridad,
+            movimientos.estado,
+            movimientos.fecha_envio,
+            movimientos.fecha_recepcion,
+            movimientos.fecha_culminacion'
+        );
+
+        //$builder->where('YEAR(expedientes.fecha_recepcion)',$anio);
+        $builder->join(
+            'oficinas',
+            'oficinas.id = movimientos.oficina_destino_id',
+            'JOIN'
+        );
+        $builder->orderBy(
+            'numero_movimiento DESC'
+        );
+        $builder->where('movimientos.expediente_id',$id_expediente);
+        
+        $query = $builder->get();
+        return $query->getResultObject();
+    }
 
     public function getAnios() {
         $db = \Config\Database::connect();

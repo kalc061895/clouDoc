@@ -41,6 +41,7 @@ return [
     'fecha'=>'Fecha',
     'searching'=>'Buscando...',
     'seguimientoTitle'=>'Seguimiento de expediente',
+    'seguimientoDescription'=>'Historial del expediente.',
 
     // New Exp Page
     'titleNew'=> 'Registrar Nuevo Expediente',
