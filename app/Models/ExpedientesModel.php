@@ -155,14 +155,17 @@ class ExpedientesModel extends Model
     }
     public function getMovimientos($id_expediente) {
         $db = \Config\Database::connect();
-
+    
         $builder = $db->table('movimientos');
-
+    
         $builder->select(
             '
             movimientos.id,
             movimientos.numero_movimiento,
-            oficinas.nombre as oficina_destino,
+            oficina_procedencia.id as oficina_procedencia_id,
+            oficina_procedencia.nombre as oficina_procedencia,
+            oficina_destino.id as oficina_destino_id,
+            oficina_destino.nombre as oficina_destino,
             movimientos.observacion,
             movimientos.prioridad,
             movimientos.estado,
@@ -170,21 +173,26 @@ class ExpedientesModel extends Model
             movimientos.fecha_recepcion,
             movimientos.fecha_culminacion'
         );
-
-        //$builder->where('YEAR(expedientes.fecha_recepcion)',$anio);
+    
         $builder->join(
-            'oficinas',
-            'oficinas.id = movimientos.oficina_destino_id',
+            'oficinas as oficina_procedencia',
+            'oficina_procedencia.id = movimientos.oficina_procedencia_id',
             'JOIN'
         );
-        $builder->orderBy(
-            'numero_movimiento DESC'
+    
+        $builder->join(
+            'oficinas as oficina_destino',
+            'oficina_destino.id = movimientos.oficina_destino_id',
+            'JOIN'
         );
-        $builder->where('movimientos.expediente_id',$id_expediente);
-        
+    
+        $builder->orderBy('numero_movimiento DESC');
+        $builder->where('movimientos.expediente_id', $id_expediente);
+    
         $query = $builder->get();
         return $query->getResultObject();
     }
+    
 
     public function getAnios() {
         $db = \Config\Database::connect();

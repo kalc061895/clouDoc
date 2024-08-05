@@ -109,6 +109,7 @@ return [
     'adjunto'=> 'Archivos Adjuntos',
     'rechazar'=> 'Rechazar Expediente',
     'observacion'=> 'Observación',
+    'confirmarDerivacion'=> 'Se Derivo Correctamente ',
 
     //observar expediente
     'observar'=> 'Observar Expediente',

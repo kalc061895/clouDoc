@@ -1,5 +1,3 @@
-
-
 <div class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
         <h4 class="card-title mb-0"><?= lang('Main.expedienteRecibidoTitle') ?></h4>
@@ -33,7 +31,7 @@
                     <?php if ($expediente) : ?>
                         <?php foreach ($expediente as $item) : ?>
 
-                            <tr>
+                            <tr data-id="<?= $item->id ?>">
                                 <td>
                                     <h6 class="fs-4 fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
                                 </td>
@@ -73,7 +71,7 @@
 </div>
 
 <script>
-    $("#expedientesTable").DataTable({
+    var tabla_expedientes = $("#expedientesTable").DataTable({
         order: [
             [0, "desc"]
         ],
@@ -107,7 +105,7 @@
                 $('#detalleExpediente').modal('show');
                 Swal.close();
             },
-            error: function(e){
+            error: function(e) {
                 Swal.fire({
                     type: "error",
                     html: "Vuelva a Intentarlo nuevamente",
@@ -116,6 +114,15 @@
             },
         });
     }
+
+    function mensaje_derivar(id) {
+        console.log('id del expedietne '+id);
+        tabla_expedientes.row(function(idx, data, node) {
+            return $(node).data('id') == id;
+        }).remove().draw();
+        Swal.fire("<?= lang('Main.confirmacionDerivar') ?>");
+    }
+
 </script>
 
 <!-- Primary Header Modal -->
@@ -144,7 +151,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                    <?=lang('Main.cerrar')?>
+                    <?= lang('Main.cerrar') ?>
                 </button>
             </div>
         </div>

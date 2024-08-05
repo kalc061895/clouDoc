@@ -13,7 +13,7 @@ class AdjuntoModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'expediente_id','local_path','drive_path','orden'
+        'expediente_id','movimiento_id','local_path','drive_path','orden'
     ];
 
     protected bool $allowEmptyInserts = false;
