@@ -60,6 +60,11 @@ return [
     'no'=> 'No',
     'confirmacionEliminar'=> 'Eliminado! El usuario se ha eliminado',
     
+    //menu settings
+    'menuGroupUserTitle'=>'Administración de Roles por Grupo de Usuario',
+    'nuevo'=>'Nuevo',
+    'menuId'=>'Menu ID',
+    'groupId'=>'Grupo de Usuario ID',
 
 
 
@@ -123,6 +128,8 @@ return [
 
     // General
     'cerrar'=> 'Cerrar',
+    'editar'=> 'Editar',
+    'eliminar'=> 'Eliminar',
     'cancelar'=> 'Cancelar',
     'guardar'=> 'Guardar',
 

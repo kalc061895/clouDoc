@@ -46,7 +46,6 @@ class TramiteController extends BaseController
                         'expediente' => $expediente,
                         'oficina' => $oficinaModel->findAll(),
                         'accion' => $accionModel->findAll(),
-
                     ]
                 )
             ];
@@ -164,4 +163,17 @@ class TramiteController extends BaseController
             'message' => 'Archivo(s) subido(s) exitosamente.',
         ];
     }
+
+    public function getExpedientePorOficina(): String
+    {
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesOficina($idOficina),
+        ];
+        return view('tramite/listar_nuevos_expedientes', $set);
+    }
+
 }

@@ -49,7 +49,7 @@
         // Función para cargar los menús desde el servidor
         function loadMenus() {
             $.ajax({
-                url: '/menus', // URL del backend para obtener los menús (adaptar según tu estructura)
+                url: "<?= base_url('/menus')?>", // URL del backend para obtener los menús (adaptar según tu estructura)
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -82,7 +82,7 @@
             var menuId = $('#menuId').val();
             var menuName = $('#menuName').val();
 
-            var url = '/menus';
+            var url = "<?= base_url('/menus')?>";
             var method = 'POST';
             if (menuId !== '') {
                 url += '/' + menuId;
@@ -105,7 +105,7 @@
         $('#menuTable').on('click', '.btn-edit', function() {
             var menuId = $(this).data('id');
             $.ajax({
-                url: '/menus/' + menuId, // URL para obtener detalles del menú por ID (adaptar según tu estructura)
+                url: "<?= base_url('/menus/')?>" + menuId, // URL para obtener detalles del menú por ID (adaptar según tu estructura)
                 type: 'GET',
                 dataType: 'json',
                 success: function(menu) {
@@ -122,7 +122,7 @@
             var menuId = $(this).data('id');
             if (confirm('¿Estás seguro de eliminar este menú?')) {
                 $.ajax({
-                    url: '/menus/' + menuId, // URL para eliminar menú por ID (adaptar según tu estructura)
+                    url: '<?=base_url("/menus")?>' + menuId, // URL para eliminar menú por ID (adaptar según tu estructura)
                     type: 'DELETE',
                     success: function(response) {
                         loadMenus();

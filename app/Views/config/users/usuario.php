@@ -88,7 +88,7 @@
             </div>
             <div class="modal-body">
                 <form id="userForm">
-                    <input type="text" hidden name="idusuario">
+                    <input type="text" hidden name="idusuario" id='idusuario' value="0">
                     <div class="row">
                         <h4 class="card-title mb-4"><?= lang('Main.infoPersonal') ?></h4>
                         <div class="col-md-4">
@@ -270,7 +270,7 @@
         e.preventDefault();
         var formData = $(this).serialize();
 
-        if ($('#idusuario').val() === '') {
+        if ($('#idusuario').val() == '0') {
 
 
             url = '<?= base_url('/configuracion/guardarusuario') ?>';

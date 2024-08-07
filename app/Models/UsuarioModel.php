@@ -25,7 +25,9 @@ class UsuarioModel extends ShieldUserModel
     }
     public function findInfo()
     {
-        return $this->select('users.*, oficinas.nombre as nombre_oficina')->join('oficinas', 'oficinas.id = users.oficina_id', 'JOIN')->get()->getResultObject();
+        return $this->select('users.*, oficinas.nombre as nombre_oficina')
+                    ->join('oficinas', 'oficinas.id = users.oficina_id', 'JOIN')
+                    ->get()->getResultObject();
     }
 
     public function getGrupos()
