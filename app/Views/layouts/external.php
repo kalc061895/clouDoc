@@ -34,7 +34,7 @@
           <nav class="navbar navbar-expand-md navbar-light ps-0">
             <!-- Logo will be here -->
             <a class="navbar-brand" href="<?= base_url('') ?>">
-              <img src="assets/images/logos/dark-logo.svg" alt="img-fluid" />
+              <img src="assets/images/logos/dark-logo.png" alt="img-fluid" />
             </a>
 
             <!--Toggle button-->

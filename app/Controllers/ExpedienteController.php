@@ -12,8 +12,10 @@ use App\Models\TipoExpedienteModel;
 use App\Models\TipoDocumentoModel;
 use App\Models\AdjuntoModel;
 use Dompdf\Dompdf;
-use Dompdf\Options; 
+use Dompdf\Options;
 use PhpParser\Node\Stmt\TryCatch;
+
+use App\Libraries\GoogleDrive;
 
 class ExpedienteController extends BaseController
 {
@@ -147,6 +149,10 @@ class ExpedienteController extends BaseController
         $_adjunto = new AdjuntoModel();
         $anexoExp = $this->request->getFile('anexoExp');
 
+
+
+
+
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             try {
                 $newName = $anexoExp->getRandomName();
@@ -156,8 +162,18 @@ class ExpedienteController extends BaseController
                 // Obtener el número de orden para el nuevo adjunto
                 $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
                     ->countAllResults() + 1;
+                /**
+                 * Subir archivos al google drive si esta habilitado
+                 */
+                $drivePath = '-';
+                if (1) {
+                    //$file = $this->request->getFile('anexoExp');
+                    $googleDrive = new GoogleDrive();
 
-                $drivePath = 'algundirreccion de google';
+                    $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                    $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $anexoExp->getName(), $folderId);
+                    $drivePath = $fileId;
+                }
                 // Guardar la información en la base de datos
                 $data = [
                     'expediente_id' => $expedienteArray['id'],
@@ -169,17 +185,16 @@ class ExpedienteController extends BaseController
                 $_adjunto->insert($data);
             } catch (\Throwable $th) {
                 $_expediente  = new ExpedientesModel();
-                $_expediente->delete($expedienteArray['id'],true);
+                $_expediente->delete($expedienteArray['id'], true);
                 $response = [
                     'status' => 'error',
                     'message' => 'Error al subir el archivo.',
                 ];
                 return $this->response->setJSON($response);
             }
-        }
-        else{
+        } else {
             $_expediente  = new ExpedientesModel();
-            $_expediente->delete($expedienteArray['id'],true);
+            $_expediente->delete($expedienteArray['id'], true);
             $response = [
                 'status' => 'error',
                 'message' => 'Error al subir el archivo.',

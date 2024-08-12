@@ -11,6 +11,7 @@ use App\Models\AccionModel;
 use App\Models\OficinaModel;
 use App\Models\AdjuntoModel;
 use Config\Auth;
+use App\Libraries\GoogleDrive;
 
 class TramiteController extends BaseController
 {
@@ -120,6 +121,8 @@ class TramiteController extends BaseController
 
     function handleFileUpload($inputName, $expedienteId,$movimientoId=null)
     {
+        
+
         $_adjunto = new AdjuntoModel();
         $files = $this->request->getFileMultiple($inputName);
 
@@ -171,9 +174,11 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesOficina($idOficina),
+            'expediente' => $expedientesModel->getExpedientesOficina($idOficina ),
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
+
+
 
 }
