@@ -331,4 +331,20 @@ class ExpedienteController extends BaseController
             return false;
         }
     }
+
+
+    public function upload()
+    {
+        if ($this->request->getMethod() == 'post' && $this->request->getFile('fileToUpload')->isValid()) {
+            $file = $this->request->getFile('fileToUpload');
+            $googleDrive = new GoogleDrive();
+
+            $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+            $fileId = $googleDrive->uploadFile($file->getTempName(), $file->getName(), $folderId);
+
+            echo "Archivo subido con éxito. ID del archivo: $fileId";
+        } else {
+            echo "Error al subir el archivo.";
+        }
+    }
 }
