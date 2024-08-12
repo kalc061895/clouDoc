@@ -60,6 +60,9 @@ writable/respuesta/*
 writable/session/*
 !writable/session/index.html
 
+app/Credentials/*
+!app/Credentials/index.html
+
 public/uploads/*
 !public/uploads/index.html
 
