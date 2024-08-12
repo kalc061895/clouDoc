@@ -28,6 +28,9 @@ return [
     
     // Uuario Settings
     'titleUsuarioTable' => 'Configuración de Usuarios',
+    'infoPersonal' => 'Personal',
+    'infoInstitucional' => 'Institucional',
+    'infoLogeo' => 'Inicio de Sesión',
     'nuevoUsuario' => 'Nuevo Usuario',
     'editarUsuario' => 'Editar',
     'eliminarUsuario' => 'Eliminar',
@@ -35,15 +38,33 @@ return [
     'cargoUsuario' => 'Cargo',
     'oficinaUsuario' => 'Oficina',
     'estadoUsuario' => 'Estado',
-    'opciones' => 'Opciones',
     'nombres'=> 'Nombres',
     'paterno'=> 'Ap. Paterno',
     'materno'=> 'Ap. Materno',
-    'nombreUsuario'=> 'Nombre de Usuario',
+    'dni'=> 'DNI',
+    'email'=> 'Correo Electrónico',
+    'telefono'=> 'Teléfono',
+    'nombreUsuario'=> 'Usuario',
     'contrasena'=> 'Contraseña',
     'ccontrasena'=> 'Confirmar Contraseña',
     'grupoUsuario'=> 'Tipo de Usuario',
     
+    'confirmarCreacion'=> 'Usuario Creado Correctamente',
+    'confirmarActualizacion'=> 'Usuario Actualizado Correctamente',
+    'errorCreacion'=> 'Error al momento de crear el usuario',
+    'errorActualizacion'=> 'Error al momento de actualizar el usuario',
+
+    'confirmarEliminar'=> '¿Estas seguro de eliminar?',
+    'cuerpoEliminar'=> 'No se podrá reestablecer',
+    'si'=> 'Si',
+    'no'=> 'No',
+    'confirmacionEliminar'=> 'Eliminado! El usuario se ha eliminado',
+    
+    //menu settings
+    'menuGroupUserTitle'=>'Administración de Roles por Grupo de Usuario',
+    'nuevo'=>'Nuevo',
+    'menuId'=>'Menu ID',
+    'groupId'=>'Grupo de Usuario ID',
 
 
 
@@ -93,6 +114,7 @@ return [
     'adjunto'=> 'Archivos Adjuntos',
     'rechazar'=> 'Rechazar Expediente',
     'observacion'=> 'Observación',
+    'confirmarDerivacion'=> 'Se Derivo Correctamente ',
 
     //observar expediente
     'observar'=> 'Observar Expediente',
@@ -106,6 +128,8 @@ return [
 
     // General
     'cerrar'=> 'Cerrar',
+    'editar'=> 'Editar',
+    'eliminar'=> 'Eliminar',
     'cancelar'=> 'Cancelar',
     'guardar'=> 'Guardar',
 

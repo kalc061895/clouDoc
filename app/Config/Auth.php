@@ -305,7 +305,15 @@ class Auth extends ShieldAuth
      * For example:
      *     $personalFields = ['firstname', 'lastname'];
      */
-    public array $personalFields = [];
+    public array $personalFields = [
+            'nombres',
+            'paterno',
+            'materno',
+            'dni',
+            'cargo',
+            'telefono',
+            'oficina_id'
+    ];
 
     /**
      * --------------------------------------------------------------------

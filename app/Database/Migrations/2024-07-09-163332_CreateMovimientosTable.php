@@ -49,6 +49,10 @@ class CreateMovimientosTable extends Migration
                 'type' => 'DATETIME',
                 'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
+            'observacion' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
             'fecha_recepcion' => [
                 'type' => 'DATETIME',
                 'null' => true,

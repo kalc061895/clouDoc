@@ -15,4 +15,6 @@ class ConfigController extends BaseController
 
         return view("config/menus");
     }
+
+
 }

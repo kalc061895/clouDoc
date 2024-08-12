@@ -4,16 +4,16 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AdjuntoModel extends Model
+class GroupUserModel extends Model
 {
-    protected $table            = 'adjuntos';
+    protected $table            = 'group_user';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'expediente_id','movimiento_id','local_path','drive_path','orden'
+        'name'
     ];
 
     protected bool $allowEmptyInserts = false;

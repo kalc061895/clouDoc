@@ -47,9 +47,9 @@
 
             <div>
                 <div class="brand-logo d-flex align-items-center">
-                    <a href="<?= base_url('/') ?>" class="text-nowrap logo-img">
-                        <img src="assets/images/logos/dark-logo.svg" alt="Logo" class="dark-logo" />
-                        <img src="assets/images/logos/light-logo.svg" alt="Logo" class="light-logo" />
+                    <a href="<?= base_url('/inicio') ?>" class="text-nowrap logo-img">
+                        <img src="assets/images/logos/dark-logo.png" alt="Logo" class="dark-logo" />
+                        <img src="assets/images/logos/light-logo.png" alt="Logo" class="light-logo" />
                     </a>
                 </div>
 
@@ -519,7 +519,7 @@
                         </ul>
 
                         <div class="d-block d-lg-none py-4 py-xl-0">
-                            <img src="assets/images/logos/light-logo.svg" alt="Logo" />
+                            <img src="assets/images/logos/light-logo.png" alt="Logo" />
                         </div>
                         <ul class="navbar-nav navbar-toggler p-0 border-0">
                             <li class="nav-item nav-icon-hover-bg dark rounded-circle d-flex">
@@ -902,8 +902,8 @@
                             <div class="offcanvas-header justify-content-between ps-0 pt-0">
                                 <div class="brand-logo d-flex align-items-center">
                                     <a href="<?= base_url('/') ?>" class="text-nowrap logo-img">
-                                        <img src="assets/images/logos/dark-logo.svg" alt="Logo" class="dark-logo" />
-                                        <img src="assets/images/logos/light-logo.svg" alt="Logo" class="light-logo" />
+                                        <img src="assets/images/logos/dark-logo.png" alt="Logo" class="dark-logo" />
+                                        <img src="assets/images/logos/light-logo.png" alt="Logo" class="light-logo" />
                                     </a>
                                 </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -1023,7 +1023,7 @@
                             <li class="nav-item d-none d-xl-flex align-items-center">
                                 <a href="../horizontal/<?= base_url('/') ?>" class="text-nowrap nav-link">
 
-                                    <img src="assets/images/logos/light-logo.svg" alt="Logo" />
+                                    <img src="assets/images/logos/light-logo.png" alt="Logo" />
                                 </a>
                             </li>
                             <!-- ------------------------------- -->
@@ -1405,7 +1405,7 @@
                         </ul>
                         <div class="d-block d-xl-none">
                             <a href="<?= base_url('/') ?>" class="text-nowrap nav-link">
-                                <img src="assets/images/logos/light-logo.svg" alt="Logo" />
+                                <img src="assets/images/logos/light-logo.png" alt="Logo" />
                             </a>
                         </div>
                         <ul class="navbar-nav navbar-toggler p-0 border-0">

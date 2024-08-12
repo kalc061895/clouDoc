@@ -54,7 +54,7 @@ class ExpedientesModel extends Model
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*,entidad.*');
+        $builder->select('expedientes.*,entidad.*,movimientos.estado');
         $builder->where('movimientos.id', null);
         $builder->join(
             'movimientos',
@@ -72,7 +72,8 @@ class ExpedientesModel extends Model
 
         return $query->getResultObject();
     }
-    public function detalleExpediente($id) {
+    public function detalleExpediente($id)
+    {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
@@ -83,7 +84,8 @@ class ExpedientesModel extends Model
             local_path,drive_path,
             tipo_expediente.nombre as tipoexpediente'
         );
-        $builder->where('expedientes.id',
+        $builder->where(
+            'expedientes.id',
             $id
         );
         $builder->join(
@@ -114,7 +116,8 @@ class ExpedientesModel extends Model
 
         return $query->getResultObject();
     }
-    public function getBuscarExpediente($numero_expediente,$anio) {
+    public function getBuscarExpediente($numero_expediente, $anio)
+    {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
@@ -148,13 +151,53 @@ class ExpedientesModel extends Model
             'tipo_expediente.id = expedientes.tipo_expediente_id',
             'inner'
         );
-        $builder->where('numero_expediente',$numero_expediente);
-        
+        $builder->where('numero_expediente', $numero_expediente);
+
         $query = $builder->get();
         return $query->getResultObject();
     }
+    public function getMovimientos($id_expediente)
+    {
+        $db = \Config\Database::connect();
 
-    public function getAnios() {
+        $builder = $db->table('movimientos');
+
+        $builder->select(
+            '
+            movimientos.id,
+            movimientos.numero_movimiento,
+            oficina_procedencia.id as oficina_procedencia_id,
+            oficina_procedencia.nombre as oficina_procedencia,
+            oficina_destino.id as oficina_destino_id,
+            oficina_destino.nombre as oficina_destino,
+            movimientos.observacion,
+            movimientos.prioridad,
+            movimientos.estado,
+            movimientos.fecha_envio,
+            movimientos.fecha_recepcion,
+            movimientos.fecha_culminacion'
+        );
+
+        $builder->join(
+            'oficinas as oficina_procedencia',
+            'oficina_procedencia.id = movimientos.oficina_procedencia_id',
+            'JOIN'
+        );
+
+        $builder->join(
+            'oficinas as oficina_destino',
+            'oficina_destino.id = movimientos.oficina_destino_id',
+            'JOIN'
+        );
+
+        $builder->orderBy('numero_movimiento DESC');
+        $builder->where('movimientos.expediente_id', $id_expediente);
+
+        $query = $builder->get();
+        return $query->getResultObject();
+    }
+    public function getAnios()
+    {
         $db = \Config\Database::connect();
 
         $builder = $db->table('anios');
@@ -163,5 +206,33 @@ class ExpedientesModel extends Model
         $query = $builder->get();
 
         return $query->getResultArray();
+    }
+    public function getExpedientesOficina($id_oficina,$where=false)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+        $builder->where('movimientos.oficina_destino_id', $id_oficina);
+        if ($where != false) {
+            $builder->where('movimientos.estado', $where);
+        }
+
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+
+        $builder->orderBy('expedientes.numero_expediente DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
     }
 }

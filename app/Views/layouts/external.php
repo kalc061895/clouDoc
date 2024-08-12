@@ -17,7 +17,7 @@
   <title><?= $this->renderSection('title'); ?></title>
   <!-- Owl Carousel  -->
   <link rel="stylesheet" href="assets/libs/aos/dist/aos.css" />
-
+  <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
   <?= $this->renderSection('pageStyles') ;?>
 
 </head>
@@ -34,7 +34,7 @@
           <nav class="navbar navbar-expand-md navbar-light ps-0">
             <!-- Logo will be here -->
             <a class="navbar-brand" href="<?= base_url('') ?>">
-              <img src="assets/images/logos/dark-logo.svg" alt="img-fluid" />
+              <img src="assets/images/logos/dark-logo.png" alt="img-fluid" />
             </a>
 
             <!--Toggle button-->
@@ -122,6 +122,7 @@
   <script src="assets/js/iconify-icon%401.0.8/dist/iconify-icon.min.js"></script>
   <script src="assets/libs/aos/dist/aos.js"></script>
   <script src="assets/js/landingpage/landingpage.js"></script>
+  <script src="assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
   <?= $this->renderSection('pageScripts') ;?>
 </body>
 

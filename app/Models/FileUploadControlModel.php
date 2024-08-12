@@ -4,16 +4,23 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AdjuntoModel extends Model
+class FileUploadControlModel extends Model
 {
-    protected $table            = 'adjuntos';
+    protected $table            = 'file_upload_control';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'expediente_id','movimiento_id','local_path','drive_path','orden'
+        'oficina_id',
+        'folder_name',
+        'folder_id',
+        'storage',
+        'count',
+        'is_active',
+        'created_at',
+        'updated_at'
     ];
 
     protected bool $allowEmptyInserts = false;

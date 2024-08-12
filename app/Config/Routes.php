@@ -26,13 +26,13 @@ service('auth')->routes($routes);
  * 
  * 
  */
-$routes->get('/','ExpedienteController::index');
-$routes->get('/nuevoexpediente','ExpedienteController::nuevoexpediente');
-$routes->post('/nuevoexpediente','ExpedienteController::store');
-$routes->get('/cargoexpediente/(:num)','ExpedienteController::generateReceiptPDF/$1');
-$routes->get('/buscarexpediente','ExpedienteController::buscarexpediente');
-$routes->post('/buscarexpediente','ExpedienteController::infoexpediente');
-$routes->get('/tupaexpediente','ExpedienteController::tupaexpediente');
+$routes->get('/', 'ExpedienteController::index');
+$routes->get('/nuevoexpediente', 'ExpedienteController::nuevoexpediente');
+$routes->post('/nuevoexpediente', 'ExpedienteController::store');
+$routes->get('/cargoexpediente/(:num)', 'ExpedienteController::generateReceiptPDF/$1');
+$routes->get('/buscarexpediente', 'ExpedienteController::buscarexpediente');
+$routes->post('/buscarexpediente', 'ExpedienteController::infoexpediente');
+$routes->get('/tupaexpediente', 'ExpedienteController::tupaexpediente');
 
 
 /**
@@ -46,9 +46,28 @@ $routes->post('menus', 'MenuController::create');
 $routes->put('menus/(:num)', 'MenuController::update/$1');
 $routes->delete('menus/(:num)', 'MenuController::delete/$1');
 
+/**
+ * Configuracion de Usuarios
+ */
 
 $routes->get('configuracion/usuarios', 'UserController::index');
-$routes->get('configuracion/guardarusuario', 'UserController::store');
+$routes->post('configuracion/guardarusuario', 'UserController::store');
+$routes->post('configuracion/eliminarusuario', 'UserController::delete');
+$routes->get('configuracion/editar', 'UserController::edit');
+$routes->post('configuracion/actualizar', 'UserController::update');
+
+/**
+ * Configuracion de Menu por Grupo Usuario
+ */
+
+$routes->get('configuracion/perfiles', 'MenuGroupUserController::index');
+$routes->post('menugroupuser/', 'MenuGroupUserController::fetchData');
+$routes->post('menugroupuser/save', 'MenuGroupUserController::save');
+$routes->get('menugroupuser/delete/(:num)', 'MenuGroupUserController::delete/$1');
+$routes->get('menugroupuser/getMenus', 'MenuGroupUserController::getMenus');
+$routes->get('menugroupuser/getGroups', 'MenuGroupUserController::getGroups');
+
+
 /**
  * Opciones de Mesa de Partes
  */
@@ -56,3 +75,9 @@ $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpediente
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
 
+/**
+ * Opciones de Mesa de Partes
+ */
+$routes->get('expediente/para_recibir', 'TramiteController::getExpedientePorOficina');
+$routes->get('expediente/detalle', 'TramiteController::getDetallesExpedientes');
+$routes->post('expediente/derivar', 'TramiteController::postDerivarExpediente');

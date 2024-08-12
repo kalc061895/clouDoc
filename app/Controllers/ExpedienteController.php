@@ -13,6 +13,9 @@ use App\Models\TipoDocumentoModel;
 use App\Models\AdjuntoModel;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PhpParser\Node\Stmt\TryCatch;
+
+use App\Libraries\GoogleDrive;
 
 class ExpedienteController extends BaseController
 {
@@ -52,39 +55,49 @@ class ExpedienteController extends BaseController
     {
 
 
-        $set=[
+        $set = [
             'anios'  =>  $this->expedienteModel->getAnios(),
-            'exp_id'  =>  $this->request->getGet('id')??'',
+            'exp_id'  =>  $this->request->getGet('id') ?? '',
         ];
-        return view('external/busqueda_expediente',$set);
+        return view('external/busqueda_expediente', $set);
     }
 
 
 
     // resultado de la busqueda de un Expediente
     public function infoExpediente()
-    {   
-        
+    {
+
         $_expedienteModel = new ExpedientesModel();
         $expedienteArray = $_expedienteModel->getBuscarExpediente($this->request->getPost('inputCode'), $this->request->getPost('inputAnio'));
+        if (count($expedienteArray) < 1) {
+            return view('external/info_expediente', ['expediente' => false, 'exp_id' => $this->request->getPost('inputCode')]);
+        }
 
-        
         $entidadArray = $this->entidadModel->find($expedienteArray[0]->remitente_id);
 
         // Manejo del archivo
         $_adjunto = new AdjuntoModel();
 
-        $adjunto = $_adjunto->where('expediente_id',$expedienteArray[0]->id)->get()->getResultObject();
+        $adjunto = $_adjunto->where('expediente_id', $expedienteArray[0]->id)->get()->getResultObject();
+        $adjunto_movimiento = $_adjunto->where('expediente_id', $expedienteArray[0]->id)->get()->getResultObject();
 
         //return print_r($adjunto);
         $_documento = new TipoExpedienteModel();
         $documento = $_documento->find($expedienteArray[0]->tipoexpediente_id);
+        $movimientoArray = $this->expedienteModel->getMovimientos($expedienteArray[0]->id);
+
+
+
         $data = [
             'entidad' => $entidadArray,
             'expediente' => $expedienteArray,
+            'movimiento' => $movimientoArray,
             'documento' => $documento,
             'adjunto' => $adjunto,
+            'adjunto_movimiento' => $adjunto_movimiento,
         ];
+
         //return print_r($data);
         return view('external/info_expediente', $data);
     }
@@ -136,31 +149,56 @@ class ExpedienteController extends BaseController
         $_adjunto = new AdjuntoModel();
         $anexoExp = $this->request->getFile('anexoExp');
 
+
+
+
+
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
-            $newName = $anexoExp->getRandomName();
-            $anexoExp->move('uploads', $newName);
+            try {
+                $newName = $anexoExp->getRandomName();
+                $anexoExp->move('uploads', $newName);
 
-            $localPath = 'uploads/' . $newName;
-            // Obtener el número de orden para el nuevo adjunto
-            $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
-                ->countAllResults() + 1;
+                $localPath = 'uploads/' . $newName;
+                // Obtener el número de orden para el nuevo adjunto
+                $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
+                    ->countAllResults() + 1;
+                /**
+                 * Subir archivos al google drive si esta habilitado
+                 */
+                $drivePath = '-';
+                if (1) {
+                    //$file = $this->request->getFile('anexoExp');
+                    $googleDrive = new GoogleDrive();
 
-            $drivePath = 'algundirreccion de google';
-            // Guardar la información en la base de datos
-            $data = [
-                'expediente_id' => $expedienteArray['id'],
-                'local_path' => $localPath,
-                'drive_path' => $drivePath,
-                'orden' => $orden,
-                'created_at' => date('Y-m-d H:i:s'),
-            ];
-            $_adjunto->insert($data);
+                    $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                    $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $anexoExp->getName(), $folderId);
+                    $drivePath = $fileId;
+                }
+                // Guardar la información en la base de datos
+                $data = [
+                    'expediente_id' => $expedienteArray['id'],
+                    'local_path' => $localPath,
+                    'drive_path' => $drivePath,
+                    'orden' => $orden,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $_adjunto->insert($data);
+            } catch (\Throwable $th) {
+                $_expediente  = new ExpedientesModel();
+                $_expediente->delete($expedienteArray['id'], true);
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Error al subir el archivo.',
+                ];
+                return $this->response->setJSON($response);
+            }
         } else {
+            $_expediente  = new ExpedientesModel();
+            $_expediente->delete($expedienteArray['id'], true);
             $response = [
                 'status' => 'error',
                 'message' => 'Error al subir el archivo.',
             ];
-            return $this->response->setJSON($response);
         }
 
         $adjunto = $_adjunto->find($_adjunto->insertID());
@@ -191,7 +229,7 @@ class ExpedienteController extends BaseController
         $expediente = $this->expedienteModel->find($expedienteId);
         $entidad = $this->entidadModel->find($expediente['entidad_id']);
 
-        
+
         $dompdf->loadHtml(
             view(
                 'pdf/pdf_template',
@@ -293,5 +331,20 @@ class ExpedienteController extends BaseController
             return false;
         }
     }
-    
+
+
+    public function upload()
+    {
+        if ($this->request->getMethod() == 'post' && $this->request->getFile('fileToUpload')->isValid()) {
+            $file = $this->request->getFile('fileToUpload');
+            $googleDrive = new GoogleDrive();
+
+            $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+            $fileId = $googleDrive->uploadFile($file->getTempName(), $file->getName(), $folderId);
+
+            echo "Archivo subido con éxito. ID del archivo: $fileId";
+        } else {
+            echo "Error al subir el archivo.";
+        }
+    }
 }

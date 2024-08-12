@@ -32,7 +32,7 @@
                         <div class="accordion-body px-3 fw-normal">
 
                             <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/derivar') ?>" method="POST" id="formDerivar">
-                                <input type="text" name="id" value="<?= $expediente[0]->id?>" hidden>
+                                <input type="text" name="idDerivar" value="<?= $expediente[0]->id ?>" hidden>
                                 <div class="form-group mb-4">
                                     <select class="form-control form-select" id="oficinaDerivar" name="oficinaDerivar" required>
                                         <option></option>
@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="form-group mb-4">
                                     <label for="adjuntoDerivar" class="form-label">Adjunto</label>
-                                    <input class="form-control form-sm" type="file" id="adjuntoDerivar" name="adjuntoDerivar">
+                                    <input class="form-control form-sm" type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
                                 </div>
                                 <div class="form-group mb-4">
 
@@ -130,6 +130,15 @@
             contentType: false, // Evitar que jQuery establezca el tipo de contenido
             success: function(response) {
                 // Manejar la respuesta del servidor aquí
+                //response = JSON.parse(response);
+                $('#detalleExpediente').modal('hide');
+
+                mensaje_derivar(response.idexpediente);
+                Swal.fire(
+                    "<?= lang('Main.confirmarDerivacion') ?>",
+                    '',
+                    "success"
+                );
                 console.log(response);
                 // Puedes mostrar un mensaje de éxito o redirigir a otra página, etc.
             },
@@ -140,7 +149,4 @@
             }
         });
     });
-    
-
-
 </script>
