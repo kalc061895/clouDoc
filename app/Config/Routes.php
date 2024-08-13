@@ -28,7 +28,8 @@ service('auth')->routes($routes);
  */
 $routes->get('/', 'ExpedienteController::index');
 $routes->get('/nuevoexpediente', 'ExpedienteController::nuevoexpediente');
-$routes->post('/nuevoexpediente', 'ExpedienteController::store');
+//$routes->post('/nuevoexpediente', 'ExpedienteController::store');
+$routes->post('/nuevoexpediente', 'ExpedienteController::upload');
 $routes->get('/cargoexpediente/(:num)', 'ExpedienteController::generateReceiptPDF/$1');
 $routes->get('/buscarexpediente', 'ExpedienteController::buscarexpediente');
 $routes->post('/buscarexpediente', 'ExpedienteController::infoexpediente');

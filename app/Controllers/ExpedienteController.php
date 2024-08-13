@@ -116,6 +116,7 @@ class ExpedienteController extends BaseController
 
     public function store()
     {
+        $drivePath = '-';
 
         $entidadData = [
             'tipo' => $this->request->getPost('tipoNew'),
@@ -149,49 +150,43 @@ class ExpedienteController extends BaseController
         $_adjunto = new AdjuntoModel();
         $anexoExp = $this->request->getFile('anexoExp');
 
-
-
-
-
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
-            try {
-                $newName = $anexoExp->getRandomName();
-                $anexoExp->move('uploads', $newName);
+            $newName = $anexoExp->getRandomName();
 
-                $localPath = 'uploads/' . $newName;
-                // Obtener el número de orden para el nuevo adjunto
-                $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
-                    ->countAllResults() + 1;
-                /**
-                 * Subir archivos al google drive si esta habilitado
-                 */
-                $drivePath = '-';
-                if (1) {
-                    //$file = $this->request->getFile('anexoExp');
-                    $googleDrive = new GoogleDrive();
+            if (true) {
+                $googleDrive = new GoogleDrive();
 
-                    $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
-                    $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $anexoExp->getName(), $folderId);
-                    $drivePath = $fileId;
-                }
-                // Guardar la información en la base de datos
-                $data = [
-                    'expediente_id' => $expedienteArray['id'],
-                    'local_path' => $localPath,
-                    'drive_path' => $drivePath,
-                    'orden' => $orden,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ];
-                $_adjunto->insert($data);
-            } catch (\Throwable $th) {
-                $_expediente  = new ExpedientesModel();
-                $_expediente->delete($expedienteArray['id'], true);
-                $response = [
-                    'status' => 'error',
-                    'message' => 'Error al subir el archivo.',
-                ];
-                return $this->response->setJSON($response);
+                $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $newName, $folderId);
+                $drivePath = $fileId;
             }
+
+            $anexoExp->move('uploads', $newName);
+
+            $localPath = 'uploads/' . $newName;
+            // Obtener el número de orden para el nuevo adjunto
+            $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
+                ->countAllResults() + 1;
+            /**
+             * Subir archivos al google drive si esta habilitado
+             */
+            if ($this->request->getFile('anexoExp')->isValid()) {
+                $file = $this->request->getFile('anexoExp');
+                $googleDrive = new GoogleDrive();
+
+                $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                $fileId = $googleDrive->uploadFile($file->getTempName(), $file->getName(), $folderId);
+                $drivePath = $fileId;
+            }
+            // Guardar la información en la base de datos
+            $data = [
+                'expediente_id' => $expedienteArray['id'],
+                'local_path' => $localPath,
+                'drive_path' => $drivePath,
+                'orden' => $orden,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $_adjunto->insert($data);
         } else {
             $_expediente  = new ExpedientesModel();
             $_expediente->delete($expedienteArray['id'], true);
@@ -221,8 +216,6 @@ class ExpedienteController extends BaseController
         $this->sendReceiptEmail($expedienteArray, $entidadArray);
         return json_encode($set);
     }
-
-
     public function generateReceiptPDF($expedienteId)
     {
         $dompdf = new Dompdf();
@@ -335,8 +328,18 @@ class ExpedienteController extends BaseController
 
     public function upload()
     {
-        if ($this->request->getMethod() == 'post' && $this->request->getFile('fileToUpload')->isValid()) {
-            $file = $this->request->getFile('fileToUpload');
+
+        $credentialsPath = APPPATH . 'Credentials/credentials.json';
+
+        if (!file_exists($credentialsPath)) {
+            echo "Archivo credentials.json no encontrado en: " . $credentialsPath;
+            exit;
+        } else {
+            echo "Archivo encontrado en: " . $credentialsPath;
+        }
+
+        if ($this->request->getFile('anexoExp')->isValid()) {
+            $file = $this->request->getFile('anexoExp');
             $googleDrive = new GoogleDrive();
 
             $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
