@@ -130,8 +130,6 @@ class ExpedienteController extends BaseController
         $id = $this->entidadModel->insert($entidadData);
         $entidadId = $this->entidadModel->insertID();
 
-
-
         $expedienteData = [
             'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
             'numero_documento' => $this->request->getPost('numDocExp'),
@@ -153,7 +151,10 @@ class ExpedienteController extends BaseController
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             $newName = $anexoExp->getRandomName();
 
-            if (true) {
+            /**
+             * Subir al google drive acorde a la configuracion
+             */
+            if (false) {
                 $googleDrive = new GoogleDrive();
 
                 $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
@@ -167,17 +168,7 @@ class ExpedienteController extends BaseController
             // Obtener el número de orden para el nuevo adjunto
             $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
                 ->countAllResults() + 1;
-            /**
-             * Subir archivos al google drive si esta habilitado
-             */
-            if ($this->request->getFile('anexoExp')->isValid()) {
-                $file = $this->request->getFile('anexoExp');
-                $googleDrive = new GoogleDrive();
-
-                $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
-                $fileId = $googleDrive->uploadFile($file->getTempName(), $file->getName(), $folderId);
-                $drivePath = $fileId;
-            }
+           
             // Guardar la información en la base de datos
             $data = [
                 'expediente_id' => $expedienteArray['id'],

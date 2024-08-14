@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title><?= lang('Auth.emailActivateSubject') ?></title>
+    <title><?= lang('Auth.email2FASubject') ?></title>
 </head>
 
 <body>
-    <p><?= lang('Auth.emailActivateMailBody') ?></p>
+    <p><?= lang('Auth.email2FAMailBody') ?></p>
     <div style="text-align: center">
         <h1><?= $code ?></h1>
     </div>
@@ -24,6 +24,7 @@
     </table>
     <b><?= lang('Auth.emailInfo') ?></b>
     <p><?= lang('Auth.emailIpAddress') ?> <?= esc($ipAddress) ?></p>
+    <p><?= lang('Auth.emailDevice') ?> <?= esc($userAgent) ?></p>
     <p><?= lang('Auth.emailDate') ?> <?= esc($date) ?></p>
 </body>
 
