@@ -19,62 +19,62 @@ $estado = [
     <div class="card-body ">
         <div class="table-responsive mb-4 ">
             <table class="table table-sm mb-0 " id="expedientesTable">
-                <thead class="text-dark fs-4">
+                <thead class="text-dark ">
                     <tr>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.expediente') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.expediente') ?></h6>
                         </th>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.remitente') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.remitente') ?></h6>
                         </th>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.asunto') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.asunto') ?></h6>
                         </th>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.estado') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.estado') ?></h6>
                         </th>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.fecha') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.fecha') ?></h6>
                         </th>
                         <th>
-                            <h6 class="fs-4 fw-semibold mb-0"><?= lang('Main.opciones') ?></h6>
+                            <h6 class=" fw-semibold mb-0"><?= lang('Main.opciones') ?></h6>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ($expediente) : ?>
                         <?php foreach ($expediente as $item) : ?>
-                                <td>
-                                    <h6 class="fs-4 fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
-                                        <div class="ms-3">
+                            <td>
+                                <h6 class=" fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
+                                    <div class="ms-3">
 
-                                            <h6 class="fs-4 fw-semibold mb-0"><?= $item->nombre ?></h6>
-                                            <span class="fw-normal"><?= $item->correo_electronico ?></span>
-                                        </div>
+                                        <h6 class=" fw-semibold mb-0"><?= $item->nombre ?></h6>
+                                        <span class="fw-normal"><?= $item->correo_electronico ?></span>
                                     </div>
-                                </td>
-                                <td style="text-wrap: pretty;">
-                                    <p class="mb-0 fw-normal fs-4"><?= $item->asunto ?></p>
-                                </td>
-                                <td>
+                                </div>
+                            </td>
+                            <td style="text-wrap: pretty;">
+                                <p class="mb-0 fw-normal "><?= $item->asunto ?></p>
+                            </td>
+                            <td>
 
-                                    <span class="badge bg-<?= ($item->estado == null) ?'danger':$estado[$item->estado] ?> text-white"><?= ($item->estado == null) ?lang('Main.NoLeido'):$item->estado ?> </span>
-                                </td>
-                                <td>
-                                    <h6 class="fs-4 fw-semibold mb-0"><?= substr($item->fecha_recepcion, 0, 10); ?></h6>
+                                <span class="badge bg-<?= ($item->estado == null) ? 'danger' : $estado[$item->estado] ?> text-white"><?= ($item->estado == null) ? lang('Main.NoLeido') : $item->estado ?> </span>
+                            </td>
+                            <td>
+                                <h6 class=" fw-semibold mb-0"><?= substr($item->fecha_recepcion, 0, 10); ?></h6>
 
-                                </td>
-                                <td>
-                                    <div class="button-group">
-                                        <button type="button" class="btn btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> </button>
-                                        <button type="button" class="btn btn-rounded btn-success" title="<?= lang('Main.recibir') ?>"><i class="ti ti-check fs-5"></i></button>
+                            </td>
+                            <td>
+                                <div class="button-group">
+                                    <button type="button" class="btn btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> </button>
+                                    <button type="button" class="btn btn-rounded btn-success" title="<?= lang('Main.recibir') ?>"><i class="ti ti-check fs-5"></i></button>
 
-                                    </div>
-                                </td>
+                                </div>
+                            </td>
                             </tr>
                         <?php endforeach ?>
                     <?php endif ?>
