@@ -61,8 +61,11 @@ return [
     'correoNew'=> 'Correo Electrónico',
     'direccionNew'=> 'Dirección',
 
-    'tipoDocExp'=> 'Tipo de Documento',
-    'numDocExp'=> 'Nro. de Documento',
+    'nota'=> 'Nota',
+    'notaBody'=> 'Para evitar que su expediente sea rechazado, presente los requisitos necesarios para cada tipo de solicitud.',
+    'notaLink'=> 'Revise aqui los requisitos',
+    'tipoDocExp'=> 'Tipo de Expediente',
+    'numDocExp'=> 'Nro.',
     'folioDocExp'=> 'Nro. de Folios',
     'asuntoDocExp'=> 'Asunto ',
     'anexoExp'=> 'Adjuntar Expediente',
