@@ -70,9 +70,7 @@ $estado = [
                             </td>
                             <td>
                                 <div class="button-group">
-                                    <button type="button" class="btn btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> </button>
-                                    <button type="button" class="btn btn-rounded btn-success" title="<?= lang('Main.recibir') ?>"><i class="ti ti-check fs-5"></i></button>
-
+                                    <button type="button" class="btn btn-sm btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> <?= lang('Main.revisar')?></button>
                                 </div>
                             </td>
                             </tr>
