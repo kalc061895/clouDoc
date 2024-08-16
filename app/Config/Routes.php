@@ -75,6 +75,7 @@ $routes->get('menugroupuser/getGroups', 'MenuGroupUserController::getGroups');
 $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpedientes');
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
+$routes->post('mesa_de_partes/atender', 'TramiteController::postAtenderExpediente');
 
 /**
  * Opciones de Mesa de Partes

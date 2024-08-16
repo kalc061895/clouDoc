@@ -39,6 +39,10 @@ class CreateMovimientosTable extends Migration
                 'default'    => 'NORMAL',
                 'null'       => false,
             ],
+            'accion'      => [
+                'type'           => 'VARCHAR',
+                'constraint'     => '255'
+            ],
             'estado' => [
                 'type'       => 'ENUM',
                 'constraint' => ['ESPERA', 'RECIBIDO', 'DERIVADO', 'EN POROCESO', 'FINALIZADO', 'ATENDIDO'],
