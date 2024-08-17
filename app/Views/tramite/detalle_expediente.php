@@ -24,11 +24,11 @@
             <div class="accordion accordion-flush position-relative overflow-hidden" id="accordionFlushParent">
                 <div class="accordion-item mb-3 shadow-none border rounded-top">
                     <h2 class="accordion-header" id="flush-headingOne">
-                        <button class="accordion-button collapsed fs-4 fw-semibold px-3 py-6 lh-base border-0 rounded-top bg-primary-subtle " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        <button class="accordion-button  fs-4 fw-semibold px-3 py-6 lh-base border-0 rounded-top bg-primary-subtle " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
                             <?= lang('Main.derivar') ?>
                         </button>
                     </h2>
-                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushParent">
+                    <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushParent">
                         <div class="accordion-body px-3 fw-normal">
 
                             <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/derivar') ?>" method="POST" id="formDerivar">
@@ -37,12 +37,26 @@
                                     <select class="form-control form-select" id="oficinaDerivar" name="oficinaDerivar" required>
                                         <option></option>
                                         <?php foreach ($oficina as $item) : ?>
-                                            <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                            <?php
+                                            // Contar cuántos hijos tiene esta oficina
+                                            $children = array_filter($oficina, function ($ofi) use ($item) {
+                                                return $ofi['oficina_padre_id'] == $item['id'];
+                                            });
+                                            ?>
+                                            <?php if (count($children) > 0) : ?>
+                                                <optgroup label="<?= $item['nombre'] ?>">
+                                                    <?php foreach ($children as $ofi) : ?>
+                                                        <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
+                                                    <?php endforeach ?>
+                                                </optgroup>
+                                            <?php endif ?>
                                         <?php endforeach ?>
+
                                     </select>
                                     <span class="bar"></span>
                                     <label for="oficinaDerivar"><?= lang('Main.derivarOficina') ?></label>
                                 </div>
+
                                 <div class="form-group mb-4">
                                     <select class="form-control form-select" id="accionDerivar" name="accionDerivar" required>
                                         <option></option>
@@ -87,16 +101,7 @@
 
                             <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/atender') ?>" method="POST" id="formAtender">
                                 <input type="text" name="idAtender" value="<?= $expediente[0]->id ?>" hidden>
-                                <div class="form-group mb-4">
-                                    <select class="form-control form-select" id="oficinaAtender" name="oficinaAtender" required>
-                                        <option></option>
-                                        <?php foreach ($oficina as $item) : ?>
-                                            <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
-                                        <?php endforeach ?>
-                                    </select>
-                                    <span class="bar"></span>
-                                    <label for="oficinaAtender"><?= lang('Main.atenderOficina') ?></label>
-                                </div>
+
                                 <div class="form-group mb-4">
                                     <select class="form-control form-select" id="accionAtender" name="accionAtender" required>
                                         <option></option>
@@ -114,7 +119,7 @@
                                 </div>
                                 <div class="form-group mb-4">
                                     <label for="adjuntoAtender" class="form-label">Adjunto</label>
-                                    <input class="form-control form-sm" type="file" id="adjuntoAtender" name="adjuntoatender[]" multiple>
+                                    <input class="form-control form-sm" type="file" id="adjuntoAtender" name="adjuntoAtender[]" multiple>
                                 </div>
                                 <div class="form-group mb-4">
 
@@ -163,15 +168,12 @@
     </div>
 
     <div class="col-md-8">
-        
         <iframe src="<?= $expediente[0]->local_path ?>" class="w-100 h-100" frameborder="0"></iframe>
-        
     </div>
 
 </div>
 
 <script>
-
     $('.floating-labels .form-control').on('focus blur', function(e) {
         $(this).parents('.form-group').toggleClass('focused', (e.type === 'focus' || this.value.length > 0));
     }).trigger('blur');
@@ -196,6 +198,40 @@
                 mensaje_derivar(response.idexpediente);
                 Swal.fire(
                     "<?= lang('Main.confirmarDerivacion') ?>",
+                    '',
+                    "success"
+                );
+                console.log(response);
+                // Puedes mostrar un mensaje de éxito o redirigir a otra página, etc.
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores aquí
+                console.error(error);
+                // Puedes mostrar un mensaje de error, etc.
+            }
+        });
+    });
+
+    // funcion para ATENDER
+    $('#formAtender').on('submit', function(event) {
+        event.preventDefault(); // Prevenir la acción predeterminada del formulario
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false, // Evitar que jQuery procese los datos
+            contentType: false, // Evitar que jQuery establezca el tipo de contenido
+            success: function(response) {
+                // Manejar la respuesta del servidor aquí
+                // response = JSON.parse(response);
+                $('#detalleExpediente').modal('hide');
+
+                mensaje_derivar(response.idexpediente);
+                Swal.fire(
+                    "<?= lang('Main.confirmarAtencion') ?>",
                     '',
                     "success"
                 );

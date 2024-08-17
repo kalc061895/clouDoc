@@ -45,7 +45,7 @@ class TramiteController extends BaseController
                     'tramite/detalle_expediente',
                     [
                         'expediente' => $expediente,
-                        'oficina' => $oficinaModel->findAll(),
+                        'oficina' => $oficinaModel->orderBy('oficina_padre_id ASC')->findAll(),
                         'accion' => $accionModel->findAll(),
                     ]
                 )
@@ -80,7 +80,7 @@ class TramiteController extends BaseController
         $set = [
             'expediente_id' => $this->request->getPost('idDerivar'),
             'observacion' => $this->request->getPost('observacionDerivar'),
-            //'accion'=> $this->request->getPost('accionDerivar'),
+            'accion'=> $this->request->getPost('accionDerivar'),
             'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $this->request->getPost('oficinaDerivar'),
             'numero_movimiento' => $ultimoMovimiento ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
@@ -118,11 +118,71 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
+    public function postAtenderExpediente()
+    {
+        $userModel = new UsuarioModel();
+        $_usuario = $userModel->find(auth()->user()->id);
+        $movimientoModel = new MovimientosModel();
+
+        $_ultimoMovimiento = new MovimientosModel();
+        $movimiento = $_ultimoMovimiento->find($this->request->getPost('idAtender'));
+
+        if ($movimiento != null) {
+            $movimiento['estado'] = 'DERIVADO';
+            $_ultimoMovimiento->save($movimiento);
+        } 
+        else {
+        }
+
+        // Obtener el número de movimiento
+        $ultimoMovimiento = $movimientoModel->where('expediente_id', $this->request->getPost('id'))->orderBy('numero_movimiento', 'DESC')->first();
+
+        $set = [
+            'expediente_id' => $this->request->getPost('idAtender'),
+            'observacion' => $this->request->getPost('observacionAtender'),
+            'accion'=> $this->request->getPost('accionAtender'),
+            'oficina_procedencia_id' => $_usuario->oficina_id,
+            'oficina_destino_id' => $_usuario->oficina_id,
+            'numero_movimiento' => ($ultimoMovimiento!=false ) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
+            'estado' => 'ATENDIDO',
+        ];
+        $nuevoMovimiento = new MovimientosModel();
+        $insertResult = $nuevoMovimiento->insert($set);
+
+        $insertID = $nuevoMovimiento->insertID();
+        if ($insertResult !== false) {
+            $insertID = $nuevoMovimiento->insertID();
+        
+            //guardar archivo
+            /**
+             * Aqui se debe llamar a la funcion que guardara el archivo adjunto si se adjunta algun archivo o archivos
+             */
+            // Uso de la función
+            $response = $this->handleFileUpload(
+                'adjuntoAtender', 
+                $this->request->getPost('idAtender'), 
+                $insertID);
+        } else {
+            // Manejar el error de inserción
+            // Podrías lanzar una excepción o manejar el error de otra manera adecuada
+            // throw new \RuntimeException('Error al insertar el nuevo movimiento');
+            $response = 'Error al insertar el nuevo movimiento';
+        }
+
+        $response = [
+            'title' => 'success',
+            'body' => 'Expediente no encontrado',
+            'num_mov' => $ultimoMovimiento,
+            'idexpediente' => $this->request->getPost('idAtender'),
+        ];
+
+
+        return $this->response->setJSON($response);
+    }
 
     function handleFileUpload($inputName, $expedienteId,$movimientoId=null)
     {
-        
-
+    
         $_adjunto = new AdjuntoModel();
         $files = $this->request->getFileMultiple($inputName);
 
@@ -134,14 +194,22 @@ class TramiteController extends BaseController
             if ($file->isValid() && !$file->hasMoved()) {
                 try {
                     $newName = $file->getRandomName();
+                    $drivePath = '-';
+                    if (false) {
+                        $googleDrive = new GoogleDrive();
+        
+                        $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                        $fileId = $googleDrive->uploadFile($file->getTempName(), $newName, $folderId);
+                        $drivePath = $fileId;
+                    }
                     $file->move('uploads', $newName);
+                    
 
                     $localPath = 'uploads/' . $newName;
                     // Obtener el número de orden para el nuevo adjunto
                     $orden = $_adjunto->where('expediente_id', $expedienteId)
                         ->countAllResults() + 1;
 
-                    $drivePath = 'algundirreccion de google';
                     // Guardar la información en la base de datos
                     $data = [
                         'expediente_id' => $expedienteId,

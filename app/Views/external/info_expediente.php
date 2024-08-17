@@ -13,8 +13,7 @@
         <h6><?= $entidad['telefono'] ?></h6>
         <small class="text-muted db"><?= lang('External.asuntoDocExp') ?></small>
         <h6>
-            <?= $expediente[0]->asunto ?> <a href="<?= $adjunto[0]->local_path ?>" target="_blank" class="
-                                "> <i class="ti ti-file-text fs-4"></i> Exp_<?= $expediente[0]->numero_expediente ?>.pdf
+            <?= $expediente[0]->asunto ?> <a href="<?= $adjunto[0]->local_path ?>" target="_blank" class=""> <i class="ti ti-file-text fs-4"></i> Exp_<?= $expediente[0]->numero_expediente ?>.pdf
             </a>
         </h6>
         <small class="text-muted db"><?= lang('External.fecha') ?></small>
@@ -35,9 +34,11 @@
         ];
         ?>
         <h4 class="card-title"><?= lang('External.seguimientoTitle') ?></h4>
+        
         <p class="card-subtitle mb-7">
             <?= lang('External.seguimientoDescription') ?>
         </p>
+
         <div class="comment-widgets position-relative mb-2 h-485" data-simplebar>
             <?php if ($movimiento) : ?>
                 <?php foreach ($movimiento as $item) : ?>
@@ -87,7 +88,7 @@
                         <div class="hstack justify-content-between gap-6 mb-2">
                             <div class="hstack gap-6">
                                 <h5 class="mb-0">Oficina de Tramite Documentario</h5>
-                                <p class="mb-0 fs-3 text-muted"> <?= $expediente[0]->recibido?> </p>
+                                <p class="mb-0 fs-3 text-muted"> <?= $expediente[0]->recibido ?> </p>
                             </div>
                             <span class="badge bg-danger-subtle text-danger rounded-pill">EN ESPERA</span>
                         </div>
@@ -101,6 +102,7 @@
     </div>
 
 <?php else : ?>
+
     <div class="alert customize-alert alert-dismissible text-secondary alert-light-secondary bg-secondary-subtle fade show remove-close-icon" role="alert">
         <span class="side-line bg-secondary"></span>
 
