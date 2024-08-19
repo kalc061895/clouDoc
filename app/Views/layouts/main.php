@@ -115,11 +115,11 @@
 
                 <div class="sidebar-footer hide-menu">
                     <!-- item-->
-                    <a href="page-account-settings.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.profileSettings')?>"><iconify-icon icon="solar:settings-linear"></iconify-icon></a>
+                    <a href="page-account-settings.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.profileSettings') ?>"><iconify-icon icon="solar:settings-linear"></iconify-icon></a>
                     <!-- item-->
-                    <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.myImbox')?>"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
+                    <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.myImbox') ?>"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
                     <!-- item-->
-                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.logout')?>"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
+                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top" title="<?= lang('Main.logout') ?>"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
                 </div>
             </div>
         </aside>
@@ -2079,16 +2079,34 @@
 
             // Función para cargar el contenido desde la URL y mostrar en 'content-main'
             function loadContent(url) {
+                Swal.fire({
+                    type: "info",
+                    html: "<div class='justify-content-center'>" +
+                        "<div class='spinner-border text-primary' role='status'>" +
+                        "<span class='visually-hidden'>Loading...</span>" +
+                        "</div>" +
+                        "</div>",
+                    showConfirmButton: false,
+                    showCloseButton: false,
+                    showCancelButton: false,
+                });
                 $.ajax({
                     url: url,
                     type: 'GET',
                     dataType: 'html',
                     success: function(response) {
                         $('.content-main').html(response); // Inserta el contenido en el div con clase 'content-main'
+                        Swal.close();
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error al cargar el contenido:', error);
+                        Swal.fire({
+                            type: "error",
+                            html: "Vuelva a Intentarlo nuevamente",
+                            showConfirmButton: true,
+                        });
+                        $('.content-main').html('');
                     }
+
                 });
             }
         });

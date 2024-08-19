@@ -13,10 +13,19 @@ class ExpedientesModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'numero_expediente', 'procedencia', 'fecha_recepcion',
-        'folios', 'tipo_expediente_id', 'tipo_documento', 'numero_documento',
-        'entidad_id', 'asunto', 'descripcion', 'atencion_oficina_id',
-        'observacion', 'activo'
+        'numero_expediente',
+        'procedencia',
+        'fecha_recepcion',
+        'folios',
+        'tipo_expediente_id',
+        'tipo_documento',
+        'numero_documento',
+        'entidad_id',
+        'asunto',
+        'descripcion',
+        'atencion_oficina_id',
+        'observacion',
+        'activo'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -190,7 +199,7 @@ class ExpedientesModel extends Model
             'JOIN'
         );
 
-        $builder->orderBy('numero_movimiento DESC');
+        $builder->orderBy('movimientos.id DESC');
         $builder->where('movimientos.expediente_id', $id_expediente);
 
         $query = $builder->get();
@@ -207,13 +216,44 @@ class ExpedientesModel extends Model
 
         return $query->getResultArray();
     }
-    public function getExpedientesOficina($id_oficina,$where=false)
+    public function getExpedientesOficina($id_oficina, $where = false)
     {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
         $builder->select('expedientes.*,entidad.*,movimientos.estado');
         $builder->where('movimientos.oficina_destino_id', $id_oficina);
+
+        if ($where != false) {
+            $builder->where('movimientos.estado', $where);
+        }
+        
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->groupBy('expedientes.id', $where);
+
+        $builder->orderBy('expedientes.numero_expediente','DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+    public function getExpedientesDerivados($id_oficina, $where = false)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+        $builder->where('movimientos.oficina_procedencia_id', $id_oficina);
+
         if ($where != false) {
             $builder->where('movimientos.estado', $where);
         }
@@ -234,5 +274,101 @@ class ExpedientesModel extends Model
         $query = $builder->get();
 
         return $query->getResultObject();
+    }
+    public function getExpedientesTodo()
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->groupBy('expedientes.id');
+
+        $builder->orderBy('expedientes.numero_expediente DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+
+    public function getFilteredData($start, $length, $searchValue, $order)
+    {
+        $builder = $this->builder();
+        $builder->select('numero_expediente, nombre, asunto, estado, expedientes.fecha_recepcion, expedientes.id, correo_electronico');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'left'
+        );
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        
+        $builder->orderBy('movimientos.id','DESC');
+        $builder->groupBy('numero_expediente');
+
+        if ($searchValue) {
+            $builder->like('numero_expediente', $searchValue);
+            $builder->orLike('nombre', $searchValue);
+            $builder->orLike('asunto', $searchValue);
+            $builder->orLike('expedientes.fecha_recepcion', $searchValue);
+        }
+
+        $columnIndex = $order[0]['column']; // Column index
+        $columnName = $order[0]['dir']; // 'asc' or 'desc'
+        $builder->orderBy($columnIndex, $columnName);
+
+        $builder->limit($length, $start);
+
+        $query = $builder->get();
+        $data = $query->getResultArray();
+
+        // Add custom options button for each row
+        foreach ($data as &$item) {
+            $item['opciones'] = '<button type="button" class="btn btn-sm btn-rounded btn-info" title="Revisar" onclick="RevisarExpediente(' . $item['id'] . ')"><i class="ti ti-eye fs-5"></i> Revisar</button>';
+        }
+        return $data;
+    }
+
+    public function getTotalRecords()
+    {
+        
+        return $this->countAllResults();
+    }
+
+    public function getTotalFilteredRecords($searchValue)
+    {
+        $builder = $this->builder();
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'left'
+        );
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+
+        if ($searchValue) {
+            $builder->like('numero_expediente', $searchValue);
+            $builder->orLike('nombre', $searchValue);
+            $builder->orLike('asunto', $searchValue);
+            $builder->orLike('expedientes.fecha_recepcion', $searchValue);
+        }
+
+        return $builder->countAllResults();
     }
 }

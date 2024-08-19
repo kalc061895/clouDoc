@@ -14,7 +14,7 @@ $estado = [
 ?>
 <div class="card w-100 position-relative overflow-hidden">
     <div class="px-4 py-3 border-bottom">
-        <h4 class="card-title mb-0"><?= lang('Main.expedienteRecibidoTitle') ?></h4>
+        <h4 class="card-title mb-0"><?= lang('Main.expedienteTitle') ?></h4>
     </div>
     <div class="card-body ">
         <div class="table-responsive mb-4 ">
@@ -44,7 +44,7 @@ $estado = [
                 <tbody>
                     <?php if ($expediente) : ?>
                         <?php foreach ($expediente as $item) : ?>
-                            <tr data-id="<?= $item->id?>">
+                            <tr data-id="<?= $item->id ?>">
                                 <td>
                                     <h6 class=" fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
                                 </td>
@@ -85,8 +85,77 @@ $estado = [
 
 <script>
     var tabla_expedientes = $("#expedientesTable").DataTable({
+        processing: true, // Show processing indicator
+        serverSide: true, // Enable server-side processing
+        ajax: {
+            url: '<?= base_url('mesa_de_partes/fetch_expedientes') ?>', // URL for the server-side processing script
+            type: 'POST',
+        },
+        columns: [{
+                data: 'numero_expediente',
+                render: function(data, type, row) {
+                    return '<h6 class="fw-semibold mb-0">' + data + '</h6>';
+                }
+            },
+            {
+                data: 'nombre',
+                render: function(data, type, row) {
+                    return `
+                    <div class="d-flex align-items-center">
+                        <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
+                        <div class="ms-3">
+                            <h6 class="fw-semibold mb-0">${data}</h6>
+                            <span class="fw-normal">${row.correo_electronico}</span>
+                        </div>
+                    </div>`;
+                }
+            },
+            {
+                data: 'asunto',
+                render: function(data, type, row) {
+                    return '<p class="mb-0 fw-normal">' + data + '</p>';
+                }
+            },
+            {
+                data: 'estado',
+                render: function(data, type, row) {
+                    var estadoClasses = {
+                        'ESPERA': 'warning',
+                        'RECIBIDO': 'success',
+                        'DERIVADO': 'primary',
+                        'EN PROCESO': 'primary',
+                        'FINALIZADO': 'success',
+                        'ATENDIDO': 'primary',
+                        'OBSERVADO': 'danger',
+                        'RECHAZADO': 'danger'
+                    };
+                    var estadoClass = data ? estadoClasses[data] : 'danger';
+                    return `<span class="badge bg-${estadoClass} text-white">${data ? data : '<?= lang('Main.NoLeido') ?>'}</span>`;
+                }
+            },
+            {
+                data: 'fecha_recepcion',
+                render: function(data, type, row) {
+                    return '<h6 class="fw-semibold mb-0">' + data.substring(0, 10) + '</h6>';
+                }
+            },
+            {
+                data: 'opciones',
+                render: function(data, type, row) {
+                    return `
+                    <div class="button-group">
+                        <button type="button" class="btn btn-sm btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(${row.id})">
+                            <i class="ti ti-eye fs-5"></i> <?= lang('Main.revisar') ?>
+                        </button>
+                    </div>`;
+                }
+            }
+        ],
+        createdRow: function(row, data, dataIndex) {
+            $(row).attr('data-id', data.id);
+        },
         order: [
-            [0, "desc"]
+            [1, "desc"]
         ],
         "language": {
             "url": "//cdn.datatables.net/plug-ins/2.1.0/i18n/es-MX.json"
