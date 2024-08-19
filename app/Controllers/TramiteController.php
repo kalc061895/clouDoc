@@ -34,6 +34,11 @@ class TramiteController extends BaseController
         $id = $this->request->getGet('id');
         $expedienteModel = new ExpedientesModel();
         $expediente = $expedienteModel->detalleExpediente($id);
+        $movimientoArray = $expedienteModel->getMovimientos($id);
+        // Manejo del archivo
+        $_adjunto = new AdjuntoModel();
+        $adjunto = $_adjunto->where('expediente_id', $id)->get()->getResultObject();
+
 
         $oficinaModel = new OficinaModel();
         $accionModel = new AccionModel();
@@ -45,6 +50,8 @@ class TramiteController extends BaseController
                     'tramite/detalle_expediente',
                     [
                         'expediente' => $expediente,
+                        'movimiento' => $movimientoArray,
+                        'adjunto' => $adjunto,
                         'oficina' => $oficinaModel->orderBy('oficina_padre_id ASC')->findAll(),
                         'accion' => $accionModel->findAll(),
                     ]
@@ -80,7 +87,7 @@ class TramiteController extends BaseController
         $set = [
             'expediente_id' => $this->request->getPost('idDerivar'),
             'observacion' => $this->request->getPost('observacionDerivar'),
-            'accion'=> $this->request->getPost('accionDerivar'),
+            'accion' => $this->request->getPost('accionDerivar'),
             'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $this->request->getPost('oficinaDerivar'),
             'numero_movimiento' => $ultimoMovimiento ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
@@ -92,16 +99,17 @@ class TramiteController extends BaseController
         $insertID = $nuevoMovimiento->insertID();
         if ($insertResult !== false) {
             $insertID = $nuevoMovimiento->insertID();
-        
+
             //guardar archivo
             /**
              * Aqui se debe llamar a la funcion que guardara el archivo adjunto si se adjunta algun archivo o archivos
              */
             // Uso de la función
             $response = $this->handleFileUpload(
-                'adjuntoDerivar', 
-                $this->request->getPost('idDerivar'), 
-                $insertID);
+                'adjuntoDerivar',
+                $this->request->getPost('idDerivar'),
+                $insertID
+            );
         } else {
             // Manejar el error de inserción
             // Podrías lanzar una excepción o manejar el error de otra manera adecuada
@@ -130,8 +138,7 @@ class TramiteController extends BaseController
         if ($movimiento != null) {
             $movimiento['estado'] = 'DERIVADO';
             $_ultimoMovimiento->save($movimiento);
-        } 
-        else {
+        } else {
         }
 
         // Obtener el número de movimiento
@@ -140,10 +147,10 @@ class TramiteController extends BaseController
         $set = [
             'expediente_id' => $this->request->getPost('idAtender'),
             'observacion' => $this->request->getPost('observacionAtender'),
-            'accion'=> $this->request->getPost('accionAtender'),
+            'accion' => $this->request->getPost('accionAtender'),
             'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $_usuario->oficina_id,
-            'numero_movimiento' => ($ultimoMovimiento!=false ) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
+            'numero_movimiento' => ($ultimoMovimiento != false) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
             'estado' => 'ATENDIDO',
         ];
         $nuevoMovimiento = new MovimientosModel();
@@ -152,16 +159,17 @@ class TramiteController extends BaseController
         $insertID = $nuevoMovimiento->insertID();
         if ($insertResult !== false) {
             $insertID = $nuevoMovimiento->insertID();
-        
+
             //guardar archivo
             /**
              * Aqui se debe llamar a la funcion que guardara el archivo adjunto si se adjunta algun archivo o archivos
              */
             // Uso de la función
             $response = $this->handleFileUpload(
-                'adjuntoAtender', 
-                $this->request->getPost('idAtender'), 
-                $insertID);
+                'adjuntoAtender',
+                $this->request->getPost('idAtender'),
+                $insertID
+            );
         } else {
             // Manejar el error de inserción
             // Podrías lanzar una excepción o manejar el error de otra manera adecuada
@@ -176,13 +184,17 @@ class TramiteController extends BaseController
             'idexpediente' => $this->request->getPost('idAtender'),
         ];
 
+        /**
+         * Remitir correo de confirmacion de atencion de expediente 
+         */
 
+         
         return $this->response->setJSON($response);
     }
 
-    function handleFileUpload($inputName, $expedienteId,$movimientoId=null)
+    function handleFileUpload($inputName, $expedienteId, $movimientoId = null)
     {
-    
+
         $_adjunto = new AdjuntoModel();
         $files = $this->request->getFileMultiple($inputName);
 
@@ -197,13 +209,13 @@ class TramiteController extends BaseController
                     $drivePath = '-';
                     if (false) {
                         $googleDrive = new GoogleDrive();
-        
+
                         $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
                         $fileId = $googleDrive->uploadFile($file->getTempName(), $newName, $folderId);
                         $drivePath = $fileId;
                     }
                     $file->move('uploads', $newName);
-                    
+
 
                     $localPath = 'uploads/' . $newName;
                     // Obtener el número de orden para el nuevo adjunto
@@ -235,6 +247,17 @@ class TramiteController extends BaseController
         ];
     }
 
+    public function getExpedienteTodo(): String
+    {
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesTodo(),
+        ];
+        return view('tramite/listar_expedientes_observacion', $set);
+    }
     public function getExpedientePorOficina(): String
     {
         $_userModel = new UsuarioModel();
@@ -242,11 +265,65 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesOficina($idOficina ),
+            'expediente' => $expedientesModel->getExpedientesOficina($idOficina),
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
 
+    public function getDerivados(): String
+    {
+        $estado = 'DERIVADO';
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina,$estado),
+        ];
 
+        return view('tramite/listar_nuevos_expedientes', $set);
+    }
+    public function getObservados(): String
+    {
+        $estado = 'OBSERVADO';
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina,$estado),
+        ];
 
+        return view('tramite/listar_nuevos_expedientes', $set);
+    }
+
+    public function fetch_expedientes()
+    {
+        $expedienteModel = new ExpedientesModel();
+
+        // Fetch filtered data from the model
+        $data = $expedienteModel->getFilteredData(
+            $this->request->getPost('start'),
+            $this->request->getPost('length'),
+            $this->request->getPost('search')['value'],
+            $this->request->getPost('order')
+        );
+
+        // Total records count before applying filters
+        $totalRecords = $expedienteModel->getTotalRecords();
+
+        // Total records count after applying filters
+        $totalFiltered = $expedienteModel->getTotalFilteredRecords(
+            $this->request->getPost('search')['value']
+        );
+
+        $response = [
+            'draw' => intval($this->request->getPost('draw')),
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFiltered,
+            'data' => $data
+        ];
+
+        return $this->response->setJSON($response);
+    }
 }

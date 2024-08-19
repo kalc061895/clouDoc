@@ -90,6 +90,7 @@ return [
 
 
     // Mesa de partes
+    'expedienteTitle' => 'Expedientes',
     'expedienteRecibidoTitle' => 'Nuevos Expedientes Recibidos',
 
     'expediente' => 'Nro. Exp.',
