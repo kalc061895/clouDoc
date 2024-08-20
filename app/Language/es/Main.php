@@ -92,7 +92,7 @@ return [
     // Mesa de partes
     'expedienteTitle' => 'Expedientes',
     'expedienteRecibidoTitle' => 'Nuevos Expedientes Recibidos',
-
+    
     'expediente' => 'Nro. Exp.',
     'remitente' => 'Remitente',
     'asunto' => 'Asunto',
@@ -105,7 +105,7 @@ return [
     'NoLeido' => 'Sin Revisar',
     'revisar' => 'Revisar',
     'recibir' => 'Recibir',
-
+    
     //derivar expediente
     'derivar'=> 'Derivar Expediente',
     'derivarOficina'=> 'Derivar a :',
@@ -116,6 +116,10 @@ return [
     'rechazar'=> 'Rechazar Expediente',
     'observacion'=> 'Observación',
     'confirmarDerivacion'=> 'Se Derivo Correctamente ',
+    
+    // detalle de expediente
+    'movimientosTitle' => 'Detalle de Movimiento',
+    'expedientePreview' => 'Vista Prevía del Expediente ',
 
     //observar expediente
     'observar'=> 'Observar Expediente',
