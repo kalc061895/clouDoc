@@ -1,3 +1,17 @@
+<?php
+$estado = [
+    'ESPERA' => 'warning',
+    'RECIBIDO' => 'success',
+    'DERIVADO' => 'primary',
+    'EN PROCESO' => 'primary',
+    'FINALIZADO' => 'success',
+    'ATENDIDO' => 'primary',
+    'OBSERVADO' => 'danger',
+    'RECHAZADO' => 'danger',
+
+];
+
+?>
 <div class="row">
     <div class="col-md-4">
 
@@ -168,187 +182,95 @@
     </div>
 
     <div class="col-md-8">
-        <?php
-        $estado = [
-            'ESPERA' => 'warning',
-            'RECIBIDO' => 'success',
-            'DERIVADO' => 'primary',
-            'EN PROCESO' => 'primary',
-            'FINALIZADO' => 'success',
-            'ATENDIDO' => 'primary',
-            'OBSERVADO' => 'danger',
-            'RECHAZADO' => 'danger',
 
-        ];
-        ?>
-        <h4 class="card-title"><?= lang('External.seguimientoTitle') ?></h4>
-        <div class="button-group">
-            <a class="btn bg-primary-subtle mb-2 text-primary " data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Toggle 1st obejct</a>
-            <button class="btn bg-success-subtle mb-2 text-success " type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">
-                Toggle 2nd obejct
-            </button>
-            <button class="btn bg-danger-subtle mb-2 text-danger " type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">
-                Toggle both elements
-            </button>
-        </div>
-        <div class="collapse multi-collapse" id="multiCollapseExample1">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Oficina</th>
-                        <th>Fecha y Hora</th>
-                        <th>Estado</th>
-                        <th>Acción</th>
-                        <th>Anexo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Oficina de Planeamiento Estratégico</td>
-                        <td>2024-08-16 13:06:30</td>
-                        <td><span class="badge bg-primary">ATENDIDO</span></td>
-                        <td>Se Derivo a: Oficina de Desarrollo Institucional</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad de SISMED</td>
-                        <td>2024-08-16 13:05:46</td>
-                        <td><span class="badge bg-primary">ATENDIDO</span></td>
-                        <td>Se Derivo a: Oficina de Planeamiento Estratégico</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad de Seguros</td>
-                        <td>2024-08-16 13:04:01</td>
-                        <td><span class="badge bg-warning">ESPERA</span></td>
-                        <td>Se Derivo a: Unidad de SISMED</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad de Apoyo a la Docencia</td>
-                        <td>2024-08-16 13:03:23</td>
-                        <td><span class="badge bg-danger">RECHAZADO</span></td>
-                        <td>SE EMITE MEMORANDUM<br>Se Derivo a: Unidad de Seguros</td>
-                        <td>Anexo 3</td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Estadística e Informática</td>
-                        <td>2024-08-16 12:33:17</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>SE EMITE MEMORANDUM DE VACACIONES<br>Se Derivo a: Unidad de Apoyo a la Docencia</td>
-                        <td>Anexo 2</td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Control Patrimonial</td>
-                        <td>2024-08-16 12:28:20</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>Se Derivo a: Unidad Estadística e Informática</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Servicios Generales y Mantenimiento</td>
-                        <td>2024-08-16 12:26:32</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>VACACIONES 2023<br>Se Derivo a: Unidad Control Patrimonial</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Logística</td>
-                        <td>2024-08-16 12:23:56</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>VACACIONES 2023<br>Se Derivo a: Unidad Servicios Generales y Mantenimiento</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Economía</td>
-                        <td>2024-08-16 12:20:34</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>SE EMITE MEMORANDUM DE VACACIONES<br>Se Derivo a: Unidad Logística</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Unidad Recursos Humanos</td>
-                        <td>2024-08-16 12:19:12</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>SE EMITE MEMO DE VACACIONES<br>Se Derivo a: Unidad Economía</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Trámite Documentario</td>
-                        <td>2024-08-16 12:09:42</td>
-                        <td><span class="badge bg-primary">DERIVADO</span></td>
-                        <td>Se Derivo a: Unidad Recursos Humanos</td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="comment-widgets position-relative mb-2 " data-simplebar>
-                <?php if ($movimiento) : ?>
-                    <?php foreach ($movimiento as $item) : ?>
-                        <div class="d-flex gap-9 comment-row mb-3">
-                            <span class="flex-shrink-0">
-                                <img src="assets/images/profile/user-<?= $item->oficina_procedencia_id ?>.jpg" alt="user" width="56" height="56" class="rounded-circle" />
-                            </span>
-                            <div class="comment-text w-100">
-                                <div class="hstack justify-content-between gap-6 mb-0">
-                                    <div class="hstack gap-6">
-                                        <h5 class="mb-0"><?= $item->oficina_procedencia ?></h5>
-                                        <p class="mb-0 fs-3 text-muted"><?= $item->fecha_envio ?></p>
-                                    </div>
-                                    <span class="badge bg-<?= $estado[$item->estado] ?>-subtle text-<?= $estado[$item->estado] ?> rounded-pill"> <?= $item->estado ?> </span>
-                                </div>
-                                <p class="comment-details mb-2">
-                                    <?= $item->observacion ?>
-                                </p>
-                                <span class="text-muted mb-2">
-                                    Se Derivo a: <?= $item->oficina_destino ?>
-                                </span>
-                                <ul class="list-unstyled mb-0 hstack gap-3 lh-1">
-                                    <?php if ($adjunto) : ?>
-                                        <?php foreach ($adjunto as $adj) : ?>
-                                            <?php if ($adj->movimiento_id == $item->id) : ?>
-                                                <!-- TRUE -->
-                                                <li>
-                                                    <a class="text-muted link-primary" href="<?= $adj->local_path ?>" target="_blank">
-                                                        <iconify-icon icon="solar:gallery-edit-line-duotone" class=""></iconify-icon> <?= lang('External.adjunto') ?> <?= $adj->orden ?>
-                                                    </a>
-                                                </li>
+        <div class="accordion accordion-flush" id="accordionFlushMovimiento">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoOne" aria-expanded="false" aria-controls="collapseMovimientoOne">
+                        <strong><?= lang('Main.movimientosTitle') ?>
+                        </strong>
+                    </button>
+                </h2>
+                <div id="collapseMovimientoOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushMovimiento">
+                    <div class="comment-widgets position-relative mb-2 " data-simplebar>
+                        <?php if ($movimiento) : ?>
+                            <?php foreach ($movimiento as $item) : ?>
+                                <div class="d-flex gap-9 comment-row mb-3">
+                                    <span class="flex-shrink-0">
+                                        <img src="assets/images/profile/user-<?= $item->oficina_procedencia_id ?>.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                    </span>
+                                    <div class="comment-text w-100">
+                                        <div class="hstack justify-content-between gap-6 mb-0">
+                                            <div class="hstack gap-6">
+                                                <h5 class="mb-0"><?= $item->oficina_procedencia ?></h5>
+                                                <p class="mb-0 fs-3 text-muted"><?= $item->fecha_envio ?></p>
+                                            </div>
+                                            <span class="badge bg-<?= $estado[$item->estado] ?>-subtle text-<?= $estado[$item->estado] ?> rounded-pill"> <?= $item->estado ?> </span>
+                                        </div>
+                                        <p class="comment-details mb-2">
+                                            <?= $item->observacion ?>
+                                        </p>
+                                        <span class="text-muted mb-2">
+                                            Se Derivo a: <?= $item->oficina_destino ?>
+                                        </span>
+                                        <ul class="list-unstyled mb-0 hstack gap-3 lh-1">
+                                            <?php if ($adjunto) : ?>
+                                                <?php foreach ($adjunto as $adj) : ?>
+                                                    <?php if ($adj->movimiento_id == $item->id) : ?>
+                                                        <!-- TRUE -->
+                                                        <li>
+                                                            <a class="text-primary link-primary" href="<?= $adj->local_path ?>" target="_blank">
+                                                                <iconify-icon icon="solar:gallery-edit-line-duotone" class=""></iconify-icon> <?= lang('External.adjunto') ?> <?= $adj->orden ?>
+                                                            </a>
+                                                        </li>
+                                                    <?php endif ?>
+                                                <?php endforeach ?>
                                             <?php endif ?>
-                                        <?php endforeach ?>
-                                    <?php endif ?>
 
-                                </ul>
+                                        </ul>
 
-                            </div>
-                        </div>
-                    <?php endforeach ?>
-                <?php else : ?>
-                    <div class="d-flex gap-9 comment-row mb-3">
-                        <span class="flex-shrink-0">
-                            <img src="assets/images/profile/user-24.jpg" alt="user" width="56" height="56" class="rounded-circle" />
-                        </span>
-                        <div class="comment-text">
-                            <div class="hstack justify-content-between gap-6 mb-2">
-                                <div class="hstack gap-6">
-                                    <h5 class="mb-0">Oficina de Tramite Documentario</h5>
-                                    <p class="mb-0 fs-3 text-muted"> <?= $expediente[0]->recibido ?> </p>
+                                    </div>
                                 </div>
-                                <span class="badge bg-danger-subtle text-danger rounded-pill">EN ESPERA</span>
+                            <?php endforeach ?>
+                        <?php else : ?>
+                            <div class="d-flex gap-9 comment-row mb-3">
+                                <span class="flex-shrink-0">
+                                    <img src="assets/images/profile/user-24.jpg" alt="user" width="56" height="56" class="rounded-circle" />
+                                </span>
+                                <div class="comment-text">
+                                    <div class="hstack justify-content-between gap-6 mb-2">
+                                        <div class="hstack gap-6">
+                                            <h5 class="mb-0">Oficina de Tramite Documentario</h5>
+                                            <p class="mb-0 fs-3 text-muted"> <?= $expediente[0]->recibido ?> </p>
+                                        </div>
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill">EN ESPERA</span>
+                                    </div>
+                                    <p class="comment-details mb-2">
+                                        Su expediente aun no ha sido revisado para su derivación.
+                                    </p>
+                                </div>
                             </div>
-                            <p class="comment-details mb-2">
-                                Su expediente aun no ha sido revisado para su derivación.
-                            </p>
-                        </div>
+                        <?php endif ?>
                     </div>
-                <?php endif ?>
+                </div>
             </div>
-        </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoTwo" aria-expanded="true" aria-controls="collapseMovimientoTwo">
+                        <strong><?= lang('Main.expedientePreview') ?></strong>
+                    </button>
+                </h2>
+                <div id="collapseMovimientoTwo" class="accordion-collapse collapse show" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushMovimiento">
 
-        <div class="collapse multi-collapse" id="multiCollapseExample2">
+                    <div class="button-group">
+                        <a href="<?= base_url('/'.$expediente[0]->local_path) ?>" class="btn btn-sm btn-primary" target="_blank">
+                            Abrir en una nueva Pestaña
+                        </a>
+                    </div>
+                    <iframe src="<?= $expediente[0]->local_path ?>" class="w-100 " frameborder="0" style="height: 720px;"></iframe>
 
-            <iframe src="<?= $expediente[0]->local_path ?>" class="w-100 " frameborder="0" style="height: 720px;"></iframe>
-
+                </div>
+            </div>
         </div>
     </div>
 

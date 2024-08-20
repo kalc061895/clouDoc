@@ -24,10 +24,20 @@ class CreateAdjuntosTable extends Migration
                 'unsigned'   => true,
                 'null'       => true,
             ],
+            'local_name' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+                'null'       => true,
+            ],
             'local_path' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
                 'null'       => false,
+            ],
+            'drive_name' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+                'null'       => true,
             ],
             'drive_path' => [
                 'type'       => 'VARCHAR',
