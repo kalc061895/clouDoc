@@ -227,7 +227,7 @@ class ExpedientesModel extends Model
         if ($where != false) {
             $builder->where('movimientos.estado', $where);
         }
-        
+
         $builder->join(
             'movimientos',
             'expedientes.id = movimientos.expediente_id',
@@ -235,7 +235,7 @@ class ExpedientesModel extends Model
         );
         $builder->groupBy('expedientes.id', $where);
 
-        $builder->orderBy('expedientes.numero_expediente','DESC');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
@@ -289,7 +289,7 @@ class ExpedientesModel extends Model
         );
         $builder->groupBy('expedientes.id');
 
-        $builder->orderBy('expedientes.numero_expediente DESC');
+        $builder->orderBy('expedientes.numero_expediente','DESC');
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
@@ -315,9 +315,7 @@ class ExpedientesModel extends Model
             'expedientes.id = movimientos.expediente_id',
             'left'
         );
-        
-        $builder->orderBy('movimientos.id','DESC');
-        $builder->groupBy('numero_expediente');
+
 
         if ($searchValue) {
             $builder->like('numero_expediente', $searchValue);
@@ -326,9 +324,19 @@ class ExpedientesModel extends Model
             $builder->orLike('expedientes.fecha_recepcion', $searchValue);
         }
 
-        $columnIndex = $order[0]['column']; // Column index
-        $columnName = $order[0]['dir']; // 'asc' or 'desc'
-        $builder->orderBy($columnIndex, $columnName);
+        $builder->groupBy('expedientes.id');
+
+        $builder->orderBy('expedientes.numero_expediente','DESC');
+
+        // Mapea el índice de columna a nombres de columna
+        $columns = ['numero_expediente', 'nombre', 'asunto', 'estado', 'fecha_recepcion','numero_expediente'];
+
+        foreach ($order as $value) {
+            $columnIndex = $value['column']; // Índice de columna
+            $columnName = $columns[$columnIndex]; // Nombre de columna
+            $direction = $value['dir']; // 'asc' o 'desc'
+            $builder->orderBy($columnName, $direction);
+        }
 
         $builder->limit($length, $start);
 
@@ -344,7 +352,7 @@ class ExpedientesModel extends Model
 
     public function getTotalRecords()
     {
-        
+
         return $this->countAllResults();
     }
 

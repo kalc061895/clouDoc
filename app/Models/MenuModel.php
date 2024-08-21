@@ -48,8 +48,8 @@ class MenuModel extends Model
 
     public function getMenusByRole()
     {
-
         $tipoUsuario = auth()->user()->groups;
+
         $db = \Config\Database::connect();
 
         $builder = $db->table('menus');

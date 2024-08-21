@@ -65,8 +65,6 @@ class AuthGroups extends ShieldAuthGroups
             'title'       => 'Encargados de Areas de Oficinas',
             'description' => 'Gestion de Documentos derivados por jefaturas',
         ],
-        'title'       => 'Trámite Documentario',
-            'description' => 'Recepción y derivación de documentos recepcionados a nivel externo e interno',
     ];
 
     /**
