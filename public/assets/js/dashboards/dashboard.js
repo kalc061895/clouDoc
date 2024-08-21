@@ -13,8 +13,70 @@ document.addEventListener("DOMContentLoaded", function () {
       let bsAlert = new bootstrap.Toast(myAlert);
       bsAlert.show();
     }
-  });
-    // -----------------------------------------------------------------------
+  })
+
+  
+  // -----------------------------------------------------------------------
+  // Sales of the Month
+  // -----------------------------------------------------------------------
+
+  var options = {
+    color: "#adb5bd",
+    series: [28, 10, 15, 40],
+    labels: ["Item A", "Item B", "Item C", "Item D"],
+    chart: {
+        type: "donut",
+        height: 265,
+        fontFamily: "inherit",
+        foreColor: "#adb0bb",
+    },
+    plotOptions: {
+        pie: {
+            donut: {
+                size: '88%',
+                background: 'transparent',
+                labels: {
+                    show: true,
+                    name: {
+                        show: true,
+                        offsetY: 7,
+                    },
+                    value: {
+                        show: false,
+                    },
+                    total: {
+                        show: true,
+                        color: 'var(--bs-info)',
+                        fontSize: '24px',
+                        fontWeight: "700",
+                        label: '32%',
+                    },
+                },
+            },
+        },
+    },
+    stroke: {
+        show: false,
+    },
+    dataLabels: {
+        enabled: false,
+    },
+
+    legend: {
+        show: false,
+    },
+    colors: ["var(--bs-info)", "var(--bs-danger)", "var(--bs-warning)", "#9fa0a5",],
+
+    tooltip: {
+        theme: "dark",
+        fillSeriesColor: false,
+    },
+};
+
+var chart = new ApexCharts(document.querySelector("#sales-of-the-month"), options);
+chart.render();
+
+  // -----------------------------------------------------------------------
   // Revenue Statistics
   // -----------------------------------------------------------------------
 
@@ -53,6 +115,129 @@ document.addEventListener("DOMContentLoaded", function () {
     Revenue_Statistics
   );
   chart_area_spline.render();
+
+  // -----------------------------------------------------------------------
+  // Sales difference
+  // -----------------------------------------------------------------------
+
+
+  var options = {
+    color: "#adb5bd",
+    series: [12, 88],
+    labels: ["12%", "88%"],
+    chart: {
+        type: "donut",
+        height: 140,
+        fontFamily: "inherit",
+        foreColor: "#adb0bb",
+    },
+    plotOptions: {
+        pie: {
+            donut: {
+                size: '85%',
+                background: 'transparent',
+                labels: {
+                    show: true,
+                    name: {
+                        show: true,
+                        offsetY: 7,
+                    },
+                    value: {
+                        show: false,
+                    },
+                    total: {
+                        show: true,
+                        color: 'var(--bs-warning)',
+                        fontSize: '16px',
+                        fontWeight: "500",
+                        label: '12%',
+                    },
+                },
+            },
+        },
+    },
+    stroke: {
+        show: false,
+    },
+    dataLabels: {
+        enabled: false,
+    },
+  
+    legend: {
+        show: false,
+    },
+    colors: ["var(--bs-warning)", "#9fa0a5",],
+  
+    tooltip: {
+        theme: "dark",
+        fillSeriesColor: false,
+    },
+  };
+  
+  var chart = new ApexCharts(document.querySelector("#sales-difference"), options);
+  chart.render();
+
+
+
+  // -----------------------------------------------------------------------
+  // Sales Prediction
+  // -----------------------------------------------------------------------
+
+  var options = {
+    color: "#adb5bd",
+    series: [46, 54],
+    labels: ["54%", "46%"],
+    chart: {
+        type: "donut",
+        height: 130,
+        fontFamily: "inherit",
+        foreColor: "#adb0bb",
+    },
+    plotOptions: {
+        pie: {
+            donut: {
+                size: '85%',
+                background: 'transparent',
+                labels: {
+                    show: true,
+                    name: {
+                        show: true,
+                        offsetY: 7,
+                    },
+                    value: {
+                        show: false,
+                    },
+                    total: {
+                        show: true,
+                        color: 'var(--bs-success)',
+                        fontSize: '16px',
+                        fontWeight: "500",
+                        label: '54%',
+                    },
+                },
+            },
+        },
+    },
+    stroke: {
+        show: false,
+    },
+    dataLabels: {
+        enabled: false,
+    },
+  
+    legend: {
+        show: false,
+    },
+    colors: ["#9fa0a5", "var(--bs-success)",],
+  
+    tooltip: {
+        theme: "dark",
+        fillSeriesColor: false,
+    },
+  };
+  
+  var chart = new ApexCharts(document.querySelector("#sales-prediction"), options);
+  chart.render();
 
 
   
