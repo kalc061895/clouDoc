@@ -31,10 +31,12 @@ class CreateMenuGroupUserTable extends Migration
                 'null' => true,
             ],
         ]);
+        $this->db->disableForeignKeyChecks();
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('menu_id', 'menus', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('group_user_id', 'group_user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('menu_group_user');
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

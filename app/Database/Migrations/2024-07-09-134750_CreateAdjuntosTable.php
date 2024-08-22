@@ -4,6 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 use CodeIgniter\Database\RawSql;
+
 class CreateAdjuntosTable extends Migration
 {
     public function up()
@@ -58,11 +59,14 @@ class CreateAdjuntosTable extends Migration
                 'null' => true,
             ],
         ]);
+        $this->db->disableForeignKeyChecks();
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('expediente_id', 'expedientes', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('movimiento_id', 'movimientos', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('adjuntos');
+        
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

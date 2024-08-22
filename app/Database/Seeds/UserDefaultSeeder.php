@@ -12,28 +12,81 @@ class UserDefaultSeeder extends Seeder
         // User data
         $users = [
             [
-                'email' => 'admintest@example.com',
-                'username' => 'admintest',
-                'password' => 'admintest', // This will be hashed by Shield
-                'nombres' => 'Admintest',
-                'paterno' => 'User',
+                'email' => 'superadmin@cloudoc.com',
+                'username' => 'superadmin',
+                'password' => 'super@dmin', // This will be hashed by Shield
                 'active' => '1',
-                'materno' => 'User',
+                // personales
+                'nombres' => 'SuperAdmin',
+                'paterno' => 'SAPaterno',
+                'materno' => 'SAMaterno',
+                'dni' => '00000001',
+                'cargo' => 'Super Administrador',
+                'telefono' => '00000001',
                 'oficina_id' => '1',
-                'group' => 1,
+                'group' => 'superadmin',
             ],
             [
-                'email' => 'user2@example.com',
-                'username' => 'user2',
-                'password' => 'password', // This will be hashed by Shield
-                'nombres' => 'user2',
-                'paterno' => 'User2',
-                'materno' => 'User2',
-                'oficina_id' => '2',
+                'email' => 'admin@cloudoc.com',
+                'username' => 'admin',
+                'password' => '@dmin', // This will be hashed by Shield
                 'active' => '1',
-                'group' => 2,
+                // personales
+                'nombres' => 'Admin',
+                'paterno' => 'APaterno',
+                'materno' => 'AMaterno',
+                'dni' => '00000002',
+                'cargo' => 'Administrador',
+                'telefono' => '00000002',
+                'oficina_id' => '1',
+                'group' => 'admin',
             ],
-            // Add more users as needed
+            [
+                'email' => 'tramite@cloudoc.com',
+                'username' => 'tramite',
+                'password' => 'tr@mite', // This will be hashed by Shield
+                'active' => '1',
+                // personales
+                'nombres' => 'tramite',
+                'paterno' => 'TPaterno',
+                'materno' => 'TMaterno',
+                'dni' => '00000003',
+                'cargo' => 'tramite',
+                'telefono' => '00000003',
+                'oficina_id' => '2',
+                'group' => 'tramite',
+            ],
+            [
+                'email' => 'oficina@cloudoc.com',
+                'username' => 'oficina',
+                'password' => 'oficin@', // This will be hashed by Shield
+                'active' => '1',
+                // personales
+                'nombres' => 'Oficina Ejemplo',
+                'paterno' => 'OPaterno',
+                'materno' => 'OMaterno',
+                'dni' => '00000004',
+                'cargo' => 'oficina',
+                'telefono' => '00000004',
+                'oficina_id' => '4',
+                'group' => 'oficina',
+            ],
+            [
+                'email' => 'area@cloudoc.com',
+                'username' => 'area',
+                'password' => '@re@', // This will be hashed by Shield
+                'active' => '1',
+                // personales
+                'nombres' => 'Area Ejemplo',
+                'paterno' => 'APaterno',
+                'materno' => 'AMaterno',
+                'dni' => '00000005',
+                'cargo' => 'Area Ejemplo',
+                'telefono' => '00000005',
+                'oficina_id' => '27',
+                'group' => 'area',
+            ],
+            
         ];
 
         foreach ($users as $user) {
@@ -41,7 +94,7 @@ class UserDefaultSeeder extends Seeder
             $_insertUser = new User($user);
             $userEntity = new UsuarioModel();
             $userEntity->save($_insertUser);
-            $insertedId = $userEntity->insertID();
+            $insertedId = $userEntity->getInsertID();
             $userEntity->actualizarGrupo($insertedId,$user['group']);
         }
     }

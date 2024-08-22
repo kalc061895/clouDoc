@@ -86,12 +86,15 @@ class CreateExpedientesTable extends Migration
                 'null' => true,
             ],
         ]);
-
+        $this->db->disableForeignKeyChecks();
+        
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('tipo_expediente_id', 'tipo_expediente', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('entidad_id', 'entidades', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('entidad_id', 'entidad', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('atencion_oficina_id', 'oficinas', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('expedientes');
+
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()
