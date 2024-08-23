@@ -4,11 +4,10 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 use CodeIgniter\Database\RawSql;
+
 class CreateEmpresaConfiguracionTable extends Migration
 {
     public function up()
-    {
-        public function up()
     {
         $this->forge->addField([
             'id' => [

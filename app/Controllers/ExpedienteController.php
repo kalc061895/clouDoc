@@ -14,8 +14,8 @@ use App\Models\AdjuntoModel;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use PhpParser\Node\Stmt\TryCatch;
-
 use App\Libraries\GoogleDrive;
+use App\Models\TupaModel;
 
 class ExpedienteController extends BaseController
 {
@@ -104,8 +104,9 @@ class ExpedienteController extends BaseController
 
     public function tupaExpediente()
     {
-        //$data['expedientes'] = $this->expedienteModel->findAll();
-        return view('external/lista_tupa_expediente');
+        $tupaModel = new TupaModel();
+        $data['tupa'] = $tupaModel->getTupa();
+        return view('external/lista_tupa_expediente',$data);
     }
 
     public function create()

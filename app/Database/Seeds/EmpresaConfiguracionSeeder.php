@@ -10,16 +10,41 @@ class EmpresaConfiguracionSeeder extends Seeder
     {
         $data = [
             [
-                'nombre_empresa' => 'Nombre de la Empresa',
-                'documento_empresa' => 'RUC 12345678901', // Ejemplo de documento de la empresa
-                'nombre_director' => 'Juan Pérez',
-                'direccion' => 'Calle Principal 123, Ciudad',
-                'telefono' => '123-456-7890',
-                'horarios_atencion' => 'Lunes a Viernes: 8:00 AM - 5:00 PM',
-                'logo' => 'logo.png', // Nombre del archivo de logo en tu sistema
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'key' => 'nombre_empresa',
+                'value' => 'Nombre de la Empresa'
             ],
+            [
+                'key' => 'documento_empresa',
+                'value' => 'RUC 12345678901'
+            ],
+            [
+                'key' => 'nombre_director',
+                'value' => 'Juan Pérez'
+            ],
+            [
+                'key' => 'direccion',
+                'value' => 'Calle Principal 123, Ciudad'
+            ],
+            [
+                'key' => 'telefono',
+                'value' => '123-456-7890'
+            ],
+            [
+                'key' => 'horarios_atencion',
+                'value' => 'Lunes a Viernes: 8:00 AM - 5:00 PM'
+            ],
+            [
+                'key' => 'logo',
+                'value' => 'logo.png'
+            ],
+            [
+                'key' => 'google_drive',
+                'value' => true
+            ],
+            [
+                'key' => 'google_drive_folder',
+                'value' => '15WeczEPwYK534xeyX3BOswRsjBLl67G0'
+            ]
             // Agrega más registros de configuración si es necesario
         ];
 
