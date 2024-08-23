@@ -64,10 +64,11 @@ class CreateEntidadTable extends Migration
                 'null' => true,
             ],
         ]);
-
+        $this->db->disableForeignKeyChecks();
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('tipo_documento_id', 'tipo_documento', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('entidad');
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

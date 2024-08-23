@@ -11,19 +11,19 @@ class GroupUserSeeder extends Seeder
         // Datos de los grupos de usuarios
         $data = [
             [
-                'name' => 'SuperAdmin',
+                'name' => 'superadmin',
             ],
             [
-                'name' => 'Admin',
+                'name' => 'admin',
             ],
             [
-                'name' => 'MesaDePartes',
+                'name' => 'tramite',
             ],
             [
-                'name' => 'Oficina',
+                'name' => 'oficina',
             ],
             [
-                'name' => 'Area',
+                'name' => 'area',
             ],
         ];
 

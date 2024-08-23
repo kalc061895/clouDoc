@@ -57,10 +57,11 @@ class CreateOficinasTable extends Migration
                 'null' => true,
             ],
         ]);
-
+        $this->db->disableForeignKeyChecks();
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('oficina_padre_id', 'oficinas', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('oficinas');
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

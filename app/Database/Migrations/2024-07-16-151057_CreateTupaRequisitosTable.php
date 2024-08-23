@@ -45,10 +45,11 @@ class CreateTupaRequisitosTable extends Migration
                 'null' => true,
             ],
         ]);
-
+        $this->db->disableForeignKeyChecks();
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('tupa_id', 'tupa', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('tupa_requisitos');
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

@@ -91,7 +91,8 @@ $estado = [
             url: '<?= base_url('mesa_de_partes/fetch_expedientes') ?>', // URL for the server-side processing script
             type: 'POST',
         },
-        columns: [{
+        columns: [
+            {
                 data: 'numero_expediente',
                 render: function(data, type, row) {
                     return '<h6 class="fw-semibold mb-0">' + data + '</h6>';
@@ -155,7 +156,7 @@ $estado = [
             $(row).attr('data-id', data.id);
         },
         order: [
-            [1, "desc"]
+            [0, "desc"]
         ],
         "language": {
             "url": "//cdn.datatables.net/plug-ins/2.1.0/i18n/es-MX.json"

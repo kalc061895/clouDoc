@@ -13,10 +13,9 @@ class MovimientosModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'expediente_id','numero_movimiento','oficina_procedencia_id',
+        'expediente_id','numero_movimiento','oficina_procedencia_id','accion',
         'oficina_destino_id','prioridad','estado','observacion',
         'fecha_envio','fecha_recepcion','fecha_culminacion'
-        
     ];
 
     protected bool $allowEmptyInserts = false;

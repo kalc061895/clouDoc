@@ -21,6 +21,25 @@
                     <p class="fw-normal mb-0 fs-4"><?= lang('External.descriptionTupa') ?></p>
                 </div>
                 <div class="accordion accordion-flush mb-5 card position-relative overflow-hidden" id="accordionFlushExample">
+                    <?php if ($tupa != null) : ?>
+                        <?php foreach ($tupa as $item) : ?>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button collapsed fs-4 fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-<?=$item->id?>" aria-expanded="false" aria-controls="flush-collapse-<?=$item->id?>">
+                                        What is an Admin Dashboard?
+                                    </button>
+                                </h2>
+                                <div id="flush-collapse-<?=$item->id?>" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body fw-normal">
+                                        Admin Dashboard is the backend interface of a website or an application that helps to manage the
+                                        website's overall content and settings. It is widely used by the site owners to keep track of
+                                        their website,
+                                        make changes to their content, and more.
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach ?>
+                    <?php endif ?>
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-headingOne">
                             <button class="accordion-button collapsed fs-4 fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">

@@ -74,10 +74,13 @@ class CreateMovimientosTable extends Migration
                 'null' => true,
             ],
         ]);
+        $this->db->disableForeignKeyChecks();
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('expediente_id', 'expedientes', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('movimientos');
+        
+        $this->db->enableForeignKeyChecks();
     }
 
     public function down()

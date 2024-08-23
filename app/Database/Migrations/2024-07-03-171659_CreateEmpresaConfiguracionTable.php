@@ -8,53 +8,33 @@ class CreateEmpresaConfiguracionTable extends Migration
 {
     public function up()
     {
+        public function up()
+    {
         $this->forge->addField([
             'id' => [
-                'type' => 'INT',
-                'constraint' => 5,
-                'unsigned' => true,
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'nombre_empresa' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => true,
+            'key' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
             ],
-            'documento_empresa' => [
-                'type' => 'VARCHAR',
-                'constraint' => 20,
-                'null' => true,
+            'value' => [
+                'type'       => 'TEXT',
             ],
-            'nombre_director' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => true,
-            ],
-            'direccion' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'telefono' => [
-                'type' => 'VARCHAR',
-                'constraint' => 20,
-                'null' => true,
-            ],
-            'horarios_atencion' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'logo' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => true,
+            'description' => [
+                'type'       => 'TEXT',
+                'null'       => true,
             ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'updated_at' => [
-                'type' => 'DATETIME',
-                'null' => true,
+                'type'       => 'DATETIME',
+                'null'       => true,
             ],
         ]);
 
