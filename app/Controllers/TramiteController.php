@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\EmpresaConfiguracionModel;
+use App\Models\EntidadModel;
 use App\Models\MovimientosModel;
 use App\Models\UsuarioModel;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -12,6 +14,7 @@ use App\Models\OficinaModel;
 use App\Models\AdjuntoModel;
 use Config\Auth;
 use App\Libraries\GoogleDrive;
+use App\Libraries\EmailLibrary;
 
 class TramiteController extends BaseController
 {
@@ -73,12 +76,13 @@ class TramiteController extends BaseController
         $movimientoModel = new MovimientosModel();
 
         $_ultimoMovimiento = new MovimientosModel();
-        $movimiento = $_ultimoMovimiento->find($this->request->getPost('idDerivar'));
+        $movimiento = $_ultimoMovimiento->where('expediente_id',$this->request->getPost('idDerivar'))->orderBy('id','DESC')->first();
 
-        if ($movimiento != null) {
+        if ($movimiento !== null) {
             $movimiento['estado'] = 'DERIVADO';
             $_ultimoMovimiento->save($movimiento);
         } else {
+
         }
 
         // Obtener el número de movimiento
@@ -133,12 +137,13 @@ class TramiteController extends BaseController
         $movimientoModel = new MovimientosModel();
 
         $_ultimoMovimiento = new MovimientosModel();
-        $movimiento = $_ultimoMovimiento->find($this->request->getPost('idAtender'));
+        $movimiento = $_ultimoMovimiento->where('expediente_id',$this->request->getPost('idAtender'))->orderBy('id','DESC')->first();
 
-        if ($movimiento != null) {
+        if ($movimiento !== null) {
             $movimiento['estado'] = 'DERIVADO';
             $_ultimoMovimiento->save($movimiento);
         } else {
+
         }
 
         // Obtener el número de movimiento
@@ -151,7 +156,7 @@ class TramiteController extends BaseController
             'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $_usuario->oficina_id,
             'numero_movimiento' => ($ultimoMovimiento != false) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
-            'estado' => 'ATENDIDO',
+            'estado' => 'ATENDIDO',//FINALIZADO
         ];
         $nuevoMovimiento = new MovimientosModel();
         $insertResult = $nuevoMovimiento->insert($set);
@@ -160,6 +165,14 @@ class TramiteController extends BaseController
         if ($insertResult !== false) {
             $insertID = $nuevoMovimiento->insertID();
 
+            $emailConfiguracion = new EmpresaConfiguracionModel();
+            if($emailConfiguracion->getConfig('email_notification')){
+                $email = new EmailLibrary();
+                $_entidad = new EntidadModel();
+                $_expediente = new ExpedientesModel();
+                $_expedienteData = $_expediente->find($$this->request->getPost('idAtender'));
+                $email->sendNotificationEmail($_expediente->find($$this->request->getPost('idAtender')),$_entidad->find($_expedienteData['entidad_id']),$set);
+            }
             //guardar archivo
             /**
              * Aqui se debe llamar a la funcion que guardara el archivo adjunto si se adjunta algun archivo o archivos
@@ -188,7 +201,7 @@ class TramiteController extends BaseController
          * Remitir correo de confirmacion de atencion de expediente 
          */
 
-         
+
         return $this->response->setJSON($response);
     }
 
@@ -207,10 +220,11 @@ class TramiteController extends BaseController
                 try {
                     $newName = $file->getRandomName();
                     $drivePath = '-';
-                    if (false) {
+                    $_driveModel = new EmpresaConfiguracionModel();
+                    if ($_driveModel->getDriveConfig()) {
                         $googleDrive = new GoogleDrive();
 
-                        $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                        $folderId = $_driveModel->getConfig('google_drive_fodler'); // ID de tu carpeta
                         $fileId = $googleDrive->uploadFile($file->getTempName(), $newName, $folderId);
                         $drivePath = $fileId;
                     }
@@ -278,7 +292,7 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina,$estado),
+            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina, $estado),
         ];
 
         return view('tramite/listar_nuevos_expedientes', $set);
@@ -291,7 +305,7 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina,$estado),
+            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina, $estado),
         ];
 
         return view('tramite/listar_nuevos_expedientes', $set);
@@ -326,4 +340,7 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
+
+
+
 }

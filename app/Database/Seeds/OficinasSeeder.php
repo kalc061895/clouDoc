@@ -262,6 +262,12 @@ class OficinasSeeder extends Seeder
                 'rango' => 3,
                 'oficina_padre_id' => 15,
             ],
+            [
+                'nombre' => 'Control de Asistencia y Permanencia',
+                'tipo' => 'Área',
+                'rango' => 3,
+                'oficina_padre_id' => 4,
+            ],
         ];
 
         // Insertar los datos en la base de datos

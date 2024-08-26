@@ -120,11 +120,12 @@ return [
     // detalle de expediente
     'movimientosTitle' => 'Detalle de Movimiento',
     'expedientePreview' => 'Vista Prevía del Expediente ',
-
+    
     //observar expediente
     'observar'=> 'Observar Expediente',
-
+    
     //atender expediente
+    'confirmarAtencion'=> 'Se Atendió Correctamente ',
     'atender'=> 'Atender Expediente',
     'descripcion'=> 'Descripción de Atención:',
     // 'nombreAdjunto'=> 'Titulo de Adjunto',

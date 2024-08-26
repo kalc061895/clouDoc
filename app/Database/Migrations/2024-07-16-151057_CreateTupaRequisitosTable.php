@@ -32,6 +32,10 @@ class CreateTupaRequisitosTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ],
+            'formato_drive' => [
+                'type' => 'VARCHAR',
+                'constraint' => '255',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'default' => new RawSql('CURRENT_TIMESTAMP'),
