@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\EmpresaConfiguracionModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Libraries\ExpedienteForm;
 use App\Models\EntidadModel;
@@ -155,10 +156,11 @@ class ExpedienteController extends BaseController
             /**
              * Subir al google drive acorde a la configuracion
              */
-            if (false) {
+            $_driveModel = new EmpresaConfiguracionModel(); 
+            if ($_driveModel->getDriveConfig()) {
                 $googleDrive = new GoogleDrive();
 
-                $folderId = '15WeczEPwYK534xeyX3BOswRsjBLl67G0'; // ID de tu carpeta
+                $folderId = $_driveModel->getConfig('google_drive_fodler'); // ID de tu carpeta
                 $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $newName, $folderId);
                 $drivePath = $fileId;
             }

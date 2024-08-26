@@ -20,6 +20,8 @@ class MasterSeeder extends Seeder
         $this->call('TipoDocumentoSeeder');
         $this->call('TipoExpedienteSeeder');
         $this->call('UserDefaultSeeder');
+        $this->call('TupaSeeder');
+        $this->call('TupaRequisitosSeeder');
         // Add more seeders as needed
 
     }

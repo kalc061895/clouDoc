@@ -44,7 +44,16 @@ class EmpresaConfiguracionSeeder extends Seeder
             [
                 'key' => 'google_drive_folder',
                 'value' => '15WeczEPwYK534xeyX3BOswRsjBLl67G0'
-            ]
+            ],
+            [
+                'key' => 'google_drive_folder_template',
+                'value' => '1_9VI9COPjUClK29mabtyVBxbhuSymssy'
+            ],
+            [
+                'key' => 'email_notification',
+                'value' => true,
+                'description' => 'Se notifica por correo electronico a lso usuarios'
+            ],
             // Agrega más registros de configuración si es necesario
         ];
 

@@ -4,19 +4,18 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class TupaModel extends Model
+class EmpresaConfiguracionModel extends Model
 {
-    protected $table            = 'tupa';
+    protected $table            = 'empresa_configuracion';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'numero_orden','denominacion_procedimiento',
-        'derecho_admision_uit','derecho_admision_soles',
-        'calificacion','plazo','oficina_inicio','oficina_competencia',
-        'oficina_reconsideracion','oficina_apelacion'
+        'key',
+        'value',
+        'description'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -48,22 +47,28 @@ class TupaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-    public function getTupa() {
-        $db = \Config\Database::connect();
+    public function getConfig($key)
+    {
+        $this->builder->where('key', $key);
+        $result = $this->builder->get()->getFirstRow(); 
+        // Obtén la primera fila de resultado
 
-        $builder = $db->table('tupa');
-        $builder->select('tupa.id as t_id,tupa.*,tupa_requisitos.*');
-        //$builder->where('requisimovimientos.id', null);
-        $builder->join(
-            'tupa_requisitos',
-            'tupa_requisitos.tupa_id = tupa.id',
-            'inner'
-        );
-        $builder->orderBy('tupa.numero_orden','ASC');
-        $builder->orderBy('tupa_requisitos.numero_requisito','ASC');
-        $query = $builder->get();
+        if ($result) {
+            return $result->value;
+        }
 
-        return $query->getResultObject();
+        return false;
+    }
+    public function getDriveConfig()
+    {
+        $this->where('key', 'google_drive');
+        $result = $this->get()->getFirstRow(); 
+        // Obtén la primera fila de resultado
 
+        if ($result) {
+            return $result->value;
+        }
+
+        return false;
     }
 }
