@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/inicio', 'Home::index');
 
+
 /**
  * Si necesitas manejarel login y register de forma particular
  * 
@@ -27,6 +28,8 @@ service('auth')->routes($routes);
  * 
  */
 $routes->get('/', 'ExpedienteController::index');
+//$routes->get('/', 'SeederController::index');
+
 $routes->get('/nuevoexpediente', 'ExpedienteController::nuevoexpediente');
 $routes->post('/nuevoexpediente', 'ExpedienteController::store');
 //$routes->post('/nuevoexpediente', 'ExpedienteController::upload');
