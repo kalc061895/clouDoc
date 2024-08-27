@@ -79,6 +79,7 @@ $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpediente
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
 $routes->post('mesa_de_partes/atender', 'TramiteController::postAtenderExpediente');
+$routes->post('mesa_de_partes/observar', 'TramiteController::postObservarExpediente');
 $routes->get('mesa_de_partes/para_despacho', 'TramiteController::getDerivados');
 $routes->get('mesa_de_partes/observados',  'TramiteController::getObservados');
 $routes->get('mesa_de_partes/todos_expediente',  'TramiteController::getExpedienteTodo');
@@ -88,5 +89,8 @@ $routes->post('mesa_de_partes/fetch_expedientes',  'TramiteController::fetch_exp
  * Opciones de Mesa de Partes
  */
 $routes->get('expediente/para_recibir', 'TramiteController::getExpedientePorOficina');
+$routes->get('expediente/derivados', 'TramiteController::getExpedienteDerivados');
 $routes->get('expediente/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('expediente/derivar', 'TramiteController::postDerivarExpediente');
+$routes->post('expediente/observar', 'TramiteController::postObservarExpediente');
+

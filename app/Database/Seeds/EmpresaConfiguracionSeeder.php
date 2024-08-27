@@ -52,7 +52,8 @@ class EmpresaConfiguracionSeeder extends Seeder
             [
                 'key' => 'email_notification',
                 'value' => true,
-                'description' => 'Se notifica por correo electronico a lso usuarios'
+                //'description' => 'Se notifica por correo electronico a los usuarios',
+                
             ],
             // Agrega más registros de configuración si es necesario
         ];

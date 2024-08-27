@@ -81,11 +81,13 @@ $estado = [
                                     <span class="bar"></span>
                                     <label for="accionDerivar"><?= lang('Main.accion') ?></label>
                                 </div>
+
                                 <div class="form-group mb-4">
                                     <textarea class="form-control" rows="4" id="observacionDerivar" name="observacionDerivar"></textarea>
                                     <span class="bar"></span>
                                     <label for="observacionDerivar"><?= lang('Main.observacion') ?></label>
                                 </div>
+
                                 <div class="form-group mb-4">
                                     <label for="adjuntoDerivar" class="form-label">Adjunto</label>
                                     <input class="form-control form-sm" type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
@@ -157,23 +159,40 @@ $estado = [
                     </h2>
                     <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushParent">
                         <div class="accordion-body px-3 fw-normal">
-                            <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/observar') ?>">
+
+                                <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/observar') ?>" method="POST" id="formObservar">
+                                <input type="text" name="idObservar" value="<?= $expediente[0]->id ?>" hidden>
 
                                 <div class="form-group mb-4">
-                                    <textarea class="form-control" rows="4" id="observacionObservar" required></textarea>
+                                    <select class="form-control form-select" id="accionObservar" name="accionObservar" required>
+                                        <option></option>
+                                        <?php foreach ($accion as $item) : ?>
+                                            <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+                                    <span class="bar"></span>
+                                    <label for="accionObservar"><?= lang('Main.accion') ?></label>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <textarea class="form-control" rows="4" id="observacionObservar" name="observacionObservar"></textarea>
                                     <span class="bar"></span>
                                     <label for="observacionObservar"><?= lang('Main.observacion') ?></label>
                                 </div>
                                 <div class="form-group mb-4">
-                                    <button type="submit" class="justify-content-center w-100 btn mb-1 btn-rounded bg-danger-subtle text-danger  d-flex align-items-center">
+                                    <label for="adjuntoObservar" class="form-label">Adjunto</label>
+                                    <input class="form-control form-sm" type="file" id="adjuntoObservar" name="adjuntoObservar[]" multiple>
+                                </div>
+                                <div class="form-group mb-4">
+
+                                    <button type="submit" class="justify-content-center w-100 btn mb-1 btn-rounded bg-primary-subtle text-primary  d-flex align-items-center">
                                         <i class="ti ti-send fs-4 me-2"></i>
                                         <?= lang('Main.observar') ?>
                                     </button>
 
-
                                 </div>
 
                             </form>
+
                         </div>
                     </div>
                 </div>
@@ -335,6 +354,39 @@ $estado = [
                 mensaje_derivar(response.idexpediente);
                 Swal.fire(
                     "<?= lang('Main.confirmarAtencion') ?>",
+                    '',
+                    "success"
+                );
+                console.log(response);
+                // Puedes mostrar un mensaje de éxito o redirigir a otra página, etc.
+            },
+            error: function(xhr, status, error) {
+                // Manejar errores aquí
+                console.error(error);
+                // Puedes mostrar un mensaje de error, etc.
+            }
+        });
+    });
+    // funcion para OBSERVAR
+    $('#formObservar').on('submit', function(event) {
+        event.preventDefault(); // Prevenir la acción predeterminada del formulario
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: formData,
+            processData: false, // Evitar que jQuery procese los datos
+            contentType: false, // Evitar que jQuery establezca el tipo de contenido
+            success: function(response) {
+                // Manejar la respuesta del servidor aquí
+                // response = JSON.parse(response);
+                $('#detalleExpediente').modal('hide');
+
+                mensaje_derivar(response.idexpediente);
+                Swal.fire(
+                    "<?= lang('Main.confirmarObservar') ?>",
                     '',
                     "success"
                 );
