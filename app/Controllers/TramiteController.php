@@ -28,6 +28,7 @@ class TramiteController extends BaseController
         $tramiteModel = new ExpedientesModel();
         $set = [
             'expediente' => $tramiteModel->getNuevosExpedientesExternos(),
+            'observacion' => false,
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
@@ -35,6 +36,8 @@ class TramiteController extends BaseController
     public function getDetallesExpedientes()
     {
         $id = $this->request->getGet('id');
+        $tipo = $this->request->getGet('observacion') ?? false;
+
         $expedienteModel = new ExpedientesModel();
         $expediente = $expedienteModel->detalleExpediente($id);
         $movimientoArray = $expedienteModel->getMovimientos($id);
@@ -57,6 +60,7 @@ class TramiteController extends BaseController
                         'adjunto' => $adjunto,
                         'oficina' => $oficinaModel->orderBy('oficina_padre_id ASC')->findAll(),
                         'accion' => $accionModel->findAll(),
+                        'observacion' => $tipo,
                     ]
                 )
             ];
@@ -343,6 +347,7 @@ class TramiteController extends BaseController
         $expedientesModel = new ExpedientesModel();
         $set = [
             'expediente' => $expedientesModel->getExpedientesTodo(),
+            'observacion' => 'true',
         ];
         return view('tramite/listar_expedientes_observacion', $set);
     }
@@ -362,7 +367,7 @@ class TramiteController extends BaseController
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
-    public function getExpedienteDerivados(): String
+    public function getExpedientesDerivados(): String
     {
         $_userModel = new UsuarioModel();
         $_user = $_userModel->find(auth()->user()->id);
@@ -370,6 +375,7 @@ class TramiteController extends BaseController
         $expedientesModel = new ExpedientesModel();
         $set = [
             'expediente' => $expedientesModel->getExpedientesOficina($idOficina,'DERIVADO'),
+            'observacion' => 'true',
         ];
         return view('tramite/listar_nuevos_expedientes', $set);
     }
@@ -382,12 +388,13 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina, $estado),
+            'expediente' => $expedientesModel->getExpedientesOficinaEstado($idOficina, $estado),
+            'observacion' => 'true',
         ];
 
         return view('tramite/listar_nuevos_expedientes', $set);
     }
-    public function getObservados(): String
+    public function getExpedientesObservados(): String
     {
         $estado = 'OBSERVADO';
         $_userModel = new UsuarioModel();
@@ -395,12 +402,37 @@ class TramiteController extends BaseController
         $idOficina = $_user->oficina_id;
         $expedientesModel = new ExpedientesModel();
         $set = [
-            'expediente' => $expedientesModel->getExpedientesDerivados($idOficina, $estado),
+            'expediente' => $expedientesModel->getExpedientesOficinaEstado($idOficina, $estado),
         ];
 
         return view('tramite/listar_nuevos_expedientes', $set);
     }
+    public function getExpedientesAtendidos(): String
+    {
+        $estado = 'ATENDIDO';
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesOficinaEstado($idOficina, $estado),
+            'observacion' => 'true',
+        ];
 
+        return view('tramite/listar_nuevos_expedientes', $set);
+    }
+    public function getExpedientesTodos(): String
+    {
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getExpedientesOficinaTodo($idOficina),
+            'observacion'=> true
+        ];
+        return view('tramite/listar_nuevos_expedientes', $set);
+    }
     public function fetch_expedientes()
     {
         $expedienteModel = new ExpedientesModel();
@@ -430,7 +462,5 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
-
-
 
 }
