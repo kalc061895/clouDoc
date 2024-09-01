@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
 
 class ExpedientesModel extends Model
@@ -233,8 +234,9 @@ class ExpedientesModel extends Model
             'expedientes.id = movimientos.expediente_id',
             'left'
         );
-        $builder->groupBy('expedientes.id', $where);
 
+        $builder->orderBy('movimientos.id', 'DESC');
+        $builder->groupBy('movimientos.expediente_id');
         $builder->orderBy('expedientes.numero_expediente', 'DESC');
         $builder->join(
             'entidad',
@@ -246,50 +248,89 @@ class ExpedientesModel extends Model
 
         return $query->getResultObject();
     }
-    public function getExpedientesDerivados($id_oficina, $where = false)
+    public function getExpedientesOficinaEstado($id_oficina, $where = false)
     {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*,entidad.*,movimientos.estado');
-        $builder->where('movimientos.oficina_procedencia_id', $id_oficina);
+        $builder->select('expedientes.*, entidad.*, estado');
 
-        if ($where != false) {
-            $builder->where('movimientos.estado', $where);
-        }
-
+        // Unir la subconsulta con la tabla de movimientos para obtener el último movimiento
         $builder->join(
-            'movimientos',
-            'expedientes.id = movimientos.expediente_id',
+            '(SELECT expediente_id, estado, oficina_procedencia_id FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
             'left'
         );
-
-        $builder->orderBy('expedientes.numero_expediente DESC');
+        // Unir con la tabla de entidad
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
-            'inner'
+            'left'
         );
+
+        // Filtrar por oficina_procedencia_id y estado si es necesario
+        $builder->where('oficina_procedencia_id', $id_oficina);
+
+        if ($where !== false) {
+            $builder->where('estado', $where);
+        }
+
+        // Ordenar los resultados
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
 
         $query = $builder->get();
 
         return $query->getResultObject();
     }
+    public function getExpedientesOficinaTodo($id_oficina)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*, entidad.*, estado');
+
+        // Unir la subconsulta con la tabla de movimientos para obtener el último movimiento
+        $builder->join(
+            '(SELECT expediente_id, estado, oficina_procedencia_id, oficina_destino_id FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos WHERE (oficina_destino_id = "'.$id_oficina.'") GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
+            'INNER'
+        );
+        // Unir con la tabla de entidad
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'left'
+        );
+
+        // Ordenar los resultados
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+
     public function getExpedientesTodo()
     {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+
+        $builder->select('expedientes.*,entidad.*,estado');
 
         $builder->join(
-            'movimientos',
-            'expedientes.id = movimientos.expediente_id',
+            '(SELECT expediente_id, estado FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
             'left'
         );
+        
         $builder->groupBy('expedientes.id');
 
-        $builder->orderBy('expedientes.numero_expediente','DESC');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
@@ -310,13 +351,15 @@ class ExpedientesModel extends Model
             'expedientes.entidad_id = entidad.id',
             'left'
         );
+
+
+        // Unir con la tabla movimientos para obtener los detalles del último movimiento
         $builder->join(
-            'movimientos',
-            'expedientes.id = movimientos.expediente_id',
+            '(SELECT expediente_id, estado FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
             'left'
         );
-
-
         if ($searchValue) {
             $builder->like('numero_expediente', $searchValue);
             $builder->orLike('nombre', $searchValue);
@@ -326,10 +369,10 @@ class ExpedientesModel extends Model
 
         $builder->groupBy('expedientes.id');
 
-        $builder->orderBy('expedientes.numero_expediente','DESC');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
 
         // Mapea el índice de columna a nombres de columna
-        $columns = ['numero_expediente', 'nombre', 'asunto', 'estado', 'fecha_recepcion','numero_expediente'];
+        $columns = ['numero_expediente', 'nombre', 'asunto', 'estado', 'fecha_recepcion', 'numero_expediente'];
 
         foreach ($order as $value) {
             $columnIndex = $value['column']; // Índice de columna
@@ -352,23 +395,44 @@ class ExpedientesModel extends Model
 
     public function getTotalRecords()
     {
-
-        return $this->countAllResults();
-    }
-
-    public function getTotalFilteredRecords($searchValue)
-    {
         $builder = $this->builder();
+        $builder->select('numero_expediente, nombre, asunto, estado, expedientes.fecha_recepcion, expedientes.id, correo_electronico');
+
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
             'left'
         );
         $builder->join(
-            'movimientos',
-            'expedientes.id = movimientos.expediente_id',
+            '(SELECT expediente_id, estado FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
             'left'
         );
+
+        $builder->groupBy('expedientes.id');
+
+        return $builder->countAllResults();
+    }
+
+    public function getTotalFilteredRecords($searchValue)
+    {
+        $builder = $this->builder();
+        $builder->select('numero_expediente, nombre, asunto, estado, expedientes.fecha_recepcion, expedientes.id, correo_electronico');
+
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'LEFT'
+        );
+        $builder->join(
+            '(SELECT expediente_id, estado FROM movimientos
+        WHERE id IN (SELECT MAX(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
+            'left'
+        );
+
+        $builder->groupBy('expedientes.id');
 
         if ($searchValue) {
             $builder->like('numero_expediente', $searchValue);

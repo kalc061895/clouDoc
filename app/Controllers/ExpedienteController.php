@@ -160,7 +160,7 @@ class ExpedienteController extends BaseController
             if ($_driveModel->getDriveConfig()) {
                 $googleDrive = new GoogleDrive();
 
-                $folderId = $_driveModel->getConfig('google_drive_fodler'); // ID de tu carpeta
+                $folderId = $_driveModel->getConfig('google_drive_folder'); // ID de tu carpeta
                 $fileId = $googleDrive->uploadFile($anexoExp->getTempName(), $newName, $folderId);
                 $drivePath = $fileId;
             }

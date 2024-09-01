@@ -49,8 +49,8 @@ class EmpresaConfiguracionModel extends Model
     protected $afterDelete    = [];
     public function getConfig($key)
     {
-        $this->builder->where('key', $key);
-        $result = $this->builder->get()->getFirstRow(); 
+        $this->where('key', $key);
+        $result = $this->get()->getFirstRow(); 
         // Obtén la primera fila de resultado
 
         if ($result) {

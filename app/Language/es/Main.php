@@ -6,8 +6,16 @@ return [
     'welcomeDecription' => 'Sistema de Trámite Documentario Virtual',
     // Agrega más claves de traducción aquí
     
-    'appTitle' => '☁️CloudDoc - Sistema de Trámite Virtual',
     
+    // Internet check
+    'titleInternetError' => 'Sin conexión a Internet',
+    'bodyInternetError' => 'No estás conectado a Internet.',
+    'titleInternetOk' => 'Conexion Establecida',
+    'bodyInternetOk' => 'Estás en línea nuevamente.',
+    
+    
+    
+    'appTitle' => '☁️CloudDoc - Sistema de Trámite Virtual',
     // Dashboard
     'totalExpedientes'=> 'Total de Expedientes',
     'totalExpedientesHoy'=> 'Expedientes Hoy',

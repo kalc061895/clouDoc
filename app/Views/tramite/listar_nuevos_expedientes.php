@@ -110,7 +110,8 @@ $estado = [
             type: 'GET',
             dataType: 'json',
             data: {
-                id: expediente_id
+                id: expediente_id,
+                observacion: '<?= $observacion ?? false ?>'
             },
             success: function(response) {
                 $('#detalleExpedienteLabel').text(response.title);

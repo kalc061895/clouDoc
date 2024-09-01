@@ -2111,6 +2111,42 @@
             }
         });
     </script>
+    <script>
+        let connectionCheckInterval;
+        let isOffline = false;
+
+        function checkInternetConnection() {
+            if (!navigator.onLine) {
+                if (!isOffline) {
+                    isOffline = true;
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '<?= lang('Main.titleInternetError')?>',
+                        text: '<?= lang('Main.bodyInternetError')?>',
+                        //confirmButtonText: 'OK'
+                    });
+                    clearInterval(connectionCheckInterval);
+                    connectionCheckInterval = setInterval(checkInternetConnection, 10000); // Revisar cada 20 segundos
+                }
+            } else {
+                if (isOffline) {
+                    isOffline = false;
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<?= lang('Main.titleInternetOk')?>',
+                        text: '<?= lang('Main.titleInternetOk')?>',
+                        //confirmButtonText: 'OK'
+                    });
+                    clearInterval(connectionCheckInterval);
+                    connectionCheckInterval = setInterval(checkInternetConnection, 30000); // Volver a revisar cada minuto
+                }
+            }
+        }
+
+        $(document).ready(function() {
+            connectionCheckInterval = setInterval(checkInternetConnection, 30000); // Revisar cada minuto
+        });
+    </script>
     <?= $this->renderSection('pageScripts'); ?>
 </body>
 

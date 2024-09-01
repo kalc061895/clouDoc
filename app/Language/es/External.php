@@ -3,7 +3,7 @@
 return [
     //
     'nameEntity'=> 'Red de Salud San Román',
-    'hourEntity'=> 'Abierto Lunes a Viernes: 07:30 a.m. a 04:45 p.m.',
+    'hourEntity'=> 'Atencion Prescenmcial - Lunes a Viernes: 07:30 a.m. a 04:45 p.m.',
     'placeEntity'=> 'Av. Huancane Km. 2 - Juliaca - San Román',
     'bossEntity'=> 'Dr. José Luis Mejía Quispe',
 
@@ -66,10 +66,10 @@ return [
     'notaLink'=> 'Revise aqui los requisitos',
     'tipoDocExp'=> 'Tipo de Expediente',
     'numDocExp'=> 'Nro.',
-    'folioDocExp'=> 'Nro. de Folios',
+    'folioDocExp'=> 'Folios',
     'asuntoDocExp'=> 'Asunto ',
     'anexoExp'=> 'Adjuntar Expediente',
-    'anexoHelpExp'=> 'El tamaño máximo acceptado es 20 MB, un solo archivo en formato .Pdf ',
+    'anexoHelpExp'=> 'El tamaño máximo acceptado es 20 MB, un solo archivo en .PDF ',
     'sendButton'=> 'Enviar Documento',
     
     // Envio corrrecto
