@@ -37,6 +37,7 @@ class ExpedienteController extends BaseController
 
         return view('external/homepage');
     }
+
     public function nuevoExpediente()
     {
         $tipo_expediente = new TipoExpedienteModel();
@@ -107,7 +108,7 @@ class ExpedienteController extends BaseController
     {
         $tupaModel = new TupaModel();
         $data['tupa'] = $tupaModel->getTupa();
-        return view('external/lista_tupa_expediente',$data);
+        return view('external/lista_tupa_expediente', $data);
     }
 
     public function create()
@@ -129,8 +130,18 @@ class ExpedienteController extends BaseController
             'correo_electronico' => $this->request->getPost('correoNew'),
             'direccion' => $this->request->getPost('direccionNew'),
         ];
-        $id = $this->entidadModel->insert($entidadData);
-        $entidadId = $this->entidadModel->insertID();
+
+
+        $entidadExistente = $this->entidadModel->where($entidadData)->first();
+
+        if ($entidadExistente) {
+            // Si ya existe, obtener la ID
+            $entidadId = $entidadExistente['id'];
+        } else {
+            // Si no existe, insertar el nuevo registro
+            $id = $this->entidadModel->insert($entidadData);
+            $entidadId = $this->entidadModel->insertID();
+        }
 
         $expedienteData = [
             'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
@@ -156,7 +167,7 @@ class ExpedienteController extends BaseController
             /**
              * Subir al google drive acorde a la configuracion
              */
-            $_driveModel = new EmpresaConfiguracionModel(); 
+            $_driveModel = new EmpresaConfiguracionModel();
             if ($_driveModel->getDriveConfig()) {
                 $googleDrive = new GoogleDrive();
 
@@ -171,7 +182,7 @@ class ExpedienteController extends BaseController
             // Obtener el número de orden para el nuevo adjunto
             $orden = $_adjunto->where('expediente_id', $expedienteArray['id'])
                 ->countAllResults() + 1;
-           
+
             // Guardar la información en la base de datos
             $data = [
                 'expediente_id' => $expedienteArray['id'],

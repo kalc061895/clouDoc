@@ -100,3 +100,7 @@ $routes->get('expediente/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('expediente/derivar', 'TramiteController::postDerivarExpediente');
 $routes->post('expediente/observar', 'TramiteController::postObservarExpediente');
 
+/**
+ * Documentos Internos
+ */
+$routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
