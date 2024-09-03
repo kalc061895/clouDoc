@@ -1,9 +1,9 @@
 <div class="card-body" id="formContent">
-    <form id="expedienteForm" action="<?= site_url('nuevoexpediente') ?>" method="post" enctype="multipart/form-data">
+    <form id="expedienteForm" action="<?= site_url('/documentos/guardarDocumento') ?>" method="post" enctype="multipart/form-data">
 
         <div class="row justify-content-center ">
             <div class="col-xl-6 col-lg-8 col-md-8 col-sm-12">
-                <div class="card">
+                <div class="card" hidden>
                     <div class="card-header text-bg-primary">
                         <h4 class="card-title text-white mb-0">
                             <?= lang('External.dataTitleNew') ?>
@@ -18,10 +18,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
                                         <select class="form-control form-select" id="tipoNew" required name="tipoNew">
-
-                                            <option value="Persona"><?= lang('External.personaNew') ?></option>
-                                            <option value="Empresa"><?= lang('External.juridicaNew') ?></option>
-                                            <option value="Empresa"><?= lang('External.entidadNew') ?></option>
+                                            <option value="Interno">Expediente Interno </option>
                                         </select>
                                         <span class="bar"></span>
                                         <label for="tipoNew"><?= lang('External.tipoNew') ?>*</label>
@@ -33,9 +30,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
                                         <select class="form-control form-select" name="tipoDocNew" id="tipoDocNew" required>
-                                            <?php foreach ($tipoDocumento as $item) : ?>
-                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
-                                            <?php endforeach ?>
+                                            <option value="DNI">DNI</option>
                                         </select>
                                         <span class="bar"></span>
                                         <label for="tipoDocNew"><?= lang('External.docTipoNew') ?>*</label>
@@ -43,14 +38,14 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
-                                        <input type="text" class="form-control" id="numDocNew" required name="numDocNew">
+                                        <input type="text" class="form-control" id="numDocNew" required name="numDocNew" value="<?= $infoUsuario->dni ?>">
                                         <span class="bar"></span>
                                         <label for="numDocNew"><?= lang('External.docNew') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group mb-4">
-                                        <input type="text" class="form-control" id="nombreNew" required name="nombreNew">
+                                        <input type="text" class="form-control" id="nombreNew" required name="nombreNew" value="<?= $infoUsuario->paterno . ' ' . $infoUsuario->materno . ' ' . $infoUsuario->nombres ?>">
                                         <span class="bar"></span>
                                         <label for="nombreNew"><?= lang('External.nombreNew') ?>*</label>
                                     </div>
@@ -59,21 +54,21 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
-                                        <input type="phone" class="form-control" id="telefonoNew" name="telefonoNew" required>
+                                        <input type="phone" class="form-control" id="telefonoNew" name="telefonoNew" required value="<?= $infoUsuario->telefono ?>">
                                         <span class="bar"></span>
                                         <label for="telefonoNew"><?= lang('External.telefonoNew') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
-                                        <input type="email" class="form-control" id="correoNew" required name="correoNew">
+                                        <input type="email" class="form-control" id="correoNew" required name="correoNew" value="<?= $infoUsuario->email ?>">
                                         <span class="bar"></span>
                                         <label for="correoNew"><?= lang('External.correoNew') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
-                                        <input type="address" class="form-control" id="direccionNew" name="direccionNew" required>
+                                        <input type="address" class="form-control" id="direccionNew" name="direccionNew" required value="-">
                                         <span class="bar"></span>
                                         <label for="direccionNew"><?= lang('External.direccionNew') ?></label>
                                     </div>
@@ -89,12 +84,21 @@
                         </h4>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-primary text-primary role=" alert"="">
-                            <strong><?= lang('External.nota') ?>: </strong> <?= lang('External.notaBody') ?> <a href="<?= base_url('tupaexpediente') ?>"><strong class="badge text-bg-info"><?= lang('External.notaLink') ?></strong> </a>
-                        </div>
+                        
                         <div class="floating-labels mt-4 pt-2">
 
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group mb-4">
+                                        <select class="form-control form-select" id="oficinaDestino" required name="oficinaDestino">
+                                            <?php foreach ($oficina as $item) : ?>
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <span class="bar"></span>
+                                        <label for="oficinaDestino"><?= lang('External.oficinaDestino') ?>*</label>
+                                    </div>
+                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
                                         <select class="form-control form-select" id="tipoDocExp" required name="tipoDocExp">
@@ -108,7 +112,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group mb-4">
-                                        <input type="text" class="form-control" id="numDocExp" name="numDocExp" value="s/n">
+                                        <input type="text" class="form-control" id="numDocExp" name="numDocExp" value="s/n" readonly>
                                         <span class="bar"></span>
                                         <label for="numDocExp"><?= lang('External.numDocExp') ?>*</label>
                                     </div>
@@ -185,7 +189,7 @@
                         <span id='progressText'>0%</span>
                         </div> <div class='d-flex justify-content-center'>
                         <div class='spinner-border' role='status'>
-                            <span class='visually-hidden'>Loading...</span>
+                            <span class='visually-hidden'>Cargando...</span>
                         </div>
                     </div>`,
                 showConfirmButton: false
@@ -251,5 +255,27 @@
 
             return true;
         }
+    });
+
+    $('#tipoDocExp').change(function() {
+        // Obtiene el valor seleccionado del select
+        var tipoDoc = $(this).val();
+
+        // Realiza la llamada AJAX
+        $.ajax({
+            url: '<?= base_url('/documentos/getNumeracion')?>', 
+            // Cambia esta URL por la ruta de tu API
+            type: 'POST', // Cambia a 'GET' si es necesario
+            data: {
+                tipoDocExp: tipoDoc
+            }, // Envía el valor seleccionado al servidor
+            success: function(respuesta) {
+                // Establece el valor de la respuesta en el campo input
+                $('#numDocExp').val(respuesta.numDocExp+1);
+            },
+            error: function() {
+                console.log('Error en la llamada AJAX');
+            }
+        });
     });
 </script>
