@@ -336,6 +336,7 @@ class ExpedientesModel extends Model
             'expedientes.entidad_id = entidad.id',
             'inner'
         );
+        $builder->limit(25);
 
         $query = $builder->get();
 

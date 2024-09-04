@@ -106,3 +106,11 @@ $routes->post('expediente/observar', 'TramiteController::postObservarExpediente'
 $routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
 $routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store');
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
+
+/**
+ * Reportes
+ */
+
+$routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
+$routes->get('reportes/guardarDocumento', 'ReporteController::store');
+$routes->post('reportes/getNumeracion', 'ReporteController::numeracion');
