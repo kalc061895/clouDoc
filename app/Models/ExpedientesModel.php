@@ -4,7 +4,6 @@ namespace App\Models;
 
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
-
 class ExpedientesModel extends Model
 {
     protected $table            = 'expedientes';
@@ -443,5 +442,47 @@ class ExpedientesModel extends Model
         }
 
         return $builder->countAllResults();
+    }
+    public function getReporteExpedientesFiltrado($where = array() )
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+
+        $builder->select('expedientes.*,entidad.*,estado,oficinas.nombre as nombre_oficina');
+
+        $builder->join(
+            '(SELECT expediente_id, estado, oficina_destino_id FROM movimientos
+        WHERE id IN (SELECT MIN(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
+            'left'
+        );
+        if (count($where) == 0) {
+            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'),new RawSql('CURDATE()'));
+        }
+        else{
+            foreach ($where as $item) {
+                $builder->where($item['key'],$item['value']);
+            }
+        }
+        $builder->groupBy('expedientes.id');
+
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        
+        $builder->join(
+            'oficinas',
+            'oficinas.id = oficina_destino_id',
+            'inner'
+        );
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+        //$builder->limit(25);
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
     }
 }
