@@ -9,6 +9,7 @@ class MasterSeeder extends Seeder
     public function run()
     {
         // Call each individual seeder
+        $this->call('AccionesSeeder');
         $this->call('AniosSeeder');
         $this->call('DiasSeeder');
         $this->call('MesesSeeder');

@@ -449,7 +449,7 @@ class ExpedientesModel extends Model
 
         $builder = $db->table('expedientes');
 
-        $builder->select('expedientes.*,entidad.*,estado,oficinas.nombre as nombre_oficina');
+        $builder->select('expedientes.*,entidad.*,estado,oficinas.nombre as nombre_oficina,');
 
         $builder->join(
             '(SELECT expediente_id, estado, oficina_destino_id FROM movimientos
@@ -458,7 +458,7 @@ class ExpedientesModel extends Model
             'left'
         );
         if (count($where) == 0) {
-            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'),new RawSql('CURDATE()'));
+            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'),new RawSql("CURDATE()"));
         }
         else{
             foreach ($where as $item) {

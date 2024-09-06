@@ -112,5 +112,6 @@ $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracio
  */
 
 $routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
+$routes->post('reportes/registrofiltrado', 'ReporteController::postPlanillaTramiteFiltrado');
 $routes->get('reportes/guardarDocumento', 'ReporteController::store');
 $routes->post('reportes/getNumeracion', 'ReporteController::numeracion');

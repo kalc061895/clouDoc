@@ -4,17 +4,54 @@
     <div class="card">
         <div class="card-body">
 
-            <h4 class="card-title"><?= lang('Reporte.registroDiario')?></h4>
+            <h4 class="card-title"><?= lang('Reporte.registroDiario') ?></h4>
 
             <p class="card-subtitle mb-3">
-                The default page control presented by DataTables
-                (forward and backward buttons with up to 7 page numbers
-                in-between) is fine for most situations, but there are
-                cases where you may wish to customise the options
-                presented to the end user. This is done through
-                DataTables' extensible pagination mechanism, the
-                <code> pagingType</code> option.
+                <?= lang('Reporte.filtroBody') ?>
             </p>
+            <form id="formExpedienteFiltro" method="POST" action="<?= base_url('reportes/registrofiltrado') ?>">
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label" for="numExpediente">Num. de expediente</label>
+                        <input type="text" class="form-control form-control-sm" id="numExpediente" name="numExpediente" />
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label" for="fechaInicio">Fecha de Inicio</label>
+                        <input type="date" class="form-control form-control-sm" id="fechaInicio" name="fechaInicio" />
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label" for="fechaFin">Fecha de Fin</label>
+                        <input type="date" class="form-control form-control-sm" id="fechaFin" name="fechaFin" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="nroDocumento">Nro. Documento</label>
+                        <input type="text" class="form-control form-control-sm" id="nroDocumento" name="nroDocumento" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="nombres">Nombres</label>
+                        <input type="text" class="form-control form-control-sm" id="nombres" name="nombres" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="asunto">Asunto</label>
+                        <input type="text" class="form-control form-control-sm" id="asunto" name="asunto" />
+                    </div>
+                    <div class="col-md-12 mb-3 text-center">
+                        <div class="btn-group">
+
+                            <button type="submit" class="btn btn-sm btn-success hstack gap-6 mb-1">
+                                <i class="ti ti-search fs-4"></i>
+                                Buscar
+                            </button>
+                            <button type="reset" class="btn btn-sm btn-danger hstack gap-6 mb-1">
+                                <i class="ti ti-trash fs-4"></i>
+                                Limpiar Filtro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <hr />
             <div class="table-responsive">
                 <table id="alt_pagination" class="table table-sm table-bordered display ">
                     <thead>
@@ -43,7 +80,7 @@
                                 <td> <?= $item->nombre ?></td>
                                 <td> <?= $item->asunto ?></td>
                                 <td> <?= $item->nombre_oficina ?></td>
-                                <td> <?= ($item->procedencia =='Externo') ? 'Virt.' : 'Fisi.' ?></td>
+                                <td> <?= ($item->procedencia == 'Externo') ? 'Virt.' : 'Fisi.' ?></td>
                                 <td> </td>
                                 <td> </td>
 
@@ -72,7 +109,48 @@
 
 
 <script>
-    $("#alt_pagination").DataTable({
+    var table = $("#alt_pagination").DataTable({
+        columns: [{
+                data: 'numero_expediente',
+                title: 'EXP.NRO.'
+            },
+            {
+                data: 'fecha_recepcion',
+                title: 'FECHA'
+            },
+            {
+                data: 'folios',
+                title: 'FOLIOS'
+            },
+            {
+                data: 'numero_documento',
+                title: 'DOCUMENTO'
+            },
+            {
+                data: 'nombre',
+                title: 'NOMBRES O RAZON SOCIAL'
+            },
+            {
+                data: 'asunto',
+                title: 'ASUNTO'
+            },
+            {
+                data: 'nombre_oficina',
+                title: 'DESTINO'
+            },
+            {
+                data: 'procedencia',
+                title: 'T.'
+            },
+            {
+                data: 'firma',
+                title: 'FIRMA'
+            },
+            {
+                data: 'observacion',
+                title: 'OBS.'
+            },
+        ],
         pagingType: "full_numbers",
         dom: 'Bfrtip', // Define la posición de los botones
         buttons: [{
@@ -91,24 +169,29 @@
                     // you can apply any logic and return any valid pdfmake element
 
                     return {
-                        columns: [
-                            {
+                        columns: [{
                                 image: "minsa",
                                 width: 60,
                                 alignment: 'left',
                                 fontSize: 7,
-                                margin: [20, 20, 0, 0]
+                                margin: [20, 15, 0, 0]
                             },
                             {
                                 fontSize: 7,
-                                text: 'Trámite Documentario Virtual - Red de Salud San Róman - <?= date("d/m/Y") ?>',
+                                text: 'Trámite Documentario Virtual - Red de Salud San Róman',
                                 alignment: 'center',
                                 margin: [0, 15, 0, 0]
+                            },
+                            {
+                                fontSize: 7,
+                                text: 'Generado el - <?= date("Y-m-d h:i:s") ?>',
+                                alignment: 'right',
+                                margin: [0, 15, 20, 0]
                             },
                         ]
                     }
                 };
-                doc.pageMargins = [20, 35, 20, 35]; // [izquierda, arriba, derecha, abajo]
+                doc.pageMargins = [25, 25, 25, 25]; // [izquierda, arriba, derecha, abajo]
 
                 // Estilo del título
                 doc.styles.title = {
@@ -158,7 +241,7 @@
                     hLineColor: '#222',
                     vLineColor: '#222'
                 }]; // Especifica el ancho de cada columna
-                
+
                 // Ajustar la anchura de las columnas
                 doc.content[1].table.widths = [50, 45, 35, 60, 135, 175, 70, 15, 60, 65]; // Especifica el ancho de cada columna
 
@@ -188,18 +271,19 @@
                                 fontSize: 7,
                                 text: 'Reporte de Registro de Expedientes ',
                                 alignment: 'left',
-                                margin: [20, 0] // Margen del pie de página
+                                margin: [25, 0] // Margen del pie de página
                             },
                             {
                                 fontSize: 7,
                                 text: 'Trámite Documentario Virtual',
                                 alignment: 'center',
+
                             },
                             {
                                 fontSize: 7,
                                 text: 'Página ' + currentPage.toString() + ' de ' + pageCount,
                                 alignment: 'right',
-                                margin: [0, 0, 20, 0] // Margen del pie de página
+                                margin: [0, 0, 25, 0] // Margen del pie de página
                             },
                         ]
                     };
@@ -208,4 +292,57 @@
             }
         }]
     });
+
+    $('#formExpedienteFiltro').on('submit', function(e) {
+        e.preventDefault(); // Evita el envío por defecto del formulario
+        var searchParam = $(this).serialize();
+        fetchTableData(searchParam);
+    });
+
+    function fetchTableData(param) {
+        $.ajax({
+            url: '<?= base_url('reportes/registrofiltrado') ?>',
+            type: 'POST',
+            data: param,
+            success: function(data) {
+                console.log(data);
+                var formattedData = formatData(data);
+                // Limpiar la tabla existente
+                table.clear().draw();
+                // Añadir los nuevos datos
+                table.rows.add(formattedData).draw();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    function formatData(data) {
+        return data.map(function(item) {
+            
+            return {
+                numero_expediente: item.numero_expediente+'-'+item.fecha_recepcion.substring(0, 4),
+                fecha_recepcion: formatDateOnly(item.fecha_recepcion),
+                folios: item.folios,
+                numero_documento: item.numero_documento,
+                nombre: item.nombre,
+                asunto: item.asunto,
+                nombre_oficina: item.nombre_oficina,
+                procedencia: item.procedencia.substring(0, 3) + '.',
+                firma: '',
+                observacion: item.observacion,
+            };
+        });
+    }
+
+    function formatDateOnly(dateString) {
+        var date = new Date(dateString);
+        var options = {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+        };
+        return date.toLocaleDateString(undefined, options); // Solo la fecha (Y-M-D)
+    }
 </script>
