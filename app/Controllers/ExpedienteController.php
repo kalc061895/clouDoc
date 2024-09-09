@@ -146,7 +146,6 @@ class ExpedienteController extends BaseController
         $expedienteData = [
             'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
             'numero_documento' => $this->request->getPost('numDocExp'),
-            'numero_expediente' => 'temp',
             'folios' => $this->request->getPost('folioDocExp'),
             'asunto' => $this->request->getPost('asuntoDocExp'),
             'anexo' => '',

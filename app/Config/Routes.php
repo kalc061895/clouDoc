@@ -113,5 +113,7 @@ $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracio
 
 $routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
 $routes->post('reportes/registrofiltrado', 'ReporteController::postPlanillaTramiteFiltrado');
-$routes->get('reportes/guardarDocumento', 'ReporteController::store');
-$routes->post('reportes/getNumeracion', 'ReporteController::numeracion');
+$routes->get('reportes/ruta', 'ReporteController::getHojaRuta');
+$routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
+
+

@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-body">
 
-            <h4 class="card-title"><?= lang('Reporte.registroDiario') ?></h4>
+            <h4 class="card-title"><?= lang('Reporte.registroDiarioTitle') ?></h4>
 
             <p class="card-subtitle mb-3">
                 <?= lang('Reporte.filtroBody') ?>
@@ -57,7 +57,7 @@
                     <thead>
                         <!-- start row -->
                         <tr>
-                            <th>EXP. NRO</th>
+                            <th width="10%" >EXP. NRO</th>
                             <th>FECHA</th>
                             <th>FOLIOS</th>
                             <th>DOCUMENTO</th>
@@ -112,7 +112,8 @@
     var table = $("#alt_pagination").DataTable({
         columns: [{
                 data: 'numero_expediente',
-                title: 'EXP.NRO.'
+                title: 'EXP.NRO.',
+                width: "6%"
             },
             {
                 data: 'fecha_recepcion',
@@ -132,7 +133,8 @@
             },
             {
                 data: 'asunto',
-                title: 'ASUNTO'
+                title: 'ASUNTO',
+                width: '30%'
             },
             {
                 data: 'nombre_oficina',
@@ -157,7 +159,7 @@
             extend: 'pdfHtml5',
             text: 'Exportar a PDF',
             title: 'REPORTE DE TRAMITE DOCUMENTARIOS - RED DE SALUD SAN ROMÁN', // titulo de la primera hoja
-            filename: 'reporte_tramites',
+            filename: 'Reporte_Registro_Diario_Cloudoc',
             orientation: 'landscape',
             pageSize: 'A4',
             exportOptions: {
@@ -191,7 +193,7 @@
                         ]
                     }
                 };
-                doc.pageMargins = [25, 25, 25, 25]; // [izquierda, arriba, derecha, abajo]
+                doc.pageMargins = [30, 35, 30, 35]; // [izquierda, arriba, derecha, abajo]
 
                 // Estilo del título
                 doc.styles.title = {
@@ -225,7 +227,7 @@
                                 cell.bold = true;
                                 cell.alignment = 'center'; // Alineación de la cabecera
                             } else {
-                                cell.margin = [0, 3, 0, 3]
+                                cell.margin = [0, 3, 0, 0]
                             }
                         }
                     });
@@ -300,6 +302,7 @@
     });
 
     function fetchTableData(param) {
+        Swal.fire("Buscando ...!");
         $.ajax({
             url: '<?= base_url('reportes/registrofiltrado') ?>',
             type: 'POST',
@@ -308,9 +311,10 @@
                 console.log(data);
                 var formattedData = formatData(data);
                 // Limpiar la tabla existente
-                table.clear().draw();
+                table.clear();
                 // Añadir los nuevos datos
                 table.rows.add(formattedData).draw();
+                Swal.close('');
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching data:', error);
