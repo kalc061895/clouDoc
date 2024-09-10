@@ -96,17 +96,6 @@
     </div>
 
 </div>
-<!-- DataTables Buttons Extension -->
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.flash.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
-
-<!-- pdfMake -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
 
 <script>
     var table = $("#alt_pagination").DataTable({
@@ -342,11 +331,9 @@
 
     function formatDateOnly(dateString) {
         var date = new Date(dateString);
-        var options = {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric',
-        };
-        return date.toLocaleDateString(undefined, options); // Solo la fecha (Y-M-D)
+        var day = ('0' + date.getDate()).slice(-2);
+        var month = ('0' + (date.getMonth() + 1)).slice(-2); // Los meses empiezan desde 0
+        var year = date.getFullYear();
+        return `${day}/${month}/${year}`; // Solo la fecha (Y-M-D)
     }
 </script>

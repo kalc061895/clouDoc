@@ -100,18 +100,8 @@
     </div>
 
 </div>
-<!-- DataTables Buttons Extension -->
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.flash.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
-<!-- pdfMake -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
-<img src="<?= base_url('assets/images/logos/hoja_ruta.jpg') ?>" alt="" hidden id="hoja_ruta">
+<img src="<?= base_url('assets/images/logos/hoja_ruta_2.jpg') ?>" alt="" hidden id="hoja_ruta">
 <img src="<?= base_url('assets/images/logos/minsa-logo.jpg') ?>" alt="" hidden id="logo_minsa">
 <script>
     var arrayExpedientes;
@@ -163,216 +153,7 @@
                 title: 'OBS.'
             },
         ],
-        pagingType: "full_numbers",
-        dom: 'Bfrtip', // Define la posición de los botones
-        buttons: [{
-            extend: 'pdfHtml5',
-            text: 'Exportar a PDF',
-            title: 'sda', // titulo de la primera hoja
-            filename: 'Hoja Ruta',
-            //orientation: 'VERTICA',
-
-            exportOptions: {
-                columns: ':visible'
-            },
-            customize: function(doc) {
-                // Reducir márgenes de la página
-                //doc.pageSize = { width: '165mm', height: '215mm' };
-
-                doc.pageSize = {
-                    width: 466,
-                    height: 609,
-                };
-                doc.background = {
-                    image: 'data:image/png;base64,' + base64ImgRuta,
-                    width: 466,
-                    height: 609,
-                    opacity: 0.3
-                };
-                doc.header = function(currentPage, pageCount, pageSize) {
-                    // you can apply any logic and return any valid pdfmake element
-
-                    return {
-                        columns: [
-                            /*{
-                                image: "minsa",
-                                width: 60,
-                                alignment: 'left',
-                                fontSize: 7,
-                                margin: [20, 15, 0, 0]
-                            },
-                            {
-                                fontSize: 7,
-                                text: 'Trámite Documentario Virtual - Red de Salud San Róman',
-                                alignment: 'center',
-                                margin: [0, 15, 0, 0]
-                            },
-                            */
-                            {
-                                fontSize: 7,
-                                text: 'Generado el - <?= date("Y-m-d h:i:s") ?>',
-                                alignment: 'right',
-                                margin: [0, 15, 20, 0]
-                            },
-                        ]
-                    }
-                };
-                doc.pageMargins = [30, 35, 30, 35]; // [izquierda, arriba, derecha, abajo]
-
-                // Estilo del título
-                doc.styles.title = {
-                    fontSize: 9,
-                    bold: true,
-                    alignment: 'center',
-                    margin: [0, 10, 0, 10], // [izquierda, arriba, derecha, abajo]
-                    FontFace: 'Helvetica',
-                };
-                doc.content[2] = [
-
-                    {
-                        text: 'NOMBRE COMPLETO DEL REMITENTE POR SI ES MUY LARGO NOMBRE COMPLETO DEL REMITENTE POR SI ES MUY LARGO NOMBRE COMPLETO DEL REMITENTE ',
-                        fontSize: 10,
-                        width: 400,
-                        absolutePosition: {
-                            x: 90,
-                            y: 163
-                        }
-                    },
-                    {
-                        text: 'ASUNTO SOBR EL CUAL SE TIENE NOMBRE COMPLETO DEL REMITENTE POR SI ES MUY LARGO NOMBRE COMPLETO DEL REMITENTE POR ',
-                        fontSize: 10,
-                        width: 400,
-                        absolutePosition: {
-                            x: 90,
-                            y: 210
-                        }
-                    },
-                    {
-                        style: 'tableExample',
-                        absolutePosition: {
-                            x: 21,
-                            y: 268
-                        },
-                        table: {
-                            widths: [79, 79, 79, 79, 79],
-                            body: [
-                                ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5'],
-                                [{
-                                        text: 'asdasd'
-                                    },
-                                    {
-                                        text: 'or a nested table',
-                                    },
-                                    {
-                                        text: 'asdasd'
-                                    },
-                                    {
-                                        text: 'asdasd'
-                                    },
-                                    {
-                                        text: 'asdasd'
-                                    }
-                                ]
-                            ],
-                        },
-                        layout: 'noBorders',
-                    }
-
-                ];
-                // Aplicar estilo a todas las celdas
-                /** doc.content[1].table.body.forEach(function(row, rowIndex) {
-                    row.forEach(function(cell, cellIndex) {
-
-                        cell.border = [true, true, true, true]; // [superior, derecho, inferior, izquierdo]
-                        cell.borderColor = '#222'; // Color de los bordes
-                        cell.borderWidth = 0.5; // Ancho de los bordes
-                        if (rowIndex === 0) {
-                            cell.fillColor = '#fff'; // Color de fondo de la cabecera
-                            cell.color = '#000'; // Color de texto de la cabecera
-                            cell.fontSize = 8; // Tamaño de la fuente del cuerpo
-                            cell.alignment = 'center'; // Alineación de la cabecera
-                        } else {
-
-                            cell.fontSize = 8; // Tamaño de la fuente del cuerpo
-                            cell.fillColor = 'white'; // Color de fondo de las filas
-                            cell.color = 'black'; // Color de texto de las filas
-
-                            if (cellIndex < 4) {
-                                cell.margin = [0, 10, 0, 10]
-                                cell.bold = true;
-                                cell.alignment = 'center'; // Alineación de la cabecera
-                            } else {
-                                cell.margin = [0, 3, 0, 0]
-                            }
-                        }
-                    });
-                });
-                */
-                doc.images = {
-
-                    hcmm: 'data:image/png;base64,' + base64ImgMinsa
-                };
-                doc.content[1].layout = [{
-                    hLineWidth: 1,
-                    vLineWidth: 1,
-                    hLineColor: '#222',
-                    vLineColor: '#222'
-                }]; // Especifica el ancho de cada columna
-                /*
-                // Ajustar la anchura de las columnas
-                doc.content[1].table.widths = [50, 45, 35, 60, 135, 175, 70, 15, 60, 65]; // Especifica el ancho de cada columna
-
-                //doc.content[1].table.widths = ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*']; // Especifica el ancho de cada columna
-
-                // Estilo de la cabecera de la tabla
-                doc.styles.tableHeader = {
-                    fillColor: 'gray',
-                    color: 'black',
-                    alignment: 'center',
-                    bold: true,
-                    fontSize: 9, // Tamaño de la fuente de la cabecera
-                    margin: [0, 5] // Margen superior e inferior
-                };
-                */
-
-                // Ajusta el tamaño de fuente y el espaciado dentro de las celdas
-                doc.styles.tableBody = {
-                    fontSize: 8,
-                    cellPadding: 5, // Controla el espaciado dentro de las celdas
-                    lineHeight: 1.2 // Ajusta la altura de la línea
-                };
-
-                // Pie de página
-                doc.footer = function(currentPage, pageCount) {
-                    return {
-                        columns: [
-                            /*{
-                                fontSize: 7,
-                                text: 'Hoja de Ruta',
-                                alignment: 'left',
-                                margin: [25, 0] // Margen del pie de página
-                            },
-                            */
-                            {
-                                fontSize: 7,
-                                text: 'Trámite Documentario Virtual',
-                                alignment: 'center',
-
-                            },
-                            /*
-                            {
-                                fontSize: 7,
-                                text: 'Página ' + currentPage.toString() + ' de ' + pageCount,
-                                alignment: 'right',
-                                margin: [0, 0, 25, 0] // Margen del pie de página
-                            },
-                            */
-                        ]
-                    };
-
-                };
-            }
-        }]
+        
     });
 
 
@@ -419,7 +200,7 @@
                 asunto: item.asunto,
                 nombre_oficina: item.nombre_oficina,
                 procedencia: item.procedencia.substring(0, 3) + '.',
-                firma: '',
+                firma: (item.firma != null)?item.firma:'',
                 observacion: item.observacion,
                 movimientos: item.movimientos
             };
@@ -473,24 +254,24 @@
             var docDefinition = {
                 content: data.map((item, index) => [{
                         text: item.numero_expediente,
-                        fontSize: 12,
-                        width: 200,
+                        fontSize: 13,
+                        width: 220,
                         bold: true,
                         alignment: 'center',
                         absolutePosition: {
-                            x: 360,
-                            y: 53
+                            x: 355,
+                            y: 75
                         }
                     },
                     {
                         text: item.fecha_recepcion,
                         fontSize: 12,
-                        width: 200,
+                        width: 220,
                         bold: true,
                         alignment: 'center',
                         absolutePosition: {
-                            x: 360,
-                            y: 83
+                            x: 355,
+                            y: 105
                         }
                     },
                     {
@@ -498,8 +279,8 @@
                         fontSize: 10,
                         width: 400,
                         absolutePosition: {
-                            x: 90,
-                            y: 163
+                            x: 100,
+                            y: 180
                         }
                     },
                     {
@@ -507,28 +288,47 @@
                         fontSize: 10,
                         width: 400,
                         absolutePosition: {
-                            x: 90,
-                            y: 210
+                            x: 85,
+                            y: 225
                         }
                     },
                     {
                         style: 'tableExample',
-                        fontSize: 9,
+                        fontSize: 10,
                         absolutePosition: {
-                            x: 21,
-                            y: 268
+                            x: 40,
+                            y: 280
                         },
+
                         table: {
-                            widths: [75, 75, 75, 75, 75],
-                            body: item.movimientos.map(item_mov => [
-                                item_mov.column1,
-                                item_mov.column2,
-                                item_mov.column3,
-                                item_mov.column4,
-                                item_mov.column5
-                            ])
-                            //layout: 'noBorders',
+                            widths: [100, 50, 75, 75, 75],
+                            body: item.movimientos.map(item_mov => [{
+                                    text: item_mov.oficina_destino,
+                                    margin: [0, 3, 0, 0],
+                                }, // Primer columna con margin top 3
+                                {
+                                    text: item_mov.accion,
+                                    alignment: 'left',
+                                    margin: [0, 3, 0, 0],
+                                }, // Columna 'accion' centrada
+                                {
+                                    text : formatDateOnly(item_mov.fecha),
+                                    margin: [0, 3, 0, 0],
+                                    alignment: 'center',
+                                },
+                                {
+                                    text: item_mov.folios,
+                                    margin: [0, 3, 0, 0],
+                                    alignment: 'center',
+                                }, // Columna 'folios' centrada
+                                {
+                                    text: item_mov.firma,
+                                    margin: [0, 3, 0, 0],
+                                    alignment: 'center',
+                                } // Columna 'firma' centrada
+                            ]),
                         },
+                        layout: 'noBorders',
                     },
                     {
                         text: '',
@@ -540,12 +340,14 @@
                     width: 466,
                     height: 609
                 },
-                background: {
+                
+                /*background: {
                     image: 'data:image/png;base64,' + base64ImgRuta,
                     width: 466,
                     height: 609,
                     opacity: 0.3
                 },
+                */
                 header: function(currentPage, pageCount, pageSize) {
                     return {
                         columns: [{
@@ -556,7 +358,7 @@
                         }]
                     }
                 },
-                pageMargins: [30, 35, 30, 35],
+                pageMargins: [30, 35, 30, 15    ],
                 styles: {
                     title: {
                         fontSize: 9,
@@ -577,7 +379,7 @@
                     return {
                         columns: [{
                             fontSize: 7,
-                            text: 'Trámite Documentario Virtual',
+                            text: 'Trámite Documentario Virtual - ClouDoc - 2024',
                             alignment: 'center',
                         }]
                     }

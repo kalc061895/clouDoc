@@ -47,16 +47,17 @@ class ReporteController extends BaseController
             ];
         }
 
+        if ($_post['fechaInicio'] != '') {
+            $where[] = [
+                'key' => 'expedientes.fecha_recepcion >=',
+                'value' => $_post['fechaInicio'].' 00:00:00',
+            ];
+        }
+
         if ($_post['fechaFin'] != '') {
             $where[] = [
                 'key' => 'expedientes.fecha_recepcion <=',
-                'value' => $_post['fechaFin'],
-            ];
-        }
-        if ($_post['nroDocumento'] != '') {
-            $where[] = [
-                'key' => 'expedientes.numero_documento ',
-                'value' => $_post['nroDocumento'],
+                'value' => $_post['fechaFin'].' 23:59:59',
             ];
         }
         if ($_post['nombres'] != '') {
@@ -104,14 +105,14 @@ class ReporteController extends BaseController
         if ($_post['fechaInicio'] != '') {
             $where[] = [
                 'key' => 'expedientes.fecha_recepcion >=',
-                'value' => $_post['fechaInicio'],
+                'value' => $_post['fechaInicio'].' 00:00:00',
             ];
         }
 
         if ($_post['fechaFin'] != '') {
             $where[] = [
                 'key' => 'expedientes.fecha_recepcion <=',
-                'value' => $_post['fechaFin'],
+                'value' => $_post['fechaFin'].' 23:59:59',
             ];
         }
         if ($_post['nroDocumento'] != '') {
@@ -134,22 +135,20 @@ class ReporteController extends BaseController
         }
 
         $data = $_expedientesModel->getReporteExpedientesFiltrado($where);
+        
         foreach ($data as $key => $value) {
-            $data[$key]->movimientos = [
-                [
-                    'oficina_destino' => 'Unidad de Recursos Humanos',
-                    'column2' => 'Dataasdasd 2',
-                    'column3' => 'Datasadasd 3',
-                    'column4' => 'Dataasdasd 4',
-                    'column5' => 'Daasdasdta 5'
-                ],
-                ['column1' => 'Dataasdas 6', 'column2' => 'Datasdasda 7', 'column3' => 'Datadasdasd 8', 'column4' => 'Daasdasdasdta 9', 'column5' => 'Data sdadas10'],
-                ['column1' => 'Dataasdas 6', 'column2' => 'Datasdasda 7', 'column3' => 'Datadasdasd 8', 'column4' => 'Daasdasdasdta 9', 'column5' => 'Data sdadas10'],
-                ['column1' => 'Dataasdas 6', 'column2' => 'Datasdasda 7', 'column3' => 'Datadasdasd 8', 'column4' => 'Daasdasdasdta 9', 'column5' => 'Data sdadas10'],
-                ['column1' => 'Dataasdas 6', 'column2' => 'Datasdasda 7', 'column3' => 'Datadasdasd 8', 'column4' => 'Daasdasdasdta 9', 'column5' => 'Data sdadas10'],
-                ['column1' => 'Dataasdas 6', 'column2' => 'Datasdasda 7', 'column3' => 'Datadasdasd 8', 'column4' => 'Daasdasdasdta 9', 'column5' => 'Data sdadas10'],
-                // Agrega más filas según sea necesario
-            ];
+            $_movimientos = $_expedientesModel->getMovimientos($value->id);
+            $_setMovimientos =[];
+            foreach ($_movimientos as $keyVal => $val) {
+                $_setMovimientos[] = [
+                    'oficina_destino' => $val->oficina_destino_abreviatura,
+                    'accion' => $val->accion,
+                    'fecha' => $val->fecha_envio,
+                    'folios' => $value->folios,
+                    'firma' => $value->estado
+                ];
+            }
+            $data[$key]->movimientos = $_setMovimientos;
         }
         return $this->response->setJSON($data);
     }
