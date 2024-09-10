@@ -462,5 +462,4 @@ class TramiteController extends BaseController
 
         return $this->response->setJSON($response);
     }
-
 }

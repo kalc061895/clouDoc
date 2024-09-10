@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+
 
     <title><?= $this->renderSection('title'); ?></title>
     <?= $this->renderSection('pageStyles'); ?>
@@ -2066,6 +2068,16 @@
     <script src="assets/js/forms/sweet-alert.init.js"></script>
     <script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="assets/js/plugins/toastr-init.js"></script>
+    <!-- DataTables Buttons Extension -->
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+
+    <!-- pdfMake -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+
     <script>
         $(document).ready(function() {
             // Al hacer clic en un enlace con clase 'open-here'
@@ -2121,8 +2133,8 @@
                     isOffline = true;
                     Swal.fire({
                         icon: 'warning',
-                        title: '<?= lang('Main.titleInternetError')?>',
-                        text: '<?= lang('Main.bodyInternetError')?>',
+                        title: '<?= lang('Main.titleInternetError') ?>',
+                        text: '<?= lang('Main.bodyInternetError') ?>',
                         //confirmButtonText: 'OK'
                     });
                     clearInterval(connectionCheckInterval);
@@ -2133,8 +2145,8 @@
                     isOffline = false;
                     Swal.fire({
                         icon: 'success',
-                        title: '<?= lang('Main.titleInternetOk')?>',
-                        text: '<?= lang('Main.titleInternetOk')?>',
+                        title: '<?= lang('Main.titleInternetOk') ?>',
+                        text: '<?= lang('Main.titleInternetOk') ?>',
                         //confirmButtonText: 'OK'
                     });
                     clearInterval(connectionCheckInterval);

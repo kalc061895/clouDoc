@@ -33,6 +33,7 @@
 
         ];
         ?>
+        
         <h4 class="card-title"><?= lang('External.seguimientoTitle') ?></h4>
         
         <p class="card-subtitle mb-7">

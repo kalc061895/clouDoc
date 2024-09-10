@@ -188,7 +188,6 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('pageScripts'); ?>
-<script src="assets/libs/dropzone/dist/min/dropzone.min.js"></script>
 <script>
     $('.floating-labels .form-control').on('focus blur', function(e) {
         $(this).parents('.form-group').toggleClass('focused', (e.type === 'focus' || this.value.length > 0));
@@ -284,11 +283,6 @@
             return true;
         }
     });
-</script>
-<script>
-    function print_constancia(params) {
-
-    }
 </script>
 
 <script src="assets/js/extra-libs/jqbootstrapvalidation/validation.js"></script>

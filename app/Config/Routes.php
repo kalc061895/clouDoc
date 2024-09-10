@@ -100,3 +100,20 @@ $routes->get('expediente/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('expediente/derivar', 'TramiteController::postDerivarExpediente');
 $routes->post('expediente/observar', 'TramiteController::postObservarExpediente');
 
+/**
+ * Documentos Internos
+ */
+$routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
+$routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store');
+$routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
+
+/**
+ * Reportes
+ */
+
+$routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
+$routes->post('reportes/registrofiltrado', 'ReporteController::postPlanillaTramiteFiltrado');
+$routes->get('reportes/ruta', 'ReporteController::getHojaRuta');
+$routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
+
+

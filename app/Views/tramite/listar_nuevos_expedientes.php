@@ -17,68 +17,70 @@ $estado = [
         <h4 class="card-title mb-0"><?= lang('Main.expedienteRecibidoTitle') ?></h4>
     </div>
     <div class="card-body ">
-        <div class="table-responsive mb-4 ">
-            <table class="table table-sm mb-0 table-hover" id="expedientesTable">
-                <thead class="text-dark ">
-                    <tr>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.expediente') ?></h6>
-                        </th>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.remitente') ?></h6>
-                        </th>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.asunto') ?></h6>
-                        </th>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.estado') ?></h6>
-                        </th>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.fecha') ?></h6>
-                        </th>
-                        <th>
-                            <h6 class=" fw-semibold mb-0"><?= lang('Main.opciones') ?></h6>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($expediente) : ?>
-                        <?php foreach ($expediente as $item) : ?>
-                            <tr data-id="<?= $item->id?>">
-                                <td>
-                                    <h6 class=" fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
-                                        <div class="ms-3">
+        <div class="datatables">
+            <div class="table-responsive mb-4 ">
+                <table class="table table-sm mb-0 table-hover" id="expedientesTable">
+                    <thead class="text-dark ">
+                        <tr>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.expediente') ?></h6>
+                            </th>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.remitente') ?></h6>
+                            </th>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.asunto') ?></h6>
+                            </th>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.estado') ?></h6>
+                            </th>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.fecha') ?></h6>
+                            </th>
+                            <th>
+                                <h6 class=" fw-semibold mb-0"><?= lang('Main.opciones') ?></h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($expediente) : ?>
+                            <?php foreach ($expediente as $item) : ?>
+                                <tr data-id="<?= $item->id ?>">
+                                    <td>
+                                        <h6 class=" fw-semibold mb-0"><?= $item->numero_expediente; ?></h6>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="assets/images/profile/user-3.jpg" class="rounded-circle" width="40" height="40" />
+                                            <div class="ms-3">
 
-                                            <h6 class=" fw-semibold mb-0"><?= $item->nombre ?></h6>
-                                            <span class="fw-normal"><?= $item->correo_electronico ?></span>
+                                                <h6 class=" fw-semibold mb-0"><?= $item->nombre ?></h6>
+                                                <span class="fw-normal"><?= $item->correo_electronico ?></span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td style="text-wrap: pretty;">
-                                    <p class="mb-0 fw-normal "><?= $item->asunto ?></p>
-                                </td>
-                                <td>
+                                    </td>
+                                    <td style="text-wrap: pretty;">
+                                        <p class="mb-0 fw-normal "><?= $item->asunto ?></p>
+                                    </td>
+                                    <td>
 
-                                    <span class="badge bg-<?= ($item->estado == null) ? 'danger' : $estado[$item->estado] ?> text-white"><?= ($item->estado == null) ? lang('Main.NoLeido') : $item->estado ?> </span>
-                                </td>
-                                <td>
-                                    <h6 class=" fw-semibold mb-0"><?= substr($item->fecha_recepcion, 0, 10); ?></h6>
+                                        <span class="badge bg-<?= ($item->estado == null) ? 'danger' : $estado[$item->estado] ?> text-white"><?= ($item->estado == null) ? lang('Main.NoLeido') : $item->estado ?> </span>
+                                    </td>
+                                    <td>
+                                        <h6 class=" fw-semibold mb-0"><?= substr($item->fecha_recepcion, 0, 10); ?></h6>
 
-                                </td>
-                                <td>
-                                    <div class="button-group">
-                                        <button type="button" class="btn btn-sm btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> <?= lang('Main.revisar') ?></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach ?>
-                    <?php endif ?>
-                </tbody>
-            </table>
+                                    </td>
+                                    <td>
+                                        <div class="button-group">
+                                            <button type="button" class="btn btn-sm btn-rounded btn-info" title="<?= lang('Main.revisar') ?>" onclick="RevisarExpediente(<?= $item->id ?>)"><i class="ti ti-eye fs-5"></i> <?= lang('Main.revisar') ?></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        <?php endif ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

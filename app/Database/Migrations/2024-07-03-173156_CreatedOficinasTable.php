@@ -19,6 +19,10 @@ class CreateOficinasTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 255,
             ],
+            'abreviatura' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+            ],
             'tipo' => [
                 'type' => 'ENUM',
                 'constraint' => ['Departamento', 'Oficina', 'Área'], // Define los tipos necesarios

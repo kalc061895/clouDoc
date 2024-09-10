@@ -4,7 +4,6 @@ namespace App\Models;
 
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
-
 class ExpedientesModel extends Model
 {
     protected $table            = 'expedientes';
@@ -64,7 +63,7 @@ class ExpedientesModel extends Model
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,movimientos.estado');
         $builder->where('movimientos.id', null);
         $builder->join(
             'movimientos',
@@ -178,8 +177,11 @@ class ExpedientesModel extends Model
             movimientos.numero_movimiento,
             oficina_procedencia.id as oficina_procedencia_id,
             oficina_procedencia.nombre as oficina_procedencia,
+            oficina_procedencia.abreviatura as oficina_procedencia_abreviatura,
             oficina_destino.id as oficina_destino_id,
             oficina_destino.nombre as oficina_destino,
+            oficina_destino.abreviatura as oficina_destino_abreviatura,
+            movimientos.accion,
             movimientos.observacion,
             movimientos.prioridad,
             movimientos.estado,
@@ -222,7 +224,7 @@ class ExpedientesModel extends Model
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*,entidad.*,movimientos.estado');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,movimientos.estado');
         $builder->where('movimientos.oficina_destino_id', $id_oficina);
 
         if ($where != false) {
@@ -253,7 +255,7 @@ class ExpedientesModel extends Model
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*, entidad.*, estado');
+        $builder->select('expedientes.*, entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico, estado');
 
         // Unir la subconsulta con la tabla de movimientos para obtener el último movimiento
         $builder->join(
@@ -288,7 +290,7 @@ class ExpedientesModel extends Model
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
-        $builder->select('expedientes.*, entidad.*, estado');
+        $builder->select('expedientes.*, entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico, estado');
 
         // Unir la subconsulta con la tabla de movimientos para obtener el último movimiento
         $builder->join(
@@ -318,7 +320,7 @@ class ExpedientesModel extends Model
 
         $builder = $db->table('expedientes');
 
-        $builder->select('expedientes.*,entidad.*,estado');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado');
 
         $builder->join(
             '(SELECT expediente_id, estado FROM movimientos
@@ -336,6 +338,7 @@ class ExpedientesModel extends Model
             'expedientes.entidad_id = entidad.id',
             'inner'
         );
+        $builder->limit(25);
 
         $query = $builder->get();
 
@@ -442,5 +445,47 @@ class ExpedientesModel extends Model
         }
 
         return $builder->countAllResults();
+    }
+    public function getReporteExpedientesFiltrado($where = array() )
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado,oficinas.nombre as nombre_oficina,');
+
+        $builder->join(
+            '(SELECT expediente_id, estado, oficina_destino_id FROM movimientos
+        WHERE id IN (SELECT MIN(id) FROM movimientos GROUP BY expediente_id)) AS latest_movimiento',
+            'expedientes.id = latest_movimiento.expediente_id',
+            'left'
+        );
+        if (count($where) == 0) {
+            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'),new RawSql("CURDATE()"));
+        }
+        else{
+            foreach ($where as $item) {
+                $builder->where($item['key'],$item['value']);
+            }
+        }
+        $builder->groupBy('expedientes.id');
+
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        
+        $builder->join(
+            'oficinas',
+            'oficinas.id = oficina_destino_id',
+            'inner'
+        );
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+        //$builder->limit(25);
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
     }
 }
