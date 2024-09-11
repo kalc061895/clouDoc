@@ -152,4 +152,76 @@ class ReporteController extends BaseController
         }
         return $this->response->setJSON($data);
     }
+
+    public function getBuscarTramite()
+    {
+        $_expedientesModel = new ExpedientesModel();
+        $set = [
+            'anios'  =>  $_expedientesModel->getAnios(),
+            'exp_id'  =>  $this->request->getGet('id') ?? '',
+        ];
+        return view('tramite/busqueda_expediente', $set);
+    }
+    public function getBuscarAvanzadoTramite()
+    {
+
+        $_expedientesModel = new ExpedientesModel();
+
+        $set = array(
+            //'expedientes' => $_expedientesModel->getExpedientesTodo(),
+            'expedientes' => $_expedientesModel->getReporteExpedientesFiltrado(),
+        );
+
+        return view('reporte/planilla_tramite', $set);
+    }
+    public function postBuscarTramiteFiltrado()
+    {
+
+        $_post = $this->request->getPost();
+        $_expedientesModel = new ExpedientesModel();
+
+        $where = [];
+
+        if ($_post['numExpediente'] != '') {
+            $where[] = [
+                'key' => 'expedientes.numero_expediente LIKE',
+                'value' => "%" . $_post['numExpediente'] . "%",
+            ];
+        }
+        if ($_post['fechaInicio'] != '') {
+            $where[] = [
+                'key' => 'expedientes.fecha_recepcion >=',
+                'value' => $_post['fechaInicio'],
+            ];
+        }
+
+        if ($_post['fechaInicio'] != '') {
+            $where[] = [
+                'key' => 'expedientes.fecha_recepcion >=',
+                'value' => $_post['fechaInicio'].' 00:00:00',
+            ];
+        }
+
+        if ($_post['fechaFin'] != '') {
+            $where[] = [
+                'key' => 'expedientes.fecha_recepcion <=',
+                'value' => $_post['fechaFin'].' 23:59:59',
+            ];
+        }
+        if ($_post['nombres'] != '') {
+            $where[] = [
+                'key' => 'entidad.nombre LIKE',
+                'value' => "%" . $_post['nombres'] . "%",
+            ];
+        }
+        if ($_post['asunto'] != '') {
+            $where[] = [
+                'key' => 'expedientes.asunto LIKE',
+                'value' => "%" . $_post['asunto'] . "%",
+            ];
+        }
+
+        $data = $_expedientesModel->getReporteExpedientesFiltrado($where);
+        return $this->response->setJSON($data);
+    }
 }

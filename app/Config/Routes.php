@@ -108,6 +108,14 @@ $routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store')
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
 
 /**
+ * Consultas
+ */
+
+$routes->get('consultas/buscar', 'ReporteController::getBuscarTramite');
+$routes->get('consultas/buscar_avanzada', 'ReporteController::getBuscarAvanzadoTramite');
+
+
+/**
  * Reportes
  */
 

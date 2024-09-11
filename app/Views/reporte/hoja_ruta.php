@@ -56,6 +56,9 @@
             </form>
 
             <hr />
+            <div class="btn-group text-center mb-2">
+                <button class="btn btn-sm btn-primary" id="generatePDF">Generar Hojas de Ruta </button>
+            </div>
             <div class="table-responsive">
                 <table id="alt_pagination" class="table table-sm table-bordered display ">
                     <thead>
@@ -226,7 +229,7 @@
     }
 </script>
 
-<button id="generatePDF">Generate PDF</button>
+
 <script>
     $(document).ready(function() {
         $('#generatePDF').click(function() {
