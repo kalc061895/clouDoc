@@ -34,7 +34,7 @@ $estado = [
             </li>
         </ul>
         <?php if (!$observacion) : ?>
-            <div class="collapsible-section mb-4">
+            <div class="collapsible-section mb-2">
                 <div class="accordion accordion-flush position-relative overflow-hidden" id="accordionFlushParent">
                     <div class="accordion-item mb-3 shadow-none border rounded-top">
                         <h2 class="accordion-header" id="flush-headingOne">
@@ -45,11 +45,16 @@ $estado = [
                         <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushParent">
                             <div class="accordion-body px-3 fw-normal">
 
-                                <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/derivar') ?>" method="POST" id="formDerivar">
+
+                                <form class=" mt-4 pt-2" action="<?= base_url('/mesa_de_partes/derivar') ?>" method="POST" id="formDerivar">
+
                                     <input type="text" name="idDerivar" value="<?= $expediente[0]->id ?>" hidden>
-                                    <div class="form-group mb-4">
-                                        <select class="form-control form-select" id="oficinaDerivar" name="oficinaDerivar" required>
-                                            <option></option>
+
+                                    <div class="form-group mb-2">
+
+                                        <label for="oficinaDerivar"><?= lang('Main.derivarOficina') ?></label>
+
+                                        <select class="select2 form-control form-control-sm " id="oficinaDerivar" name="oficinaDerivar" required>
                                             <?php foreach ($oficina as $item) : ?>
                                                 <?php
                                                 // Contar cuántos hijos tiene esta oficina
@@ -67,32 +72,28 @@ $estado = [
                                             <?php endforeach ?>
 
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="oficinaDerivar"><?= lang('Main.derivarOficina') ?></label>
                                     </div>
 
-                                    <div class="form-group mb-4">
-                                        <select class="form-control form-select" id="accionDerivar" name="accionDerivar" required>
-                                            <option></option>
+                                    <div class="form-group mb-2">
+                                        <label for="accionDerivar"><?= lang('Main.accion') ?></label>
+                                        <select class="select2 form-control form-control-sm" id="accionDerivar" name="accionDerivar" required>
                                             <?php foreach ($accion as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="accionDerivar"><?= lang('Main.accion') ?></label>
+
                                     </div>
 
-                                    <div class="form-group mb-4">
-                                        <textarea class="form-control" rows="4" id="observacionDerivar" name="observacionDerivar"></textarea>
-                                        <span class="bar"></span>
+                                    <div class="form-group mb-2">
                                         <label for="observacionDerivar"><?= lang('Main.observacion') ?></label>
+                                        <textarea class="form-control form-control-sm" rows="4" id="observacionDerivar" name="observacionDerivar"></textarea>
                                     </div>
 
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
                                         <label for="adjuntoDerivar" class="form-label">Adjunto</label>
-                                        <input class="form-control form-sm" type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
+                                        <input class="form-control " type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
                                     </div>
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
 
                                         <button type="submit" class="justify-content-center w-100 btn mb-1 btn-rounded bg-primary-subtle text-primary  d-flex align-items-center">
                                             <i class="ti ti-send fs-4 me-2"></i>
@@ -115,29 +116,27 @@ $estado = [
                         <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushParent">
                             <div class="accordion-body px-3 fw-normal">
 
-                                <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/atender') ?>" method="POST" id="formAtender">
+                                <form class=" mt-4 pt-2" action="<?= base_url('/mesa_de_partes/atender') ?>" method="POST" id="formAtender">
                                     <input type="text" name="idAtender" value="<?= $expediente[0]->id ?>" hidden>
 
-                                    <div class="form-group mb-4">
-                                        <select class="form-control form-select" id="accionAtender" name="accionAtender" required>
-                                            <option></option>
+                                    <div class="form-group mb-2">
+                                        <label for="accionAtender"><?= lang('Main.accion') ?></label>
+                                        <select class="form-control form-control-sm select2" id="accionAtender" name="accionAtender" required>
                                             <?php foreach ($accion as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="accionAtender"><?= lang('Main.accion') ?></label>
                                     </div>
-                                    <div class="form-group mb-4">
-                                        <textarea class="form-control" rows="4" id="observacionAtender" name="observacionAtender"></textarea>
-                                        <span class="bar"></span>
+                                    <div class="form-group mb-2">
                                         <label for="observacionAtender"><?= lang('Main.observacion') ?></label>
+                                        <textarea class="form-control form-control-sm" rows="4" id="observacionAtender" name="observacionAtender"></textarea>
+
                                     </div>
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
                                         <label for="adjuntoAtender" class="form-label">Adjunto</label>
-                                        <input class="form-control form-sm" type="file" id="adjuntoAtender" name="adjuntoAtender[]" multiple>
+                                        <input class="form-control form-control-sm form-sm" type="file" id="adjuntoAtender" name="adjuntoAtender[]" multiple>
                                     </div>
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
 
                                         <button type="submit" class="justify-content-center w-100 btn mb-1 btn-rounded bg-primary-subtle text-primary  d-flex align-items-center">
                                             <i class="ti ti-send fs-4 me-2"></i>
@@ -160,29 +159,26 @@ $estado = [
                         <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushParent">
                             <div class="accordion-body px-3 fw-normal">
 
-                                <form class="floating-labels mt-4 pt-2" action="<?= base_url('/mesa_de_partes/observar') ?>" method="POST" id="formObservar">
+                                <form class=" mt-4 pt-2" action="<?= base_url('/mesa_de_partes/observar') ?>" method="POST" id="formObservar">
                                     <input type="text" name="idObservar" value="<?= $expediente[0]->id ?>" hidden>
 
-                                    <div class="form-group mb-4">
-                                        <select class="form-control form-select" id="accionObservar" name="accionObservar" required>
-                                            <option></option>
+                                    <div class="form-group mb-2">
+                                        <label for="accionObservar"><?= lang('Main.accion') ?></label>
+                                        <select class="form-control form-control-sm select2" id="accionObservar" name="accionObservar" required>
                                             <?php foreach ($accion as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="accionObservar"><?= lang('Main.accion') ?></label>
                                     </div>
-                                    <div class="form-group mb-4">
-                                        <textarea class="form-control" rows="4" id="observacionObservar" name="observacionObservar"></textarea>
-                                        <span class="bar"></span>
+                                    <div class="form-group mb-2">
                                         <label for="observacionObservar"><?= lang('Main.observacion') ?></label>
+                                        <textarea class="form-control form-control-sm" rows="4" id="observacionObservar" name="observacionObservar"></textarea>
                                     </div>
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
                                         <label for="adjuntoObservar" class="form-label">Adjunto</label>
-                                        <input class="form-control form-sm" type="file" id="adjuntoObservar" name="adjuntoObservar[]" multiple>
+                                        <input class="form-control form-control-sm form-sm" type="file" id="adjuntoObservar" name="adjuntoObservar[]" multiple>
                                     </div>
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-2">
 
                                         <button type="submit" class="justify-content-center w-100 btn mb-1 btn-rounded bg-primary-subtle text-primary  d-flex align-items-center">
                                             <i class="ti ti-send fs-4 me-2"></i>
@@ -206,13 +202,13 @@ $estado = [
         <div class="accordion accordion-flush" id="accordionFlushMovimiento">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoOne" aria-expanded="<?= $observacion? 'true':'false' ?>" aria-controls="collapseMovimientoOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoOne" aria-expanded="<?= $observacion ? 'true' : 'false' ?>" aria-controls="collapseMovimientoOne">
                         <strong><?= lang('Main.movimientosTitle') ?>
                         </strong>
                     </button>
                 </h2>
-                
-                <div id="collapseMovimientoOne" class="accordion-collapse collapse <?= $observacion? 'show':'' ?>" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushMovimiento">
+
+                <div id="collapseMovimientoOne" class="accordion-collapse collapse <?= $observacion ? 'show' : '' ?>" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushMovimiento">
                     <div class="comment-widgets position-relative mb-2 " data-simplebar>
                         <?php if ($movimiento) : ?>
                             <?php foreach ($movimiento as $item) : ?>
@@ -277,11 +273,11 @@ $estado = [
             </div>
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoTwo" aria-expanded="<?= $observacion? 'false':'true' ?>" aria-controls="collapseMovimientoTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMovimientoTwo" aria-expanded="<?= $observacion ? 'false' : 'true' ?>" aria-controls="collapseMovimientoTwo">
                         <strong><?= lang('Main.expedientePreview') ?></strong>
                     </button>
                 </h2>
-                <div id="collapseMovimientoTwo" class="accordion-collapse collapse <?= $observacion ? '':'show' ?>" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushMovimiento">
+                <div id="collapseMovimientoTwo" class="accordion-collapse collapse <?= $observacion ? '' : 'show' ?>" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushMovimiento">
 
                     <div class="button-group">
                         <a href="<?= base_url('/' . $expediente[0]->local_path) ?>" class="btn btn-sm btn-primary" target="_blank">
@@ -298,10 +294,6 @@ $estado = [
 </div>
 
 <script>
-    $('.floating-labels .form-control').on('focus blur', function(e) {
-        $(this).parents('.form-group').toggleClass('focused', (e.type === 'focus' || this.value.length > 0));
-    }).trigger('blur');
-
     // funcion para derivar
     $('#formDerivar').on('submit', function(event) {
         event.preventDefault(); // Prevenir la acción predeterminada del formulario
@@ -401,5 +393,25 @@ $estado = [
                 // Puedes mostrar un mensaje de error, etc.
             }
         });
+    });
+    $('form').on('submit', function(event) {
+        var isValid = true;
+        $(this).find('input[type="file"]').each(function() {
+            var files = this.files;
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].size > 20 * 1024 * 1024) { // 20 MB
+                    isValid = false;
+                    break;
+                }
+            }
+        });
+        if (!isValid) {
+            event.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Uno o más archivos superan el tamaño máximo permitido de 20 MB.',
+            });
+        }
     });
 </script>

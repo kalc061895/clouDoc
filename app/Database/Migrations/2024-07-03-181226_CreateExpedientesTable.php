@@ -29,9 +29,8 @@ class CreateExpedientesTable extends Migration
                 'default' => new RawSql('CURRENT_TIMESTAMP'),
             ],
             'folios' => [
-                'type' => 'INT',
-                'constraint' => 5,
-                'unsigned' => true,
+                'type' => 'varchar',
+                'constraint' => 100,
             ],
             'tipo_expediente_id' => [
                 'type' => 'INT',

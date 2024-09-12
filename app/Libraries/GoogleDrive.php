@@ -3,6 +3,7 @@
 namespace App\Libraries;
 
 use Google\Client;
+use Google\Service\Docs;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use PhpParser\Node\Stmt\TryCatch;
@@ -12,10 +13,12 @@ class GoogleDrive
     private $client;
     private $service;
 
+    private $docsService;
     public function __construct()
     {
         $this->client = $this->getClient();
         $this->service = new Drive($this->client);
+        $this->docsService = new Docs($this->client);
     }
 
     private function getClient()
@@ -99,5 +102,67 @@ class GoogleDrive
         ));
 
         return $folder->id;
+    }
+
+    public function createDocumentFromTemplate($templateFileId, $documentName, $replacements)
+    {
+        // Copiar el documento de la plantilla
+        $copy = new DriveFile(['name' => $documentName]);
+        $newFile = $this->service->files->copy($templateFileId, $copy);
+        $documentId = $newFile->getId();
+
+        // Crear las solicitudes para reemplazar texto en el cuerpo, encabezado y pie de página
+        $requests = [];
+        foreach ($replacements as $placeholder => $value) {
+            $requests[] = new \Google_Service_Docs_Request([
+                'replaceAllText' => [
+                    'containsText' => [
+                        'text' => $placeholder,
+                        'matchCase' => true,
+                    ],
+                    'replaceText' => $value,
+                ]
+            ]);
+        }
+
+        // Obtener el documento completo para encontrar encabezados y pies de página
+        $document = $this->docsService->documents->get($documentId);
+
+        // Buscar encabezados y pies de página y aplicar reemplazos
+        foreach ($document->getHeaders() as $headerId => $header) {
+            foreach ($replacements as $placeholder => $value) {
+                $requests[] = new \Google_Service_Docs_Request([
+                    'replaceAllText' => [
+                        'containsText' => [
+                            'text' => $placeholder,
+                            'matchCase' => true,
+                        ],
+                        'replaceText' => $value,
+                        'segmentId' => $headerId,
+                    ]
+                ]);
+            }
+        }
+
+        foreach ($document->getFooters() as $footerId => $footer) {
+            foreach ($replacements as $placeholder => $value) {
+                $requests[] = new \Google_Service_Docs_Request([
+                    'replaceAllText' => [
+                        'containsText' => [
+                            'text' => $placeholder,
+                            'matchCase' => true,
+                        ],
+                        'replaceText' => $value,
+                        'segmentId' => $footerId,
+                    ]
+                ]);
+            }
+        }
+
+        // Aplicar los reemplazos en el documento
+        $batchUpdateRequest = new \Google_Service_Docs_BatchUpdateDocumentRequest(['requests' => $requests]);
+        $this->docsService->documents->batchUpdate($documentId, $batchUpdateRequest);
+
+        return $documentId;
     }
 }

@@ -104,6 +104,7 @@ $routes->post('expediente/observar', 'TramiteController::postObservarExpediente'
  * Documentos Internos
  */
 $routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
+$routes->get('documentos/emitidos', 'DocumentoInternoController::nuevoDocumentoDesdePlantilla');
 $routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store');
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
 

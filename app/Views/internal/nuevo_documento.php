@@ -84,61 +84,95 @@
                         </h4>
                     </div>
                     <div class="card-body">
-                        
-                        <div class="floating-labels mt-4 pt-2">
+
+                        <div class=" mt-4 pt-2">
 
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group mb-4">
-                                        <select class="form-control form-select" id="oficinaDestino" required name="oficinaDestino">
-                                            <?php foreach ($oficina as $item) : ?>
-                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                        <label for="oficinaDestino"><?= lang('External.oficinaDestino') ?>*</label>
+                                        <select class="select2 form-control " id="oficinaDestino" required name="oficinaDestino">
+                                        <?php foreach ($oficina as $item) : ?>
+                                                <?php
+                                                // Contar cuántos hijos tiene esta oficina
+                                                $children = array_filter($oficina, function ($ofi) use ($item) {
+                                                    return $ofi['oficina_padre_id'] == $item['id'];
+                                                });
+                                                ?>
+                                                <?php if (count($children) > 0) : ?>
+                                                    <optgroup label="<?= $item['nombre'] ?>">
+                                                        <?php foreach ($children as $ofi) : ?>
+                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
+                                                        <?php endforeach ?>
+                                                    </optgroup>
+                                                <?php endif ?>
                                             <?php endforeach ?>
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="oficinaDestino"><?= lang('External.oficinaDestino') ?>*</label>
+
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group mb-4">
+                                        <label for="tipoDocExp"><?= lang('External.tipoDocExp') ?>*</label>
                                         <select class="form-control form-select" id="tipoDocExp" required name="tipoDocExp">
                                             <?php foreach ($tipoExpediente as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <span class="bar"></span>
-                                        <label for="tipoDocExp"><?= lang('External.tipoDocExp') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group mb-4">
-                                        <input type="text" class="form-control" id="numDocExp" name="numDocExp" value="s/n" readonly>
-                                        <span class="bar"></span>
                                         <label for="numDocExp"><?= lang('External.numDocExp') ?>*</label>
+                                        <input type="text" class="form-control" id="numDocExp" name="numDocExp" value="s/n" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group mb-4">
+                                        <label for="folioDocExp"><?= lang('External.folioDocExp') ?>*</label>
                                         <input type="text" min="1" class="form-control" id="folioDocExp" required name="folioDocExp">
                                         <span class="bar"></span>
-                                        <label for="folioDocExp"><?= lang('External.folioDocExp') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group mb-4">
+                                        <label for="asuntoDocExp"><?= lang('External.asuntoDocExp') ?>*</label>
                                         <textarea class="form-control" rows="2" id="asuntoDocExp" required name="asuntoDocExp" maxlength="250"></textarea>
                                         <span class="bar"></span>
-                                        <label for="asuntoDocExp"><?= lang('External.asuntoDocExp') ?>*</label>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group mb-4">
+                                        <label for="anexoExp"><?= lang('External.anexoExp') ?></label>
                                         <input type="file" class="form-control form-control-file" id="anexoExp" required name="anexoExp" accept=".pdf" placeholder=".pdf">
                                         <span class="bar"></span>
-                                        <label for="anexoExp"><?= lang('External.anexoExp') ?></label>
                                         <small class="form-control-feedback">
                                             <?= lang('External.anexoHelpExp') ?>*
                                         </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group mb-4">
+                                        <label for="oficinaConCopia"><?= lang('External.conCopia') ?></label>
+                                        <select class="select2 form-control" id="oficinaConCopia" multiple="multiple" name="oficinaConCopia">
+                                        <?php foreach ($oficina as $item) : ?>
+                                                <?php
+                                                // Contar cuántos hijos tiene esta oficina
+                                                $children = array_filter($oficina, function ($ofi) use ($item) {
+                                                    return $ofi['oficina_padre_id'] == $item['id'];
+                                                });
+                                                ?>
+                                                <?php if (count($children) > 0) : ?>
+                                                    <optgroup label="<?= $item['nombre'] ?>">
+                                                        <?php foreach ($children as $ofi) : ?>
+                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
+                                                        <?php endforeach ?>
+                                                    </optgroup>
+                                                <?php endif ?>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <span class="bar"></span>
                                     </div>
                                 </div>
                                 <div class="col-12 justify-content-center">
@@ -263,7 +297,7 @@
 
         // Realiza la llamada AJAX
         $.ajax({
-            url: '<?= base_url('/documentos/getNumeracion')?>', 
+            url: '<?= base_url('/documentos/getNumeracion') ?>',
             // Cambia esta URL por la ruta de tu API
             type: 'POST', // Cambia a 'GET' si es necesario
             data: {
@@ -271,11 +305,12 @@
             }, // Envía el valor seleccionado al servidor
             success: function(respuesta) {
                 // Establece el valor de la respuesta en el campo input
-                $('#numDocExp').val(respuesta.numDocExp+1);
+                $('#numDocExp').val(respuesta.numDocExp + 1);
             },
             error: function() {
                 console.log('Error en la llamada AJAX');
             }
         });
     });
+    $(".select2").select2();
 </script>

@@ -179,5 +179,33 @@ class DocumentoInternoController extends BaseController
     }
 
 
+    public function nuevoDocumentoDesdePlantilla()
+    {
+        // Instanciar la biblioteca GoogleDrive
+        $googleDrive = new GoogleDrive();
 
+        // Datos para el nuevo documento
+        $templateFileId = '1ncPrlfNZC_mjcsl3AF7GDztMKsYNpWXQ'; // Reemplaza con el ID de tu plantilla
+        
+        $documentName = 'Nuevo Documento Generado';
+        $replacements = [
+            '[NOMBRE_DE_ANIO]' => 'Año del Bicentenario de la consolidacion de nuestra independencia y de la consolidación de las heroícas batallas de Junín y Ayacucho',
+            '[NUMERO_CARTA]' => '001',
+            '[ANIO]' => '2024',
+            '[OFICINA_REMITENTE]' => 'Oficina Principal',
+            '[AREA_REMITENTE]' => 'Área de Gestión',
+            '[NOMBRE_REMITENTE]' => 'Juan Pérez',
+            '[CARGO_REMITENTE]' => 'Director General',
+            '[PERSONA_DESTINO]' => 'María López',
+            '[OFICINA_DESTINO]' => 'Oficina de Recursos Humanos'
+        ];
+
+        // Crear el nuevo documento a partir de la plantilla
+        try {
+            $newDocumentId = $googleDrive->createDocumentFromTemplate($templateFileId, $documentName, $replacements);
+            return "Nuevo documento creado con ID: $newDocumentId";
+        } catch (\Exception $e) {
+            return "Error al crear el documento: " . $e->getMessage();
+        }
+    }
 }

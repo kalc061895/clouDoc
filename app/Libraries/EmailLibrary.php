@@ -19,9 +19,9 @@ class EmailLibrary
         $this->email->setFrom('mesadepartes.rssr@gmail.com', 'ClouDoc - Trámite Documentario Virtual');
         $this->email->setTo($entidad['correo_electronico']);
         $this->email->setSubject('Cargo de Trámite Virtual - Exp:' . $expediente['numero_expediente']);
-
+        $this->email->setCC('mesadepartes.rssr@gmail.com');
         // Cargar la vista para el cuerpo del mensaje
-        $message = view('emails/receipt_email', [
+        $message = view('email/receipt_email', [
             'entidad' => $entidad,
             'expediente' => $expediente
         ]);
@@ -47,7 +47,7 @@ class EmailLibrary
         $this->email->setSubject('Expediente '. $body['estado'].' - Trámite Virtual - Exp:' . $expediente['numero_expediente']);
 
         // Cargar la vista para el cuerpo del mensaje
-        $message = view('emails/notification_email', [
+        $message = view('email/notification_email', [
             'entidad' => $entidad,
             'expediente' => $expediente,
             'body' => $body,

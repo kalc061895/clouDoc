@@ -47,6 +47,7 @@ return [
     // New Exp Page
     'titleNew'=> 'Registrar Nuevo Expediente',
     'oficinaDestino'=> 'Oficina de Destino',
+    'conCopia'=> 'Con Copia a Oficinas: (solo lectura)',
     'titleLargeNew'=> 'Trámite Documentario Virtual',
     'dataTitleNew'=> 'Datos del Solicitante',
     'expedienteTitleNew'=> 'Datos del Documento',

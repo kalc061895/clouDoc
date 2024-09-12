@@ -175,3 +175,13 @@ $estado = [
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+<script>
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+    $(document).ready(function() {
+      $('#detalleExpediente').on('shown.bs.modal', function () {
+        $('.select2').select2({
+          dropdownParent: $('#detalleExpediente')
+        });
+      });
+    });
+  </script>
