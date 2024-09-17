@@ -13,7 +13,7 @@ class EntidadModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'nombre','tipo','num_documento','tipo_documento_id',
+        'nombre','tipo','num_documento','tipo_documento_id','abreviatura',
         'direccion','telefono','correo_electronico','activo'
     ];
 

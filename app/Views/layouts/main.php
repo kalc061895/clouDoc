@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-
+    <link rel="stylesheet" href="assets/libs/select2/dist/css/select2.min.css">
 
     <title><?= $this->renderSection('title'); ?></title>
     <?= $this->renderSection('pageStyles'); ?>
@@ -2077,7 +2077,8 @@
     <!-- pdfMake -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
+    <script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="assets/libs/select2/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
             // Al hacer clic en un enlace con clase 'open-here'

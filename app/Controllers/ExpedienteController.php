@@ -17,6 +17,7 @@ use Dompdf\Options;
 use PhpParser\Node\Stmt\TryCatch;
 use App\Libraries\GoogleDrive;
 use App\Models\TupaModel;
+use App\Libraries\EmailLibrary;
 
 class ExpedienteController extends BaseController
 {
@@ -217,7 +218,8 @@ class ExpedienteController extends BaseController
             ),
             //'pdf' => $this->generateReceiptPDF($expedienteArray['id'])
         );
-        $this->sendReceiptEmail($expedienteArray, $entidadArray);
+        $email = new EmailLibrary();
+        $email->sendReceiptEmail($expedienteArray, $entidadArray);
         return json_encode($set);
     }
     public function generateReceiptPDF($expedienteId)

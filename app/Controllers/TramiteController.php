@@ -174,8 +174,8 @@ class TramiteController extends BaseController
                 $email = new EmailLibrary();
                 $_entidad = new EntidadModel();
                 $_expediente = new ExpedientesModel();
-                $_expedienteData = $_expediente->find($$this->request->getPost('idAtender'));
-                $email->sendNotificationEmail($_expediente->find($$this->request->getPost('idAtender')),$_entidad->find($_expedienteData['entidad_id']),$set);
+                $_expedienteData = $_expediente->find($this->request->getPost('idAtender'));
+                $email->sendNotificationEmail($_expediente->find($this->request->getPost('idAtender')),$_entidad->find($_expedienteData['entidad_id']),$set);
             }
             //guardar archivo
             /**
@@ -248,8 +248,8 @@ class TramiteController extends BaseController
                 $email = new EmailLibrary();
                 $_entidad = new EntidadModel();
                 $_expediente = new ExpedientesModel();
-                $_expedienteData = $_expediente->find($$this->request->getPost('idObservar'));
-                $email->sendNotificationEmail($_expediente->find($$this->request->getPost('idObservar')),$_entidad->find($_expedienteData['entidad_id']),$set);
+                $_expedienteData = $_expediente->find($this->request->getPost('idObservar'));
+                $email->sendNotificationEmail($_expediente->find($this->request->getPost('idObservar')),$_entidad->find($_expedienteData['entidad_id']),$set);
             }
             //guardar archivo
             /**
