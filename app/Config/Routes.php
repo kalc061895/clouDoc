@@ -126,3 +126,18 @@ $routes->get('reportes/ruta', 'ReporteController::getHojaRuta');
 $routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
 
 
+/**
+ * Ficha Social
+ */
+
+//$routes->get('fichasocial/', 'FichaSocialController::index');
+$routes->get('configuracion/documentos/', 'FichaSocialController::index');
+$routes->post('fichasocial/store', 'FichaSocialController::store');
+$routes->post('fichasocial/buscar', 'FichaSocialController::searchByDni');
+$routes->get('fichasocial/search', 'FichaSocialController::getHojaRuta');
+$routes->post('fichasocial/searchresult', 'FichaSocialController::postHojaRutaFiltrado');
+/**
+ *  Word
+ */
+
+ $routes->get('configuracion/oficinas/', 'WordController::generateDocument');

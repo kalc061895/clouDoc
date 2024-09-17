@@ -21,7 +21,7 @@ class CreateExpedientesTable extends Migration
             ],
             'procedencia' => [
                 'type' => 'ENUM',
-                'constraint' => ['Interno', 'Externo'],
+                'constraint' => ['Interno', 'Externo','Fisico','Virtual'],
                 'default' => 'Externo',
             ],
             'fecha_recepcion' => [
