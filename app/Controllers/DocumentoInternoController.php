@@ -15,6 +15,7 @@ use App\Models\AdjuntoModel;
 use App\Libraries\GoogleDrive;
 use App\Models\EmpresaConfiguracionModel;
 use App\Models\OficinaModel;
+use App\Models\MovimientosModel;
 
 class DocumentoInternoController extends BaseController
 {
@@ -31,7 +32,7 @@ class DocumentoInternoController extends BaseController
 
         $userModel = new UsuarioModel();
         $_usuario = $userModel->find(auth()->user()->id);
-        
+
         $oficinasModel = new OficinaModel();
 
         $_oficinas = $oficinasModel->findAll();
@@ -69,6 +70,7 @@ class DocumentoInternoController extends BaseController
 
     public function store()
     {
+
         $entidadModel = new EntidadModel();
         $expedienteModel = new ExpedientesModel();
         $drivePath = '-';
@@ -83,7 +85,7 @@ class DocumentoInternoController extends BaseController
             'direccion' => $this->request->getPost('direccionNew'),
         ];
 
-        
+
         $entidadExistente = $entidadModel->where($entidadData)->first();
 
         if ($entidadExistente) {
@@ -146,6 +148,27 @@ class DocumentoInternoController extends BaseController
                 'created_at' => date('Y-m-d H:i:s'),
             ];
             $_adjunto->insert($data);
+
+
+            $_referencia = $this->request->getPost('documentoReferencia'); 
+            $_concopia = $this->request->getPost('oficinaConCopia'); 
+            $setMovimiento = [
+                'expediente_id' => $expedienteArray['id'],
+                'observacion' => '',
+                'accion' => 2,
+                'oficina_procedencia_id' => $_usuario->oficina_id,
+                'oficina_destino_id' => $this->request->getPost('oficinaDestino'),
+                'numero_movimiento' => 1,
+                'estado' => 'ESPERA',
+                'referencia' => ($_referencia =='')?'':implode(',', $_referencia),
+                'concopia' => ($_concopia =='')?'':implode(',', $_concopia),
+            ];
+
+            // aqui guardamos las referencias
+            // y las con copia
+            //
+            $nuevoMovimiento = new MovimientosModel();
+            $insertResult = $nuevoMovimiento->insert($setMovimiento);
         } else {
             $_expediente  = new ExpedientesModel();
             $_expediente->delete($expedienteArray['id'], true);
@@ -153,7 +176,9 @@ class DocumentoInternoController extends BaseController
                 'status' => 'error',
                 'message' => 'Error al subir el archivo.',
             ];
+            return $response;
         }
+
 
         $adjunto = $_adjunto->find($_adjunto->insertID());
 
@@ -186,7 +211,7 @@ class DocumentoInternoController extends BaseController
 
         // Datos para el nuevo documento
         $templateFileId = '1ncPrlfNZC_mjcsl3AF7GDztMKsYNpWXQ'; // Reemplaza con el ID de tu plantilla
-        
+
         $documentName = 'Nuevo Documento Generado';
         $replacements = [
             '[NOMBRE_DE_ANIO]' => 'Año del Bicentenario de la consolidacion de nuestra independencia y de la consolidación de las heroícas batallas de Junín y Ayacucho',
@@ -207,5 +232,60 @@ class DocumentoInternoController extends BaseController
         } catch (\Exception $e) {
             return "Error al crear el documento: " . $e->getMessage();
         }
+    }
+    function handleFileUpload($inputName, $expedienteId, $movimientoId = null)
+    {
+
+        $_adjunto = new AdjuntoModel();
+        $files = $this->request->getFileMultiple($inputName);
+
+        if (empty($files)) {
+            $files = [$this->request->getFile($inputName)];
+        }
+
+        foreach ($files as $file) {
+            if ($file->isValid() && !$file->hasMoved()) {
+                try {
+                    $newName = $file->getRandomName();
+                    $drivePath = '-';
+                    $_driveModel = new EmpresaConfiguracionModel();
+                    if ($_driveModel->getDriveConfig()) {
+                        $googleDrive = new GoogleDrive();
+
+                        $folderId = $_driveModel->getConfig('google_drive_fodler'); // ID de tu carpeta
+                        $fileId = $googleDrive->uploadFile($file->getTempName(), $newName, $folderId);
+                        $drivePath = $fileId;
+                    }
+                    $file->move('uploads', $newName);
+
+
+                    $localPath = 'uploads/' . $newName;
+                    // Obtener el número de orden para el nuevo adjunto
+                    $orden = $_adjunto->where('expediente_id', $expedienteId)
+                        ->countAllResults() + 1;
+
+                    // Guardar la información en la base de datos
+                    $data = [
+                        'expediente_id' => $expedienteId,
+                        'movimiento_id' => $movimientoId,
+                        'local_path' => $localPath,
+                        'drive_path' => $drivePath,
+                        'orden' => $orden,
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ];
+                    $_adjunto->insert($data);
+                } catch (\Throwable $th) {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Error al subir el archivo: ' . $th->getMessage(),
+                    ];
+                }
+            }
+        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Archivo(s) subido(s) exitosamente.',
+        ];
     }
 }

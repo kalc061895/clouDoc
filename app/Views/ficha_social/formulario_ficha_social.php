@@ -2000,7 +2000,7 @@ $formBuilder = new FormBuilder();
 
                     console.log(familyArray);
                     updateFamilyTable();
-                    familyArray = [];
+                    educationArray = [];
                     response.educacion.forEach(element => {
                         // Clonar el objeto eliminando la propiedad 'id'
                         let {
@@ -2015,6 +2015,10 @@ $formBuilder = new FormBuilder();
                     Swal.close();
                 } else {
                     $('.tab-wizard')[0].reset();
+                    educationArray = [];
+                    familyArray = [];
+                    updateEducationTable();
+                    updateFamilyTable();
                     Swal.fire(
                         "Error!",
                         "No se encontro el DNI buscado",

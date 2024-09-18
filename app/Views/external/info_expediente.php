@@ -40,7 +40,7 @@
             <?= lang('External.seguimientoDescription') ?>
         </p>
 
-        <div class="comment-widgets position-relative mb-2 h-485" data-simplebar>
+        <div class="comment-widgets position-relative mb-2" data-simplebar>
             <?php if ($movimiento) : ?>
                 <?php foreach ($movimiento as $item) : ?>
                     <div class="d-flex gap-9 comment-row mb-3">

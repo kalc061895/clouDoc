@@ -105,7 +105,9 @@ $routes->post('expediente/observar', 'TramiteController::postObservarExpediente'
  */
 $routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
 $routes->get('documentos/emitidos', 'DocumentoInternoController::nuevoDocumentoDesdePlantilla');
-$routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store');
+$routes->post('documentos/guardar', 'DocumentoInternoController::store');
+$routes->post('documentos/generar', 'WordController::generateDocument');
+$routes->get('documentos/generar', 'WordController::generateDocument');
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
 
 /**
