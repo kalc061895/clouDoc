@@ -103,6 +103,7 @@ return [
     
     'expediente' => 'Nro. Exp.',
     'remitente' => 'Remitente',
+    'documento' => 'Documento',
     'asunto' => 'Asunto',
     'TipoExpediente' => 'Tipo',
     'estado' => 'Estado',

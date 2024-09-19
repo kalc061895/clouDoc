@@ -52,9 +52,22 @@ class WordController extends BaseController
             ->setHeader('Content-Disposition', 'attachment; filename="document.docx"')
             ->setBody($processor->output());
     }
-    public function generateDocument()
+    public function generateDocument($idInfo = false)
     {
+        $set = '';
         // Ruta a la plantilla
+        if ($idInfo != false) {
+            $set = array(
+                'NOMBRE_ANIO' => 'Año del bicentenario de la consolidacion de nuestra independencia y de la conmemoración de la heroicas  batallas de Junín y Ayacucho',
+                'LUGAR_EMISION' => 'dsakdalsndla',
+            );
+        } else {
+            $set = array(
+                'TIPO_DOCUMENTO' => 'OFICIO',
+                'NUMERO_DOCUMENTO' => '025',
+            );
+        }
+
         //$templatePath = WRITEPATH . 'templates/template_local.docx';
         $templatePath = WRITEPATH . 'templates/template_local.docx';
 
@@ -62,11 +75,13 @@ class WordController extends BaseController
         $templateProcessor = new TemplateProcessor($templatePath);
 
         // Reemplazar los marcadores con los datos deseados
-        $templateProcessor->setValue('NOMBRE_DE_ANIO', 'Año del bicentenario de la consolidacion de nuestra independencia y de la conmemoración de la heroicas  batallas de Junín y Ayacucho');
+        foreach ($set as $key => $value) {
+            $templateProcessor->setValue($key, $value);
+        }
+
         $templateProcessor->setValue('LUGAR_EMISION', 'Juliaca');
         $templateProcessor->setValue('FECHA_ACTUAL', date('d') . ' de ' . date('F',) . '' . date('Y'));
-        $templateProcessor->setValue('TIPO_DOCUMENTO', 'OFICIO');
-        $templateProcessor->setValue('NUMERO_DOCUMENTO', '025');
+
         $templateProcessor->setValue('ANIO', date('Y'));
         $templateProcessor->setValue('OFICINA_SIGLAS', 'URRH/ACAP');
         $templateProcessor->setValue('TITULO_TRATAMIENTO_DESTINATARIO', 'Sr.');

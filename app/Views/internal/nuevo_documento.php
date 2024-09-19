@@ -18,7 +18,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
                                         <select class="form-control form-select" id="tipoNew" required name="tipoNew">
-                                            <option value="Interno">Expediente Interno </option>
+                                            <option value="Persona">Persona </option>
                                         </select>
                                         <span class="bar"></span>
                                         <label for="tipoNew"><?= lang('External.tipoNew') ?>*</label>
@@ -174,11 +174,13 @@
                                 <script>
                                     $('#generarDocBtn').on('click', function(e) {
                                         e.preventDefault();
+
                                         $.ajax({
-                                            url: '<?= base_url('documentos/generar') ?>',
+                                            url: '<?= base_url('documentos/generarformato') ?>',
+                                            data: $('#documentoForm').serialize(),
                                             method: 'POST',
                                             success: function(response) {
-                                                var newWindow = window.open('<?= base_url('documentos/generar') ?>', '_blank');;
+                                                var newWindow = window.open('<?= base_url('documentos/generar') ?>/' + response.id, '_blank');;
 
                                             },
                                             error: function(xhr, status, error) {
@@ -196,6 +198,12 @@
                                         <small class="form-control-feedback">
                                             <?= lang('External.anexoHelpExp') ?>*
                                         </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group mb-2">
+                                        <label for="adjuntoDerivar" class="form-label">Adjunto</label>
+                                        <input class="form-control " type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
                                     </div>
                                 </div>
                                 <div class="col-12 justify-content-center">
@@ -328,7 +336,7 @@
             }, // Envía el valor seleccionado al servidor
             success: function(respuesta) {
                 // Establece el valor de la respuesta en el campo input
-                $('#numDocExp').val(respuesta.numDocExp + 1);
+                $('#numDocExp').val(respuesta.numDocExp);
             },
             error: function() {
                 console.log('Error en la llamada AJAX');

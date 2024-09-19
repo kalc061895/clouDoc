@@ -47,7 +47,20 @@ class DocumentoInternoController extends BaseController
         return view('internal/nuevo_documento', $set);
     }
 
+    public function getEmitidos()
+    {
 
+        $_userModel = new UsuarioModel();
+        $_user = $_userModel->find(auth()->user()->id);
+        $idOficina = $_user->oficina_id;
+        $expedientesModel = new ExpedientesModel();
+        $set = [
+            'expediente' => $expedientesModel->getEmitidos($idOficina),
+            'observacion'=> true
+
+        ];
+        return view('tramite/listar_emitidos', $set);
+    }
     public function numeracion()
     {
         $userModel = new UsuarioModel();
@@ -60,13 +73,40 @@ class DocumentoInternoController extends BaseController
         // Obtener el número de documento basado en el tipo (esto depende de tu lógica)
         $numeroDocumento = $expedienteModel
             ->where('tipo_expediente_id', $tipoDocExp)
-            ->where('procedencia', 'interno')
+            ->where('procedencia', 'Interno')
+            ->where('atencion_oficina_id', $_usuario->oficina_id)
+            ->orderBy('numero_documento', 'DESC')->get()->getResultObject();
+        // Retornar el número de documento en formato JSON
+        return $this->response->setJSON(
+            [
+                'numDocExp' => ($numeroDocumento != null) ? intval($numeroDocumento[0]->numero_documento) + 1 : 1,
+                'tipo' => $tipoDocExp,
+
+            ]
+        );
+    }
+
+    public function generarformato()
+    {
+        return $this->response->setJSON(['id' => 24, 'body' => $this->request->getPost()]);
+        $userModel = new UsuarioModel();
+        $_usuario = $userModel->find(auth()->user()->id);
+        // Obtener el ID del tipo de documento desde la solicitud
+        $tipoDocExp = $this->request->getPost('tipoDocExp');
+        // Instanciar el modelo
+        $expedienteModel = new ExpedientesModel();
+
+        // Obtener el número de documento basado en el tipo (esto depende de tu lógica)
+        $numeroDocumento = $expedienteModel
+            ->where('tipo_expediente_id', $tipoDocExp)
+            ->where('procedencia', 'Interno')
             ->where('atencion_oficina_id', $_usuario->oficina_id)
             ->orderBy('numero_documento', 'DESC')
             ->first();
         // Retornar el número de documento en formato JSON
-        return $this->response->setJSON(['numDocExp' => $numeroDocumento]);
+        //return $this->response->setJSON(['numDocExp' => $numeroDocumento]);
     }
+
 
     public function store()
     {
@@ -76,7 +116,7 @@ class DocumentoInternoController extends BaseController
         $drivePath = '-';
 
         $entidadData = [
-            'tipo' => $this->request->getPost('tipoNew'),
+            'tipo' => 'Persona',
             'tipo_documento_id' => $this->request->getPost('tipoDocNew'),
             'num_documento' => $this->request->getPost('numDocNew'),
             'nombre' => $this->request->getPost('nombreNew'),
@@ -149,9 +189,8 @@ class DocumentoInternoController extends BaseController
             ];
             $_adjunto->insert($data);
 
-
-            $_referencia = $this->request->getPost('documentoReferencia'); 
-            $_concopia = $this->request->getPost('oficinaConCopia'); 
+            $_referencia = $this->request->getPost('documentoReferencia');
+            $_concopia = $this->request->getPost('oficinaConCopia');
             $setMovimiento = [
                 'expediente_id' => $expedienteArray['id'],
                 'observacion' => '',
@@ -160,8 +199,8 @@ class DocumentoInternoController extends BaseController
                 'oficina_destino_id' => $this->request->getPost('oficinaDestino'),
                 'numero_movimiento' => 1,
                 'estado' => 'ESPERA',
-                'referencia' => ($_referencia =='')?'':implode(',', $_referencia),
-                'concopia' => ($_concopia =='')?'':implode(',', $_concopia),
+                'referencia' => ($_referencia == '') ? '' : implode(',', $_referencia),
+                'concopia' => ($_concopia == '') ? '' : implode(',', $_concopia),
             ];
 
             // aqui guardamos las referencias
@@ -169,6 +208,11 @@ class DocumentoInternoController extends BaseController
             //
             $nuevoMovimiento = new MovimientosModel();
             $insertResult = $nuevoMovimiento->insert($setMovimiento);
+            $response = $this->handleFileUpload(
+                'adjuntoDerivar',
+                $expedienteArray['id'],
+                $nuevoMovimiento->insertID(),
+            );
         } else {
             $_expediente  = new ExpedientesModel();
             $_expediente->delete($expedienteArray['id'], true);

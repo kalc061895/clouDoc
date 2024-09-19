@@ -230,6 +230,12 @@ class ExpedientesModel extends Model
         if ($where != false) {
             $builder->where('movimientos.estado', $where);
         }
+        if (count($other) > 0) {
+            foreach ($other as $key => $value) {
+                $builder->where($key,$value);
+            }
+
+        }
 
         $builder->join(
             'movimientos',
@@ -250,6 +256,40 @@ class ExpedientesModel extends Model
 
         return $query->getResultObject();
     }
+    public function getEmitidos($id_oficina)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,movimientos.estado,tipo_expediente.nombre as nombre_documento');
+        //$builder->where('.oficina_destino_id', $id_oficina);
+        $builder->where('expedientes.atencion_oficina_id', $id_oficina);
+
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'expedientes.tipo_expediente_id = tipo_expediente.id',
+            'left'
+        );
+
+        $builder->orderBy('movimientos.id', 'DESC');
+        $builder->groupBy('movimientos.expediente_id');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+
     public function getExpedientesOficinaEstado($id_oficina, $where = false)
     {
         $db = \Config\Database::connect();
