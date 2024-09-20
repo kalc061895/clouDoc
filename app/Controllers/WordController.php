@@ -90,7 +90,7 @@ class WordController extends BaseController
         $templateProcessor->setValue('OFICINA_DESTINATARIO', 'JEFATURA DE RECURSOS HUMANOS - RED DE SALUD SAN ROMÁN');
         $templateProcessor->setValue('DIRECCION_DESTINATARIO', 'Av. Huancane km2.');
         $templateProcessor->setValue('LUGAR_DESTINATARIO', 'Juliaca');
-        $templateProcessor->setValue('ASUNTO', 'REMITO INFORME SOBRE LARUTA CALCINA KEVIN ARNOLD');
+        $templateProcessor->setValue('ASUNTO', 'solicito vacaciones 2023');
         $templateProcessor->setValue('REFERENCIA', 'Exp. 001895-2024');
         $templateProcessor->setValue('CUERPO_DOCUMENTO', 'Por la presente se...');
         $templateProcessor->setValue('TITULO_TRATAMIENTO_EMISARIO', 'Ing.');

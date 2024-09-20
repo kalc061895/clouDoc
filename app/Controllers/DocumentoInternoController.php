@@ -139,7 +139,7 @@ class DocumentoInternoController extends BaseController
         $userModel = new UsuarioModel();
         $_usuario = $userModel->find(auth()->user()->id);
         $expedienteData = [
-            'procendencia' => 'Interno',
+            'procedencia' => 'Interno',
             'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
             'numero_documento' => $this->request->getPost('numDocExp'),
             'numero_expediente' => 'temp',
