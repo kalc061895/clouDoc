@@ -126,6 +126,8 @@ $routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
 $routes->post('reportes/registrofiltrado', 'ReporteController::postPlanillaTramiteFiltrado');
 $routes->get('reportes/ruta', 'ReporteController::getHojaRuta');
 $routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
+$routes->get('reportes/semanal', 'ReporteController::getGraficoSemanal');
+$routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
 
 
 /**

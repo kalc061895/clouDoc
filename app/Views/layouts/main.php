@@ -2090,8 +2090,10 @@
                 loadContent(url); // Llama a la función para cargar el contenido
             });
 
+            
             // Función para cargar el contenido desde la URL y mostrar en 'content-main'
             function loadContent(url) {
+                clearInterval(chartInterval);
                 Swal.fire({
                     type: "info",
                     html: "<div class='justify-content-center'>" +

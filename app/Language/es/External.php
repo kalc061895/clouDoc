@@ -3,7 +3,7 @@
 return [
     //
     'nameEntity'=> 'Red de Salud San Román',
-    'hourEntity'=> 'Atencion Prescenmcial - Lunes a Viernes: 07:30 a.m. a 04:45 p.m.',
+    'hourEntity'=> 'Atencion Prescencial - Lunes a Viernes: 07:30 a.m. a 04:45 p.m.',
     'placeEntity'=> 'Av. Huancane Km. 2 - Juliaca - San Román',
     'bossEntity'=> 'Dr. José Luis Mejía Quispe',
 
@@ -25,8 +25,8 @@ return [
     
 
     // HOME PAGE INFO
-    'rights'=>'Todos Los derechos reservados.',
-    'owner'=>'OTI - RSSR',
+    'rights'=>'Todos los derechos reservados.',
+    'owner'=>'Oficina de Tecnología e Informática - RSSR',
 
     // search page
     'titleSearch'=>'Buscar Expediente',

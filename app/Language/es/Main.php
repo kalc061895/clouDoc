@@ -21,7 +21,11 @@ return [
     'totalExpedientesHoy'=> 'Expedientes Hoy',
     'totalAtendidos'=> 'Expedientes Atendidos',
     'totalEnEspera'=> 'Expedientes en Espera',
-    'almacenamientoDrive'=> 'Tamaño de Almacenamiento',
+    'almacenamientoDrive'=> 'Almacenamiento',
+    'hoyFisicos'=> 'Fisicos',
+    'hoyVirtual'=> 'Virtual',
+    'hoyAtendidos'=> 'Atendidos',
+    'hoyEmitidos'=> 'Emitidos',
 
 
     // Profile
@@ -79,6 +83,10 @@ return [
 
     // Menu
     'dashboard'=> 'Inicio',
+    'chartSemanalTitle'=> 'Estadística de Expedientes',
+    'chartFisicos'=> ' Exp. Físicos',
+    'chartVirtuales'=> 'Exp. Virtuales',
+    'chartAtendidos'=> 'Exp. Atendidos',
     
     
     //Errors

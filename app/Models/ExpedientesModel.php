@@ -230,12 +230,6 @@ class ExpedientesModel extends Model
         if ($where != false) {
             $builder->where('movimientos.estado', $where);
         }
-        if (count($other) > 0) {
-            foreach ($other as $key => $value) {
-                $builder->where($key,$value);
-            }
-
-        }
 
         $builder->join(
             'movimientos',
