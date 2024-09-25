@@ -115,7 +115,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="alert alert-primary text-primary role=" alert"="">
-                                        <strong><?= lang('External.nota')?>: </strong> <?= lang('External.notaBody')?> <a href="<?= base_url('tupaexpediente')?>"><strong class="badge text-bg-info"><?= lang('External.notaLink')?></strong> </a>
+                                        <strong><?= lang('External.nota') ?>: </strong> <?= lang('External.notaBody') ?> <a href="<?= base_url('tupaexpediente') ?>"><strong class="badge text-bg-info"><?= lang('External.notaLink') ?></strong> </a>
                                     </div>
                                     <div class="floating-labels mt-4 pt-2">
 
@@ -147,7 +147,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group mb-4">
-                                                    <textarea class="form-control" rows="2" id="asuntoDocExp" required name="asuntoDocExp" maxlength="250" ></textarea>
+                                                    <textarea class="form-control" rows="2" id="asuntoDocExp" required name="asuntoDocExp" maxlength="250"></textarea>
                                                     <span class="bar"></span>
                                                     <label for="asuntoDocExp"><?= lang('External.asuntoDocExp') ?>*</label>
                                                 </div>
@@ -284,6 +284,8 @@
         }
     });
 </script>
+
+
 
 <script src="assets/js/extra-libs/jqbootstrapvalidation/validation.js"></script>
 <script src="assets/js/forms/custom-validation-init.js"></script>
