@@ -107,8 +107,9 @@ $routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento'
 $routes->get('documentos/emitidos', 'DocumentoInternoController::getEmitidos');
 $routes->post('documentos/guardar', 'DocumentoInternoController::store');
 $routes->post('documentos/generarformato', 'DocumentoInternoController::generarformato');
-$routes->get('documentos/generar/(:num)', 'WordController::generateDocument/$1');
+$routes->get('documentos/descargarplantilla/(:num)', 'WordController::generarPlantilla/$1');
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
+$routes->get('documentos/getreferencia', 'DocumentoInternoController::referencia');
 
 /**
  * Consultas

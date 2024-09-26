@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Libraries\WordProcessor;
 use PhpOffice\PhpWord\TemplateProcessor;
+use App\Models\EmpresaConfiguracionModel;
 
 class WordController extends BaseController
 {
@@ -111,47 +112,50 @@ class WordController extends BaseController
         // Descargar el documento
         return $this->response->download($temp_file, null)->setFileName($filename);
     }
-    public function generarPlantilla()
+    public function generarPlantilla($idInfo)
     {
+
+        $empresaModel = new EmpresaConfiguracionModel();
+
+        $data = $empresaModel->find($idInfo);
+        $set = json_decode($data['value']);
+        
+        $empresaModel->delete($idInfo);
+
+        // Informacion del documento
+        /*$set['NUMERO_DOCUMENTO']=$infoArray['numDocExp'];
+        //echo $infoArray['nombreNew'];
+        //print_r($infoArray);
+        $set = '';
         // Ruta a la plantilla
-        $templatePath = WRITEPATH . 'templates/template_ficha_social.docx';
+        if ($idInfo != false) {
+            $set = array(
+                'NOMBRE_ANIO' => 'Año del bicentenario de la consolidacion de nuestra independencia y de la conmemoración de la heroicas  batallas de Junín y Ayacucho',
+                'LUGAR_EMISION' => 'dsakdalsndla',
+            );
+        } else {
+            $set = array(
+                'TIPO_DOCUMENTO' => 'OFICIO',
+                'NUMERO_DOCUMENTO' => '025',
+            );
+        }
+        */
+        //$templatePath = WRITEPATH . 'templates/template_local.docx';
+        $templatePath = WRITEPATH . 'templates/template_local.docx';
 
         // Crear una instancia de TemplateProcessor
         $templateProcessor = new TemplateProcessor($templatePath);
 
         // Reemplazar los marcadores con los datos deseados
-        $templateProcessor->setValue('NOMBRE_DE_ANIO', 'Año del bicentenario de la consolidacion de nuestra independencia y de la conmemoración de la heroicas  batallas de Junín y Ayacucho');
-        $templateProcessor->setValue('LUGAR_EMISION', 'Juliaca');
-        $templateProcessor->setValue('FECHA_ACTUAL', date('d') . ' de ' . date('F',) . '' . date('Y'));
-        $templateProcessor->setValue('TIPO_DOCUMENTO', 'OFICIO');
-        $templateProcessor->setValue('NUMERO_DOCUMENTO', '025');
-        $templateProcessor->setValue('ANIO', date('Y'));
-        $templateProcessor->setValue('OFICINA_SIGLAS', 'URRH/ACAP');
-        $templateProcessor->setValue('TITULO_TRATAMIENTO_DESTINATARIO', 'Sr.');
-        $templateProcessor->setValue('NOMBRE_DESTINATARIO', 'GODO VASQUEZ MAMANI');
-        $templateProcessor->setValue('CARGO_DESTINATARIO', 'Jefe de la Unidad de Recursos Humano');
-        $templateProcessor->setValue('OFICINA_DESTINATARIO', 'JEFATURA DE RECURSOS HUMANOS - RED DE SALUD SAN ROMÁN');
-        $templateProcessor->setValue('DIRECCION_DESTINATARIO', 'Av. Huancane km2.');
-        $templateProcessor->setValue('LUGAR_DESTINATARIO', 'Juliaca');
-        $templateProcessor->setValue('ASUNTO', 'REMITO INFORME SOBRE LARUTA CALCINA KEVIN ARNOLD');
-        $templateProcessor->setValue('REFERENCIA', 'Exp. 001895-2024');
-        $templateProcessor->setValue('CUERPO_DOCUMENTO', 'Por la presente se...');
-        $templateProcessor->setValue('TITULO_TRATAMIENTO_EMISARIO', 'Ing.');
-        $templateProcessor->setValue('NOMBRE_EMISARIO', 'HENRY HAROLD SALAZAR FLORES');
-        $templateProcessor->setValue('CARGO_EMISARIO', 'Jefe de Control de Asistencia');
-        $templateProcessor->setValue('OFICINA_EMISARIO', 'Area de Control de Asistencia');
-        $templateProcessor->setValue('CODIGO_DOCUMENTO', 'DS56HSD');
-        $templateProcessor->setValue('DIRECCION_EMISARIO', 'Av. Huancane km 2');
-        $templateProcessor->setValue('LUGAR_EMISARIO', 'Juliaca');
-        $templateProcessor->setValue('TELEFONO_EMISARIO', '935316849');
-        $templateProcessor->setValue('CORREO_EMISARIO', 'acap@cloudoc.com');
-
+        foreach ($set as $key => $value) {
+            $templateProcessor->setValue($key, $value);
+        }
         // Guardar el documento modificado
-        $filename = 'platilla_numero.docx';
+        $filename = $set->TIPO_DOCUMENTO.'_'.$set->NUMERO_DOCUMENTO.'.docx';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $templateProcessor->saveAs($temp_file);
 
-        // Retornar la URL temporal del archivo
-        return $this->response->setJSON(['file_url' => base_url('temp/' . basename($temp_file))]);
+        // Descargar el documento
+        return $this->response->download($temp_file, null)->setFileName($filename);
     }
 }

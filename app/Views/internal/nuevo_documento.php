@@ -93,19 +93,7 @@
                                         <label for="oficinaDestino"><?= lang('External.oficinaDestino') ?>*</label>
                                         <select class="select2 form-control " id="oficinaDestino" required name="oficinaDestino">
                                             <?php foreach ($oficina as $item) : ?>
-                                                <?php
-                                                // Contar cuántos hijos tiene esta oficina
-                                                $children = array_filter($oficina, function ($ofi) use ($item) {
-                                                    return $ofi['oficina_padre_id'] == $item['id'];
-                                                });
-                                                ?>
-                                                <?php if (count($children) > 0) : ?>
-                                                    <optgroup label="<?= $item['nombre'] ?>">
-                                                        <?php foreach ($children as $ofi) : ?>
-                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
-                                                        <?php endforeach ?>
-                                                    </optgroup>
-                                                <?php endif ?>
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
 
@@ -180,7 +168,7 @@
                                             data: $('#documentoForm').serialize(),
                                             method: 'POST',
                                             success: function(response) {
-                                                var newWindow = window.open('<?= base_url('documentos/generar') ?>/' + response.id, '_blank');;
+                                                var newWindow = window.open('<?= base_url('documentos/descargarplantilla') ?>/' + response.id, '_blank');;
 
                                             },
                                             error: function(xhr, status, error) {
@@ -343,8 +331,44 @@
             }
         });
     });
+
     $(".select2").select2();
+
     $(".select2-tag").select2({
-        tags: true
+        tags: true,
+        ajax: {
+            url: "<?= base_url('documentos/getreferencia'); ?>", // Reemplaza con la URL de tu servidor
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term // Término de búsqueda
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.items // Estructura de datos recibida desde el servidor
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
+        placeholder: 'Selecciona una o más opciones',
+        multiple: true,
+        width: 'resolve',
+        language: {
+            noResults: function() {
+                return "No se encontraron resultados";
+            },
+            searching: function() {
+                return "Buscando...";
+            },
+            inputTooShort: function() {
+                return "Por favor, ingresa 1 o más caracteres";
+            },
+            maximumSelected: function(args) {
+                return "Solo puedes seleccionar " + args.maximum + " ítem" + (args.maximum != 1 ? "s" : "");
+            }
+        }
     });
 </script>

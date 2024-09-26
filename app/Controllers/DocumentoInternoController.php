@@ -56,7 +56,7 @@ class DocumentoInternoController extends BaseController
         $expedientesModel = new ExpedientesModel();
         $set = [
             'expediente' => $expedientesModel->getEmitidos($idOficina),
-            'observacion'=> true
+            'observacion' => true
 
         ];
         return view('tramite/listar_emitidos', $set);
@@ -88,23 +88,68 @@ class DocumentoInternoController extends BaseController
 
     public function generarformato()
     {
-        return $this->response->setJSON(['id' => 24, 'body' => $this->request->getPost()]);
         $userModel = new UsuarioModel();
         $_usuario = $userModel->find(auth()->user()->id);
-        // Obtener el ID del tipo de documento desde la solicitud
-        $tipoDocExp = $this->request->getPost('tipoDocExp');
-        // Instanciar el modelo
-        $expedienteModel = new ExpedientesModel();
 
-        // Obtener el número de documento basado en el tipo (esto depende de tu lógica)
-        $numeroDocumento = $expedienteModel
-            ->where('tipo_expediente_id', $tipoDocExp)
-            ->where('procedencia', 'Interno')
-            ->where('atencion_oficina_id', $_usuario->oficina_id)
-            ->orderBy('numero_documento', 'DESC')
-            ->first();
-        // Retornar el número de documento en formato JSON
-        //return $this->response->setJSON(['numDocExp' => $numeroDocumento]);
+        $empresaModel = new EmpresaConfiguracionModel();
+        $_post = $this->request->getPost();
+
+        $oficinaModel = new OficinaModel();
+        $documentoModel = new TipoExpedienteModel();
+        $empresaModel = new EmpresaConfiguracionModel();
+
+        $_oficinaRemitente = $oficinaModel->find($_usuario->oficina_id);
+        $_oficinaDestino = $oficinaModel->find($_post['oficinaDestino']);
+        $_tipoDocumento = $documentoModel->find($_post['tipoDocExp']);
+
+        $referencia = (isset($_post['documentoReferencia'])) ? implode("\n", $_post['documentoReferencia']) : '';
+        $cCopia = (isset($_post['oficinaConCopia'])) ? implode("\n", $_post['oficinaConCopia']) : '';
+        $setInfo = [
+            'NOMBRE_DE_ANIO' => $empresaModel->getConfig('anio_nombre'),
+            'LUGAR_EMISION' => 'Juliaca',
+            'TIPO_DOCUMENTO' => $_tipoDocumento['nombre'],
+            'NUMERO_DOCUMENTO' => $_post['numDocExp'],
+            'FECHA_ACTUAL' => date('d') . ' de ' . date('F',) . '' . date('Y'),
+            'ANIO' => date('Y'),
+
+            'TITULO_TRATAMIENTO_DESTINATARIO' => $_oficinaDestino['titulo_encargado'],
+            'NOMBRE_DESTINATARIO' => $_oficinaDestino['nombres_encargado'],
+            'CARGO_DESTINATARIO' => $_oficinaDestino['cargo_encargado'],
+            'OFICINA_DESTINATARIO' => $_oficinaDestino['nombre'],
+            'DIRECCION_DESTINATARIO' => 'Av. Huancane km2',
+            'LUGAR_DESTINATARIO' => 'Juliaca',
+
+            'ASUNTO' => $_post['asuntoDocExp'],
+            'REFERENCIA' => $referencia,
+            'CCOPIA' => $cCopia,
+            'CUERPO_DOCUMENTO' => 'Ingrese aqui el cuerpo ...',
+
+            'TITULO_TRATAMIENTO_EMISARIO' => $_oficinaRemitente['titulo_encargado'],
+            'NOMBRE_EMISARIO' => $_oficinaRemitente['nombres_encargado'],
+            'OFICINA_SIGLAS' => $_oficinaRemitente['codigo_referencia'],
+            'CARGO_EMISARIO' => $_oficinaRemitente['cargo_encargado'],
+            'OFICINA_EMISARIO' => $_oficinaRemitente['nombre'],
+            'CODIGO_DOCUMENTO' => '',
+            'DIRECCION_EMISARIO' => 'Av. Huancane 224',
+            'LUGAR_EMISARIO' => 'Juliaca',
+            'TELEFONO_EMISARIO' => '',
+            'CORREO_EMISARIO' => '',
+        ];
+
+        $insert = (object)[
+            'key' => 'info_docTemp',
+            'value' => $this->request->getPost('formData'),
+        ];
+        $insert = (object)[
+            'key' => 'info_docTemp',
+            'value' => json_encode($setInfo),
+        ];
+
+        $_tempData = $empresaModel->insert($insert);
+
+        return $this->response->setJSON(
+            ['id' => $empresaModel->insertID()]
+        );
     }
 
 
@@ -331,5 +376,24 @@ class DocumentoInternoController extends BaseController
             'status' => 'success',
             'message' => 'Archivo(s) subido(s) exitosamente.',
         ];
+    }
+
+    public function referencia()
+    {
+
+        $expedienteModel =  new ExpedientesModel();
+
+        $items = [
+            ['id' => 1, 'text' => 'Opción 1'],
+            ['id' => 2, 'text' => 'Opción 2'],
+            ['id' => 3, 'text' => 'Opción 3'],
+            ['id' => 4, 'text' => 'Opción 4'],
+            ['id' => 5, 'text' => 'Opción 5']
+        ];
+        $set = [
+            'term' => 'q',
+            'items' => $expedienteModel->getExpedienteSelect($this->request->getGET('q'), false),
+        ];
+        return $this->response->setJSON($set);
     }
 }

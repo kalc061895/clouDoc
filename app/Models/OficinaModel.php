@@ -13,7 +13,9 @@ class OficinaModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'nombre','tipo','descripcion','rango','oficina_padre_id','activo'
+        'nombre','tipo','descripcion','rango',
+        'codigo_referencia','titulo_encargado','nombres_encargado',
+        'cargo_encargado','oficina_padre_id','activo'
     ];
 
     protected bool $allowEmptyInserts = false;
