@@ -156,7 +156,7 @@
                 title: 'OBS.'
             },
         ],
-        
+
     });
 
 
@@ -203,7 +203,7 @@
                 asunto: item.asunto,
                 nombre_oficina: item.nombre_oficina,
                 procedencia: item.procedencia.substring(0, 3) + '.',
-                firma: (item.firma != null)?item.firma:'',
+                firma: (item.firma != null) ? item.firma : '',
                 observacion: item.observacion,
                 movimientos: item.movimientos
             };
@@ -315,7 +315,7 @@
                                     margin: [0, 3, 0, 0],
                                 }, // Columna 'accion' centrada
                                 {
-                                    text : formatDateOnly(item_mov.fecha),
+                                    text: formatDateOnly(item_mov.fecha),
                                     margin: [0, 3, 0, 0],
                                     alignment: 'center',
                                 },
@@ -339,11 +339,15 @@
                     } // Añade salto de página si no es la última
 
                 ]).flat(),
-                pageSize: {
+                /*pageSize: {
                     width: 466,
                     height: 609
                 },
-                
+                */
+                pageSize: {
+                    width: 466,
+                    height: 649
+                },
                 /*background: {
                     image: 'data:image/png;base64,' + base64ImgRuta,
                     width: 466,
@@ -361,7 +365,7 @@
                         }]
                     }
                 },
-                pageMargins: [30, 35, 30, 15    ],
+                pageMargins: [30, 35, 30, 15],
                 styles: {
                     title: {
                         fontSize: 9,
