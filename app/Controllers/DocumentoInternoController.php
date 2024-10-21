@@ -46,6 +46,28 @@ class DocumentoInternoController extends BaseController
 
         return view('internal/nuevo_documento', $set);
     }
+    public function getNuevoDocumentoFisico()
+    {
+        $tipo_expediente = new TipoExpedienteModel();
+        $tipo_documento = new TipoDocumentoModel();
+        $expedienteForm = new ExpedienteForm();
+
+        $userModel = new UsuarioModel();
+        $_usuario = $userModel->find(auth()->user()->id);
+
+        $oficinasModel = new OficinaModel();
+
+        $_oficinas = $oficinasModel->findAll();
+        $set = array(
+            'infoUsuario' => $_usuario,
+            'oficina' => $_oficinas,
+            'tipoDocumento' => $tipo_documento->findAll(),
+            'tipoExpediente' => $tipo_expediente->findAll(),
+            'content' => $expedienteForm->render()
+        );
+
+        return view('internal/nuevo_documento_fisico', $set);
+    }
 
     public function getEmitidos()
     {

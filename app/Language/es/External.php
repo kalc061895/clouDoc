@@ -3,7 +3,7 @@
 return [
     //
     'nameEntity'=> 'Red de Salud San Román',
-    'hourEntity'=> 'Atencion Prescencial - Lunes a Viernes: 07:30 a.m. a 04:45 p.m.',
+    'hourEntity'=> 'Atencion Prescencial - Lunes a Viernes: 07:30 a.m. a 14:45 p.m.',
     'placeEntity'=> 'Av. Huancane Km. 2 - Juliaca - San Román',
     'bossEntity'=> 'Dr. José Luis Mejía Quispe',
 

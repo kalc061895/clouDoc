@@ -75,6 +75,7 @@ $routes->get('menugroupuser/getGroups', 'MenuGroupUserController::getGroups');
 /**
  * Opciones de Mesa de Partes
  */
+$routes->get('mesa_de_partes/nuevo', 'DocumentoInternoController::getNuevoDocumentoFisico');
 $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpedientes');
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
