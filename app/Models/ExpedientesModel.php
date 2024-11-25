@@ -488,7 +488,7 @@ class ExpedientesModel extends Model
 
         $builder = $db->table('expedientes');
 
-        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado,oficinas.nombre as nombre_oficina,');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado,oficinas.nombre as nombre_oficina,CONCAT(tipo_expediente.nombre," ",numero_documento) as numero_documento');
 
         $builder->join(
             '(SELECT expediente_id, estado, oficina_destino_id FROM movimientos
@@ -510,6 +510,11 @@ class ExpedientesModel extends Model
         $builder->join(
             'oficinas',
             'oficinas.id = oficina_destino_id',
+             'inner'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'tipo_expediente.id = tipo_expediente_id',
             'inner'
         );
         $builder->join(

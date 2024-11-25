@@ -365,7 +365,7 @@
                         }]
                     }
                 },
-                pageMargins: [30, 35, 30, 15],
+                pageMargins: [35, 35, 30, 15],
                 styles: {
                     title: {
                         fontSize: 9,
