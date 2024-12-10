@@ -4,6 +4,8 @@ namespace App\Models;
 
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Model;
+use SebastianBergmann\Type\FalseType;
+
 class ExpedientesModel extends Model
 {
     protected $table            = 'expedientes';
@@ -250,6 +252,40 @@ class ExpedientesModel extends Model
 
         return $query->getResultObject();
     }
+    public function getEmitidos($id_oficina)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,movimientos.estado,tipo_expediente.nombre as nombre_documento');
+        //$builder->where('.oficina_destino_id', $id_oficina);
+        $builder->where('expedientes.atencion_oficina_id', $id_oficina);
+
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'expedientes.tipo_expediente_id = tipo_expediente.id',
+            'left'
+        );
+
+        $builder->orderBy('movimientos.id', 'DESC');
+        $builder->groupBy('movimientos.expediente_id');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+
     public function getExpedientesOficinaEstado($id_oficina, $where = false)
     {
         $db = \Config\Database::connect();
@@ -295,7 +331,7 @@ class ExpedientesModel extends Model
         // Unir la subconsulta con la tabla de movimientos para obtener el último movimiento
         $builder->join(
             '(SELECT expediente_id, estado, oficina_procedencia_id, oficina_destino_id FROM movimientos
-        WHERE id IN (SELECT MAX(id) FROM movimientos WHERE (oficina_destino_id = "'.$id_oficina.'") GROUP BY expediente_id)) AS latest_movimiento',
+        WHERE id IN (SELECT MAX(id) FROM movimientos WHERE (oficina_destino_id = "' . $id_oficina . '") GROUP BY expediente_id)) AS latest_movimiento',
             'expedientes.id = latest_movimiento.expediente_id',
             'INNER'
         );
@@ -328,11 +364,11 @@ class ExpedientesModel extends Model
             'expedientes.id = latest_movimiento.expediente_id',
             'left'
         );
-        
+
         $builder->groupBy('expedientes.id');
 
         $builder->orderBy('expedientes.numero_expediente', 'DESC');
-        
+
         $builder->join(
             'entidad',
             'expedientes.entidad_id = entidad.id',
@@ -446,13 +482,13 @@ class ExpedientesModel extends Model
 
         return $builder->countAllResults();
     }
-    public function getReporteExpedientesFiltrado($where = array() )
+    public function getReporteExpedientesFiltrado($where = array())
     {
         $db = \Config\Database::connect();
 
         $builder = $db->table('expedientes');
 
-        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado,oficinas.nombre as nombre_oficina,');
+        $builder->select('expedientes.*,entidad.nombre,entidad.tipo,entidad.num_documento,entidad.correo_electronico,estado,oficinas.nombre as nombre_oficina,CONCAT(tipo_expediente.nombre," ",numero_documento) as numero_documento');
 
         $builder->join(
             '(SELECT expediente_id, estado, oficina_destino_id FROM movimientos
@@ -461,20 +497,24 @@ class ExpedientesModel extends Model
             'left'
         );
         if (count($where) == 0) {
-            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'),new RawSql("CURDATE()"));
-        }
-        else{
+            $builder->where(new RawSql('DATE(expedientes.fecha_recepcion)'), new RawSql("CURDATE()"));
+        } else {
             foreach ($where as $item) {
-                $builder->where($item['key'],$item['value']);
+                $builder->where($item['key'], $item['value']);
             }
         }
         $builder->groupBy('expedientes.id');
 
         $builder->orderBy('expedientes.numero_expediente', 'DESC');
-        
+
         $builder->join(
             'oficinas',
             'oficinas.id = oficina_destino_id',
+             'inner'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'tipo_expediente.id = tipo_expediente_id',
             'inner'
         );
         $builder->join(
@@ -483,6 +523,54 @@ class ExpedientesModel extends Model
             'inner'
         );
         //$builder->limit(25);
+
+        $query = $builder->get();
+
+        return $query->getResultObject();
+    }
+    public function getExpedienteSelect($where = false, $select = false)
+    {
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('expedientes');
+        if($select){
+            $select = "expedientes.id, CONCAT(expedientes.numero_expediente,': ',tipo_expediente.nombre,' ',expedientes.numero_documento,' - ',expedientes.asunto) as text";
+        }
+        else
+        {
+            $select = "CONCAT(expedientes.numero_expediente,': ',tipo_expediente.nombre,' ',expedientes.numero_documento,' - ',expedientes.asunto) as id, CONCAT(expedientes.numero_expediente,': ',tipo_expediente.nombre,' ',expedientes.numero_documento,' - ',expedientes.asunto) as text";
+        }
+        $builder->select($select);
+        //$builder->where('.oficina_destino_id', $id_oficina);
+
+        if ($where != false) {
+            $builder->like(
+                'numero_expediente',
+                $where
+            );
+        }
+        $builder->join(
+            'movimientos',
+            'expedientes.id = movimientos.expediente_id',
+            'left'
+        );
+        $builder->join(
+            'tipo_expediente',
+            'expedientes.tipo_expediente_id = tipo_expediente.id',
+            'left'
+        );
+
+        $builder->orderBy('movimientos.id', 'DESC');
+        $builder->groupBy('movimientos.expediente_id');
+        $builder->orderBy('expedientes.numero_expediente', 'DESC');
+        $builder->join(
+            'entidad',
+            'expedientes.entidad_id = entidad.id',
+            'inner'
+        );
+        $builder->limit(
+            10
+        );
 
         $query = $builder->get();
 

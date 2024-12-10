@@ -4,18 +4,43 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class OficinaModel extends Model
+class DatosPersonalesModel extends Model
 {
-    protected $table            = 'oficinas';
+    protected $table            = 'datos_personales';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'nombre','tipo','descripcion','rango',
-        'codigo_referencia','titulo_encargado','nombres_encargado',
-        'cargo_encargado','oficina_padre_id','activo'
+    protected $allowedFields = [
+        'apellido_paterno',
+        'apellido_materno',
+        'nombres',
+        'foto',
+        'sexo',
+        'nacionalidad',
+        'fecha_nacimiento',
+        'edad',
+        'dni',
+        'carne_extranjeria',
+        'licencia_conducir',
+        'estado_civil',
+        'numero_hijos',
+        'domicilio_actual',
+        'distrito',
+        'provincia',
+        'departamento',
+        'telefono_celular',
+        'telefono_fijo',
+        'correo_electronico',
+        'RUC',
+        'banco_nombre',
+        'numero_cuenta',
+        'persona_emergencia',
+        'telefono_emergencia',
+        'created_at',
+        'updated_at',
+        'deleted_at'
     ];
 
     protected bool $allowEmptyInserts = false;

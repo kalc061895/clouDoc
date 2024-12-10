@@ -55,20 +55,9 @@ $estado = [
                                         <label for="oficinaDerivar"><?= lang('Main.derivarOficina') ?></label>
 
                                         <select class="select2 form-control form-control-sm " id="oficinaDerivar" name="oficinaDerivar" required>
+                                            
                                             <?php foreach ($oficina as $item) : ?>
-                                                <?php
-                                                // Contar cuántos hijos tiene esta oficina
-                                                $children = array_filter($oficina, function ($ofi) use ($item) {
-                                                    return $ofi['oficina_padre_id'] == $item['id'];
-                                                });
-                                                ?>
-                                                <?php if (count($children) > 0) : ?>
-                                                    <optgroup label="<?= $item['nombre'] ?>">
-                                                        <?php foreach ($children as $ofi) : ?>
-                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
-                                                        <?php endforeach ?>
-                                                    </optgroup>
-                                                <?php endif ?>
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>            
                                             <?php endforeach ?>
 
                                         </select>

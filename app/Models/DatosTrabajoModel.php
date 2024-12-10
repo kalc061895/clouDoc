@@ -4,19 +4,36 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class OficinaModel extends Model
+class DatosTrabajoModel extends Model
 {
-    protected $table            = 'oficinas';
+    protected $table            = 'datos_trabajo';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'nombre','tipo','descripcion','rango',
-        'codigo_referencia','titulo_encargado','nombres_encargado',
-        'cargo_encargado','oficina_padre_id','activo'
+    protected $allowedFields = [
+        'dato_personal_id',
+        'fecha_ingreso',
+        'numero_contrato',
+        'resolucion_nombramiento',
+        'modalidad',
+        'establecimiento',
+        'nivel',
+        'unidad',
+        'servicio',
+        'area',
+        'cargo',
+        'remuneracion',
+        'pension',
+        'pension_cuenta',
+        'numero_historia_sst',
+        'numero_legajo',
+        'created_at',
+        'updated_at',
+        'deleted_at'
     ];
+    
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

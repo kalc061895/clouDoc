@@ -75,6 +75,7 @@ $routes->get('menugroupuser/getGroups', 'MenuGroupUserController::getGroups');
 /**
  * Opciones de Mesa de Partes
  */
+$routes->get('mesa_de_partes/nuevo', 'DocumentoInternoController::getNuevoDocumentoFisico');
 $routes->get('mesa_de_partes/no_leidos', 'TramiteController::getNuevosExpedientes');
 $routes->get('mesa_de_partes/detalle', 'TramiteController::getDetallesExpedientes');
 $routes->post('mesa_de_partes/derivar', 'TramiteController::postDerivarExpediente');
@@ -104,9 +105,12 @@ $routes->post('expediente/observar', 'TramiteController::postObservarExpediente'
  * Documentos Internos
  */
 $routes->get('documentos/nuevo', 'DocumentoInternoController::getNuevoDocumento');
-$routes->get('documentos/emitidos', 'DocumentoInternoController::nuevoDocumentoDesdePlantilla');
-$routes->get('documentos/guardarDocumento', 'DocumentoInternoController::store');
+$routes->get('documentos/emitidos', 'DocumentoInternoController::getEmitidos');
+$routes->post('documentos/guardar', 'DocumentoInternoController::store');
+$routes->post('documentos/generarformato', 'DocumentoInternoController::generarformato');
+$routes->get('documentos/descargarplantilla/(:num)', 'WordController::generarPlantilla/$1');
 $routes->post('documentos/getNumeracion', 'DocumentoInternoController::numeracion');
+$routes->get('documentos/getreferencia', 'DocumentoInternoController::referencia');
 
 /**
  * Consultas
@@ -124,5 +128,22 @@ $routes->get('reportes/registro', 'ReporteController::getPlanillaTramite');
 $routes->post('reportes/registrofiltrado', 'ReporteController::postPlanillaTramiteFiltrado');
 $routes->get('reportes/ruta', 'ReporteController::getHojaRuta');
 $routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
+$routes->get('reportes/semanal', 'ReporteController::getGraficoSemanal');
+$routes->post('reportes/rutafiltrado', 'ReporteController::postHojaRutaFiltrado');
 
 
+/**
+ * Ficha Social
+ */
+
+//$routes->get('fichasocial/', 'FichaSocialController::index');
+$routes->get('configuracion/documentos/', 'FichaSocialController::index');
+$routes->post('fichasocial/store', 'FichaSocialController::store');
+$routes->post('fichasocial/buscar', 'FichaSocialController::searchByDni');
+$routes->get('fichasocial/search', 'FichaSocialController::getHojaRuta');
+$routes->post('fichasocial/searchresult', 'FichaSocialController::postHojaRutaFiltrado');
+/**
+ *  Word
+ */
+
+ $routes->get('configuracion/oficinas/', 'WordController::generateDocument');

@@ -4,6 +4,8 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 use CodeIgniter\Database\RawSql;
+use SebastianBergmann\Type\TrueType;
+
 class CreateMovimientosTable extends Migration
 {
     public function up()
@@ -43,6 +45,17 @@ class CreateMovimientosTable extends Migration
                 'type'           => 'VARCHAR',
                 'constraint'     => '255'
             ],
+            'referencia'      => [
+                'type'           => 'VARCHAR',
+                'constraint'     => '255',
+                'null'       => true,
+
+            ],
+            'concopia'      => [
+                'type'           => 'VARCHAR',
+                'constraint'     => '255',
+                'null'       => true,
+            ],
             'estado' => [
                 'type'       => 'ENUM',
                 'constraint' => ['ESPERA', 'RECIBIDO', 'DERIVADO', 'EN POROCESO', 'FINALIZADO', 'ATENDIDO'],
@@ -79,7 +92,7 @@ class CreateMovimientosTable extends Migration
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('expediente_id', 'expedientes', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('movimientos');
-        
+
         $this->db->enableForeignKeyChecks();
     }
 

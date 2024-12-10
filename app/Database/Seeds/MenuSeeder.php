@@ -381,6 +381,19 @@ class MenuSeeder extends Seeder
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
+            [
+                'type' => 'secondary',
+                'parent_id' => 1, // ID del menú 'TRAMITE'
+                'name' => 'Nuevo',
+                'abbr' => null,
+                'url' => '/mesa_de_partes/nuevo',
+                'icon' => 'pen-new-round-linear',
+                'status' => 'active',
+                'separator' => null,
+                'order' => 105,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
 
         ];
 

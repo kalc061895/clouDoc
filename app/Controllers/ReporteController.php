@@ -224,4 +224,31 @@ class ReporteController extends BaseController
         $data = $_expedientesModel->getReporteExpedientesFiltrado($where);
         return $this->response->setJSON($data);
     }
+
+    public function getGraficoSemanal() {
+
+        $arrayName = array(
+            'sales' => [intval(rand(180,400)),intval(rand(180,400)),intval(rand(180,400)),intval(rand(180,400)),intval(rand(180,400)),intval(rand(180,400)),intval(rand(180,400))],
+            'orders' => [intval(rand(50,150)),intval(rand(50,150)),intval(rand(50,150)),intval(rand(50,150)),intval(rand(50,150)),intval(rand(50,150)),intval(rand(50,150))],
+            'deliveries' => [intval(rand(181,320)),intval(rand(181,320)),intval(rand(181,320)),intval(rand(181,320)),intval(rand(181,320)),intval(rand(181,320)),intval(rand(181,320))],
+            'categories' => ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+            'params'=>[
+                'totalSemanal'=>rand(500,2000),
+                'diferenciaSemanal'=>rand(100,200),
+                'totalHoy'=>rand(500,2000),
+                'diferenciaHoy'=>rand(100,200),
+                'totalAlmacenamiento'=>rand(500,2000),
+                'diferenciaAlmacenamiento'=>rand(100,200),
+                'totalAtendidos'=>rand(1810,3200),
+                'diferenciaAtendidos'=>rand(100,300),
+                'hoyFisicos'=>rand(100,300),
+                'hoyVirtual'=>rand(100,300),
+                'hoyAtendidos'=>rand(100,300),
+                'hoyEmitidos'=>rand(100,300),
+                
+            ]
+        );
+
+        return $this->response->setJSON($arrayName);
+    } 
 }

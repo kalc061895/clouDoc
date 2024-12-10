@@ -1,5 +1,5 @@
 <div class="card-body" id="formContent">
-    <form id="expedienteForm" action="<?= site_url('/documentos/guardarDocumento') ?>" method="post" enctype="multipart/form-data">
+    <form id="documentoForm" action="<?= site_url('/documentos/guardarDocumento') ?>" method="post" enctype="multipart/form-data">
 
         <div class="row justify-content-center ">
             <div class="col-xl-6 col-lg-8 col-md-8 col-sm-12">
@@ -18,7 +18,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group mb-4">
                                         <select class="form-control form-select" id="tipoNew" required name="tipoNew">
-                                            <option value="Interno">Expediente Interno </option>
+                                            <option value="Persona">Persona </option>
                                         </select>
                                         <span class="bar"></span>
                                         <label for="tipoNew"><?= lang('External.tipoNew') ?>*</label>
@@ -92,20 +92,8 @@
                                     <div class="form-group mb-4">
                                         <label for="oficinaDestino"><?= lang('External.oficinaDestino') ?>*</label>
                                         <select class="select2 form-control " id="oficinaDestino" required name="oficinaDestino">
-                                        <?php foreach ($oficina as $item) : ?>
-                                                <?php
-                                                // Contar cuántos hijos tiene esta oficina
-                                                $children = array_filter($oficina, function ($ofi) use ($item) {
-                                                    return $ofi['oficina_padre_id'] == $item['id'];
-                                                });
-                                                ?>
-                                                <?php if (count($children) > 0) : ?>
-                                                    <optgroup label="<?= $item['nombre'] ?>">
-                                                        <?php foreach ($children as $ofi) : ?>
-                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
-                                                        <?php endforeach ?>
-                                                    </optgroup>
-                                                <?php endif ?>
+                                            <?php foreach ($oficina as $item) : ?>
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
                                         </select>
 
@@ -129,19 +117,67 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-3">
                                         <label for="folioDocExp"><?= lang('External.folioDocExp') ?>*</label>
                                         <input type="text" min="1" class="form-control" id="folioDocExp" required name="folioDocExp">
                                         <span class="bar"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="form-group mb-4">
+                                    <div class="form-group mb-3">
                                         <label for="asuntoDocExp"><?= lang('External.asuntoDocExp') ?>*</label>
                                         <textarea class="form-control" rows="2" id="asuntoDocExp" required name="asuntoDocExp" maxlength="250"></textarea>
                                         <span class="bar"></span>
                                     </div>
                                 </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="documentoReferencia"><?= lang('External.documentoReferencia') ?></label>
+                                        <select class="select2-tag form-control" id="documentoReferencia" multiple="multiple" name="documentoReferencia[]">
+                                            <?php foreach ($oficina as $item) : ?>
+
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <span class="bar"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="oficinaConCopia"><?= lang('External.conCopia') ?></label>
+                                        <select class="select2 form-control" id="oficinaConCopia" multiple="multiple" name="oficinaConCopia[]">
+                                            <?php foreach ($oficina as $item) : ?>
+
+                                                <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <span class="bar"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-4">
+                                    <button class="btn btn-sm btn-secondary" id="generarDocBtn"> Generar Plantilla</button>
+                                </div>
+                                <script>
+                                    $('#generarDocBtn').on('click', function(e) {
+                                        e.preventDefault();
+
+                                        $.ajax({
+                                            url: '<?= base_url('documentos/generarformato') ?>',
+                                            data: $('#documentoForm').serialize(),
+                                            method: 'POST',
+                                            success: function(response) {
+                                                var newWindow = window.open('<?= base_url('documentos/descargarplantilla') ?>/' + response.id, '_blank');;
+
+                                            },
+                                            error: function(xhr, status, error) {
+                                                console.error(error);
+                                                alert('Error en la solicitud AJAX.');
+                                            }
+                                        });
+                                    });
+                                </script>
                                 <div class="col-md-12">
                                     <div class="form-group mb-4">
                                         <label for="anexoExp"><?= lang('External.anexoExp') ?></label>
@@ -153,26 +189,9 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="form-group mb-4">
-                                        <label for="oficinaConCopia"><?= lang('External.conCopia') ?></label>
-                                        <select class="select2 form-control" id="oficinaConCopia" multiple="multiple" name="oficinaConCopia">
-                                        <?php foreach ($oficina as $item) : ?>
-                                                <?php
-                                                // Contar cuántos hijos tiene esta oficina
-                                                $children = array_filter($oficina, function ($ofi) use ($item) {
-                                                    return $ofi['oficina_padre_id'] == $item['id'];
-                                                });
-                                                ?>
-                                                <?php if (count($children) > 0) : ?>
-                                                    <optgroup label="<?= $item['nombre'] ?>">
-                                                        <?php foreach ($children as $ofi) : ?>
-                                                            <option value="<?= $ofi['id'] ?>"><?= $ofi['nombre'] ?></option>
-                                                        <?php endforeach ?>
-                                                    </optgroup>
-                                                <?php endif ?>
-                                            <?php endforeach ?>
-                                        </select>
-                                        <span class="bar"></span>
+                                    <div class="form-group mb-2">
+                                        <label for="adjuntoDerivar" class="form-label">Adjunto</label>
+                                        <input class="form-control " type="file" id="adjuntoDerivar" name="adjuntoDerivar[]" multiple>
                                     </div>
                                 </div>
                                 <div class="col-12 justify-content-center">
@@ -203,7 +222,7 @@
 </script>
 <script>
     $(document).ready(function() {
-        $('#expedienteForm').on('submit', function(e) {
+        $('#documentoForm').on('submit', function(e) {
             e.preventDefault(); // Previene el envío del formulario de forma convencional
             // Validar el archivo seleccionado
             if (!validateFile($('#anexoExp')[0].files[0])) {
@@ -214,7 +233,7 @@
                 );
                 return;
             }
-            var formData = new FormData($('#expedienteForm')[0]); // Crea un objeto FormData con el formulario
+            var formData = new FormData($('#documentoForm')[0]); // Crea un objeto FormData con el formulario
 
             Swal.fire({
                 title: "Enviando",
@@ -247,7 +266,7 @@
                     }, false);
                     return xhr;
                 },
-                url: "<?= base_url('nuevoexpediente') ?>", // Cambia esto por la URL a la que quieres enviar el formulario
+                url: "<?= base_url('documentos/guardar') ?>", // Cambia esto por la URL a la que quieres enviar el formulario
                 type: 'POST',
                 data: formData,
                 contentType: false, // Es necesario establecer en false para evitar que jQuery configure el tipo de contenido
@@ -305,12 +324,51 @@
             }, // Envía el valor seleccionado al servidor
             success: function(respuesta) {
                 // Establece el valor de la respuesta en el campo input
-                $('#numDocExp').val(respuesta.numDocExp + 1);
+                $('#numDocExp').val(respuesta.numDocExp);
             },
             error: function() {
                 console.log('Error en la llamada AJAX');
             }
         });
     });
+
     $(".select2").select2();
+
+    $(".select2-tag").select2({
+        tags: true,
+        ajax: {
+            url: "<?= base_url('documentos/getreferencia'); ?>", // Reemplaza con la URL de tu servidor
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term // Término de búsqueda
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.items // Estructura de datos recibida desde el servidor
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
+        placeholder: 'Selecciona una o más opciones',
+        multiple: true,
+        width: 'resolve',
+        language: {
+            noResults: function() {
+                return "No se encontraron resultados";
+            },
+            searching: function() {
+                return "Buscando...";
+            },
+            inputTooShort: function() {
+                return "Por favor, ingresa 1 o más caracteres";
+            },
+            maximumSelected: function(args) {
+                return "Solo puedes seleccionar " + args.maximum + " ítem" + (args.maximum != 1 ? "s" : "");
+            }
+        }
+    });
 </script>

@@ -4,18 +4,24 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class OficinaModel extends Model
+class DatosEducacionModel extends Model
 {
-    protected $table            = 'oficinas';
+    protected $table            = 'datos_educacion';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'nombre','tipo','descripcion','rango',
-        'codigo_referencia','titulo_encargado','nombres_encargado',
-        'cargo_encargado','oficina_padre_id','activo'
+    protected $allowedFields = [
+        'dato_personal_id',
+        'e_centro_estudios',
+        'e_grado_instruccion',
+        'e_anios_cursados',
+        'e_titulo_obtenido',
+        'e_observaciones',
+        'created_at',
+        'updated_at',
+        'deleted_at'
     ];
 
     protected bool $allowEmptyInserts = false;
