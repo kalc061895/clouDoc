@@ -47,4 +47,10 @@ class MovimientosModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db->query("SET time_zone = '-05:00'");
+    }
 }

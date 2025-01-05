@@ -143,15 +143,28 @@ class ExpedienteController extends BaseController
             $id = $this->entidadModel->insert($entidadData);
             $entidadId = $this->entidadModel->insertID();
         }
-
-        $expedienteData = [
-            'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
-            'numero_documento' => $this->request->getPost('numDocExp'),
-            'folios' => $this->request->getPost('folioDocExp'),
-            'asunto' => $this->request->getPost('asuntoDocExp'),
-            'anexo' => '',
-            'entidad_id' => $entidadId,
-        ];
+        if($this->request->getPost('numExp')!='' ){
+            $expedienteData = [
+                'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
+                'numero_expediente' => $this->request->getPost('numExp'),
+                'numero_documento' => $this->request->getPost('numDocExp'),
+                'folios' => $this->request->getPost('folioDocExp'),
+                'asunto' => $this->request->getPost('asuntoDocExp'),
+                'anexo' => '',
+                'entidad_id' => $entidadId,
+            ];
+        }
+        else{
+            $expedienteData = [
+                'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
+                'numero_documento' => $this->request->getPost('numDocExp'),
+                'folios' => $this->request->getPost('folioDocExp'),
+                'asunto' => $this->request->getPost('asuntoDocExp'),
+                'anexo' => '',
+                'entidad_id' => $entidadId,
+            ];
+        }
+        
 
         $this->expedienteModel->save($expedienteData);
         $expedienteArray = $this->expedienteModel->find($this->expedienteModel->insertID());

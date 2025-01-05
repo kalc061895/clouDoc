@@ -78,15 +78,6 @@ class MenuGroupUserSeeder extends Seeder
             'group_user_id' => 5,
             'menu_id' => 22,
         ];
-        
-        $data[] = [
-            'group_user_id' => 1,
-            'menu_id' => 29,
-        ];
-        $data[] = [
-            'group_user_id' => 3,
-            'menu_id' => 29,
-        ];
 
         // Insertar los datos en la base de datos
         $this->db->table('menu_group_user')->insertBatch($data);

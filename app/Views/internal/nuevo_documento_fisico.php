@@ -45,14 +45,14 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group mb-4">
-                                            <input type="text" class="form-control" id="numDocNew" required name="numDocNew">
+                                            <input type="text" class="form-control" id="numDocNew" required name="numDocNew" value='-'>
                                             <span class="bar"></span>
                                             <label for="numDocNew"><?= lang('External.docNew') ?>*</label>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <div class="form-group mb-4">
-                                            <input type="text" class="form-control" id="nombreNew" required name="nombreNew">
+                                            <input type="text" class="form-control" id="nombreNew" required name="nombreNew" >
                                             <span class="bar"></span>
                                             <label for="nombreNew"><?= lang('External.nombreNew') ?>*</label>
                                         </div>
@@ -61,7 +61,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group mb-4">
-                                            <input type="phone" class="form-control" id="telefonoNew" name="telefonoNew" required>
+                                            <input type="phone" class="form-control" id="telefonoNew" name="telefonoNew" required value='-'>
                                             <span class="bar"></span>
                                             <label for="telefonoNew"><?= lang('External.telefonoNew') ?>*</label>
                                         </div>
@@ -97,6 +97,15 @@
                             <div class="floating-labels mt-4 pt-2">
 
                                 <div class="row">
+                                    
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-4">
+                                            <input type="text" class="form-control" id="numExp" name="numExp">
+                                            <span class="bar"></span>
+                                            <label for="numExp"><?= lang('External.numExp') ?>*</label>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="col-md-6">
                                         <div class="form-group mb-4">
                                             <select class="form-control form-select" id="tipoDocExp" required name="tipoDocExp">
@@ -159,6 +168,14 @@
     </div>
     <div class="card-body" id="formResponse" hidden></div>
 </div>
+
+<script>
+    // Esperar 2 segundos y luego hacer focus en el input
+    setTimeout(function() {
+      document.getElementById('nombreNew').focus();
+    }, 1500);  // 2000 milisegundos = 2 segundos
+  </script>
+
 <script>
     $('.floating-labels .form-control').on('focus blur', function(e) {
         $(this).parents('.form-group').toggleClass('focused', (e.type === 'focus' || this.value.length > 0));
@@ -167,6 +184,7 @@
 
 <script>
     $(document).ready(function() {
+        
         $('#expedienteForm').on('submit', function(e) {
             e.preventDefault(); // Previene el envío del formulario de forma convencional
             // Validar el archivo seleccionado
@@ -253,5 +271,6 @@
 
             return true;
         }
+        
     });
 </script>

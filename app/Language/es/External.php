@@ -68,6 +68,7 @@ return [
     'notaBody'=> 'Para evitar que su expediente sea rechazado, presente los requisitos necesarios para cada tipo de solicitud.',
     'notaLink'=> 'Revise aqui los requisitos',
     'tipoDocExp'=> 'Tipo de Expediente',
+    'numExp'=> 'Numero Expediente (dejar en blanco si es correlativo)',
     'numDocExp'=> 'Nro.',
     'folioDocExp'=> 'Folios',
     'asuntoDocExp'=> 'Asunto ',

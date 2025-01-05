@@ -60,6 +60,12 @@ class ExpedientesModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db->query("SET time_zone = '-05:00'");
+    }
+
     public function getNuevosExpedientesExternos()
     {
         $db = \Config\Database::connect();
@@ -510,7 +516,7 @@ class ExpedientesModel extends Model
         $builder->join(
             'oficinas',
             'oficinas.id = oficina_destino_id',
-             'inner'
+            'inner'
         );
         $builder->join(
             'tipo_expediente',

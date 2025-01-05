@@ -35,10 +35,22 @@ class ReporteController extends BaseController
         $where = [];
 
         if ($_post['numExpediente'] != '') {
-            $where[] = [
+            if ($_post['numExpedienteFin'] != '') {
+                $where[] = [
+                    'key' => 'expedientes.numero_expediente >=',
+                    'value' => "" . $_post['numExpediente'] . "",
+                ];
+                $where[] = [
+                    'key' => 'expedientes.numero_expediente <=',
+                    'value' => "" . $_post['numExpedienteFin'] . "",
+                ];
+            }else{
+              $where[] = [
                 'key' => 'expedientes.numero_expediente LIKE',
                 'value' => "%" . $_post['numExpediente'] . "%",
-            ];
+                ];
+            }
+
         }
         if ($_post['fechaInicio'] != '') {
             $where[] = [
@@ -97,10 +109,21 @@ class ReporteController extends BaseController
         $where = [];
 
         if ($_post['numExpediente'] != '') {
-            $where[] = [
+            if ($_post['numExpedienteFin'] != '') {
+                $where[] = [
+                    'key' => 'expedientes.numero_expediente >=',
+                    'value' => "" . $_post['numExpediente'] . "",
+                ];
+                $where[] = [
+                    'key' => 'expedientes.numero_expediente <=',
+                    'value' => "" . $_post['numExpedienteFin'] . "",
+                ];
+            }else{
+              $where[] = [
                 'key' => 'expedientes.numero_expediente LIKE',
                 'value' => "%" . $_post['numExpediente'] . "%",
-            ];
+                ];
+            }
         }
         if ($_post['fechaInicio'] != '') {
             $where[] = [

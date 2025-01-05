@@ -56,6 +56,8 @@ $estado = [
 
                                         <select class="select2 form-control form-control-sm " id="oficinaDerivar" name="oficinaDerivar" required>
                                             
+                                            <option value="6">LOGISTICA</option>
+                                            
                                             <?php foreach ($oficina as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>            
                                             <?php endforeach ?>
@@ -66,6 +68,7 @@ $estado = [
                                     <div class="form-group mb-2">
                                         <label for="accionDerivar"><?= lang('Main.accion') ?></label>
                                         <select class="select2 form-control form-control-sm" id="accionDerivar" name="accionDerivar" required>
+                                            <option value="2">ATENCION</option>
                                             <?php foreach ($accion as $item) : ?>
                                                 <option value="<?= $item['id'] ?>"><?= $item['nombre'] ?></option>
                                             <?php endforeach ?>
@@ -288,7 +291,18 @@ $estado = [
         event.preventDefault(); // Prevenir la acción predeterminada del formulario
 
         var formData = new FormData(this);
-
+        $('#detalleExpediente').modal('hide');
+        Swal.fire({
+            type: "info",
+            html: "<div class='d-flex justify-content-center'>" +
+                "<div class='spinner-border text-primary' role='status'>" +
+                "<span class='visually-hidden'>Loading...</span>" +
+                "</div>" +
+                "</div>",
+            showConfirmButton: false,
+            showCloseButton: false,
+            showCancelButton: false,
+        });
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -298,7 +312,7 @@ $estado = [
             success: function(response) {
                 // Manejar la respuesta del servidor aquí
                 //response = JSON.parse(response);
-                $('#detalleExpediente').modal('hide');
+                
 
                 mensaje_derivar(response.idexpediente);
                 Swal.fire(
@@ -313,6 +327,11 @@ $estado = [
                 // Manejar errores aquí
                 console.error(error);
                 // Puedes mostrar un mensaje de error, etc.
+                Swal.fire(
+                        "Alerta",
+                        "Hubo un Error, Vuelva a intentarlo nuevamente.",
+                        "error"
+                    ); // Muestra el error en la consola
             }
         });
     });
@@ -322,7 +341,18 @@ $estado = [
         event.preventDefault(); // Prevenir la acción predeterminada del formulario
 
         var formData = new FormData(this);
-
+        $('#detalleExpediente').modal('hide');
+        Swal.fire({
+            type: "info",
+            html: "<div class='d-flex justify-content-center'>" +
+                "<div class='spinner-border text-primary' role='status'>" +
+                "<span class='visually-hidden'>Loading...</span>" +
+                "</div>" +
+                "</div>",
+            showConfirmButton: false,
+            showCloseButton: false,
+            showCancelButton: false,
+        });
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -332,7 +362,7 @@ $estado = [
             success: function(response) {
                 // Manejar la respuesta del servidor aquí
                 // response = JSON.parse(response);
-                $('#detalleExpediente').modal('hide');
+                
 
                 mensaje_derivar(response.idexpediente);
                 Swal.fire(
@@ -347,6 +377,11 @@ $estado = [
                 // Manejar errores aquí
                 console.error(error);
                 // Puedes mostrar un mensaje de error, etc.
+                Swal.fire(
+                        "Alerta",
+                        "Hubo un Error, Vuelva a intentarlo nuevamente.",
+                        "error"
+                    ); // Muestra el error en la consola
             }
         });
     });
@@ -380,6 +415,11 @@ $estado = [
                 // Manejar errores aquí
                 console.error(error);
                 // Puedes mostrar un mensaje de error, etc.
+                Swal.fire(
+                        "Alerta",
+                        "Hubo un Error, Vuelva a intentarlo nuevamente.",
+                        "error"
+                    ); // Muestra el error en la consola
             }
         });
     });

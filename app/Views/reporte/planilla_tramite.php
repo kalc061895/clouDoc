@@ -16,6 +16,10 @@
                         <input type="text" class="form-control form-control-sm" id="numExpediente" name="numExpediente" />
                     </div>
                     <div class="col-md-2 mb-3">
+                        <label class="form-label" for="numExpedienteFin">Num. de expediente Fin</label>
+                        <input type="text" class="form-control form-control-sm" id="numExpedienteFin" name="numExpedienteFin" />
+                    </div>
+                    <div class="col-md-2 mb-3">
                         <label class="form-label" for="fechaInicio">Fecha de Inicio</label>
                         <input type="date" class="form-control form-control-sm" id="fechaInicio" name="fechaInicio" />
                     </div>
@@ -96,6 +100,15 @@
     </div>
 
 </div>
+
+<!-- DataTables Buttons JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+
+<!-- JSZip (required for Excel export) -->
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+<!-- Buttons HTML5 export JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
 
 <script>
     var table = $("#alt_pagination").DataTable({
@@ -281,7 +294,31 @@
 
                 };
             }
-        }]
+        },
+        {
+                extend: 'excelHtml5',
+                text: 'Exportar a Excel',
+                title: 'Datos_de_mi_tabla'
+            }
+            ],
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+        language: {
+            lengthMenu: "Mostrar _MENU_ resultados por página",
+            zeroRecords: "No se encontraron resultados",
+            info: "Mostrando página _PAGE_ de _PAGES_",
+            infoEmpty: "No hay resultados disponibles",
+            infoFiltered: "(filtrado de _MAX_ resultados totales)",
+            search: "Buscar:",
+            paginate: {
+                first: "Primero",
+                last: "Último",
+                next: "Siguiente",
+                previous: "Anterior"
+            },
+            buttons: {
+                excel: 'Exportar a Excel'
+            }
+        }
     });
 
     $('#formExpedienteFiltro').on('submit', function(e) {

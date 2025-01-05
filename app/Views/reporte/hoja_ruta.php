@@ -263,7 +263,7 @@
                         alignment: 'center',
                         absolutePosition: {
                             x: 355,
-                            y: 75
+                            y: 80
                         }
                     },
                     {
@@ -274,7 +274,7 @@
                         alignment: 'center',
                         absolutePosition: {
                             x: 355,
-                            y: 105
+                            y: 110
                         }
                     },
                     {
@@ -283,7 +283,7 @@
                         width: 400,
                         absolutePosition: {
                             x: 100,
-                            y: 180
+                            y: 185
                         }
                     },
                     {
@@ -292,7 +292,7 @@
                         width: 400,
                         absolutePosition: {
                             x: 85,
-                            y: 225
+                            y: 230
                         }
                     },
                     {
@@ -300,7 +300,7 @@
                         fontSize: 10,
                         absolutePosition: {
                             x: 40,
-                            y: 280
+                            y: 285
                         },
 
                         table: {
@@ -346,7 +346,7 @@
                 */
                 pageSize: {
                     width: 466,
-                    height: 649
+                    height: 600
                 },
                 /*background: {
                     image: 'data:image/png;base64,' + base64ImgRuta,
@@ -365,7 +365,7 @@
                         }]
                     }
                 },
-                pageMargins: [35, 35, 30, 15],
+                pageMargins: [30, 35, 30, 15],
                 styles: {
                     title: {
                         fontSize: 9,

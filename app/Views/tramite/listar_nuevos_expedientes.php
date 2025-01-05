@@ -118,8 +118,9 @@ $estado = [
             success: function(response) {
                 $('#detalleExpedienteLabel').text(response.title);
                 $('#detalleExpedienteBody').html(response.body);
-                $('#detalleExpediente').modal('show');
                 Swal.close();
+                $('#detalleExpediente').modal('show');
+                
             },
             error: function(e) {
                 Swal.fire({
