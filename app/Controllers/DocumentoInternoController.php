@@ -209,7 +209,7 @@ class DocumentoInternoController extends BaseController
             'procedencia' => 'Interno',
             'tipo_expediente_id' => $this->request->getPost('tipoDocExp'),
             'numero_documento' => $this->request->getPost('numDocExp'),
-            'numero_expediente' => 'temp',
+            //'numero_expediente' => 'temp',
             'folios' => $this->request->getPost('folioDocExp'),
             'asunto' => $this->request->getPost('asuntoDocExp'),
             'entidad_id' => $entidadId,
@@ -223,6 +223,7 @@ class DocumentoInternoController extends BaseController
         // Manejo del archivo
         $_adjunto = new AdjuntoModel();
         $anexoExp = $this->request->getFile('anexoExp');
+        $adjunto_id ='';
 
         if ($anexoExp->isValid() && !$anexoExp->hasMoved()) {
             $newName = $anexoExp->getRandomName();
@@ -254,7 +255,7 @@ class DocumentoInternoController extends BaseController
                 'orden' => $orden,
                 'created_at' => date('Y-m-d H:i:s'),
             ];
-            $_adjunto->insert($data);
+            $adjunto_id = $_adjunto->insert($data);
 
             $_referencia = $this->request->getPost('documentoReferencia');
             $_concopia = $this->request->getPost('oficinaConCopia');
@@ -291,7 +292,8 @@ class DocumentoInternoController extends BaseController
         }
 
 
-        $adjunto = $_adjunto->find($_adjunto->insertID());
+        //$adjunto = $_adjunto->find($_adjunto->insertID()); // obtine el valor de 0 - por tano un retorno de null
+        $adjunto = $_adjunto->find($adjunto_id);
 
         $_documento = new TipoExpedienteModel();
         $documento = $_documento->find($expedienteArray['tipo_expediente_id']);

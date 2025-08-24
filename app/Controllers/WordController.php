@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Libraries\WordProcessor;
 use PhpOffice\PhpWord\TemplateProcessor;
 use App\Models\EmpresaConfiguracionModel;
+use App\Models\PersonalModel;
+use App\Models\AsisReporteBodyModel;
 
 class WordController extends BaseController
 {
@@ -157,5 +159,103 @@ class WordController extends BaseController
 
         // Descargar el documento
         return $this->response->download($temp_file, null)->setFileName($filename);
+    }
+
+    public function generarReporteAscenso()
+    {
+        $asisPersonalModel = new PersonalModel();
+        $asisReporteBodyModel = new AsisReporteBodyModel();
+        $data = $this->request->getPost();
+        $dni = $data['dni'];
+
+        if (!$dni) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'DNI no proporcionado.']);
+        }
+
+        // --- 1. Obtener datos del personal ---
+        // Asume que tienes una forma de obtener el perl_ide o los datos de asis_personal por DNI.
+        // Podrías añadir una función en AsisPersonalModel para buscar por DNI si no la tienes.
+        $personalData = $asisPersonalModel->getPersonalWithDetails( $dni);
+
+        if (!$personalData) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Personal no encontrado para el DNI proporcionado.']);
+        }
+
+        // --- 2. Obtener resumen de asistencia y tardanzas ---
+        // Usamos la función que creamos en AsisReporteBodyModel
+        // Las fechas del semestre deben ser consistentes con la plantilla
+        $fechaHoy = date('Y-m-d');
+        $ultimoSemestreInicio = date('Y-m-01', strtotime('-6 months', strtotime($fechaHoy)));
+        $ultimoSemestreFin = date('Y-m-t', strtotime($fechaHoy)); // Fin del mes actual
+
+        $attendanceSummary=$asisReporteBodyModel->getPersonalAttendanceSummaryByDNI(
+            $dni,
+            null, // No filtramos por rep_ide específico aquí
+            $ultimoSemestreInicio,
+            $ultimoSemestreFin
+        );
+
+        // Valores por defecto si no hay resumen de asistencia
+        $totalFaltas = $attendanceSummary['total_faltas'] ?? 0;
+        $totalTardanzas = $attendanceSummary['total_tardanzas'] ?? 0;
+
+        // --- 3. Preparar los datos para la plantilla Word en un array ---
+        $dataToFill = [
+            'ULTIMO_SEMESTRE' => date('Y-m', strtotime($ultimoSemestreInicio)) . ' - ' . date('Y-m', strtotime($ultimoSemestreFin)),
+            'FECHA_HOY' => date('d/m/Y'),
+            '[APELLIDOS_NOMBRES]' => $personalData['per_paterno'] . ' ' . $personalData['per_materno'] . ', ' . $personalData['per_nombre'],
+            'CARGO' => $personalData['perl_tipo_contrato'],
+            'SERVICIO' => $personalData['nombre_servicio'] ?? 'N/A',
+            'PTS_FALTA' => $totalFaltas,
+            'PTS_TARD' => $totalTardanzas,
+            // Agrega aquí otros marcadores de posición si los tienes en tu plantilla
+        ];
+
+        // --- 4. Ruta a la plantilla y generación del documento ---
+        $templatePath = WRITEPATH . 'templates/template_ascenso_auxiliares.docx';
+
+        // VERIFICACIÓN CLAVE: Asegúrate de que la plantilla existe
+        if (!file_exists($templatePath)) {
+            log_message('error', 'Plantilla DOCX no encontrada en: ' . $templatePath);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'La plantilla del reporte no fue encontrada. Por favor, asegúrese de que "ascenso_auxiliares.docx" esté en ' . WRITEPATH . 'templates/']);
+        }
+
+        // Define la ruta de salida en la carpeta public (¡NO RECOMENDADO POR SEGURIDAD!)
+        $publicUploadDir = ROOTPATH . 'public/uploads/reportes/';
+        
+        // Asegúrate de que la carpeta de subida pública exista
+        if (!is_dir($publicUploadDir)) {
+            // Se recomienda establecer permisos más restrictivos en un entorno de producción (ej. 0755)
+            mkdir($publicUploadDir, 0777, true); 
+        }
+
+        // Generar nombre de archivo dinámico
+        $filename = 'Reporte_Ascenso_' . $dni . '_' . date('Ymd_His') . '.docx';
+        $outputPath = $publicUploadDir . $filename; // Ruta completa del archivo en public
+
+        try {
+            $templateProcessor = new TemplateProcessor($templatePath);
+
+            // Rellenar los marcadores de posición con los datos del array
+            foreach ($dataToFill as $key => $value) {
+                $templateProcessor->setValue($key, $value);
+            }
+
+            // Guardar el documento rellenado en la carpeta pública
+            $templateProcessor->saveAs($outputPath);
+
+            // Devolver la URL pública del documento generado
+            $fileUrl = base_url('uploads/reportes/' . $filename); // URL accesible desde el navegador
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Reporte de ascenso generado con éxito.',
+                'file_url' => $fileUrl // Se devuelve la URL pública
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Error al generar el reporte Word: ' . $e->getMessage());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Error al generar el reporte Word: ' . $e->getMessage()]);
+        }
     }
 }

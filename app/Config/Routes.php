@@ -147,3 +147,20 @@ $routes->post('fichasocial/searchresult', 'FichaSocialController::postHojaRutaFi
  */
 
  $routes->get('configuracion/oficinas/', 'WordController::generateDocument');
+ 
+ /**
+  * Configuracion de Oficinas
+  */
+$routes->get('apitest/show/(:num)', 'APItest::show/$1');
+$routes->get('apitest/', 'APItest::index');
+
+
+
+ ############################# CONTROL DE ASISTENCIA #############################
+ /**
+  * Configuracion de Oficinas
+  */
+$routes->get('asistencia/reporte_ascenso', 'AsisReporteController::ReporteAscenso');
+$routes->post('asistencia/buscarDni', 'AsisReporteController::BuscarPorDni');
+// En app/Config/Routes.php
+$routes->post('asistencia/generar_reporte_ascenso', 'WordController::generarReporteAscenso');

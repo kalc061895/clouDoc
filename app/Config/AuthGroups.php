@@ -65,6 +65,10 @@ class AuthGroups extends ShieldAuthGroups
             'title'       => 'Encargados de Areas de Oficinas',
             'description' => 'Gestion de Documentos derivados por jefaturas',
         ],
+        'asistencia' => [
+            'title'       => 'Encargado del Area de Control y asistencia y permanencia',
+            'description' => 'Gestion de Asistencia y permanencia de los trabajadores',
+        ],
     ];
 
     /**
