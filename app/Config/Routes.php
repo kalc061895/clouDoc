@@ -146,21 +146,36 @@ $routes->post('fichasocial/searchresult', 'FichaSocialController::postHojaRutaFi
  *  Word
  */
 
- $routes->get('configuracion/oficinas/', 'WordController::generateDocument');
- 
- /**
-  * Configuracion de Oficinas
-  */
+$routes->get('configuracion/oficinas/', 'WordController::generateDocument');
+
+/**
+ * Configuracion de Oficinas
+ */
 $routes->get('apitest/show/(:num)', 'APItest::show/$1');
 $routes->get('apitest/', 'APItest::index');
 
 
 
- ############################# CONTROL DE ASISTENCIA #############################
- /**
-  * Configuracion de Oficinas
-  */
+############################# CONTROL DE ASISTENCIA #############################
+/**
+ * Configuracion de Oficinas
+ */
+
 $routes->get('asistencia/reporte_ascenso', 'AsisReporteController::ReporteAscenso');
 $routes->post('asistencia/buscarDni', 'AsisReporteController::BuscarPorDni');
 // En app/Config/Routes.php
 $routes->post('asistencia/generar_reporte_ascenso', 'WordController::generarReporteAscenso');
+
+############################# CONTROL DE ASISTENCIA #############################
+/**
+ * Rutas para las api de firma
+ */
+
+
+$routes->get('api/inicio', 'SignatureController::index');          // sube documento y crea job
+$routes->post('api/signature/job', 'SignatureController::createJob');          // sube documento y crea jobF
+
+$routes->get('api/signature/param', 'SignatureController::param');           // <- param_url del componente
+$routes->post('api/signature/param', 'SignatureController::param');           // <- param_url del componente
+$routes->get('api/signature/doc/(:segment)', 'SignatureController::doc/$1');  // sirve el documento a firmar
+$routes->post('api/signature/upload/(:segment)', 'SignatureController::upload/$1'); // recibe signed_file

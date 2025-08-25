@@ -6,7 +6,7 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'cloudoc@quillasoftware.com';
+    public string $fromEmail  = 'cloudoc@quillasoftware.net.pe';
     public string $fromName   = 'ClouDoc - Tramite Virtual';
     public string $recipients = '';
 
