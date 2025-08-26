@@ -10,112 +10,34 @@ class Email extends BaseConfig
     public string $fromName   = 'ClouDoc - Tramite Virtual';
     public string $recipients = '';
 
-    /**
-     * The "user agent"
-     */
-    public string $userAgent = 'CodeIgniter';
+    // Usar SMTP
+    public string $protocol = 'smtp';
 
-    /**
-     * The mail sending protocol: mail, sendmail, smtp
-     */
-    public string $protocol = 'mail';
+    // Configuración Hostinger
+    public string $SMTPHost = 'smtp.hostinger.com';
+    public string $SMTPUser = 'cloudoc@quillasoftware.net.pe';
+    public string $SMTPPass = 'Q8fL^XM$AD/s'; // pon tu clave real
+    public int $SMTPPort    = 465; // puerto seguro SSL
+    public string $SMTPCrypto = 'ssl'; // obligatorio porque usas 465
 
-    /**
-     * The server path to Sendmail.
-     */
-    public string $mailPath = '/usr/sbin/sendmail';
-
-    /**
-     * SMTP Server Hostname
-     */
-    public string $SMTPHost = '';
-
-    /**
-     * SMTP Username
-     */
-    public string $SMTPUser = '';
-
-    /**
-     * SMTP Password
-     */
-    public string $SMTPPass = '';
-
-    /**
-     * SMTP Port
-     */
-    public int $SMTPPort = 25;
-
-    /**
-     * SMTP Timeout (in seconds)
-     */
-    public int $SMTPTimeout = 5;
-
-    /**
-     * Enable persistent SMTP connections
-     */
+    // Timeout
+    public int $SMTPTimeout = 10;
     public bool $SMTPKeepAlive = false;
 
-    /**
-     * SMTP Encryption.
-     *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
-     */
-    public string $SMTPCrypto = 'tls';
+    // Formato del correo
+    public string $mailType = 'html';
+    public string $charset  = 'UTF-8';
+    public bool $wordWrap   = true;
+    public int $wrapChars   = 76;
 
-    /**
-     * Enable word-wrap
-     */
-    public bool $wordWrap = true;
+    // Otros
+    public bool $validate = true;
+    public int $priority  = 3;
 
-    /**
-     * Character count to wrap at
-     */
-    public int $wrapChars = 76;
-
-    /**
-     * Type of mail, either 'text' or 'html'
-     */
-    public string $mailType = 'text';
-
-    /**
-     * Character set (utf-8, iso-8859-1, etc.)
-     */
-    public string $charset = 'UTF-8';
-
-    /**
-     * Whether to validate the email address
-     */
-    public bool $validate = false;
-
-    /**
-     * Email Priority. 1 = highest. 5 = lowest. 3 = normal
-     */
-    public int $priority = 3;
-
-    /**
-     * Newline character. (Use “\r\n” to comply with RFC 822)
-     */
-    public string $CRLF = "\r\n";
-
-    /**
-     * Newline character. (Use “\r\n” to comply with RFC 822)
-     */
+    public string $CRLF    = "\r\n";
     public string $newline = "\r\n";
 
-    /**
-     * Enable BCC Batch Mode.
-     */
     public bool $BCCBatchMode = false;
-
-    /**
-     * Number of emails in each BCC batch
-     */
-    public int $BCCBatchSize = 200;
-
-    /**
-     * Enable notify message from server
-     */
+    public int $BCCBatchSize  = 200;
     public bool $DSN = false;
 }

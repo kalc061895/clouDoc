@@ -172,6 +172,7 @@ $routes->post('asistencia/generar_reporte_ascenso', 'WordController::generarRepo
  */
 
 
+$routes->get('emailtest', 'MailTestController::index');          // sube documento y crea job
 $routes->get('api/inicio', 'SignatureController::index');          // sube documento y crea job
 $routes->post('api/signature/job', 'SignatureController::createJob');          // sube documento y crea jobF
 

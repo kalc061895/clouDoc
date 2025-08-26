@@ -77,7 +77,7 @@ class SignatureController extends BaseController
     }
 
     // POST /api/signature/param   (x-www-form-urlencoded: param_token=...)
-    public function param(): ResponseInterface
+    public function param()
     {
         $paramToken = $this->request->getPost('param_token');
         //if (!$paramToken) return $this->fail('Falta param_token', 400);
@@ -102,7 +102,7 @@ class SignatureController extends BaseController
         if ($job->expires_at && strtotime($job->expires_at) < time()) 
         {
 
-            return $this->response->setStatusCode(410)->setJSON(['error' => 'Token expirado']);
+            //return $this->response->setStatusCode(410)->setJSON(['error' => 'Token expirado']);
             //return $this->fail('Token expirado', 410);
         }
 

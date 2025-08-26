@@ -152,6 +152,7 @@ class TramiteController extends BaseController
 
         // Obtener el número de movimiento
         $ultimoMovimiento = $movimientoModel->where('expediente_id', $this->request->getPost('id'))->orderBy('numero_movimiento', 'DESC')->first();
+        $ultimoMovimiento = ($ultimoMovimiento != false) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1;
 
         $set = [
             'expediente_id' => $this->request->getPost('idAtender'),
@@ -159,7 +160,7 @@ class TramiteController extends BaseController
             'accion' => $this->request->getPost('accionAtender'),
             'oficina_procedencia_id' => $_usuario->oficina_id,
             'oficina_destino_id' => $_usuario->oficina_id,
-            'numero_movimiento' => ($ultimoMovimiento != false) ? $ultimoMovimiento['numero_movimiento'] + 1 : 1,
+            'numero_movimiento' => $ultimoMovimiento,
             'estado' => 'ATENDIDO',//FINALIZADO
         ];
         $nuevoMovimiento = new MovimientosModel();
@@ -185,19 +186,21 @@ class TramiteController extends BaseController
             $response = $this->handleFileUpload(
                 'adjuntoAtender',
                 $this->request->getPost('idAtender'),
-                $insertID
+                //$insertID
+                $insertResult
             );
         } else {
             // Manejar el error de inserción
             // Podrías lanzar una excepción o manejar el error de otra manera adecuada
-            // throw new \RuntimeException('Error al insertar el nuevo movimiento');
-            $response = 'Error al insertar el nuevo movimiento';
+            throw new \RuntimeException('Error al insertar el nuevo movimiento');
+            //$response = 'Error al insertar el nuevo movimiento';
         }
 
         $response = [
             'title' => 'success',
             'body' => 'Expediente no encontrado',
             'num_mov' => $ultimoMovimiento,
+            'num_adj' => $insertResult,
             'idexpediente' => $this->request->getPost('idAtender'),
         ];
 
@@ -292,6 +295,7 @@ class TramiteController extends BaseController
         if (empty($files)) {
             $files = [$this->request->getFile($inputName)];
         }
+        $id_adjunto = 0;
 
         foreach ($files as $file) {
             if ($file->isValid() && !$file->hasMoved()) {
@@ -302,7 +306,7 @@ class TramiteController extends BaseController
                     if ($_driveModel->getDriveConfig()) {
                         $googleDrive = new GoogleDrive();
 
-                        $folderId = $_driveModel->getConfig('google_drive_fodler'); // ID de tu carpeta
+                        $folderId = $_driveModel->getConfig('google_drive_folder'); // ID de tu carpeta
                         $fileId = $googleDrive->uploadFile($file->getTempName(), $newName, $folderId);
                         $drivePath = $fileId;
                     }
@@ -323,18 +327,20 @@ class TramiteController extends BaseController
                         'orden' => $orden,
                         'created_at' => date('Y-m-d H:i:s'),
                     ];
-                    $_adjunto->insert($data);
+                    $id_adjunto = $_adjunto->insert($data);
                 } catch (\Throwable $th) {
                     return [
                         'status' => 'error',
                         'message' => 'Error al subir el archivo: ' . $th->getMessage(),
                     ];
                 }
+                
             }
         }
 
         return [
             'status' => 'success',
+            'data' => $id_adjunto,
             'message' => 'Archivo(s) subido(s) exitosamente.',
         ];
     }

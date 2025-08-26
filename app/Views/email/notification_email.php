@@ -55,7 +55,7 @@
         </div>
         <div class="content">
             <p>Estimado/a, <?= $entidad['nombre'] ?></p>
-            <p>El presente correo es para hacer de su conocimiento que expediente a sido <strong><?= $body['estado'] .' Observaciones: '.$body['observaciones'] ?></strong> .</p>
+            <p>El presente correo es para hacer de su conocimiento que expediente a sido <strong><?= $body['estado'] .' Observaciones: '.$body['observacion'] ?></strong> .</p>
             <p><strong>Número de Expediente:</strong> <?= $expediente['numero_expediente'] ?></p>
             <p>Vea el estado de su expediente, haga clic en el siguiente enlace:</p>
             <p><a href="<?= base_url('/buscarexpediente') . '?id=' . $expediente['numero_expediente'] ?>">Seguir Expediente</a></p>
