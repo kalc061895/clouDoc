@@ -81,4 +81,11 @@ class MenuModel extends Model
     {
         return $this->orderBy('order ASC')->findAll();
     }
+
+    public function findAllWithParents()
+    {
+        return $this->select('menus.*, parent.name as parent_name')
+                    ->join('menus as parent', 'parent.id = menus.parent_id', 'left')
+                    ->findAll();
+    }
 }

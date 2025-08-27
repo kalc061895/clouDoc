@@ -13,7 +13,7 @@ class OficinaModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'nombre','tipo','descripcion','rango',
+        'nombre','tipo','descripcion','rango', 'abreviatura',
         'codigo_referencia','titulo_encargado','nombres_encargado',
         'cargo_encargado','oficina_padre_id','activo'
     ];
@@ -47,4 +47,10 @@ class OficinaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+     public function findAllWithParents()
+    {
+        return $this->select('oficinas.*, parent.nombre as oficina_padre')
+                    ->join('oficinas as parent', 'parent.id = oficinas.oficina_padre_id', 'left')
+                    ->findAll();
+    }
 }

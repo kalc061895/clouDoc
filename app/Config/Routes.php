@@ -39,16 +39,6 @@ $routes->post('/buscarexpediente', 'ExpedienteController::infoexpediente');
 $routes->get('/tupaexpediente', 'ExpedienteController::tupaexpediente');
 
 
-/**
- * Configuracion de la Tabla menu
- * 
- */
-$routes->get('configuracion/menus', 'ConfigController::menus');
-$routes->get('menus', 'MenuController::index');
-$routes->get('menus/(:num)', 'MenuController::show/$1');
-$routes->post('menus', 'MenuController::create');
-$routes->put('menus/(:num)', 'MenuController::update/$1');
-$routes->delete('menus/(:num)', 'MenuController::delete/$1');
 
 /**
  * Configuracion de Usuarios
@@ -146,19 +136,34 @@ $routes->post('fichasocial/searchresult', 'FichaSocialController::postHojaRutaFi
  *  Word
  */
 
-$routes->get('configuracion/oficinas/', 'WordController::generateDocument');
+//$routes->get('configuracion/oficinas/', 'WordController::generateDocument');
 
 /**
  * Configuracion de Oficinas
  */
-$routes->get('apitest/show/(:num)', 'APItest::show/$1');
-$routes->get('apitest/', 'APItest::index');
+
+$routes->get('configuracion/oficinas', 'OficinaController::index');
+$routes->get('oficinas/listado', 'OficinaController::listado');
+$routes->post('oficinas/guardar', 'OficinaController::guardar');
+$routes->post('oficinas/actualizar', 'OficinaController::actualizar');
+$routes->get('oficinas/editar', 'OficinaController::editar');
+$routes->post('oficinas/eliminar', 'OficinaController::eliminar');
+
+/**
+ * Configuracion de Menus
+ */
+$routes->get('configuracion/menus', 'MenuController::index');        // $routes->group('menus', ['namespace' => 'App\Controllers'], function($routes) {
+
+$routes->get('menus/listado', 'MenuController::listado');   // Retorna JSON para DataTable
+$routes->post('menus/guardar', 'MenuController::guardar');  // Guardar (insert/update)
+$routes->get('menus/editar', 'MenuController::editar');     // Obtener un menú
+$routes->post('menus/eliminar', 'MenuController::eliminar'); // Eliminar
 
 
 
 ############################# CONTROL DE ASISTENCIA #############################
 /**
- * Configuracion de Oficinas
+ * Reporte Ascenso
  */
 
 $routes->get('asistencia/reporte_ascenso', 'AsisReporteController::ReporteAscenso');
