@@ -2079,6 +2079,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
     <script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
     <script src="assets/libs/select2/dist/js/select2.min.js"></script>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
     <script>
         $(document).ready(function() {
             // Al hacer clic en un enlace con clase 'open-here'

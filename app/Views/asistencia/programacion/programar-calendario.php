@@ -1,4 +1,3 @@
-
 <div class="container-fluid mt-4">
 
     <!-- HEADER -->
@@ -52,6 +51,27 @@
         </div>
 
     </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5>Resumen de Horas Programadas</h5>
+
+                    <table class="table table-bordered table-sm" id="tablaHoras">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Trabajador</th>
+                                <th>Tipo</th>
+                                <th>Total Horas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- MODAL -->
@@ -70,32 +90,32 @@
                     <!-- TRABAJADOR -->
                     <div class="col-md-12">
                         <label>Trabajador</label>
-                        <select id="trabajador_modal" class="form-control"></select>
+                        <select id="trabajador_modal" class="form-control" name=""></select>
                     </div>
 
                     <div class="col-md-4 mt-3">
                         <label>DNI</label>
-                        <input id="dni" class="form-control" readonly>
+                        <input id="dni" class="form-control">
                     </div>
 
                     <div class="col-md-4 mt-3">
                         <label>Apellidos</label>
-                        <input id="apellidos" class="form-control" readonly>
+                        <input id="apellidos" class="form-control">
                     </div>
 
                     <div class="col-md-4 mt-3">
                         <label>Nombres</label>
-                        <input id="nombres" class="form-control" readonly>
+                        <input id="nombres" class="form-control">
                     </div>
 
                     <div class="col-md-6 mt-3">
                         <label>Cargo</label>
-                        <input id="cargo" class="form-control" readonly>
+                        <input id="cargo" class="form-control">
                     </div>
 
                     <div class="col-md-6 mt-3">
                         <label>Especialidad</label>
-                        <input id="especialidad" class="form-control" readonly>
+                        <input id="especialidad" class="form-control">
                     </div>
 
                     <!-- CONFIG -->
@@ -187,6 +207,13 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
+            buttonText: {
+                today: 'Hoy',
+                month: 'MES',
+                week: 'SEMANA',
+                day: 'DÍA',
+                list: 'LISTA'
+            },
 
             events: '<?= base_url("asistencia/programacion/eventos") ?>',
 
@@ -273,7 +300,13 @@
 
                 data.forEach(t => {
                     let opt = new Option(t.apellidos + ' ' + t.nombres, t.id);
-                    opt.dataset = t;
+
+                    opt.dataset.dni = t.dni;
+                    opt.dataset.apellidos = t.apellidos;
+                    opt.dataset.nombres = t.nombres;
+                    opt.dataset.cargo = t.cargo;
+                    opt.dataset.especialidad = t.especialidad;
+                    opt.dataset.tipo = t.tipo;
 
                     select1.add(opt.cloneNode(true));
                     select2.add(opt);
@@ -287,6 +320,7 @@
     });
 
     function autocompletarTrabajador(data) {
+        console.log(data);
         document.getElementById("dni").value = data.dni || '';
         document.getElementById("apellidos").value = data.apellidos || '';
         document.getElementById("nombres").value = data.nombres || '';
@@ -305,8 +339,7 @@
             trabajador_nombres: t.nombres,
             trabajador_cargo: t.cargo,
             trabajador_especialidad: t.especialidad,
-
-            tipo: document.getElementById("tipo").value,
+            tipo: t.tipo,
             turno: document.getElementById("turno").value,
 
             upss: document.getElementById("upss").value,
@@ -360,5 +393,42 @@
 
     function limpiarModal() {
         document.querySelectorAll('#eventModal input, #eventModal select').forEach(e => e.value = '');
+    }
+
+    function calcularHoras() {
+
+        let eventos = calendar.getEvents();
+
+        let resumen = {};
+
+        eventos.forEach(e => {
+
+            let props = e.extendedProps;
+
+            let nombre = props.trabajador_apellidos + ' ' + props.trabajador_nombres;
+            let tipo = props.tipo;
+
+            let inicio = new Date(e.start);
+            let fin = e.end ? new Date(e.end) : new Date(e.start);
+
+            let horas = (fin - inicio) / (1000 * 60 * 60);
+
+            // Si es todo el día (ej: drop simple)
+            if (horas === 0) horas = 6;
+
+            let key = nombre;
+
+            if (!resumen[key]) {
+                resumen[key] = {
+                    nombre: nombre,
+                    tipo: tipo,
+                    horas: 0
+                };
+            }
+
+            resumen[key].horas += horas;
+        });
+
+        pintarTabla(resumen);
     }
 </script>

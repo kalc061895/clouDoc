@@ -9,6 +9,8 @@ class ProgramacionController extends BaseController
 {
     public function index()
     {
+        
+        //return view('asistencia/programacion/full-calendar');
         return view('asistencia/programacion/programar-calendario');
     }
 
@@ -26,7 +28,7 @@ class ProgramacionController extends BaseController
 
             $eventos[] = [
                 'id'    => $row['id'],
-                'title' => $row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'] . ' - ' . $row['turno'],
+                'title' => $row['upss'] .' - '.$row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'] . ' - ' . $row['turno'],
 
                 'start' => $row['fecha_hora_inicio'],
                 'end'   => $row['fecha_hora_fin'],
@@ -61,7 +63,8 @@ class ProgramacionController extends BaseController
     {
         $model = new EventoModel();
         $data = $this->request->getJSON(true);
-
+        
+        //return $this->response->setJSON($data); // Detener la ejecución después de la prueba
         $titulo = $data['trabajador_apellidos'] . ' ' . $data['trabajador_nombres'] . ' - ' . $data['turno'];
 
         $model->insert([

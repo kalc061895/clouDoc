@@ -13,12 +13,21 @@ class EventoModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'empleado_id',
-        'turno',
+        'trabajador_id',
+        'trabajador_dni',
+        'trabajador_apellidos',
+        'trabajador_nombres',
+        'trabajador_cargo',
+        'trabajador_especialidad',
         'tipo',
-        'titulo',
-        'inicio',
-        'fin'
+        'upss',
+        'ambiente',
+        'actividad',
+        'color_actividad',
+        'fecha_hora_inicio',
+        'fecha_hora_fin',
+        'turno',
+        
     ];
 
     protected bool $allowEmptyInserts = false;
