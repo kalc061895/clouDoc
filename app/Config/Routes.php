@@ -185,3 +185,14 @@ $routes->get('api/signature/param', 'SignatureController::param');           // 
 $routes->post('api/signature/param', 'SignatureController::param');           // <- param_url del componente
 $routes->get('api/signature/doc/(:segment)', 'SignatureController::doc/$1');  // sirve el documento a firmar
 $routes->post('api/signature/upload/(:segment)', 'SignatureController::upload/$1'); // recibe signed_file
+
+$routes->get('asistencia/horario','Asistencia\ProgramacionController::index');
+
+$routes->get('asistencia/programacion/calendario', 'Asistencia\ProgramacionController::index');
+$routes->get('asistencia/programacion/eventos', 'Asistencia\ProgramacionController::listar');
+$routes->post('asistencia/programacion/eventos', 'Asistencia\ProgramacionController::guardar');
+$routes->put('asistencia/programacion/eventos/(:num)', 'Asistencia\ProgramacionController::actualizar/$1');
+//$routes->post('asistencia/programacion/eliminar/(:num)', 'Asistencia\ProgramacionController::eliminar/$1');
+$routes->delete('asistencia/programacion/eventos/(:num)', 'Asistencia\ProgramacionController::eliminar/$1');
+$routes->get('asistencia/programacion/trabajadores', 'Asistencia\ProgramacionController::trabajadores');
+###################### 
