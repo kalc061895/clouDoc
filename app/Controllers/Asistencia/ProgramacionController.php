@@ -4,12 +4,13 @@ namespace App\Controllers\Asistencia;
 
 use App\Controllers\BaseController;
 use App\Models\Asistencia\EventoModel;
+use Dompdf\Dompdf;
 
 class ProgramacionController extends BaseController
 {
     public function index()
     {
-        
+
         //return view('asistencia/programacion/full-calendar');
         return view('asistencia/programacion/programar-calendario');
     }
@@ -28,7 +29,7 @@ class ProgramacionController extends BaseController
 
             $eventos[] = [
                 'id'    => $row['id'],
-                'title' => $row['upss'] .' - '.$row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'] . ' - ' . $row['turno'],
+                'title' => $row['upss'] . ' - ' . $row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'] . ' - ' . $row['turno'],
 
                 'start' => $row['fecha_hora_inicio'],
                 'end'   => $row['fecha_hora_fin'],
@@ -59,11 +60,12 @@ class ProgramacionController extends BaseController
     /**
      * GUARDAR EVENTO
      */
+
     public function guardar()
     {
         $model = new EventoModel();
         $data = $this->request->getJSON(true);
-        
+
         //return $this->response->setJSON($data); // Detener la ejecución después de la prueba
         $titulo = $data['trabajador_apellidos'] . ' ' . $data['trabajador_nombres'] . ' - ' . $data['turno'];
 
@@ -182,5 +184,170 @@ class ProgramacionController extends BaseController
         ];
 
         return $this->response->setJSON($data);
+    }
+
+
+
+    public function pdfMensual()
+    {
+        $mes = 'Mayo';
+        $anio = '2026';
+
+        $model = new \App\Models\Asistencia\EventoModel();
+
+        $data = $model->findAll();
+
+        // 🔁 MATRIZ
+        $filas = [];
+
+        foreach ($data as $row) {
+
+            $id = $row['trabajador_id'];
+            $dia = date('j', strtotime($row['fecha_hora_inicio']));
+
+            if (!isset($filas[$id])) {
+                $filas[$id] = [
+                    'dni' => $row['trabajador_dni'],
+                    'nombre' => $row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'],
+                    'cargo' => $row['trabajador_cargo'],
+                    'dias' => array_fill(1, 31, '')
+                ];
+            }
+
+            $filas[$id]['dias'][$dia] = $row['turno'];
+        }
+
+        $html = $this->generarHTMLPDF($filas, $mes, $anio);
+
+        $dompdf = new Dompdf();
+        $html = view('asistencia/programacion/pdf-template', ['html' => $html]);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setBody($dompdf->output());
+    }
+
+    /**
+     * HTML DEL PDF
+     */
+    private function generarHTMLPDF($filas, $mes, $anio)
+    {
+        $html = '
+            <style>
+            body { font-family: Arial; font-size:8px; }
+
+            .titulo {
+                text-align:center;
+                font-weight:bold;
+                font-size:14px;
+            }
+
+            .sub {
+                text-align:center;
+                font-size:10px;
+            }
+
+            table {
+                width:100%;
+                border-collapse:collapse;
+            }
+
+            th, td {
+                border:1px solid #000;
+                padding:2px;
+                text-align:center;
+            }
+
+            .nombre {
+                text-align:left;
+            }
+
+            .small {
+                font-size:7px;
+            }
+
+            .footer {
+                margin-top:10px;
+                font-size:9px;
+            }
+            </style>
+
+            <div class="titulo">HOSPITAL CARLOS MONGE MEDRANO</div>
+            <div class="sub">PROGRAMACION DE TURNOS DE TRABAJO</div>
+            <div class="sub">MES: ' . $mes . ' - ' . $anio . '</div>
+
+            <br>
+
+            <table>
+            <tr>
+            <th>N°</th>
+            <th>DNI</th>
+            <th>APELLIDOS Y NOMBRES</th>
+            <th>CARGO</th>';
+
+        for ($d = 1; $d <= 31; $d++) {
+            $html .= "<th>$d</th>";
+        }
+
+        $html .= '</tr>';
+
+        $i = 1;
+
+        foreach ($filas as $f) {
+
+            $html .= '<tr>';
+            $html .= '<td>' . $i++ . '</td>';
+            $html .= '<td class="nombre">' . $f['nombre'] . '</td>';
+
+            for ($d = 1; $d <= 31; $d++) {
+
+                $turno = $f['dias'][$d];
+
+                $bg = '';
+                if ($turno == 'M') $bg = '#cfe2ff';
+                if ($turno == 'T') $bg = '#d1e7dd';
+                if ($turno == 'N') $bg = '#f8d7da';
+
+                $html .= "<td style='background:$bg'>$turno</td>";
+            }
+
+            $html .= '</tr>';
+        }
+
+        $html .= '
+            <br>
+
+            <table class="small">
+            <tr><td><b>LEYENDA:</b></td></tr>
+            <tr><td>M = Mañana (07:00 - 13:00)</td></tr>
+            <tr><td>T = Tarde (13:00 - 19:00)</td></tr>
+            <tr><td>GD = Guardia Diurna</td></tr>
+            <tr><td>GN = Guardia Nocturna</td></tr>
+            <tr><td>MT = Doble turno</td></tr>
+            </table>
+
+            <br>
+
+            <div class="footer">
+            OBSERVACIONES:<br>
+            - Programación referencial.<br>
+            - Cumple normativa de horas laborales.<br>
+            </div>
+
+            <br><br>
+
+            <table width="100%">
+            <tr>
+            <td align="center">____________________<br>JEFE DE SERVICIO</td>
+            <td align="center">____________________<br>RRHH</td>
+            <td align="center">____________________<br>DIRECCIÓN</td>
+            </tr>
+            </table>
+        ';
+
+        return $html;
     }
 }

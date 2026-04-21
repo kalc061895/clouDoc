@@ -73,7 +73,17 @@
         </div>
     </div>
 </div>
+<!-- Vista de Boton Generar Rol -->
+<button class="btn btn-danger" onclick="verPDF()">
+    Exportar Formato Oficial
+</button>
 
+<script>
+    function verPDF() {
+        window.open('<?= base_url("asistencia/programacion/pdf") ?>', '_blank');
+    }
+</script>
+<!-- Fin Vista de Boton Generar Rol -->
 <!-- MODAL -->
 <div class="modal fade" id="eventModal">
     <div class="modal-dialog modal-lg">
@@ -430,5 +440,34 @@
         });
 
         pintarTabla(resumen);
+    }
+
+    function pintarTabla(resumen) {
+
+        let tbody = document.querySelector("#tablaHoras tbody");
+        tbody.innerHTML = '';
+
+        Object.values(resumen).forEach(r => {
+
+            let color = '';
+
+            if (r.tipo === 'ASIS' && r.horas > 150) {
+                color = 'table-danger';
+            }
+
+            if (r.tipo === 'ADMIN' && r.horas > 160) {
+                color = 'table-warning';
+            }
+
+            let tr = `
+            <tr class="${color}">
+                <td>${r.nombre}</td>
+                <td>${r.tipo}</td>
+                <td>${r.horas.toFixed(1)} h</td>
+            </tr>
+        `;
+
+            tbody.innerHTML += tr;
+        });
     }
 </script>
