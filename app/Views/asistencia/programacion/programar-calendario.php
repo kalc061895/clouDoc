@@ -17,7 +17,34 @@
                 <div class="card-body">
 
                     <h6>Trabajador</h6>
-                    <select id="trabajador" class="form-control mb-3"></select>
+                    <form action="">
+                        <div class="form-group mb-4">
+                            <label class="mr-sm-2" for="trabajadorSelect">Trabajador</label>
+                            <select class="form-select mr-sm-2" id="trabajador">
+                                <option selected>Seleccione...</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="mr-sm-2" for="DepartamentoSelect">Departamento</label>
+                            <select class="form-select mr-sm-2" id="DepartamentoSelect">
+                                <option selected>Todos</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="mr-sm-2" for="ServicioSelect">Servicio</label>
+                            <select class="form-select mr-sm-2" id="ServicioSelect">
+                                <option selected>Todos</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                        </div>
+
+                    </form>
+
 
                     <h6>Turnos</h6>
 

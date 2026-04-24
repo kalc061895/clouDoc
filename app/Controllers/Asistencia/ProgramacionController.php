@@ -5,6 +5,9 @@ namespace App\Controllers\Asistencia;
 use App\Controllers\BaseController;
 use App\Models\Asistencia\EventoModel;
 use Dompdf\Dompdf;
+use App\Models\Asistencia\PersonalModel;
+use App\Models\Asistencia\PersonaModel;
+use App\Models\Asistencia\ServicioModel;
 
 class ProgramacionController extends BaseController
 {
@@ -143,6 +146,7 @@ class ProgramacionController extends BaseController
      */
     public function trabajadores()
     {
+
         // 👉 puedes cambiar esto por tu tabla real
         $data = [
             [
@@ -349,5 +353,12 @@ class ProgramacionController extends BaseController
         ';
 
         return $html;
+    }
+
+    public function LoadFromExcel()
+    {
+        // Aquí iría la lógica para cargar datos desde un archivo Excel
+        // Puedes usar una biblioteca como PhpSpreadsheet para esto
+
     }
 }

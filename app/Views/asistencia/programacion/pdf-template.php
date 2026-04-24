@@ -140,11 +140,6 @@
                     <td class="text-left"><span class="bold">SERVICIO O ÁREA:</span> EMERGENCIA (UPSS)</td>
                     <td class="text-left"><span class="bold">MES/AÑO:</span> MAYO-2026</td>
                 </tr>
-                <tr>
-                    <td class="text-left"><span class="bold">SERVICIO O ÁREA:</span> EMERGENCIA (UPSS)</td>
-                    <td class="text-left"><span class="bold">DEPARTAMENTO:</span> ENFERMERIA</td>
-                    <td class="text-left"><span class="bold">MES/AÑO:</span> MAYO-2026</td>
-                </tr>
             </tbody>
         </table>
     </header>
@@ -162,7 +157,7 @@
             <thead>
                 <tr>
                     <th colspan="4" rowspan="2">MES Y AÑO: </th>
-                    <th colspan="31"><b>MAYO 2026</b></th>
+                    <th colspan="31"><b style="font-size: 14px ;">MAYO 2026</b></th>
                     <th colspan="6" rowspan="2">TOTAL HORAS</th>
                 </tr>
                 <tr style="text-align:center" id="dia_mes" class="table-warning text-primary text-uppercase">
