@@ -146,46 +146,19 @@ class ProgramacionController extends BaseController
      */
     public function trabajadores()
     {
+        $personalModel = new PersonalModel();
 
-        // 👉 puedes cambiar esto por tu tabla real
-        $data = [
-            [
-                'id' => 1,
-                'dni' => '70000001',
-                'apellidos' => 'Pérez',
-                'nombres' => 'Juan',
-                'cargo' => 'Médico',
-                'especialidad' => 'Cardiología',
-                'tipo' => 'ASIS'
-            ],
-            [
-                'id' => 2,
-                'dni' => '70000002',
-                'apellidos' => 'García',
-                'nombres' => 'Luis',
-                'cargo' => 'Médico',
-                'especialidad' => 'Gastroenterología',
-                'tipo' => 'ASIS'
-            ],
-            [
-                'id' => 3,
-                'dni' => '80000001',
-                'apellidos' => 'Quispe',
-                'nombres' => 'María',
-                'cargo' => 'Enfermera',
-                'especialidad' => 'General',
-                'tipo' => 'ASIS'
-            ],
-            [
-                'id' => 4,
-                'dni' => '90000001',
-                'apellidos' => 'Vargas',
-                'nombres' => 'Pedro',
-                'cargo' => 'Administrador',
-                'especialidad' => 'Gestión',
-                'tipo' => 'ADMIN'
-            ]
-        ];
+        // Seleccionamos los campos necesarios y unimos las tablas
+        $data = $personalModel->select('
+                casis_personal.perl_ide as id, 
+                casis_persona.per_dni as dni, 
+                casis_persona.per_nombre as nombres,
+                CONCAT(casis_persona.per_paterno, " ", casis_persona.per_materno) as apellidos,
+                IFNULL(casis_servicio.ser_nombre, "N/A") as cargo
+            ')
+            ->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_dni', 'left')
+            ->join('casis_servicio', 'casis_servicio.ser_ide = casis_personal.perl_ser_ide', 'left')
+            ->findAll();
 
         return $this->response->setJSON($data);
     }
@@ -197,7 +170,7 @@ class ProgramacionController extends BaseController
         $mes = 'Mayo';
         $anio = '2026';
 
-        $model = new \App\Models\Asistencia\EventoModel();
+        $model = new EventoModel();
 
         $data = $model->findAll();
 
@@ -228,10 +201,34 @@ class ProgramacionController extends BaseController
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        
+        // =========================
+        // CREAR CARPETA SI NO EXISTE
+        // =========================
+        $rutaCarpeta = WRITEPATH . 'uploads/programaciones/';
+
+        if (!is_dir($rutaCarpeta)) {
+            mkdir($rutaCarpeta, 0777, true);
+        }
+
+        // =========================
+        // NOMBRE ARCHIVO
+        // =========================
+        $nombre = 'programacion_' . date('Ymd_His') . '.pdf';
+
+        $rutaCompleta = $rutaCarpeta . $nombre;
+
+        // =========================
+        // GUARDAR PDF
+        // =========================
+        file_put_contents($rutaCompleta, $dompdf->output());
+
+        return "PDF guardado en: " . $rutaCompleta;
+
+        /*
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
             ->setBody($dompdf->output());
+            */
     }
 
     /**
@@ -355,10 +352,11 @@ class ProgramacionController extends BaseController
         return $html;
     }
 
-    public function LoadFromExcel()
+    public function loadFromExcel()
     {
         // Aquí iría la lógica para cargar datos desde un archivo Excel
         // Puedes usar una biblioteca como PhpSpreadsheet para esto
 
+        return view('asistencia/programacion/cargar-excel');
     }
 }

@@ -281,7 +281,9 @@
 
                 modal.show();
             },
-
+            refetchEvents: function() {
+                calcularHoras();
+            },
             eventDidMount: function(info) {
                 let color = info.event.extendedProps.color_actividad;
                 if (color) {
@@ -432,6 +434,35 @@
         document.querySelectorAll('#eventModal input, #eventModal select').forEach(e => e.value = '');
     }
 
+    function pintarTabla(resumen) {
+
+        let tbody = document.querySelector("#tablaHoras tbody");
+        tbody.innerHTML = '';
+
+        Object.values(resumen).forEach(r => {
+
+            let color = '';
+
+            if (r.tipo === 'ASIS' && r.horas > 150) {
+                color = 'table-danger';
+            }
+
+            if (r.tipo === 'ADMIN' && r.horas > 160) {
+                color = 'table-warning';
+            }
+
+            let tr = `
+            <tr class="${color}">
+                <td>${r.nombre}</td>
+                <td>${r.tipo}</td>
+                <td>${r.horas.toFixed(1)} h</td>
+            </tr>
+        `;
+
+            tbody.innerHTML += tr;
+        });
+    }
+
     function calcularHoras() {
 
         let eventos = calendar.getEvents();
@@ -467,34 +498,5 @@
         });
 
         pintarTabla(resumen);
-    }
-
-    function pintarTabla(resumen) {
-
-        let tbody = document.querySelector("#tablaHoras tbody");
-        tbody.innerHTML = '';
-
-        Object.values(resumen).forEach(r => {
-
-            let color = '';
-
-            if (r.tipo === 'ASIS' && r.horas > 150) {
-                color = 'table-danger';
-            }
-
-            if (r.tipo === 'ADMIN' && r.horas > 160) {
-                color = 'table-warning';
-            }
-
-            let tr = `
-            <tr class="${color}">
-                <td>${r.nombre}</td>
-                <td>${r.tipo}</td>
-                <td>${r.horas.toFixed(1)} h</td>
-            </tr>
-        `;
-
-            tbody.innerHTML += tr;
-        });
     }
 </script>

@@ -6,18 +6,6 @@ use CodeIgniter\Model;
 
 class PersonalModel extends Model
 {
-
-    Este es el modelo para la tabla casis_personal. Dado que esta tabla parece ser el núcleo que relaciona a las personas con sus servicios, especialidades y regímenes laborales (como el DL 276 o CAS), he configurado el modelo para facilitar estas conexiones.
-
-PHP
-<?php
-
-namespace App\Models;
-
-use CodeIgniter\Model;
-
-class PersonalModel extends Model
-{
     protected $table            = 'casis_personal';
     protected $primaryKey       = 'perl_ide';
     protected $useAutoIncrement = true;

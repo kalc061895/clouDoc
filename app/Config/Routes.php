@@ -196,6 +196,8 @@ $routes->put('asistencia/programacion/eventos/(:num)', 'Asistencia\ProgramacionC
 $routes->delete('asistencia/programacion/eventos/(:num)', 'Asistencia\ProgramacionController::eliminar/$1');
 $routes->get('asistencia/programacion/trabajadores', 'Asistencia\ProgramacionController::trabajadores');
 
+
 $routes->get('asistencia/programacion/pdf', 'Asistencia\ProgramacionController::pdfMensual');
 
+$routes->get('asistencia/programacion/excel', 'Asistencia\ProgramacionController::loadFromExcel');
 ###################### 
