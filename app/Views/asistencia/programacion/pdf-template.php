@@ -7,7 +7,7 @@
     <style>
         /* Configuración de los márgenes de la página para dar espacio al header y footer */
         @page {
-            margin: 140px 20px 80px 20px;
+            margin: 140px 20px 100px 20px;
             /* Superior, Derecho, Inferior, Izquierdo */
             font-family: Arial, sans-serif;
         }
@@ -105,9 +105,95 @@
 
         /* Para las columnas de los días del mes */
 
-        /* Paginación automática en Dompdf */
-        .page-number:after {
+        /* Borra el código anterior y coloca este */
+        .page-number::before {
             content: counter(page);
+        }
+
+        .header-logo-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .header-logo-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        /* Controlar el tamaño máximo de las imágenes para que no desfiguren el header */
+        .header-logo-left img,
+        .header-logo-right img {
+            height: 50px;
+            /* Ajusta la altura según el diseño de tus logos */
+            width: auto;
+            /* Mantiene la proporción original */
+            display: block;
+        }
+
+        /* --- Estilos del Footer con Bloques de Firma (2x2) --- */
+
+        
+
+        .footer-obs {
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .footer-signatures-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 15px 4px;
+            /* Espaciado horizontal y vertical entre los bloques de firma */
+            margin-bottom: 5px;
+        }
+
+        /* Forzamos que las celdas del footer no hereden estilos de la tabla principal */
+        .footer-signatures-table td {
+            border: none !important;
+            padding: 0px !important;
+            width: 50%;
+            /* Divide la tabla exactamente a la mitad */
+            vertical-align: top;
+        }
+
+        /* Contenedor individual de cada firma */
+        .signature-box {
+            text-align: left;
+        }
+
+        .signature-title {
+            font-size: 7.5px;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 2px;
+        }
+
+        /* El espacio físico en blanco donde se estampará la firma digital */
+        .signature-space {
+            height: 50px;
+            /* Altura ideal para el recuadro visual de firmas tipo REFIRMA */
+            background-color: transparent;
+            /* Se mantiene invisible, listo para ser firmado */
+        }
+
+        .signature-charge {
+            font-weight: bold;
+            font-size: 8.5px;
+            border-top: 0.5px dashed #ccc;
+            /* Una línea sutil divisoria superior para el cargo */
+            padding-top: 2px;
+        }
+
+        /* Paginación */
+        .footer-pagination {
+            text-align: right;
+            font-weight: bold;
+            font-size: 8.5px;
+            position: absolute;
+            bottom: -5px;
+            right: 15px;
         }
     </style>
 </head>
@@ -115,8 +201,14 @@
 <body>
 
     <header>
+        <div class="header-logo-right">
+            <img src="data:image/png;base64,<?php echo base64_encode(file_get_contents(base_url('images/logos/logo-header-rssr.png'))); ?>" alt="Logo">
+        </div>
+        <div class="header-logo-left">
+            <img src="data:image/png;base64,<?php echo base64_encode(file_get_contents(base_url('images/logos/logo-header-hcmm.png'))); ?>" alt="Logo_hcmm">
+        </div>
         <div class="header-title">
-            PERÚ Ministerio de Salud | DIRESA | RED DE SALUD SAN ROMAN
+            MINISTERIO DE SALUD | DIRESA | RED DE SALUD SAN ROMAN
         </div>
         <div class="header-title" style="font-size: 13px; margin-top: 5px;">
             PROGRAMACIÓN DE TURNOS DE TRABAJO DE PERSONAL PROFESIONAL, TÉCNICO Y AUXILIAR DE LA SALUD </div>
@@ -124,12 +216,8 @@
         <table class="info-table">
             <tbody>
                 <tr>
-
-                    <th>
-                    <td col></td>
-                    <td>Datos de Establecimiento</td>
+                    <th colspan="3"> Datos de Establecimiento </th>
                 </tr>
-                </th>
                 <tr>
                     <td class="text-left"><span class="bold">ESTABLECIMIENTO:</span> HOSPITAL CARLOS MONGE MEDRANO</td>
                     <td class="text-left"><span class="bold">IPRESS:</span> 00003299</td>
@@ -145,13 +233,36 @@
     </header>
 
     <footer>
-        <div class="bold">OBSERVACIONES Y ACLARACIONES:</div>
-        <div>NO SE PROGRAMA GUARDIAS HOSPITALARIAS AL PERSONAL NOMBRADO DEL 30% Y EXCLUIDOS 2006 POR INDICACIÓN DE RRHH. </div>
-        <div style="text-align: right; margin-top: 5px;">
-            Página <span class="page-number"></span>
+        <div class="footer-obs">
+            <div class="signature-title">Firmado digitalmente por:</div>
+        </div>
+
+        <table class="footer-signatures-table">
+            <tr>
+                <td class="signature-box">
+                    <div class="signature-space"></div>
+                    <div class="signature-charge">DIRECTOR DE ESTABLECIMIENTO</div>
+                </td>
+                <td class="signature-box">
+                    <div class="signature-space"></div>
+                    <div class="signature-charge">JEFE DE DEPARTAMENTO</div>
+                </td>
+  
+                <td class="signature-box">
+                    <div class="signature-space"></div>
+                    <div class="signature-charge">JEFE DE SERVICIO</div>
+                </td>
+                <td class="signature-box">
+                    <div class="signature-space"></div>
+                    <div class="signature-charge">CONTROL DE ASISTENCIA</div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="footer-pagination">
+            Pág. <span class="page-number"></span> de <span class="page-count"></span>
         </div>
     </footer>
-
     <main>
         <table class="main-table">
             <thead>
@@ -197,8 +308,8 @@
                 <tr>
                     <th class="text-left"><strong>Nº:</strong></th>
                     <th class="text-left"><strong>Nombres: </strong></th>
-                    <td class="text-left"><strong>DNI: </strong></td>
-                    <td class="text-left"><strong>Cargo: </strong></td>
+                    <th class="text-left"><strong>DNI: </strong></th>
+                    <th class="text-left"><strong>Cargo: </strong></th>
                     <th class="" scope="col">Vi</th>
                     <th class="" scope="col">Sa</th>
                     <th class="" scope="col">Do</th>
@@ -240,314 +351,55 @@
 
             </thead>
             <tbody>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
+                <?php for ($i = 1; $i < 30; $i++) : ?>
+                    <tr>
+                        <td><?php echo $i; ?></td>
+                        <td>25832980</td>
+                        <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
+                        <td>TÉCNICO EN ENFERMERÍA</td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>MT</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>MT</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>M</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>MT</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>MT</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td>GD</td>
+                        <td>GN</td>
+                        <td>M</td>
+                        <td>GN</td>
+                        <td></td>
+                        <td></td>
+                        <th>4</th>
+                        <th>4</th>
+                        <th>5</th>
+                        <th>2</th>
+                        <th>1</th>
+                        <td class="bold">150</td>
 
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
+                    </tr>
 
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
+                <?php endfor; ?>
 
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
 
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
-
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
-
-                </tr>
-                <tr>
-                    <td>001</td>
-                    <td>25832980</td>
-                    <td class="text-left">MAMANI CALLA MARIO MENELIO</td>
-                    <td>TÉCNICO EN ENFERMERÍA</td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>MT</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td>GD</td>
-                    <td>GN</td>
-                    <td>M</td>
-                    <td>GN</td>
-                    <td></td>
-                    <td></td>
-                    <th>4</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>2</th>
-                    <th>1</th>
-                    <td class="bold">150</td>
-
-                </tr>
 
             </tbody>
         </table>

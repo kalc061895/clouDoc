@@ -8,6 +8,7 @@ use Dompdf\Dompdf;
 use App\Models\Asistencia\PersonalModel;
 use App\Models\Asistencia\PersonaModel;
 use App\Models\Asistencia\ServicioModel;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class ProgramacionController extends BaseController
 {
@@ -201,7 +202,7 @@ class ProgramacionController extends BaseController
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        // =========================
+/*        // =========================
         // CREAR CARPETA SI NO EXISTE
         // =========================
         $rutaCarpeta = WRITEPATH . 'uploads/programaciones/';
@@ -213,7 +214,9 @@ class ProgramacionController extends BaseController
         // =========================
         // NOMBRE ARCHIVO
         // =========================
-        $nombre = 'programacion_' . date('Ymd_His') . '.pdf';
+        
+        $nombre = UuidV4::uuid4()->toString().'programacion_' . date('Ymd_His') . '.pdf';
+        
 
         $rutaCompleta = $rutaCarpeta . $nombre;
 
@@ -223,12 +226,12 @@ class ProgramacionController extends BaseController
         file_put_contents($rutaCompleta, $dompdf->output());
 
         return "PDF guardado en: " . $rutaCompleta;
-
-        /*
+*/
+        
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
             ->setBody($dompdf->output());
-            */
+            
     }
 
     /**
