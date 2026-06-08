@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Models\Asistencia;
+namespace Modules\Asistencia\Models;
+
 
 use CodeIgniter\Model;
 
@@ -27,7 +28,7 @@ class EventoModel extends Model
         'fecha_hora_inicio',
         'fecha_hora_fin',
         'turno',
-        
+
     ];
 
     protected bool $allowEmptyInserts = false;

@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Models\Asistencia;
+namespace Modules\Asistencia\Models;
+
 
 use CodeIgniter\Model;
 
@@ -61,7 +62,7 @@ class PersonalModel extends Model
         $builder->select('casis_personal.*, casis_persona.per_paterno, casis_persona.per_materno, casis_persona.per_nombre, casis_servicio.ser_nombre');
         $builder->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_dni');
         $builder->join('casis_servicio', 'casis_servicio.ser_ide = casis_personal.perl_ser_ide', 'left');
-        
+
         if ($dni) {
             $builder->where('perl_per_dni', $dni);
         }

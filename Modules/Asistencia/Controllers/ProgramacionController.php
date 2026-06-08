@@ -1,13 +1,23 @@
 <?php
 
-namespace App\Controllers\Asistencia;
+// 1. CAMBIA EL NAMESPACE PARA QUE COINCIDA CON TU NUEVO MÓDULO
+namespace Modules\Asistencia\Controllers;
 
+// 2. ASEGÚRATE DE IMPORTAR EL BASECONTROLLER DE LA CARPETA APP
 use App\Controllers\BaseController;
-use App\Models\Asistencia\EventoModel;
+
+// 3. ACTUALIZA LAS RUTAS DE TUS MODELOS SI TAMBIÉN LOS MOVISTE AL MÓDULO
+// Si tus modelos siguen en 'app/Models/Asistencia...', déjalos así:
+use Modules\Asistencia\Models\EventoModel;
+use Modules\Asistencia\Models\PersonalModel;
+use Modules\Asistencia\Models\PersonaModel;
+use Modules\Asistencia\Models\ServicioModel;
+
+// Si en el futuro mudas los modelos a 'Modules/Asistencia/Models', deberás cambiarlos a:
+// use Modules\Asistencia\Models\EventoModel;
+
+// Librerías externas (siguen igual)
 use Dompdf\Dompdf;
-use App\Models\Asistencia\PersonalModel;
-use App\Models\Asistencia\PersonaModel;
-use App\Models\Asistencia\ServicioModel;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class ProgramacionController extends BaseController
@@ -202,7 +212,7 @@ class ProgramacionController extends BaseController
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-/*        // =========================
+        /*        // =========================
         // CREAR CARPETA SI NO EXISTE
         // =========================
         $rutaCarpeta = WRITEPATH . 'uploads/programaciones/';
@@ -227,11 +237,10 @@ class ProgramacionController extends BaseController
 
         return "PDF guardado en: " . $rutaCompleta;
 */
-        
+
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
             ->setBody($dompdf->output());
-            
     }
 
     /**
