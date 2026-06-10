@@ -41,7 +41,7 @@ class CreateOficinasTable extends Migration
             ],
             'tipo' => [
                 'type' => 'ENUM',
-                'constraint' => ['Departamento', 'Oficina', 'Área'], // Define los tipos necesarios
+                'constraint' => ['Departamento', 'Oficina', 'Área','Unidad','Servicio'], // Define los tipos necesarios
                 'default' => 'Oficina', // Tipo por defecto
             ],
             'descripcion' => [

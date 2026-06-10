@@ -206,9 +206,14 @@ class ProgramacionController extends BaseController
         }
 
         $html = $this->generarHTMLPDF($filas, $mes, $anio);
+        
+        $info_rol = [
+            'html' => $html
+        ];
 
         $dompdf = new Dompdf();
-        $html = view('asistencia/programacion/pdf-template', ['html' => $html]);
+
+        $html = view('asistencia/programacion/pdf-template', $info_rol);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();

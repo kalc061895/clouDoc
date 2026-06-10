@@ -9,64 +9,143 @@ class PersonalModel extends Model
 {
     protected $table            = 'casis_personal';
     protected $primaryKey       = 'perl_ide';
+
     protected $useAutoIncrement = true;
-
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
 
-    protected $allowedFields    = [
-        'perl_per_dni',
-        'perl_codigo',
-        'perl_tipo_contrato',
-        'perl_fecha_inicio',
-        'perl_esp_ide',
-        'perl_ser_ide',
-        'perl_estado',
+    protected $protectFields = true;
+
+    protected $allowedFields = [
+        'perl_per_ide',
         'perl_est_ide',
-        'perl_nivel',
-        'perl_plaza',
-        'perl_segunda_especialidad',
+        'perl_ofi_ide',
+        'perl_car_ide',
+        'perl_mco_ide',
+        'perl_se_ide',
+        'perl_codigo',
+        'perl_fecha_inicio',
         'perl_fecha_termino',
+        'perl_numero_colegiatura',
+        'perl_plaza',
+        'perl_nivel',
+        'perl_estado',
+        'perl_regimen_laboral',
         'perl_observacion',
-        'perl_tipo_colegio',
-        'perl_numero_colegio',
-        'perl_regimen_laboral'
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
-    // Gestión de auditoría
+    protected $useSoftDeletes = true;
+    protected $deletedField   = 'deleted_at';
+
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'perl_fecha_registro';
-    protected $updatedField  = ''; // No definido en el SQL proporcionado
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 
-    // Reglas de validación
-    protected $validationRules      = [
-        'perl_per_dni'        => 'required|exact_length[8]',
-        'perl_ser_ide'        => 'permit_empty|integer',
-        'perl_esp_ide'        => 'permit_empty|integer',
-        'perl_numero_colegio' => 'permit_empty|alpha_numeric_punct',
+    protected $validationRules = [
+        'perl_per_ide' => 'required|integer',
+        'perl_est_ide' => 'required|integer',
+        'perl_mco_ide' => 'required|integer',
     ];
 
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
+    protected $validationMessages = [
+        'perl_per_ide' => [
+            'required' => 'Debe seleccionar una persona.',
+        ],
+        'perl_est_ide' => [
+            'required' => 'Debe seleccionar un establecimiento.',
+        ],
+        'perl_mco_ide' => [
+            'required' => 'Debe seleccionar una modalidad.',
+        ],
+    ];
+
+    protected $skipValidation = false;
 
     /**
-     * Obtiene los datos del personal junto con su información básica de persona
-     * Útil para el control de asistencia por DNI
+     * Personal activo
      */
-    public function getPersonalDetallado($dni = null)
+    public function activos()
     {
-        $builder = $this->db->table($this->table);
-        $builder->select('casis_personal.*, casis_persona.per_paterno, casis_persona.per_materno, casis_persona.per_nombre, casis_servicio.ser_nombre');
-        $builder->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_dni');
-        $builder->join('casis_servicio', 'casis_servicio.ser_ide = casis_personal.perl_ser_ide', 'left');
-
-        if ($dni) {
-            $builder->where('perl_per_dni', $dni);
-        }
-
-        return $builder->get()->getResultArray();
+        return $this->where('perl_estado', 'ACTIVO')
+                    ->findAll();
     }
+
+    /**
+     * Personal por establecimiento
+     */
+    public function porEstablecimiento(int $estIde)
+    {
+        return $this->where('perl_est_ide', $estIde)
+                    ->findAll();
+    }
+
+    /**
+     * Personal por oficina
+     */
+    public function porOficina(int $ofiIde)
+    {
+        return $this->where('perl_ofi_ide', $ofiIde)
+                    ->findAll();
+    }
+
+    /**
+     * Personal por cargo
+     */
+    public function porCargo(int $carIde)
+    {
+        return $this->where('perl_car_ide', $carIde)
+                    ->findAll();
+    }
+
+    /**
+     * Obtener ficha completa
+     */
+    public function obtenerFicha(int $perlIde)
+    {
+        return $this->select("
+                    casis_personal.*,
+                    p.per_numero_documento,
+                    p.per_paterno,
+                    p.per_materno,
+                    p.per_nombre,
+
+                    est.est_denominacion,
+
+                    c.car_nombre,
+
+                    o.ofi_nombre,
+
+                    m.mco_nombre
+                ")
+                ->join(
+                    'casis_persona p',
+                    'p.per_ide = casis_personal.perl_per_ide'
+                )
+                ->join(
+                    'casis_establecimiento est',
+                    'est.est_ide = casis_personal.perl_est_ide',
+                    'left'
+                )
+                ->join(
+                    'casis_cargo c',
+                    'c.car_ide = casis_personal.perl_car_ide',
+                    'left'
+                )
+                ->join(
+                    'casis_oficina o',
+                    'o.ofi_ide = casis_personal.perl_ofi_ide',
+                    'left'
+                )
+                ->join(
+                    'casis_modalidad_contrato m',
+                    'm.mco_ide = casis_personal.perl_mco_ide',
+                    'left'
+                )
+                ->find($perlIde);
+    }
+    protected $dateFormat    = 'datetime';
+    protected $cleanValidationRules = true;
+
 }

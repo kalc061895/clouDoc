@@ -16,7 +16,9 @@ class PersonaModel extends Model
     protected $protectFields    = true;
 
     protected $allowedFields    = [
-        'per_dni',
+
+        'per_tipo_documento',
+        'per_numero_documento',
         'per_paterno',
         'per_materno',
         'per_nombre',
