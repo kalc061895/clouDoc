@@ -6,38 +6,32 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'cloudoc@quillasoftware.net.pe';
-    public string $fromName   = 'ClouDoc - Tramite Virtual';
-    public string $recipients = '';
+    public string $fromEmail = 'kalaruta@rissanroman.gob.pe';
+    public string $fromName  = 'ClouDoc - Trámite Virtual';
 
-    // Usar SMTP
     public string $protocol = 'smtp';
 
-    // Configuración Hostinger
-    public string $SMTPHost = 'smtp.hostinger.com';
-    public string $SMTPUser = 'cloudoc@quillasoftware.net.pe';
-    public string $SMTPPass = 'Q8fL^XM$AD/s'; // pon tu clave real
-    public int $SMTPPort    = 465; // puerto seguro SSL
-    public string $SMTPCrypto = 'ssl'; // obligatorio porque usas 465
+    // Servidor SMTP
+    public string $SMTPHost = 'mail.rissanroman.gob.pe';
+    public string $SMTPUser = 'kalaruta@rissanroman.gob.pe';
+    public string $SMTPPass = 'lVwIq6za~k1@[LuL'; // ⚠️ NO subir a git
+    public int    $SMTPPort = 465;
+    public string $SMTPCrypto = 'ssl';
 
-    // Timeout
-    public int $SMTPTimeout = 10;
+    // Opciones SMTP
+    public int  $SMTPTimeout = 10;
     public bool $SMTPKeepAlive = false;
 
     // Formato del correo
     public string $mailType = 'html';
     public string $charset  = 'UTF-8';
-    public bool $wordWrap   = true;
-    public int $wrapChars   = 76;
+    public bool   $wordWrap = true;
+    public int    $wrapChars = 76;
 
-    // Otros
+    // Validaciones
     public bool $validate = true;
-    public int $priority  = 3;
+    public int  $priority = 3;
 
     public string $CRLF    = "\r\n";
     public string $newline = "\r\n";
-
-    public bool $BCCBatchMode = false;
-    public int $BCCBatchSize  = 200;
-    public bool $DSN = false;
 }

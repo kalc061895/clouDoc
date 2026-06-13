@@ -25,6 +25,16 @@ class GroupUserSeeder extends Seeder
             [
                 'name' => 'area',
             ],
+            // CONTRATACION
+            [
+                'name' => 'postulante',
+            ],
+            [
+                'name' => 'comision',
+            ],
+            [
+                'name' => 'user',
+            ],
         ];
 
         // Insertar los datos en la base de datos
