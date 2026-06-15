@@ -186,3 +186,15 @@ $routes->post('api/signature/param', 'SignatureController::param');           //
 $routes->get('api/signature/doc/(:segment)', 'SignatureController::doc/$1');  // sirve el documento a firmar
 $routes->post('api/signature/upload/(:segment)', 'SignatureController::upload/$1'); // recibe signed_file
 
+
+
+/**
+ * Rutas para las api de notificaciones
+ */
+$routes->group('notificaciones', static function ($routes) {
+    $routes->get('contador', 'NotificacionController::contador');
+    $routes->get('pendientes', 'NotificacionController::pendientes');
+    $routes->get('listado', 'NotificacionController::listado');
+    $routes->post('leer/(:num)', 'NotificacionController::marcarLeida/$1');
+    $routes->post('leer-todas', 'NotificacionController::marcarTodasLeidas');
+});

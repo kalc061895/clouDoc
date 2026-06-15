@@ -22,19 +22,9 @@
 </head>
 
 <body>
+
     <!-- Toast -->
-    <div class="toast toast-onload align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body hstack align-items-start gap-6">
-            <i class="ti ti-alert-circle fs-6"></i>
-            <div>
-                <h5 class="text-white fs-3 mb-1"><?= lang('Main.welcomeMessage'); ?></h5>
-                <h6 class="text-white fs-2 mb-0">
-                    <?= lang('Main.welcomeDecription'); ?>
-                </h6>
-            </div>
-            <button type="button" class="btn-close btn-close-white fs-2 m-0 ms-auto shadow-none" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
+
     <!-- Preloader -->
     <div class="preloader">
         <img src="assets/images/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
@@ -104,7 +94,7 @@
                             <!-- End User profile text-->
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="<?= base_url('/inicio') ?>" aria-expanded="false">
+                            <a class="sidebar-link" href="<?= base_url('/inicio') ?>" aria-expanded="false" id="get-url">
                                 <iconify-icon icon="solar:home-linear"></iconify-icon>
                                 <span class="hide-menu"><?= lang('Main.dashboard') ?></span>
                             </a>
@@ -154,91 +144,17 @@
                                 </a>
                                 <div class="dropdown-menu content-dd dropdown-menu-animate-up" aria-labelledby="drop2">
                                     <div class="py-3 px-4 border-bottom">
-                                        <h5 class="mb-0 fs-4 fw-normal">Notifications</h5>
+                                        <h5 class="mb-0 fs-4 fw-normal"><?= lang('Notification.notificacion') ?></h5>
                                     </div>
                                     <div class="message-body" data-simplebar>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-danger-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-danger">
-                                                <iconify-icon icon="solar:widget-3-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                    admin!</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that you
-                                                    have event</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                    <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize this
-                                                    template as you want</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-warning-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-warning">
-                                                <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                    admin!</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that you
-                                                    have event</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                    <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize this
-                                                    template as you want</span>
-                                            </div>
-                                        </a>
+                                        <div class="contenedorNotificaciones">
+                                            <p class="text-center"><?= lang('Notification.no_new_notifications') ?></p>
+                                        </div>
+
                                     </div>
                                     <div>
                                         <a class="d-flex align-items-center pt-3 pb-2 justify-content-center link-primary text-dark" href="javascript:void(0);">
-                                            <span class="fw-semibold">Check all notifications</span>
+                                            <span class="fw-semibold"><?= lang('Notification.check_all') ?></span>
                                             <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
                                         </a>
                                     </div>
@@ -547,91 +463,17 @@
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-start content-dd dropdown-menu-animate-up mailbox" aria-labelledby="drop2">
                                             <div class="py-3 px-4 border-bottom">
-                                                <h5 class="mb-0 fs-4 fw-normal">Notifications</h5>
+                                                <h5 class="mb-0 fs-4 fw-normal"><?php echo lang('Notification.notificacion'); ?></h5>
                                             </div>
                                             <div class="message-body" data-simplebar>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-danger-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-danger">
-                                                        <iconify-icon icon="solar:widget-3-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                            <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                            admin!</span>
-                                                    </div>
-                                                </a>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                        <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                            <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that
-                                                            you have event</span>
-                                                    </div>
-                                                </a>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                        <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                            <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize
-                                                            this template as you want</span>
-                                                    </div>
-                                                </a>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-warning-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-warning">
-                                                        <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                            <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                            admin!</span>
-                                                    </div>
-                                                </a>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                        <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                            <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that
-                                                            you have event</span>
-                                                    </div>
-                                                </a>
-                                                <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                                    <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                        <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                                    </span>
-                                                    <div class="w-75 d-inline-block ">
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                            <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                        </div>
-                                                        <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize
-                                                            this template as you want</span>
-                                                    </div>
-                                                </a>
+                                                <div class="contenedorNotificaciones">
+                                                    <p class="text-center"><?= lang('Notification.no_new_notifications') ?></p>
+                                                </div>
+
                                             </div>
                                             <div>
                                                 <a class="d-flex align-items-center pt-3 pb-2 justify-content-center link-primary text-dark" href="javascript:void(0);">
-                                                    <span class="fw-semibold">Check all notifications</span>
+                                                    <span class="fw-semibold"><?php echo lang('Notification.check_all'); ?></span>
                                                     <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
                                                 </a>
                                             </div>
@@ -1041,91 +883,17 @@
                                 </a>
                                 <div class="dropdown-menu content-dd dropdown-menu-animate-up" aria-labelledby="drop2">
                                     <div class="py-3 px-4 border-bottom">
-                                        <h5 class="mb-0 fs-4 fw-normal">Notifications</h5>
+                                        <h5 class="mb-0 fs-4 fw-normal"><?= lang('Notification.notificaciones') ?></h5>
                                     </div>
                                     <div class="message-body" data-simplebar>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-danger-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-danger">
-                                                <iconify-icon icon="solar:widget-3-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                    admin!</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that you
-                                                    have event</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                    <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize this
-                                                    template as you want</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-warning-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-warning">
-                                                <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Launch Admin</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:30 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just see the my new
-                                                    admin!</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                                                <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Event today</h6>
-                                                    <span class="d-block fs-2 text-body-color">9:15 AM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">Just a reminder that you
-                                                    have event</span>
-                                            </div>
-                                        </a>
-                                        <a href="javascript:void(0)" class="p-3 pe-0 border-bottom d-flex align-items-center dropdown-item gap-3">
-                                            <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                                                <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                                            </span>
-                                            <div class="w-75 d-inline-block ">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <h6 class="mb-1 fw-semibold">Settings</h6>
-                                                    <span class="d-block fs-2 text-body-color">4:36 PM</span>
-                                                </div>
-                                                <span class="d-block text-truncate text-truncate fs-11 text-body-color">You can customize this
-                                                    template as you want</span>
-                                            </div>
-                                        </a>
+                                        <div class="contenedorNotificaciones">
+                                            <p class="text-center"><?= lang('Notification.no_new_notifications') ?></p>
+                                        </div>
+
                                     </div>
                                     <div>
                                         <a class="d-flex align-items-center pt-3 pb-2 justify-content-center link-primary text-dark" href="javascript:void(0);">
-                                            <span class="fw-semibold">Check all notifications</span>
+                                            <span class="fw-semibold"><?= lang('Notification.check_all') ?></span>
                                             <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
                                         </a>
                                     </div>
@@ -1575,215 +1343,7 @@
                                 <span class="hide-menu">Home</span>
                             </li>
                             <?= $this->renderSection('menuHorizontal'); ?>
-                            <!-- =================== -->
-                            <!-- Dashboard -->
-                            <!-- =================== -->
-                            <li class="sidebar-item">
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                                    <span>
-                                        <iconify-icon icon="solar:layers-line-duotone" class="ti"></iconify-icon>
-                                    </span>
-                                    <span class="hide-menu">Dashboard</span>
-                                </a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item">
-                                        <a href="<?= base_url('/') ?>" class="sidebar-link">
-                                            <i class="ti ti-aperture"></i>
-                                            <span class="hide-menu">Dashboard 1</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="index2.html" class="sidebar-link">
-                                            <i class="ti ti-shopping-cart"></i>
-                                            <span class="hide-menu">Dashboard 2</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- ============================= -->
-                            <!-- Apps -->
-                            <!-- ============================= -->
-                            <li class="nav-small-cap">
-                                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                                <span class="hide-menu">Apps</span>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link two-column has-arrow" href="javascript:void(0)" aria-expanded="false">
-                                    <span>
-                                        <iconify-icon icon="solar:widget-line-duotone" class="ti"></iconify-icon>
-                                    </span>
-                                    <span class="hide-menu">Apps</span>
-                                </a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item">
-                                        <a href="app-calendar.html" class="sidebar-link">
-                                            <i class="ti ti-calendar"></i>
-                                            <span class="hide-menu">Calendar</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="apps-kanban.html" class="sidebar-link">
-                                            <i class="ti ti-layout-kanban"></i>
-                                            <span class="hide-menu">Kanban</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="app-chat.html" class="sidebar-link">
-                                            <i class="ti ti-message-dots"></i>
-                                            <span class="hide-menu">Chat</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="app-email.html" aria-expanded="false">
-                                            <i class="ti ti-mail"></i>
-                                            <span class="hide-menu">Email</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="app-contact.html" class="sidebar-link">
-                                            <i class="ti ti-phone"></i>
-                                            <span class="hide-menu">Contact Table</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="app-contact2.html" class="sidebar-link">
-                                            <i class="ti ti-list-details"></i>
-                                            <span class="hide-menu">Contact List</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="app-notes.html" class="sidebar-link">
-                                            <i class="ti ti-notes"></i>
-                                            <span class="hide-menu">Notes</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="app-invoice.html" class="sidebar-link">
-                                            <i class="ti ti-file-text"></i>
-                                            <span class="hide-menu">Invoice</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="page-user-profile.html" class="sidebar-link">
-                                            <i class="ti ti-user-circle"></i>
-                                            <span class="hide-menu">User Profile</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="blog-posts.html" class="sidebar-link">
-                                            <i class="ti ti-article"></i>
-                                            <span class="hide-menu">Posts</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="blog-detail.html" class="sidebar-link">
-                                            <i class="ti ti-details"></i>
-                                            <span class="hide-menu">Detail</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-shop.html" class="sidebar-link">
-                                            <i class="ti ti-shopping-cart"></i>
-                                            <span class="hide-menu">Shop</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-shop-detail.html" class="sidebar-link">
-                                            <i class="ti ti-basket"></i>
-                                            <span class="hide-menu">Shop Detail</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-product-list.html" class="sidebar-link">
-                                            <i class="ti ti-list-check"></i>
-                                            <span class="hide-menu">List</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-checkout.html" class="sidebar-link">
-                                            <i class="ti ti-brand-shopee"></i>
-                                            <span class="hide-menu">Checkout</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-add-product.html" class="sidebar-link">
-                                            <i class="ti ti-file-plus"></i>
-                                            <span class="hide-menu">Add Product</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="eco-edit-product.html" class="sidebar-link">
-                                            <i class="ti ti-file-pencil"></i>
-                                            <span class="hide-menu">Edit Product</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- ============================= -->
-                            <!-- PAGES -->
-                            <!-- ============================= -->
-                            <li class="nav-small-cap">
-                                <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                                <span class="hide-menu">PAGES</span>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                                    <span>
-                                        <iconify-icon icon="solar:notes-line-duotone" class="ti"></iconify-icon>
-                                    </span>
-                                    <span class="hide-menu">Pages</span>
-                                </a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item">
-                                        <a href="page-faq.html" class="sidebar-link">
-                                            <i class="ti ti-help"></i>
-                                            <span class="hide-menu">FAQ</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="page-account-settings.html" class="sidebar-link">
-                                            <i class="ti ti-user-circle"></i>
-                                            <span class="hide-menu">Account Setting</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="page-pricing.html" class="sidebar-link">
-                                            <i class="ti ti-currency-dollar"></i>
-                                            <span class="hide-menu">Pricing</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="widgets-cards.html" class="sidebar-link">
-                                            <i class="ti ti-cards"></i>
-                                            <span class="hide-menu">Card</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="widgets-banners.html" class="sidebar-link">
-                                            <i class="ti ti-ad"></i>
-                                            <span class="hide-menu">Banner</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="widgets-charts.html" class="sidebar-link">
-                                            <i class="ti ti-chart-bar"></i>
-                                            <span class="hide-menu">Charts</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="starter.html" class="sidebar-link">
-                                            <i class="ti ti-file"></i>
-                                            <span class="hide-menu">Starter</span>
-                                        </a>
-                                    </li>
-                                    <li class="sidebar-item">
-                                        <a href="../landingpage/<?= base_url('/') ?>" class="sidebar-link">
-                                            <i class="ti ti-app-window"></i>
-                                            <span class="hide-menu">Landing Page</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+
 
                         </ul>
                     </nav>
@@ -2049,6 +1609,9 @@
         </div>
 
     </div>
+
+
+
     <div class="dark-transparent sidebartoggler"></div>
     <!-- Import Js Files -->
     <script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -2081,6 +1644,8 @@
     <script src="assets/libs/select2/dist/js/select2.min.js"></script>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
+    <script src="assets/js/notification.js"></script>
+
     <script>
         $(document).ready(function() {
             // Al hacer clic en un enlace con clase 'open-here'
@@ -2092,7 +1657,7 @@
                 loadContent(url); // Llama a la función para cargar el contenido
             });
 
-            
+
             // Función para cargar el contenido desde la URL y mostrar en 'content-main'
             function loadContent(url) {
                 clearInterval(chartInterval);
@@ -2163,6 +1728,8 @@
         $(document).ready(function() {
             connectionCheckInterval = setInterval(checkInternetConnection, 30000); // Revisar cada minuto
         });
+
+        toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');
     </script>
     <?= $this->renderSection('pageScripts'); ?>
 </body>

@@ -31,7 +31,7 @@ class Home extends BaseController
         $menu = new MenuModel();
         $set = array(
             //"menu"=> $menu->findAll(),
-            "menu"=> $menu->getMenusByRole(),
+            "menu"=> $menu->getMenuTree(),
             //"dasboard"=> $dashboard,
             //"menu"=> $menu->getMenuUsuario(),
         );

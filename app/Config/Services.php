@@ -29,4 +29,38 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    public static function notificacion($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('notificacion');
+        }
+
+        return new \App\Libraries\Notificacion();
+    }
+    public function crearMultiple(
+        array $usuarios,
+        string $titulo,
+        string $mensaje,
+        string $tipo = 'info',
+        ?string $url = null
+    ) {
+        $data = [];
+
+        foreach ($usuarios as $userId) {
+
+            $data[] = [
+                'not_user_id'  => $userId,
+                'not_tipo'     => strtoupper($tipo),
+                'not_titulo'   => $titulo,
+                'not_mensaje'  => $mensaje,
+                'not_url'      => $url,
+                'not_icono'    => $tipo,
+                'not_leido'    => 0,
+                'not_mostrado' => 0,
+            ];
+        }
+
+        return $this->model->insertBatch($data);
+    }
 }

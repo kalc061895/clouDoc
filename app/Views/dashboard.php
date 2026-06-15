@@ -33,31 +33,15 @@ $menuActive = 2;
 <!-- Menu Vertical -->
 <?= $this->section('menuVertical'); ?>
 
-<?php foreach ($menu as $item) : ?>
+<?= $this->include('partials/menuVertical',$menu); ?>
 
-    <?php if ($item['type'] == 'primary') : ?>
-        <!-- MENU DE TODO---------------------------------- -->
-        <li class="nav-small-cap">
-            <iconify-icon icon="solar:menu-dots-linear" class="mini-icon"></iconify-icon>
-            <span class="hide-menu"><?= $item['name'] ?></span>
-        </li>
-    <?php else : ?>
-        <li class="sidebar-item">
-            <a class="sidebar-link open-here <?= ($item['id'] == $menuActive) ? ' active ' : '' ?>" href="<?= base_url('/' . $item['url']) ?>" aria-expanded="false" accesskey="<?= $item['abbr']?>">
-                <iconify-icon icon="solar:<?= $item['icon'] ?>"></iconify-icon>
-                <span class="hide-menu"><?= $item['name'] ?></span>
-            </a>
-        </li>
-    <?php endif ?>
-
-
-
-<?php endforeach ?>
 
 <?= $this->endSection(); ?>
 
 <!-- Menu Horizontal -->
 <?= $this->section('menuHorizontal'); ?>
+
+<?= $this->include('partials/menuHorizontal',$menu); ?>
 
 <?= $this->endSection(); ?>
 
@@ -363,8 +347,7 @@ $menuActive = 2;
 
 
     function renderData(salesData, ordersData, deliveriesData, categories, params) {
-        chart_area_spline.updateSeries([
-            {
+        chart_area_spline.updateSeries([{
                 data: salesData,
             },
             {
