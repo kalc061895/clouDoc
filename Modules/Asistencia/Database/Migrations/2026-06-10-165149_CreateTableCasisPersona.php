@@ -17,10 +17,9 @@ class CreateTableCasisPersona extends Migration
             ],
 
             'per_tdi_ide' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-                'default'    => 1, // 1= DNI, 2= RUC, etc.
+                'type'           => 'INT',
+                'unsigned'       => true,
+                
             ],
 
             'per_numero_documento' => [
@@ -120,7 +119,6 @@ class CreateTableCasisPersona extends Migration
             'per_fecha_registro' => [
                 'type'    => 'TIMESTAMP',
                 'null'    => true,
-                'default' => 'CURRENT_TIMESTAMP',
             ],
             'created_at' => [
                 'type' => 'DATETIME',

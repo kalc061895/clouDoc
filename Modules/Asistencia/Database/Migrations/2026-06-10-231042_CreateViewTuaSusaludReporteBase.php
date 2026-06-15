@@ -19,8 +19,8 @@ class CreateViewTuaSusaludReporteBase extends Migration
             tdi.tdi_abreviatura                    AS tipo_documento,
             per.per_numero_documento,
 
-            pro.pro_abreviatura                    AS profesion,
-            tra.tra_numero_colegiatura             AS numero_colegiatura,
+            car.car_nombre                         AS cargo,
+            perl.perl_numero_colegiatura           AS numero_colegiatura,
 
             CONCAT(
                 per.per_paterno,
@@ -49,8 +49,8 @@ class CreateViewTuaSusaludReporteBase extends Migration
             LEFT JOIN casis_tipo_documento_identidad tdi
                 ON tdi.tdi_ide = per.per_tdi_ide
 
-            LEFT JOIN casis_profesion pro
-                ON pro.pro_ide = perl.perl_pro_ide
+            LEFT JOIN casis_cargo car
+                ON car.car_ide = perl.perl_car_ide
 
             LEFT JOIN casis_segunda_especialidad esp
                 ON esp.se_ide = perl.perl_se_ide
@@ -61,14 +61,14 @@ class CreateViewTuaSusaludReporteBase extends Migration
             LEFT JOIN casis_microred mic
                 ON mic.mic_ide = est.est_mic_ide
 
-            LEFT JOIN casis_reddes red
+            LEFT JOIN casis_red red
                 ON red.red_ide = mic.mic_red_ide
 
             LEFT JOIN casis_programacion prog
                 ON prog.prog_perl_ide = perl.perl_ide
 
             LEFT JOIN casis_turno tur
-                ON tur.tur_ide = prog.prog_tur_ide
+                ON tur.tur_ide = prog.prog_th_ide
 
             LEFT JOIN casis_turno_horario th
                 ON th.th_tur_ide = tur.tur_ide

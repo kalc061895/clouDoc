@@ -66,21 +66,7 @@ class CreateUnidadesOrganizacionales extends Migration
         $this->forge->addForeignKey('uo_padre_ide', 'casis_unidades_organizacionales', 'uo_ide', 'CASCADE', 'SET NULL');
         $this->forge->createTable('casis_unidades_organizacionales');
 
-        // 2. Modificar la tabla casis_personal para añadir la relación
-        // Esto permite saber a qué unidad exacta pertenece el trabajador
-        $fields = [
-            'perl_uo_ide' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'unsigned'   => true,
-                'null'       => true,
-                'after'      => 'perl_ser_ide' // Se coloca después del campo de servicio
-            ],
-        ];
-        $this->forge->addColumn('casis_personal', $fields);
-
-        // Añadir la llave foránea a casis_personal
-        $this->db->query("ALTER TABLE casis_personal ADD CONSTRAINT fk_personal_uo FOREIGN KEY (perl_uo_ide) REFERENCES casis_unidades_organizacionales(uo_ide) ON DELETE SET NULL ON UPDATE CASCADE");
+       
     }
 
     public function down()
