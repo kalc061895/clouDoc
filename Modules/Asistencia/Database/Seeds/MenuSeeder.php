@@ -13,7 +13,7 @@ class MenuSeeder extends Seeder
 
         // Desactivar temporalmente las llaves foráneas para evitar problemas al limpiar la tabla
         $db->query('SET FOREIGN_KEY_CHECKS = 0;');
-        $builder->truncate();
+        //$builder->truncate();
         $db->query('SET FOREIGN_KEY_CHECKS = 1;');
 
         // 1. Definición de los Agrupadores / Separadores Principales (Padres)
@@ -263,7 +263,7 @@ class MenuSeeder extends Seeder
                     'parent_id'  => $padresIds[$sub['parent']],
                     'name'       => $sub['name'],
                     'abbr'       => null,
-                    'url'        => $sub['url'],
+                    'url'        => 'asistencia/'.$sub['url'],
                     'icon'       => $sub['icon'],
                     'status'     => 'active',
                     'order'      => $sub['order'],

@@ -90,20 +90,135 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->group('gestordb', function ($routes) {
         $routes->get('listar_tablas', 'DatabaseController::index');
         $routes->get('tarea', 'DatabaseController::tareas');
+        $routes->get('tipo-oficina', 'DatabaseController::tiposOficina');
         $routes->get('oficina', 'DatabaseController::oficinas');
+        $routes->get('diresas', 'DatabaseController::diresas');
+        $routes->get('redes', 'DatabaseController::redes');
+        $routes->get('microredes', 'DatabaseController::microredes');
+        $routes->get('establecimiento', 'DatabaseController::establecimientos');
         $routes->get('licencia', 'DatabaseController::licencias');
         $routes->get('turno', 'DatabaseController::turnos');
         $routes->get('turno_horario', 'DatabaseController::horarios');
-        $routes->get('cargo', 'DatabaseController::cargos');
         $routes->get('rol', 'DatabaseController::nivelesAcceso');
         $routes->get('distrito', 'DatabaseController::distritos');
         $routes->get('microred', 'DatabaseController::sectores');
         $routes->get('usuario', 'DatabaseController::usuarios');
-        $routes->get('establecimiento', 'DatabaseController::establecimientos');
         $routes->get('asignar_tarea', 'DatabaseController::asignarTareas');
         $routes->get('tipo_contrato', 'DatabaseController::modalidades');
         $routes->get('permiso', 'DatabaseController::permisos');
+        // Endpoints del API RESTful
+        $routes->group('api', function ($routes) {
+
+            // Endpoints de apoyo para selects desplegables (Lookups)
+            $routes->get('establecimientos-lookup', 'DatabaseController::apiEstablecimientosLookup');
+            $routes->get('oficinas-lookup', 'DatabaseController::apiOficinasLookup');
+
+            $routes->get('diresas', 'DatabaseController::apiListarDiresas');
+            $routes->post('diresas', 'DatabaseController::apiCrearDiresa');
+            $routes->put('diresas/(:num)', 'DatabaseController::apiActualizarDiresa/$1');
+            $routes->delete('diresas/(:num)', 'DatabaseController::apiEliminarDiresa/$1');
+
+
+            $routes->get('redes', 'DatabaseController::apiListarRedes');
+            $routes->post('redes', 'DatabaseController::apiCrearRed');
+            $routes->put('redes/(:num)', 'DatabaseController::apiActualizarRed/$1');
+            $routes->delete('redes/(:num)', 'DatabaseController::apiEliminarRed/$1');
+
+            // Lookup de Redes
+            $routes->get('redes-lookup', 'DatabaseController::apiRedesLookup');
+
+            $routes->get('microredes', 'DatabaseController::apiListarMicroredes');
+            $routes->post('microredes', 'DatabaseController::apiCrearMicrored');
+            $routes->put('microredes/(:num)', 'DatabaseController::apiActualizarMicrored/$1');
+            $routes->delete('microredes/(:num)', 'DatabaseController::apiEliminarMicrored/$1');
+
+            // El lookup que consumirá la vista de establecimientos
+            $routes->get('microredes-lookup', 'DatabaseController::apiMicroredesLookup');
+
+            $routes->get('establecimientos', 'DatabaseController::apiListarEstablecimientos');
+            $routes->post('establecimientos', 'DatabaseController::apiCrearEstablecimiento');
+            $routes->put('establecimientos/(:num)', 'DatabaseController::apiActualizarEstablecimiento/$1');
+            $routes->delete('establecimientos/(:num)', 'DatabaseController::apiEliminarEstablecimiento/$1');
+
+            $routes->get('tipos-oficina', 'DatabaseController::apiListarTiposOficina');
+            $routes->post('tipos-oficina', 'DatabaseController::apiCrearTipoOficina');
+            $routes->put('tipos-oficina/(:num)', 'DatabaseController::apiActualizarTipoOficina/$1');
+            $routes->delete('tipos-oficina/(:num)', 'DatabaseController::apiEliminarTipoOficina/$1');
+            $routes->get('tipos-oficina-lookup', 'DatabaseController::apiTiposOficinaLookup');
+
+            $routes->get('oficinas', 'DatabaseController::apiListarOficinas');
+            $routes->get('oficinas-establecimiento/(:num)', 'DatabaseController::apiOficinasEstablecimiento/$1');
+            $routes->post('oficinas', 'DatabaseController::apiCrearOficina');
+            $routes->put('oficinas/(:num)', 'DatabaseController::apiActualizarOficina/$1');
+            $routes->delete('oficinas/(:num)', 'DatabaseController::apiEliminarOficina/$1');
+        });
+
+        $routes->get('cargo', 'DatabaseController::cargos');
+        $routes->group('api', function ($routes) {
+            $routes->get('cargos', 'DatabaseController::apiListarCargos');
+            $routes->post('cargos', 'DatabaseController::apiCrearCargo');
+            $routes->put('cargos/(:num)', 'DatabaseController::apiActualizarCargo/$1');
+            $routes->delete('cargos/(:num)', 'DatabaseController::apiEliminarCargo/$1');
+            $routes->get('cargos-lookup', 'DatabaseController::apiCargosLookup');
+        });
+
+        $routes->get('profesion', 'DatabaseController::profesiones');
+        $routes->group('api', function ($routes) {
+            $routes->get('profesiones', 'DatabaseController::apiListarProfesiones');
+            $routes->post('profesiones', 'DatabaseController::apiCrearProfesion');
+            $routes->put('profesiones/(:num)', 'DatabaseController::apiActualizarProfesion/$1');
+            $routes->delete('profesiones/(:num)', 'DatabaseController::apiEliminarProfesion/$1');
+            $routes->get('profesiones-lookup', 'DatabaseController::apiProfesionesLookup');
+        });
+
+        $routes->get('colegiatura', 'DatabaseController::colegiaturas');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('colegiaturas', 'DatabaseController::apiListarColegiaturas');
+            $routes->post('colegiaturas', 'DatabaseController::apiCrearColegiatura');
+            $routes->put('colegiaturas/(:num)', 'DatabaseController::apiActualizarColegiatura/$1');
+            $routes->delete('colegiaturas/(:num)', 'DatabaseController::apiEliminarColegiatura/$1');
+            $routes->get('colegiaturas-por-profesion/(:num)', 'DatabaseController::apiColegiaturasPorProfesion/$1');
+        });
+
+        $routes->get('feriado', 'DatabaseController::feriados');
+        $routes->group('api', function ($routes) {
+            $routes->get('feriados', 'DatabaseController::apiListarFeriados');
+            $routes->post('feriados', 'DatabaseController::apiCrearFeriado');
+            $routes->put('feriados/(:num)', 'DatabaseController::apiActualizarFeriado/$1');
+            $routes->delete('feriados/(:num)', 'DatabaseController::apiEliminarFeriado/$1');
+        });
+
+        $routes->get('modalidad', 'DatabaseController::modalidades');
+        $routes->group('api', function ($routes) {
+            $routes->get('modalidades', 'DatabaseController::apiListarModalidades');
+            $routes->post('modalidades', 'DatabaseController::apiCrearModalidad');
+            $routes->put('modalidades/(:num)', 'DatabaseController::apiActualizarModalidad/$1');
+            $routes->delete('modalidades/(:num)', 'DatabaseController::apiEliminarModalidad/$1');
+        });
+
+        $routes->get('licencia', 'DatabaseController::licencias');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('licencias', 'DatabaseController::apiListarLicencias');
+            $routes->post('licencias', 'DatabaseController::apiCrearLicencia');
+            $routes->put('licencias/(:num)', 'DatabaseController::apiActualizarLicencia/$1');
+            $routes->delete('licencias/(:num)', 'DatabaseController::apiEliminarLicencia/$1');
+        });
+
+        $routes->get('permiso', 'DatabaseController::permisos');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('permisos', 'DatabaseController::apiListarPermisos');
+            $routes->post('permisos', 'DatabaseController::apiCrearPermiso');
+            $routes->put('permisos/(:num)', 'DatabaseController::apiActualizarPermiso/$1');
+            $routes->delete('permisos/(:num)', 'DatabaseController::apiEliminarPermiso/$1');
+        });
     });
+
+
+
+
 
     // Otros controladores específicos
     $routes->get('tuasalud/reporte_rol_tuasalud', 'TuasaludController::reporte');

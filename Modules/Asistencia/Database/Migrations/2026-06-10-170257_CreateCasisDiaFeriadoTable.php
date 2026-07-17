@@ -39,6 +39,42 @@ class CreateCasisDiaFeriadoTable extends Migration
                 'default'    => 0,
                 'comment'    => '0=No, 1=Si',
             ],
+            // Auditoría
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'created_by' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => true,
+            ],
+
+            'updated_by' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => true,
+            ],
+
+            'deleted_by' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => true,
+            ],
         ]);
 
         $this->forge->addKey('df_ide', true);

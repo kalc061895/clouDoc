@@ -4,7 +4,7 @@ namespace Modules\Asistencia\Models;
 
 use CodeIgniter\Model;
 
-class PermisoLicenciaModel extends Model
+class PermisoModel extends Model
 {
     protected $table            = 'casis_permiso';
     protected $primaryKey       = 'pero_ide';

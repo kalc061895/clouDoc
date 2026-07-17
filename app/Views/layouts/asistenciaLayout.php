@@ -8,14 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Favicon icon-->
-    <link rel="shortcut icon" type="image/png" href="assets/images/logos/favicon.png" />
+    <link rel="shortcut icon" type="image/png') ?>" href="<?= base_url('assets/images/logos/favicon.png') ?>" />
 
     <!-- Core Css -->
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="<?= base_url('assets/css/styles.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('assets/libs/sweetalert2/dist/sweetalert2.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') ?>">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="assets/libs/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="<?= base_url('assets/libs/select2/dist/css/select2.min.css') ?>">
 
     <title><?= $this->renderSection('title'); ?></title>
     <?= $this->renderSection('pageStyles'); ?>
@@ -27,7 +27,7 @@
 
     <!-- Preloader -->
     <div class="preloader">
-        <img src="assets/images/logos/favicon.png" alt="loader" class="lds-ripple img-fluid" />
+        <img src="<?= base_url('assets/images/logos/favicon.png') ?>" alt="loader" class="lds-ripple img-fluid" />
     </div>
     <div id="main-wrapper">
 
@@ -40,8 +40,8 @@
             <div>
                 <div class="brand-logo d-flex align-items-center">
                     <a href="<?= base_url('/inicio') ?>" class="text-nowrap logo-img">
-                        <img src="assets/images/logos/dark-logo.png" alt="Logo" class="dark-logo" />
-                        <img src="assets/images/logos/light-logo.png" alt="Logo" class="light-logo" />
+                        <img src="<?= base_url('assets/images/logos/dark-logo.png') ?>" alt="Logo" class="dark-logo" />
+                        <img src="<?= base_url('assets/images/logos/light-logo.png') ?>" alt="Logo" class="light-logo" />
                     </a>
                 </div>
 
@@ -56,7 +56,7 @@
                             <div class="user-profile text-center position-relative pt-4 mt-1">
                                 <!-- User profile image -->
                                 <div class="profile-img m-auto">
-                                    <img src="assets/images/profile/user-1.jpg" alt="user" class="w-100 rounded-circle" />
+                                    <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>" alt="user" class="w-100 rounded-circle" />
                                 </div>
 
                                 <!-- User profile text-->
@@ -100,7 +100,7 @@
                             </a>
                         </li>
                         <!-- Menu Vertical -->
-                        <?= $this->renderSection('menuVertical'); ?>
+                        <?= view_cell('MenuCell', ['tipo' => 'vertical']); ?>
 
                     </ul>
                 </nav>
@@ -183,7 +183,7 @@
                                     <div class="message-body" data-simplebar>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-5.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-5.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -199,7 +199,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-3.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-3.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -216,7 +216,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-6.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-6.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -232,7 +232,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-7.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-7.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -249,7 +249,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-8.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-8.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -265,7 +265,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-9.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-9.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -437,7 +437,7 @@
                         </ul>
 
                         <div class="d-block d-lg-none py-4 py-xl-0">
-                            <img src="assets/images/logos/light-logo.png" alt="Logo" />
+                            <img src="<?= base_url('assets/images/logos/light-logo.png') ?>" alt="Logo" />
                         </div>
                         <ul class="navbar-nav navbar-toggler p-0 border-0">
                             <li class="nav-item nav-icon-hover-bg dark rounded-circle d-flex">
@@ -502,7 +502,7 @@
                                             <div class="message-body" data-simplebar>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-5.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-5.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -518,7 +518,7 @@
                                                 </a>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-3.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-3.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -535,7 +535,7 @@
                                                 </a>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-6.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-6.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -551,7 +551,7 @@
                                                 </a>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-7.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-7.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -568,7 +568,7 @@
                                                 </a>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-8.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-8.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -584,7 +584,7 @@
                                                 </a>
                                                 <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                                     <span class="user-img position-relative d-inline-block">
-                                                        <img src="assets/images/profile/user-9.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                        <img src="<?= base_url('assets/images/profile/user-9.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                         <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                             <span class="visually-hidden">New alerts</span>
                                                         </span>
@@ -649,19 +649,19 @@
                                     <!-- ------------------------------- -->
                                     <li class="nav-item dropdown nav-icon-hover-bg dark rounded-circle">
                                         <a class="nav-link" href="javascript:void(0)" id="drop2" aria-expanded="false">
-                                            <img src="assets/images/flag/icon-flag-pe.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                            <img src="<?= base_url('assets/images/flag/icon-flag-pe.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up overflow-hidden" aria-labelledby="drop2">
                                             <div class="message-body">
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-pe.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-pe.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3"><?= lang('Main.languageES') ?></p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-us.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-us.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3"><?= lang('Main.languageEN') ?></p>
                                                 </a>
@@ -678,7 +678,7 @@
                                     <li class="nav-item dropdown">
                                         <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                             <div class="d-flex align-items-center lh-base">
-                                                <img src="assets/images/profile/user-1.jpg" class="rounded-circle" width="35" height="35" alt="monster-img" />
+                                                <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>" class="rounded-circle" width="35" height="35" alt="monster-img" />
                                             </div>
                                         </a>
                                         <div class="dropdown-menu content-dd dropdown-menu-end animated flipInY" aria-labelledby="drop1">
@@ -746,8 +746,8 @@
                             <div class="offcanvas-header justify-content-between ps-0 pt-0">
                                 <div class="brand-logo d-flex align-items-center">
                                     <a href="<?= base_url('/') ?>" class="text-nowrap logo-img">
-                                        <img src="assets/images/logos/dark-logo.png" alt="Logo" class="dark-logo" />
-                                        <img src="assets/images/logos/light-logo.png" alt="Logo" class="light-logo" />
+                                        <img src="<?= base_url('assets/images/logos/dark-logo.png') ?>" alt="Logo" class="dark-logo" />
+                                        <img src="<?= base_url('assets/images/logos/light-logo.png') ?>" alt="Logo" class="light-logo" />
                                     </a>
                                 </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -867,7 +867,7 @@
                             <li class="nav-item d-none d-xl-flex align-items-center">
                                 <a href="../horizontal/<?= base_url('/') ?>" class="text-nowrap nav-link">
 
-                                    <img src="assets/images/logos/light-logo.png" alt="Logo" />
+                                    <img src="<?= base_url('assets/images/logos/light-logo.png') ?>" alt="Logo" />
                                 </a>
                             </li>
                             <!-- ------------------------------- -->
@@ -922,7 +922,7 @@
                                     <div class="message-body" data-simplebar>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-5.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-5.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -938,7 +938,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-3.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-3.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -955,7 +955,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-6.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-6.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -971,7 +971,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-7.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-7.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -988,7 +988,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-8.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-8.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -1004,7 +1004,7 @@
                                         </a>
                                         <a href="javascript:void(0)" class="p-3 pe-0 d-flex align-items-center dropdown-item gap-3 border-bottom">
                                             <span class="user-img position-relative d-inline-block">
-                                                <img src="assets/images/profile/user-9.jpg" alt="user" class="rounded-circle w-100 round-40" />
+                                                <img src="<?= base_url('assets/images/profile/user-9.jpg') ?>" alt="user" class="rounded-circle w-100 round-40" />
                                                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle">
                                                     <span class="visually-hidden">New alerts</span>
                                                 </span>
@@ -1175,7 +1175,7 @@
                         </ul>
                         <div class="d-block d-xl-none">
                             <a href="<?= base_url('/') ?>" class="text-nowrap nav-link">
-                                <img src="assets/images/logos/light-logo.png" alt="Logo" />
+                                <img src="<?= base_url('assets/images/logos/light-logo.png') ?>" alt="Logo" />
                             </a>
                         </div>
                         <ul class="navbar-nav navbar-toggler p-0 border-0">
@@ -1222,31 +1222,31 @@
                                     <!-- ------------------------------- -->
                                     <li class="nav-item dropdown nav-icon-hover-bg rounded-circle">
                                         <a class="nav-link" href="javascript:void(0)" id="drop2" aria-expanded="false">
-                                            <img src="assets/images/flag/icon-flag-en.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                            <img src="<?= base_url('assets/images/flag/icon-flag-en.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up overflow-hidden" aria-labelledby="drop2">
                                             <div class="message-body">
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-en.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-en.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3">English (UK)</p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-cn.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-cn.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3">中国人 (Chinese)</p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-fr.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-fr.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3">français (French)</p>
                                                 </a>
                                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                                     <div class="position-relative">
-                                                        <img src="assets/images/flag/icon-flag-sa.svg" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
+                                                        <img src="<?= base_url('assets/images/flag/icon-flag-sa.svg')?>" alt="monster-img" width="20px" height="20px" class="rounded-circle object-fit-cover round-20" />
                                                     </div>
                                                     <p class="mb-0 fs-3">عربي (Arabic)</p>
                                                 </a>
@@ -1263,7 +1263,7 @@
                                     <li class="nav-item dropdown">
                                         <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                             <div class="d-flex align-items-center lh-base">
-                                                <img src="assets/images/profile/user-1.jpg" class="rounded-circle" width="35" height="35" alt="monster-img" />
+                                                <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>" class="rounded-circle" width="35" height="35" alt="monster-img" />
                                             </div>
                                         </a>
                                         <div class="dropdown-menu content-dd dropdown-menu-end animated flipInY" aria-labelledby="drop1">
@@ -1272,7 +1272,7 @@
                                                     <h5 class="mb-0 fs-5">User Profile</h5>
                                                 </div>
                                                 <div class="d-flex align-items-center py-9 mx-7 border-bottom">
-                                                    <img src="assets/images/profile/user-1.jpg" class="rounded-circle" width="80" height="80" alt="" />
+                                                    <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>" class="rounded-circle" width="80" height="80" alt="" />
                                                     <div class="ms-3">
                                                         <h5 class="mb-1 fs-4">Markarn Doe</h5>
                                                         <span class="mb-1 d-block">Designer</span>
@@ -1342,7 +1342,7 @@
                                 <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                                 <span class="hide-menu">Home</span>
                             </li>
-                            <?= $this->renderSection('menuHorizontal'); ?>
+                            <?= view_cell('MenuCell', ['tipo' => 'horizontal']); ?>
 
 
                         </ul>
@@ -1614,23 +1614,23 @@
 
     <div class="dark-transparent sidebartoggler"></div>
     <!-- Import Js Files -->
-    <script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/libs/simplebar/dist/simplebar.min.js"></script>
-    <script src="assets/js/theme/app.init.js"></script>
-    <script src="assets/js/theme/theme.js"></script>
-    <script src="assets/js/theme/app.min.js"></script>
-    <script src="assets/js/theme/sidebarmenu.js"></script>
+    <script src="<?= base_url('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= base_url('assets/libs/simplebar/dist/simplebar.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/theme/app.init.js') ?>"></script>
+    <script src="<?= base_url('assets/js/theme/theme.js') ?>"></script>
+    <script src="<?= base_url('assets/js/theme/app.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/theme/sidebarmenu.js') ?>"></script>
 
     <!-- solar icons -->
-    <script src="assets/js/iconify-icon%401.0.8/dist/iconify-icon.min.js"></script>
-    <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="assets/js/dashboards/dashboard.js"></script>
+    <script src="<?= base_url('assets/js/iconify-icon%401.0.8/dist/iconify-icon.min.js') ?>"></script>
+    <script src="<?= base_url('assets/libs/apexcharts/dist/apexcharts.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/dashboards/dashboard.js') ?>"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-    <script src="assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
-    <script src="assets/js/forms/sweet-alert.init.js"></script>
-    <script src="assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
-    <script src="assets/js/plugins/toastr-init.js"></script>
+    <script src="<?= base_url('assets/libs/sweetalert2/dist/sweetalert2.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/forms/sweet-alert.init.js') ?>"></script>
+    <script src="<?= base_url('assets/libs/datatables.net/js/jquery.dataTables.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/plugins/toastr-init.js') ?>"></script>
     <!-- DataTables Buttons Extension -->
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.flash.min.js"></script>
@@ -1640,11 +1640,11 @@
     <!-- pdfMake -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
-    <script src="assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="<?= base_url('assets/libs/select2/dist/js/select2.full.min.js') ?>"></script>
+    <script src="<?= base_url('assets/libs/select2/dist/js/select2.min.js') ?>"></script>
 
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
-    <script src="assets/js/notification.js"></script>
+    <script src="<?= base_url('assets/js/notification.js') ?>"></script>
 
     <script>
         $(document).ready(function() {
@@ -1696,6 +1696,7 @@
             }
         });
     </script>
+
     <script>
         let URLNotification = "<?= base_url('') ?>";
     </script>
