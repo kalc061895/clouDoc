@@ -1,51 +1,36 @@
-version: "3.9"
-
 services:
 
   app:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
-
+    build: .
     container_name: cloudoc_app
-
-    restart: unless-stopped
 
     ports:
       - "8080:80"
 
     volumes:
-      - ./:/var/www/html
+      - .:/var/www/html
 
     depends_on:
       - db
-
-    networks:
-      - cloudoc
 
   db:
     image: mariadb:11
 
     container_name: cloudoc_db
 
-    restart: unless-stopped
-
-    ports:
-      - "3306:3306"
+    restart: always
 
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: cloudoc2
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+
+    ports:
+      - "3306:3306"
 
     volumes:
-      - mysql_data:/var/lib/mysql
-
-    networks:
-      - cloudoc
+      - mariadb_data:/var/lib/mysql
 
 volumes:
-  mysql_data:
-
-networks:
-  cloudoc:
-    driver: bridge
+  mariadb_data:

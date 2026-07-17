@@ -214,6 +214,41 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->put('permisos/(:num)', 'DatabaseController::apiActualizarPermiso/$1');
             $routes->delete('permisos/(:num)', 'DatabaseController::apiEliminarPermiso/$1');
         });
+
+        $routes->get('tipodocumento', 'DatabaseController::tiposDocumentos');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('documentos', 'DatabaseController::apiListarDocumentos');
+            $routes->post('documentos', 'DatabaseController::apiCrearDocumento');
+            $routes->put('documentos/(:num)', 'DatabaseController::apiActualizarDocumento/$1');
+            $routes->delete('documentos/(:num)', 'DatabaseController::apiEliminarDocumento/$1');
+        });
+
+        $routes->get('turno', 'DatabaseController::turnos');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('turnos', 'DatabaseController::apiListarTurnos');
+            $routes->post('turnos', 'DatabaseController::apiCrearTurno');
+            $routes->put('turnos/(:num)', 'DatabaseController::apiActualizarTurno/$1');
+            $routes->delete('turnos/(:num)', 'DatabaseController::apiEliminarTurno/$1');
+        });
+
+        $routes->get('turnohorario', 'DatabaseController::turnosHorarios');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('horarios', 'DatabaseController::apiListarHorarios');
+            $routes->post('horarios', 'DatabaseController::apiCrearHorario');
+            $routes->put('horarios/(:num)', 'DatabaseController::apiActualizarHorario/$1');
+            $routes->delete('horarios/(:num)', 'DatabaseController::apiEliminarHorario/$1');
+        });
+        $routes->get('upss', 'DatabaseController::upss');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('upss', 'DatabaseController::apiListarUpss');
+            $routes->post('upss', 'DatabaseController::apiCrearUpss');
+            $routes->put('upss/(:num)', 'DatabaseController::apiActualizarUpss/$1');
+            $routes->delete('upss/(:num)', 'DatabaseController::apiEliminarUpss/$1');
+        });
     });
 
 

@@ -18,6 +18,10 @@ use Modules\Asistencia\Services\DiaFeriadoService;
 use Modules\Asistencia\Services\ModalidadContratoService;
 use Modules\Asistencia\Services\LicenciaService;
 use Modules\Asistencia\Services\PermisoService;
+use Modules\Asistencia\Services\TipoDocumentoService;
+use Modules\Asistencia\Services\TurnoService;
+use Modules\Asistencia\Services\TurnoHorarioService;
+use Modules\Asistencia\Services\UpssService;
 
 
 class DatabaseController extends BaseController
@@ -1378,5 +1382,410 @@ class DatabaseController extends BaseController
             return $this->respondDeleted(['status' => 'success', 'message' => 'Permiso enviado a la papelera.']);
         }
         return $this->fail('No se pudo desactivar el permiso.', 400);
+    }
+
+    /**
+     * Vista de Tipos de Documentos de Identidad
+     * GET /asistencia/gestordb/tipodocumento
+     */
+    public function tiposDocumentos()
+    {
+        return view('Modules\Asistencia\Views\database\tipos_documentos_view');
+    }
+
+    /**
+     * API: Listar Tipos de Documentos
+     * GET /asistencia/gestordb/api/documentos
+     */
+    public function apiListarDocumentos()
+    {
+        $service = new TipoDocumentoService();
+        $search = $this->request->getVar('search');
+
+        // Tratamiento seguro de nulos para filtros select de estado
+        $rawEstado = $this->request->getVar('estado');
+        $estado = ($rawEstado === '' || $rawEstado === null) ? null : (int)$rawEstado;
+
+        $data = $service->listarDocumentos($search, $estado);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Tipo de Documento
+     * POST /asistencia/gestordb/api/documentos
+     */
+    public function apiCrearDocumento()
+    {
+        $service = new TipoDocumentoService();
+        $datos = [
+            'tdi_nombre'      => $this->request->getVar('tdi_nombre'),
+            'tdi_abreviatura' => $this->request->getVar('tdi_abreviatura'),
+            'tdi_longitud'    => $this->request->getVar('tdi_longitud') ? (int)$this->request->getVar('tdi_longitud') : null,
+            'tdi_estado'      => $this->request->getVar('tdi_estado') ?? 1,
+        ];
+
+        $resultado = $service->crearDocumento($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated(['status' => 'success', 'message' => 'Tipo de documento registrado correctamente.']);
+    }
+
+    /**
+     * API: Actualizar Tipo de Documento
+     * PUT /asistencia/gestordb/api/documentos/1
+     */
+    public function apiActualizarDocumento($id = null)
+    {
+        $service = new TipoDocumentoService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'tdi_nombre'      => $rawDatos['tdi_nombre'] ?? null,
+            'tdi_abreviatura' => $rawDatos['tdi_abreviatura'] ?? null,
+            'tdi_longitud'    => !empty($rawDatos['tdi_longitud']) ? (int)$rawDatos['tdi_longitud'] : null,
+            'tdi_estado'      => isset($rawDatos['tdi_estado']) ? (int)$rawDatos['tdi_estado'] : 1,
+        ];
+
+        $resultado = $service->actualizarDocumento((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond(['status' => 'success', 'message' => 'Tipo de documento actualizado.']);
+    }
+
+    /**
+     * API: Eliminar Tipo de Documento (Soft Delete)
+     * DELETE /asistencia/gestordb/api/documentos/1
+     */
+    public function apiEliminarDocumento($id = null)
+    {
+        $service = new TipoDocumentoService();
+
+        if ($service->eliminarDocumento((int)$id)) {
+            return $this->respondDeleted(['status' => 'success', 'message' => 'Tipo de documento archivado.']);
+        }
+        return $this->fail('No se pudo desactivar el documento.', 400);
+    }
+
+    /**
+     * Vista de Gestión de Turnos
+     * GET /asistencia/gestordb/turno
+     */
+    public function turnos()
+    {
+        return view('Modules\Asistencia\Views\database\turnos_view');
+    }
+
+    /**
+     * API: Listar Turnos
+     * GET /asistencia/gestordb/api/turnos
+     */
+    public function apiListarTurnos()
+    {
+        $service = new TurnoService();
+        $search = $this->request->getVar('search');
+
+        $rawEstado = $this->request->getVar('estado');
+        $estado = ($rawEstado === '' || $rawEstado === null) ? null : (int)$rawEstado;
+
+        $data = $service->listarTurnos($search, $estado);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Turno
+     * POST /asistencia/gestordb/api/turnos
+     */
+    public function apiCrearTurno()
+    {
+        $service = new TurnoService();
+        $datos = [
+            'tur_codigo' => $this->request->getVar('tur_codigo'),
+            'tur_nombre' => $this->request->getVar('tur_nombre'),
+            'tur_color'  => $this->request->getVar('tur_color') ?: '#3b82f6',
+            'tur_estado' => $this->request->getVar('tur_estado') ?? 1,
+        ];
+
+        $resultado = $service->crearTurno($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Turno registrado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar Turno
+     * PUT /asistencia/gestordb/api/turnos/1
+     */
+    public function apiActualizarTurno($id = null)
+    {
+        $service = new TurnoService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'tur_codigo' => $rawDatos['tur_codigo'] ?? null,
+            'tur_nombre' => $rawDatos['tur_nombre'] ?? null,
+            'tur_color'  => $rawDatos['tur_color'] ?? '#3b82f6',
+            'tur_estado' => isset($rawDatos['tur_estado']) ? (int)$rawDatos['tur_estado'] : 1,
+        ];
+
+        $resultado = $service->actualizarTurno((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Turno actualizado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Turno (Soft Delete)
+     * DELETE /asistencia/gestordb/api/turnos/1
+     */
+    public function apiEliminarTurno($id = null)
+    {
+        $service = new TurnoService();
+
+        if ($service->eliminarTurno((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'El turno ha sido archivado del sistema.'
+            ]);
+        }
+        return $this->fail('No se pudo desactivar el turno seleccionado.', 400);
+    }
+
+    /**
+     * Vista de Gestión de Horarios de Turnos
+     * GET /asistencia/gestordb/turnohorario
+     */
+    public function turnosHorarios()
+    {
+        return view('Modules\Asistencia\Views\database\turnos_horarios_view');
+    }
+
+    /**
+     * API: Listar Horarios de Turnos
+     * GET /asistencia/gestordb/api/horarios
+     */
+    public function apiListarHorarios()
+    {
+        $service = new TurnoHorarioService();
+        $search = $this->request->getVar('search');
+
+        $rawEstado = $this->request->getVar('estado');
+        $estado = ($rawEstado === '' || $rawEstado === null) ? null : (int)$rawEstado;
+
+        $data = $service->listarHorarios($search, $estado);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Horario
+     * POST /asistencia/gestordb/api/horarios
+     */
+    public function apiCrearHorario()
+    {
+        $service = new TurnoHorarioService();
+        $datos = [
+            'th_tur_ide'            => (int)$this->request->getVar('th_tur_ide'),
+            'th_codigo'             => $this->request->getVar('th_codigo'),
+            'th_nombre'             => $this->request->getVar('th_nombre'),
+            'th_hora_ingreso'       => $this->request->getVar('th_hora_ingreso'),
+            'th_hora_salida'        => $this->request->getVar('th_hora_salida'),
+            'th_tolerancia_ingreso' => (int)$this->request->getVar('th_tolerancia_ingreso'),
+            'th_tolerancia_salida'  => (int)$this->request->getVar('th_tolerancia_salida'),
+            'th_refrigerio_salida'  => $this->request->getVar('th_refrigerio_salida'),
+            'th_refrigerio_retorno' => $this->request->getVar('th_refrigerio_retorno'),
+            'th_estado'             => $this->request->getVar('th_estado') ?? 1,
+        ];
+
+        $resultado = $service->crearHorario($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Horario de turno guardado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar Horario
+     * PUT /asistencia/gestordb/api/horarios/1
+     */
+    public function apiActualizarHorario($id = null)
+    {
+        $service = new TurnoHorarioService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'th_tur_ide'            => isset($rawDatos['th_tur_ide']) ? (int)$rawDatos['th_tur_ide'] : null,
+            'th_codigo'             => $rawDatos['th_codigo'] ?? null,
+            'th_nombre'             => $rawDatos['th_nombre'] ?? null,
+            'th_hora_ingreso'       => $rawDatos['th_hora_ingreso'] ?? null,
+            'th_hora_salida'        => $rawDatos['th_hora_salida'] ?? null,
+            'th_tolerancia_ingreso' => isset($rawDatos['th_tolerancia_ingreso']) ? (int)$rawDatos['th_tolerancia_ingreso'] : 0,
+            'th_tolerancia_salida'  => isset($rawDatos['th_tolerancia_salida']) ? (int)$rawDatos['th_tolerancia_salida'] : 0,
+            'th_refrigerio_salida'  => $rawDatos['th_refrigerio_salida'] ?? null,
+            'th_refrigerio_retorno' => $rawDatos['th_refrigerio_retorno'] ?? null,
+            'th_estado'             => isset($rawDatos['th_estado']) ? (int)$rawDatos['th_estado'] : 1,
+        ];
+
+        $resultado = $service->actualizarHorario((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Horario de turno actualizado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Horario (Soft Delete)
+     * DELETE /asistencia/gestordb/api/horarios/1
+     */
+    public function apiEliminarHorario($id = null)
+    {
+        $service = new TurnoHorarioService();
+
+        if ($service->eliminarHorario((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'El horario de turno ha sido archivado.'
+            ]);
+        }
+        return $this->fail('No se pudo desactivar el horario seleccionado.', 400);
+    }
+    /**
+     * Vista de Gestión de UPSS
+     * GET /asistencia/gestordb/upss
+     */
+    public function upss()
+    {
+        return view('Modules\Asistencia\Views\database\upss_view');
+    }
+
+    /**
+     * API: Listar UPSS
+     * GET /asistencia/gestordb/api/upss
+     */
+    public function apiListarUpss()
+    {
+        $service = new UpssService();
+        $search = $this->request->getVar('search');
+
+        $rawEstado = $this->request->getVar('estado');
+        $estado = ($rawEstado === '' || $rawEstado === null) ? null : (int)$rawEstado;
+
+        $data = $service->listarUpss($search, $estado);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear UPSS
+     * POST /asistencia/gestordb/api/upss
+     */
+    public function apiCrearUpss()
+    {
+        $service = new UpssService();
+        $datos = [
+            'ups_codigo'                 => $this->request->getVar('ups_codigo'),
+            'ups_nombre'                 => $this->request->getVar('ups_nombre'),
+            'ups_agrupacion'             => $this->request->getVar('ups_agrupacion'),
+            'ups_agrupacion_abreviatura' => $this->request->getVar('ups_agrupacion_abreviatura'),
+            'ups_estado'                 => $this->request->getVar('ups_estado') ?? 1,
+        ];
+
+        $resultado = $service->crearUpss($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Unidad Productora (UPSS) registrada correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar UPSS
+     * PUT /asistencia/gestordb/api/upss/1
+     */
+    public function apiActualizarUpss($id = null)
+    {
+        $service = new UpssService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'ups_codigo'                 => $rawDatos['ups_codigo'] ?? null,
+            'ups_nombre'                 => $rawDatos['ups_nombre'] ?? null,
+            'ups_agrupacion'             => $rawDatos['ups_agrupacion'] ?? null,
+            'ups_agrupacion_abreviatura' => $rawDatos['ups_agrupacion_abreviatura'] ?? null,
+            'ups_estado'                 => isset($rawDatos['ups_estado']) ? (int)$rawDatos['ups_estado'] : 1,
+        ];
+
+        $resultado = $service->actualizarUpss((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Unidad Productora (UPSS) actualizada correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar UPSS (Soft Delete)
+     * DELETE /asistencia/gestordb/api/upss/1
+     */
+    public function apiEliminarUpss($id = null)
+    {
+        $service = new UpssService();
+
+        if ($service->eliminarUpss((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'La UPSS ha sido archivada del sistema.'
+            ]);
+        }
+        return $this->fail('No se pudo desactivar la UPSS seleccionada.', 400);
     }
 }
