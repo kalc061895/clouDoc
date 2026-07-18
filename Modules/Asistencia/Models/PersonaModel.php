@@ -2,7 +2,6 @@
 
 namespace Modules\Asistencia\Models;
 
-
 use CodeIgniter\Model;
 
 class PersonaModel extends Model
@@ -12,10 +11,14 @@ class PersonaModel extends Model
     protected $useAutoIncrement = true;
 
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
     protected $protectFields    = true;
 
-    protected $allowedFields    = [
+    /*
+    |--------------------------------------------------------------------------
+    | Campos permitidos
+    |--------------------------------------------------------------------------
+    */
+    protected $allowedFields = [
 
         'per_tipo_documento',
         'per_numero_documento',
@@ -32,46 +35,172 @@ class PersonaModel extends Model
         'per_email',
         'per_estadocivil',
         'per_ingreso',
-        'per_user',
-        'per_pass'
+
+        // Auditoría
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
-    // Gestión de fechas
+    /*
+    |--------------------------------------------------------------------------
+    | Soft Deletes
+    |--------------------------------------------------------------------------
+    */
+    protected $useSoftDeletes = true;
+    protected $deletedField   = 'deleted_at';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Timestamps
+    |--------------------------------------------------------------------------
+    */
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'per_fecha_registro';
-    protected $updatedField  = ''; // No definido en tu SQL, lo dejamos vacío
 
-    // Reglas de validación orientadas a datos de personal
-    protected $validationRules      = [
-        'per_dni'    => 'permit_empty|exact_length[8]|numeric',
-        'per_ruc'    => 'permit_empty|min_length[11]|max_length[15]|numeric',
-        'per_email'  => 'permit_empty|valid_email',
-        'per_nombre' => 'required|min_length[2]',
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Callbacks
+    |--------------------------------------------------------------------------
+    */
+    protected $beforeInsert = ['setCreatedBy'];
+    protected $beforeUpdate = ['setUpdatedBy'];
+    protected $beforeDelete = ['setDeletedBy'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validaciones
+    |--------------------------------------------------------------------------
+    */
+    protected $validationRules = [
+
+        'per_tipo_documento' =>
+        'required|max_length[5]',
+
+        'per_numero_documento' =>
+        'required|numeric|min_length[8]|max_length[15]|is_unique[casis_persona.per_numero_documento,per_ide,{per_ide}]',
+
+        'per_paterno' =>
+        'required|max_length[100]',
+
+        'per_materno' =>
+        'required|max_length[100]',
+
+        'per_nombre' =>
+        'required|min_length[2]|max_length[150]',
+
+        'per_ruc' =>
+        'permit_empty|exact_length[11]|numeric',
+
+        'per_email' =>
+        'permit_empty|valid_email',
+
+        'per_telefono' =>
+        'permit_empty|max_length[20]',
     ];
 
-    protected $validationMessages   = [
-        'per_dni' => [
-            'exact_length' => 'El DNI debe tener exactamente 8 dígitos.',
-            'numeric'      => 'El DNI solo debe contener números.'
+    protected $validationMessages = [
+
+        'per_numero_documento' => [
+            'required'  => 'Debe ingresar el número de documento.',
+            'numeric'   => 'El número de documento solo puede contener números.',
+            'is_unique' => 'Ya existe una persona registrada con ese documento.'
         ],
+
+        'per_nombre' => [
+            'required' => 'Debe ingresar el nombre.'
+        ],
+
         'per_email' => [
-            'valid_email' => 'Por favor, ingrese un correo electrónico válido.'
+            'valid_email' => 'Debe ingresar un correo válido.'
+        ],
+
+        'per_ruc' => [
+            'exact_length' => 'El RUC debe tener exactamente 11 dígitos.'
         ]
     ];
 
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
-    /**
-     * Obtener el nombre completo formateado
-     * Útil para reportes de asistencia o listas desplegables
-     */
-    public function getNombreCompleto($id)
+    /*
+    |--------------------------------------------------------------------------
+    | Auditoría
+    |--------------------------------------------------------------------------
+    */
+
+    protected function setCreatedBy(array $data)
+    {
+        if (function_exists('auth') && auth()->loggedIn()) {
+            $data['data']['created_by'] = auth()->id();
+        }
+
+        return $data;
+    }
+
+    protected function setUpdatedBy(array $data)
+    {
+        if (function_exists('auth') && auth()->loggedIn()) {
+            $data['data']['updated_by'] = auth()->id();
+        }
+
+        return $data;
+    }
+
+    protected function setDeletedBy(array $data)
+    {
+        if (! function_exists('auth')) {
+            return $data;
+        }
+
+        if (! auth()->loggedIn()) {
+            return $data;
+        }
+
+        if (! empty($data['id'])) {
+
+            $this->builder()
+                ->whereIn($this->primaryKey, (array) $data['id'])
+                ->update([
+                    'deleted_by' => auth()->id()
+                ]);
+        }
+
+        return $data;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Métodos auxiliares
+    |--------------------------------------------------------------------------
+    */
+
+    public function getNombreCompleto(int $id): ?string
     {
         $persona = $this->find($id);
-        if (!$persona) return null;
 
-        return trim("{$persona['per_paterno']} {$persona['per_materno']}, {$persona['per_nombre']}");
+        if (!$persona) {
+            return null;
+        }
+
+        return trim(sprintf(
+            '%s %s, %s',
+            $persona['per_paterno'],
+            $persona['per_materno'],
+            $persona['per_nombre']
+        ));
+    }
+
+    public function getNombreCompletoArray(array $persona): string
+    {
+        return trim(sprintf(
+            '%s %s, %s',
+            $persona['per_paterno'] ?? '',
+            $persona['per_materno'] ?? '',
+            $persona['per_nombre'] ?? ''
+        ));
     }
 }

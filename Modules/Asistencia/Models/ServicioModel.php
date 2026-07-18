@@ -1,46 +1,127 @@
 <?php
-
 namespace Modules\Asistencia\Models;
-
 
 use CodeIgniter\Model;
 
 class ServicioModel extends Model
 {
-    protected $table            = 'casis_servicio';
-    protected $primaryKey       = 'ser_ide';
+    protected $table = 'casis_servicio';
+
+    protected $primaryKey = 'ser_ide';
+
+    protected $returnType = 'array';
+
     protected $useAutoIncrement = true;
 
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
+    protected $protectFields = true;
 
-    // Campos que se pueden llenar mediante los métodos save(), insert() o update()
-    protected $allowedFields    = [
+    protected $allowedFields = [
+
         'ser_abreviatura',
         'ser_nombre',
         'ser_departamento',
         'ser_descripcion',
-        'ser_upss'
+        'ser_upss',
+
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
-    // Esta tabla no parece tener campos de auditoría (timestamps) en el SQL proporcionado
-    protected $useTimestamps = false;
+    /*
+    |--------------------------------------------------------------------------
+    | Soft Delete
+    |--------------------------------------------------------------------------
+    */
 
-    // Reglas de validación sugeridas para mantener la integridad en el sector salud
-    protected $validationRules      = [
-        'ser_abreviatura'  => 'required|max_length[50]',
-        'ser_nombre'       => 'permit_empty|max_length[100]',
+    protected $useSoftDeletes = true;
+
+    protected $deletedField = 'deleted_at';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Timestamps
+    |--------------------------------------------------------------------------
+    */
+
+    protected $useTimestamps = true;
+
+    protected $dateFormat = 'datetime';
+
+    protected $createdField = 'created_at';
+
+    protected $updatedField = 'updated_at';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Callbacks
+    |--------------------------------------------------------------------------
+    */
+
+    protected $beforeInsert = ['beforeInsert'];
+
+    protected $beforeUpdate = ['beforeUpdate'];
+
+    protected $beforeDelete = ['beforeDelete'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+
+    protected $validationRules = [
+
+        'ser_abreviatura' => 'required|max_length[50]',
+        'ser_nombre' => 'permit_empty|max_length[100]',
         'ser_departamento' => 'permit_empty|max_length[100]',
-        'ser_upss'         => 'permit_empty|integer'
+        'ser_upss' => 'permit_empty|integer',
     ];
 
-    protected $validationMessages   = [
-        'ser_abreviatura' => [
-            'required' => 'La abreviatura del servicio es obligatoria.'
-        ]
-    ];
+    /**
+     * Antes de insertar
+     */
+    protected function beforeInsert(array $data)
+    {
+        if (auth()->loggedIn()) {
 
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
+            $data['data']['created_by'] = auth()->id();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Antes de actualizar
+     */
+    protected function beforeUpdate(array $data)
+    {
+        if (auth()->loggedIn()) {
+
+            $data['data']['updated_by'] = auth()->id();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Antes de eliminar
+     */
+    protected function beforeDelete(array $data)
+    {
+        if (! auth()->loggedIn()) {
+            return $data;
+        }
+
+        if (! empty($data['id'])) {
+
+            $this->builder()
+                ->whereIn($this->primaryKey, (array) $data['id'])
+                ->update([
+                    'deleted_by' => auth()->id()
+                ]);
+        }
+
+        return $data;
+    }
 }

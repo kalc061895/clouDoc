@@ -87,6 +87,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     // GRUPO: MANTENIMIENTO BASE DE DATOS (gestordb/*)
     // ==========================================
+
     $routes->group('gestordb', function ($routes) {
         $routes->get('listar_tablas', 'DatabaseController::index');
         $routes->get('tarea', 'DatabaseController::tareas');
@@ -248,6 +249,59 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('upss', 'DatabaseController::apiCrearUpss');
             $routes->put('upss/(:num)', 'DatabaseController::apiActualizarUpss/$1');
             $routes->delete('upss/(:num)', 'DatabaseController::apiEliminarUpss/$1');
+        });
+
+        $routes->get('servicio', 'DatabaseController::servicios');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('servicios', 'DatabaseController::apiListarServicios');
+            $routes->post('servicios', 'DatabaseController::apiCrearServicio');
+            $routes->put('servicios/(:num)', 'DatabaseController::apiActualizarServicio/$1');
+            $routes->delete('servicios/(:num)', 'DatabaseController::apiEliminarServicio/$1');
+        });
+
+        $routes->get('persona', 'DatabaseController::personas');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('personas', 'DatabaseController::apiListarPersonas');
+            $routes->post('personas', 'DatabaseController::apiCrearPersona');
+            $routes->put('personas/(:num)', 'DatabaseController::apiActualizarPersona/$1');
+            $routes->delete('personas/(:num)', 'DatabaseController::apiEliminarPersona/$1');
+        });
+        $routes->get('segunda-especialidad', 'DatabaseController::segundasEspecialidades');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('segundas-especialidades', 'DatabaseController::apiListarEspecialidades');
+            $routes->post('segundas-especialidades', 'DatabaseController::apiCrearEspecialidad');
+            $routes->put('segundas-especialidades/(:num)', 'DatabaseController::apiActualizarEspecialidad/$1');
+            $routes->delete('segundas-especialidades/(:num)', 'DatabaseController::apiEliminarEspecialidad/$1');
+        });
+
+        $routes->get('profesion-especialidad', 'DatabaseController::profesionEspecialidades');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('profesion-especialidades', 'DatabaseController::apiListarRelacionesProfesionEspecialidades');
+            $routes->post('profesion-especialidades', 'DatabaseController::apiCrearRelacionProfesionEspecialidades');
+            $routes->delete('profesion-especialidades/(:num)', 'DatabaseController::apiEliminarRelacionProfesionEspecialidades/$1');
+        });
+    });
+
+    $routes->group('personal', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+        // Vistas principales
+        $routes->get('/', 'PersonalController::nuevo');
+        $routes->get('nuevo', 'PersonalController::nuevo');
+        $routes->get('editar/(:num)', 'PersonalController::editar/$1');
+
+        // API Operaciones Core
+        $routes->group('api', function ($routes) {
+            $routes->get('/', 'PersonalController::apiListar');
+            $routes->post('verificar-identidad', 'PersonalController::apiVerificarIdentidad');
+            $routes->post('/', 'PersonalController::apiCrear');
+            $routes->put('(:num)', 'PersonalController::apiActualizar/$1');
+
+            // Historial, Movimientos e Incidencias (Bajas, rotaciones)
+            $routes->post('movimiento', 'PersonalController::apiRegistrarMovimiento');
+            $routes->post('baja/(:num)', 'PersonalController::apiRegistrarBaja/$1');
         });
     });
 

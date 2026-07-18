@@ -12,52 +12,70 @@ class CreateTablePersonal extends Migration
 
             'perl_ide' => [
                 'type'           => 'INT',
+                'constraint'     => 10,
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
 
+            /*
+            |--------------------------------------------------------------------------
+            | Relaciones
+            |--------------------------------------------------------------------------
+            */
+
             'perl_per_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
             ],
 
             'perl_est_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+            ],
+
+            'perl_uo_ide' => [
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+                'null'       => true,
             ],
 
             'perl_ofi_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
-                'null'     => true,
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+                'null'       => true,
             ],
 
             'perl_car_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
-                'null'     => true,
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+                'null'       => true,
             ],
 
             'perl_mco_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
             ],
 
-            'perl_se_ide' => [
-                'type'     => 'INT',
-                'unsigned' => true,
-                'null'     => true,
-            ],
+            /*
+            |--------------------------------------------------------------------------
+            | Datos laborales
+            |--------------------------------------------------------------------------
+            */
 
             'perl_codigo' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 20,
-                'null'       => true,
             ],
 
             'perl_fecha_inicio' => [
                 'type' => 'DATE',
-                'null' => true,
+                'null' => false,
             ],
 
             'perl_fecha_termino' => [
@@ -65,10 +83,9 @@ class CreateTablePersonal extends Migration
                 'null' => true,
             ],
 
-            'perl_numero_colegiatura' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 30,
-                'null'       => true,
+            'perl_fecha_cese' => [
+                'type' => 'DATE',
+                'null' => true,
             ],
 
             'perl_plaza' => [
@@ -83,16 +100,17 @@ class CreateTablePersonal extends Migration
                 'null'       => true,
             ],
 
-            'perl_estado' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
-                'default'    => 'ACTIVO',
-            ],
+            /*
+            |--------------------------------------------------------------------------
+            | Estado laboral
+            |--------------------------------------------------------------------------
+            */
 
-            'perl_regimen_laboral' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
-                'null'       => true,
+            'perl_estado' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 1,
+                'comment'    => '1=Activo,2=Licencia,3=Vacaciones,4=Suspendido,5=Cesado',
             ],
 
             'perl_observacion' => [
@@ -100,31 +118,84 @@ class CreateTablePersonal extends Migration
                 'null' => true,
             ],
 
-            'perl_uo_ide' => [
+            /*
+            |--------------------------------------------------------------------------
+            | Auditoría
+            |--------------------------------------------------------------------------
+            */
+
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
+            'created_by' => [
                 'type'       => 'INT',
-                'constraint' => 11,
+                'constraint' => 10,
                 'unsigned'   => true,
                 'null'       => true,
-                'after'      => 'perl_ser_ide' // Se coloca después del campo de servicio
             ],
-            // Auditoría
-            'created_at' => ['type' => 'DATETIME', 'null' => true],
-            'updated_at' => ['type' => 'DATETIME', 'null' => true],
-            'deleted_at' => ['type' => 'DATETIME', 'null' => true],
 
-            'created_by' => ['type' => 'INT', 'unsigned' => true, 'null' => true],
-            'updated_by' => ['type' => 'INT', 'unsigned' => true, 'null' => true],
-            'deleted_by' => ['type' => 'INT', 'unsigned' => true, 'null' => true],
+            'updated_by' => [
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+                'null'       => true,
+            ],
+
+            'deleted_by' => [
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+                'null'       => true,
+            ],
+
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Primary Key
+        |--------------------------------------------------------------------------
+        */
 
         $this->forge->addKey('perl_ide', true);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Índices
+        |--------------------------------------------------------------------------
+        */
+
+        $this->forge->addUniqueKey('perl_codigo');
+
         $this->forge->addKey('perl_per_ide');
         $this->forge->addKey('perl_est_ide');
+        $this->forge->addKey('perl_uo_ide');
         $this->forge->addKey('perl_ofi_ide');
         $this->forge->addKey('perl_car_ide');
         $this->forge->addKey('perl_mco_ide');
-        $this->forge->addKey('perl_se_ide');
+
+        // Índices compuestos para consultas frecuentes
+
+        $this->forge->addKey(['perl_est_ide', 'perl_estado']);
+        $this->forge->addKey(['perl_ofi_ide', 'perl_estado']);
+        $this->forge->addKey(['perl_car_ide', 'perl_estado']);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Relaciones
+        |--------------------------------------------------------------------------
+        */
 
         $this->forge->addForeignKey(
             'perl_per_ide',
@@ -143,10 +214,18 @@ class CreateTablePersonal extends Migration
         );
 
         $this->forge->addForeignKey(
+            'perl_uo_ide',
+            'casis_unidades_organizacionales',
+            'uo_ide',
+            'SET NULL',
+            'CASCADE'
+        );
+
+        $this->forge->addForeignKey(
             'perl_ofi_ide',
             'casis_oficina',
             'ofi_ide',
-            'RESTRICT',
+            'SET NULL',
             'CASCADE'
         );
 
@@ -154,7 +233,7 @@ class CreateTablePersonal extends Migration
             'perl_car_ide',
             'casis_cargo',
             'car_ide',
-            'RESTRICT',
+            'SET NULL',
             'CASCADE'
         );
 
@@ -162,22 +241,6 @@ class CreateTablePersonal extends Migration
             'perl_mco_ide',
             'casis_modalidad_contrato',
             'mco_ide',
-            'RESTRICT',
-            'CASCADE'
-        );
-
-        $this->forge->addForeignKey(
-            'perl_se_ide',
-            'casis_segunda_especialidad',
-            'se_ide',
-            'RESTRICT',
-            'CASCADE'
-        );
-
-        $this->forge->addForeignKey(
-            'perl_uo_ide',
-            'casis_unidades_organizacionales',
-            'uo_ide',
             'RESTRICT',
             'CASCADE'
         );

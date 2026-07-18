@@ -22,7 +22,11 @@ use Modules\Asistencia\Services\TipoDocumentoService;
 use Modules\Asistencia\Services\TurnoService;
 use Modules\Asistencia\Services\TurnoHorarioService;
 use Modules\Asistencia\Services\UpssService;
+use Modules\Asistencia\Services\ServicioService;
+use Modules\Asistencia\Services\SegundaEspecialidadService;
+use Modules\Asistencia\Services\ProfesionEspecialidadService;
 
+use Modules\Asistencia\Services\PersonaService;
 
 class DatabaseController extends BaseController
 {
@@ -1787,5 +1791,387 @@ class DatabaseController extends BaseController
             ]);
         }
         return $this->fail('No se pudo desactivar la UPSS seleccionada.', 400);
+    }
+
+    /**
+     * Vista de Gestión de Servicios
+     * GET /asistencia/gestordb/servicio
+     */
+    public function servicios()
+    {
+        return view('Modules\Asistencia\Views\database\servicios_view');
+    }
+
+    /**
+     * API: Listar Servicios
+     * GET /asistencia/gestordb/api/servicios
+     */
+    public function apiListarServicios()
+    {
+        $service = new ServicioService();
+        $search = $this->request->getVar('search');
+
+        $data = $service->listarServicios($search);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Servicio
+     * POST /asistencia/gestordb/api/servicios
+     */
+    public function apiCrearServicio()
+    {
+        $service = new ServicioService();
+        $datos = [
+            'ser_abreviatura'  => $this->request->getVar('ser_abreviatura'),
+            'ser_nombre'       => $this->request->getVar('ser_nombre'),
+            'ser_departamento' => $this->request->getVar('ser_departamento'),
+            'ser_descripcion'  => $this->request->getVar('ser_descripcion'),
+            'ser_upss'         => $this->request->getVar('ser_upss'),
+        ];
+
+        $resultado = $service->crearServicio($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Servicio registrado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar Servicio
+     * PUT /asistencia/gestordb/api/servicios/1
+     */
+    public function apiActualizarServicio($id = null)
+    {
+        $service = new ServicioService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'ser_abreviatura'  => $rawDatos['ser_abreviatura'] ?? null,
+            'ser_nombre'       => $rawDatos['ser_nombre'] ?? null,
+            'ser_departamento' => $rawDatos['ser_departamento'] ?? null,
+            'ser_descripcion'  => $rawDatos['ser_descripcion'] ?? null,
+            'ser_upss'         => $rawDatos['ser_upss'] ?? null,
+        ];
+
+        $resultado = $service->actualizarServicio((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Servicio actualizado correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Servicio (Físico)
+     * DELETE /asistencia/gestordb/api/servicios/1
+     */
+    public function apiEliminarServicio($id = null)
+    {
+        $service = new ServicioService();
+
+        if ($service->eliminarServicio((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'El servicio ha sido removido del sistema permanentemente.'
+            ]);
+        }
+        return $this->fail('No se pudo eliminar el servicio seleccionado.', 400);
+    }
+
+
+    /**
+     * Vista del Gestor de Segundas Especialidades
+     * GET /asistencia/gestordb/segunda-especialidad
+     */
+    public function segundasEspecialidades()
+    {
+        return view('Modules\Asistencia\Views\database\segundas_especialidades_view');
+    }
+
+    /**
+     * API: Listar Segundas Especialidades
+     * GET /asistencia/gestordb/api/segundas-especialidades
+     */
+    public function apiListarEspecialidades()
+    {
+        $service = new SegundaEspecialidadService();
+        $search = $this->request->getVar('search');
+
+        $rawEstado = $this->request->getVar('estado');
+        $estado = ($rawEstado === '' || $rawEstado === null) ? null : (int)$rawEstado;
+
+        $data = $service->listarEspecialidades($search, $estado);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Segunda Especialidad
+     * POST /asistencia/gestordb/api/segundas-especialidades
+     */
+    public function apiCrearEspecialidad()
+    {
+        $service = new SegundaEspecialidadService();
+        $datos = [
+            'se_nombre'      => $this->request->getVar('se_nombre'),
+            'se_abreviatura' => $this->request->getVar('se_abreviatura'),
+            'se_estado'      => $this->request->getVar('se_estado') ?? 1,
+        ];
+
+        $resultado = $service->crearEspecialidad($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Segunda especialidad registrada correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar Segunda Especialidad
+     * PUT /asistencia/gestordb/api/segundas-especialidades/1
+     */
+    public function apiActualizarEspecialidad($id = null)
+    {
+        $service = new SegundaEspecialidadService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'se_nombre'      => $rawDatos['se_nombre'] ?? null,
+            'se_abreviatura' => $rawDatos['se_abreviatura'] ?? null,
+            'se_estado'      => isset($rawDatos['se_estado']) ? (int)$rawDatos['se_estado'] : 1,
+        ];
+
+        $resultado = $service->actualizarEspecialidad((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Segunda especialidad actualizada correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Segunda Especialidad (Soft Delete)
+     * DELETE /asistencia/gestordb/api/segundas-especialidades/1
+     */
+    public function apiEliminarEspecialidad($id = null)
+    {
+        $service = new SegundaEspecialidadService();
+
+        if ($service->eliminarEspecialidad((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'La especialidad ha sido archivada del catálogo activo.'
+            ]);
+        }
+        return $this->fail('No se pudo archivar la especialidad seleccionada.', 400);
+    }
+
+    /**
+     * Vista de la Matriz de Profesiones y Especialidades
+     * GET /asistencia/gestordb/profesion-especialidad
+     */
+    public function profesionEspecialidades()
+    {
+        return view('Modules\Asistencia\Views\database\profesion_especialidades_view');
+    }
+
+    /**
+     * API: Listar Matriz de Relaciones
+     * GET /asistencia/gestordb/api/profesion-especialidades
+     */
+    public function apiListarRelacionesProfesionEspecialidades()
+    {
+        $service = new ProfesionEspecialidadService();
+        $search = $this->request->getVar('search');
+
+        $data = $service->listarRelaciones($search);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Vincular Profesión con Especialidad
+     * POST /asistencia/gestordb/api/profesion-especialidades
+     */
+    public function apiCrearRelacionProfesionEspecialidades()
+    {
+        $service = new ProfesionEspecialidadService();
+        $datos = [
+            'pes_pro_ide' => $this->request->getVar('pes_pro_ide'),
+            'pes_se_ide'  => $this->request->getVar('pes_se_ide'),
+        ];
+
+        $resultado = $service->asociarEspecialidad($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Vinculación de competencia registrada con éxito.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Vinculación (Soft Delete)
+     * DELETE /asistencia/gestordb/api/profesion-especialidades/1
+     */
+    public function apiEliminarRelacionProfesionEspecialidades($id = null)
+    {
+        $service = new ProfesionEspecialidadService();
+
+        if ($service->eliminarAsociacion((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'Vínculo revocado correctamente. Se mantiene registro histórico para auditoría.'
+            ]);
+        }
+        return $this->fail('No se pudo remover la vinculación.', 400);
+    }
+
+    /**
+     * Vista del Gestor de Personal
+     * GET /asistencia/gestordb/persona
+     */
+    public function personas()
+    {
+        return view('Modules\Asistencia\Views\database\personas_view');
+    }
+
+    /**
+     * API: Listar Personas
+     * GET /asistencia/gestordb/api/personas
+     */
+    public function apiListarPersonas()
+    {
+        $service = new PersonaService();
+        $search = $this->request->getVar('search');
+
+        $data = $service->listarPersonas($search);
+
+        return $this->respond([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    }
+
+    /**
+     * API: Crear Persona
+     * POST /asistencia/gestordb/api/personas
+     */
+    public function apiCrearPersona()
+    {
+        $service = new PersonaService();
+        $datos = [
+            'per_tipo_documento'   => $this->request->getVar('per_tipo_documento'),
+            'per_numero_documento' => $this->request->getVar('per_numero_documento'),
+            'per_paterno'          => $this->request->getVar('per_paterno'),
+            'per_materno'          => $this->request->getVar('per_materno'),
+            'per_nombre'           => $this->request->getVar('per_nombre'),
+            'per_sexo'             => $this->request->getVar('per_sexo'),
+            'per_lugar_nacimiento' => $this->request->getVar('per_lugar_nacimiento'),
+            'per_fecha_nacimiento' => $this->request->getVar('per_fecha_nacimiento') ?: null,
+            'per_residencia'       => $this->request->getVar('per_residencia'),
+            'per_ruc'              => $this->request->getVar('per_ruc'),
+            'per_telefono'         => $this->request->getVar('per_telefono'),
+            'per_email'            => $this->request->getVar('per_email'),
+            'per_estadocivil'      => $this->request->getVar('per_estadocivil'),
+            'per_ingreso'          => $this->request->getVar('per_ingreso') ?: null,
+        ];
+
+        $resultado = $service->crearPersona($datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respondCreated([
+            'status'  => 'success',
+            'message' => 'Ficha de datos personales guardada correctamente.'
+        ]);
+    }
+
+    /**
+     * API: Actualizar Persona
+     * PUT /asistencia/gestordb/api/personas/1
+     */
+    public function apiActualizarPersona($id = null)
+    {
+        $service = new PersonaService();
+        $rawDatos = $this->request->getRawInput();
+
+        $datos = [
+            'per_tipo_documento'   => $rawDatos['per_tipo_documento'] ?? null,
+            'per_numero_documento' => $rawDatos['per_numero_documento'] ?? null,
+            'per_paterno'          => $rawDatos['per_paterno'] ?? null,
+            'per_materno'          => $rawDatos['per_materno'] ?? null,
+            'per_nombre'           => $rawDatos['per_nombre'] ?? null,
+            'per_sexo'             => $rawDatos['per_sexo'] ?? null,
+            'per_lugar_nacimiento' => $rawDatos['per_lugar_nacimiento'] ?? null,
+            'per_fecha_nacimiento' => !empty($rawDatos['per_fecha_nacimiento']) ? $rawDatos['per_fecha_nacimiento'] : null,
+            'per_residencia'       => $rawDatos['per_residencia'] ?? null,
+            'per_ruc'              => $rawDatos['per_ruc'] ?? null,
+            'per_telefono'         => $rawDatos['per_telefono'] ?? null,
+            'per_email'            => $rawDatos['per_email'] ?? null,
+            'per_estadocivil'      => $rawDatos['per_estadocivil'] ?? null,
+            'per_ingreso'          => !empty($rawDatos['per_ingreso']) ? $rawDatos['per_ingreso'] : null,
+        ];
+
+        $resultado = $service->actualizarPersona((int)$id, $datos);
+
+        if (is_array($resultado)) {
+            return $this->fail($resultado, 400);
+        }
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Ficha de datos personales actualizada.'
+        ]);
+    }
+
+    /**
+     * API: Eliminar Persona (Soft Delete para Auditoría)
+     * DELETE /asistencia/gestordb/api/personas/1
+     */
+    public function apiEliminarPersona($id = null)
+    {
+        $service = new PersonaService();
+
+        if ($service->eliminarPersona((int)$id)) {
+            return $this->respondDeleted([
+                'status'  => 'success',
+                'message' => 'El registro ha sido retirado de la vista principal (Conservado en auditoría).'
+            ]);
+        }
+        return $this->fail('No se pudo archivar la ficha personal.', 400);
     }
 }
