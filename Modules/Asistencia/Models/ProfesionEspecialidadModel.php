@@ -43,6 +43,7 @@ class ProfesionEspecialidadModel extends Model
     {
         return $this->select('
                 casis_profesion_especialidad.*,
+                casis_segunda_especialidad.se_ide,
                 casis_segunda_especialidad.se_nombre,
                 casis_segunda_especialidad.se_abreviatura
             ')

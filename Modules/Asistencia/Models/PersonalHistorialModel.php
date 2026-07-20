@@ -56,7 +56,7 @@ class PersonalHistorialModel extends Model
                 tmp.tmp_nombre,
                 car.car_nombre,
                 ofi.ofi_nombre,
-                est.est_denominacion,
+                est.est_nombre,
                 mco.mco_nombre
             ")
             ->join(

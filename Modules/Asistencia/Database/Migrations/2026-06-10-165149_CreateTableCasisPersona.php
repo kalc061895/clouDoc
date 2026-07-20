@@ -104,18 +104,6 @@ class CreateTableCasisPersona extends Migration
                 'null' => true,
             ],
 
-            'per_user' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
-                'null'       => true,
-            ],
-
-            'per_pass' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-                'null'       => true,
-            ],
-
             'per_fecha_registro' => [
                 'type'    => 'TIMESTAMP',
                 'null'    => true,
@@ -132,6 +120,19 @@ class CreateTableCasisPersona extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+
         ]);
 
         $this->forge->addKey('per_ide', true);

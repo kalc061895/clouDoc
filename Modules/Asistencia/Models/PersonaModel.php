@@ -20,7 +20,7 @@ class PersonaModel extends Model
     */
     protected $allowedFields = [
 
-        'per_tipo_documento',
+        'per_tdi_ide',
         'per_numero_documento',
         'per_paterno',
         'per_materno',
@@ -68,7 +68,6 @@ class PersonaModel extends Model
     */
     protected $beforeInsert = ['setCreatedBy'];
     protected $beforeUpdate = ['setUpdatedBy'];
-    protected $beforeDelete = ['setDeletedBy'];
 
     /*
     |--------------------------------------------------------------------------
@@ -77,7 +76,7 @@ class PersonaModel extends Model
     */
     protected $validationRules = [
 
-        'per_tipo_documento' =>
+        'per_tdi_ide' =>
         'required|max_length[5]',
 
         'per_numero_documento' =>
@@ -202,5 +201,67 @@ class PersonaModel extends Model
             $persona['per_materno'] ?? '',
             $persona['per_nombre'] ?? ''
         ));
+    }
+
+    // ... Tus propiedades anteriores se mantienen intactas ...
+
+    protected $afterInsert = ['guardarHistorialInsert'];
+    protected $afterUpdate = ['guardarHistorialUpdate'];
+    protected $beforeDelete = ['guardarHistorialDelete','setDeletedBy']; // Se ejecuta antes de aplicar el soft-delete para congelar la fila completa
+
+    protected function guardarHistorialInsert(array $data)
+    {
+        if (!$data['result']) return $data;
+        
+        $db = \Config\Database::connect();
+        $registro = $this->find($data['id']);
+        
+        if ($registro) {
+            $registro['hist_accion']    = 'INSERT';
+            $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+            $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+            
+            $db->table('casis_persona_historial')->insert($registro);
+        }
+        return $data;
+    }
+
+    protected function guardarHistorialUpdate(array $data)
+    {
+        if (!$data['result']) return $data;
+        
+        $db = \Config\Database::connect();
+        // $data['id'] puede venir como array si fue una actualización masiva
+        $ids = (array) $data['id'];
+
+        foreach ($ids as $id) {
+            $registro = $this->find($id);
+            if ($registro) {
+                $registro['hist_accion']    = 'UPDATE';
+                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+                
+                $db->table('casis_persona_historial')->insert($registro);
+            }
+        }
+        return $data;
+    }
+
+    protected function guardarHistorialDelete(array $data)
+    {
+        $db = \Config\Database::connect();
+        $ids = (array) $data['id'];
+
+        foreach ($ids as $id) {
+            $registro = $this->find($id);
+            if ($registro) {
+                $registro['hist_accion']    = 'DELETE';
+                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+                
+                $db->table('casis_persona_historial')->insert($registro);
+            }
+        }
+        return $data;
     }
 }

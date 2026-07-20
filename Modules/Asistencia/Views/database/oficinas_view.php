@@ -373,7 +373,7 @@ Oficinas y Áreas
                     const filtradas = response.data.filter(e => e.est_mic_ide == microredIde);
                     selectEst.empty().append('<option value="">Seleccione Establecimiento...</option>');
                     filtradas.forEach(item => {
-                        selectEst.append(`<option value="${item.est_ide}">${item.est_denominacion}</option>`);
+                        selectEst.append(`<option value="${item.est_ide}">${item.est_nombre}</option>`);
                     });
                     selectEst.prop('disabled', false);
 

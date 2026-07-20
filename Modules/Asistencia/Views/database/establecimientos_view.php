@@ -74,7 +74,7 @@ Establecimientos de Salud
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label class="form-label small fw-bold">Denominación del Establecimiento</label>
-                            <input type="text" class="form-control" id="est_denominacion" required placeholder="Ej. C.S. CONO SUR">
+                            <input type="text" class="form-control" id="est_nombre" required placeholder="Ej. C.S. CONO SUR">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold">Categoría</label>
@@ -159,7 +159,7 @@ Establecimientos de Salud
                     "data": "est_ipress"
                 },
                 {
-                    "data": "est_denominacion",
+                    "data": "est_nombre",
                     "className": "fw-bold"
                 },
                 {
@@ -311,7 +311,7 @@ Establecimientos de Salud
     function abrirModalEditar(data) {
         $('#formEstablecimiento')[0].reset();
         $('#est_ide').val(data.est_ide);
-        $('#est_denominacion').val(data.est_denominacion);
+        $('#est_nombre').val(data.est_nombre);
         $('#est_categoria').val(data.est_categoria);
         $('#est_codigo').val(data.est_codigo);
         $('#est_ipress').val(data.est_ipress);
@@ -351,7 +351,7 @@ Establecimientos de Salud
             est_codigo: $('#est_codigo').val(),
             est_ipress: $('#est_ipress').val(),
             est_tipo: $('#est_tipo').val(),
-            est_denominacion: $('#est_denominacion').val(),
+            est_nombre: $('#est_nombre').val(),
             est_categoria: $('#est_categoria').val(),
             est_ubigeo: $('#est_ubigeo').val(),
             est_latitud: $('#est_latitud').val(),

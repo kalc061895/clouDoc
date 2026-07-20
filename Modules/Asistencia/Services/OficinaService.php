@@ -24,7 +24,7 @@ class OficinaService
                     casis_oficina.*,
                     padre.ofi_nombre as padre_nombre,
                     casis_tipo_oficina.tofi_nombre as tipo_oficina_nombre,
-                    casis_establecimiento.est_denominacion as establecimiento_nombre,
+                    casis_establecimiento.est_nombre as establecimiento_nombre,
                     casis_establecimiento.est_mic_ide as microred_ide,
                     casis_microred.mic_red_ide as red_ide,
                     casis_red.red_dir_ide as diresa_ide

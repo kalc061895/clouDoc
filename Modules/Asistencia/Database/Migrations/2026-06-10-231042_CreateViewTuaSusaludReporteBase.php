@@ -13,7 +13,7 @@ class CreateViewTuaSusaludReporteBase extends Migration
         SELECT
 
             est.est_ipress                         AS codigo_unico,
-            est.est_denominacion                   AS establecimiento,
+            est.est_nombre                   AS establecimiento,
             red.red_nombre                         AS red,
 
             tdi.tdi_abreviatura                    AS tipo_documento,

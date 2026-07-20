@@ -29,8 +29,8 @@ class PersonalModel extends Model
         'perl_tipo_colegio',
         'perl_numero_colegio',
         'perl_regimen_laboral',
-        // 'perl_fecha_registro' no se incluye aquí porque tiene CURRENT_TIMESTAMP en la BD
-        // y se gestiona automáticamente por la base de datos.
+        
+        
     ];
 
     protected bool $allowEmptyInserts = false;

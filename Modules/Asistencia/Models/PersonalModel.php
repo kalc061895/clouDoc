@@ -6,11 +6,11 @@ use CodeIgniter\Model;
 
 class PersonalModel extends Model
 {
-    protected $table            = 'casis_personal';
-    protected $primaryKey       = 'perl_ide';
+    protected $table = 'casis_personal';
+    protected $primaryKey = 'perl_ide';
     protected $useAutoIncrement = true;
 
-    protected $returnType    = 'array';
+    protected $returnType = 'array';
     protected $protectFields = true;
 
     /*
@@ -28,6 +28,7 @@ class PersonalModel extends Model
         'perl_codigo',
         'perl_fecha_inicio',
         'perl_fecha_termino',
+        'perl_fecha_cese',
         'perl_numero_colegiatura',
         'perl_plaza',
         'perl_nivel',
@@ -47,7 +48,7 @@ class PersonalModel extends Model
     |--------------------------------------------------------------------------
     */
     protected $useSoftDeletes = true;
-    protected $deletedField   = 'deleted_at';
+    protected $deletedField = 'deleted_at';
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +56,7 @@ class PersonalModel extends Model
     |--------------------------------------------------------------------------
     */
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
+    protected $dateFormat = 'datetime';
 
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
@@ -67,7 +68,6 @@ class PersonalModel extends Model
     */
     protected $beforeInsert = ['setCreatedBy'];
     protected $beforeUpdate = ['setUpdatedBy'];
-    protected $beforeDelete = ['setDeletedBy'];
 
     /*
     |--------------------------------------------------------------------------
@@ -86,19 +86,19 @@ class PersonalModel extends Model
 
         'perl_mco_ide' => 'required|is_natural_no_zero',
 
-        'perl_se_ide'  => 'permit_empty|is_natural_no_zero',
+        'perl_se_ide' => 'permit_empty|is_natural_no_zero',
 
         'perl_codigo' =>
-        'permit_empty|max_length[20]|is_unique[casis_personal.perl_codigo,perl_ide,{perl_ide}]',
+            'permit_empty|max_length[20]|is_unique[casis_personal.perl_codigo,perl_ide,{perl_ide}]',
 
         'perl_fecha_inicio' =>
-        'permit_empty|valid_date',
+            'permit_empty|valid_date',
 
         'perl_fecha_termino' =>
-        'permit_empty|valid_date',
+            'permit_empty|valid_date',
 
         'perl_estado' =>
-        'permit_empty|in_list[ACTIVO,INACTIVO,SUSPENDIDO,BAJA]',
+            'permit_empty',
     ];
 
     protected $validationMessages = [
@@ -120,7 +120,7 @@ class PersonalModel extends Model
         ]
     ];
 
-    protected $skipValidation       = false;
+    protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
     /*
@@ -149,15 +149,15 @@ class PersonalModel extends Model
 
     protected function setDeletedBy(array $data)
     {
-        if (! function_exists('auth')) {
+        if (!function_exists('auth')) {
             return $data;
         }
 
-        if (! auth()->loggedIn()) {
+        if (!auth()->loggedIn()) {
             return $data;
         }
 
-        if (! empty($data['id'])) {
+        if (!empty($data['id'])) {
 
             $this->builder()
                 ->whereIn($this->primaryKey, (array) $data['id'])
@@ -211,7 +211,7 @@ class PersonalModel extends Model
                 p.per_materno,
                 p.per_nombre,
 
-                establecimiento.est_denominacion,
+                establecimiento.est_nombre,
 
                 cargo.car_nombre,
 
@@ -252,5 +252,60 @@ class PersonalModel extends Model
             ->where('casis_personal.perl_ide', $perlIde)
 
             ->first();
+    }
+
+    // ... Tus propiedades anteriores se mantienen ...
+
+    protected $afterInsert = ['guardarHistorialInsert'];
+    protected $afterUpdate = ['guardarHistorialUpdate'];
+    protected $beforeDelete = ['guardarHistorialDelete', 'setDeletedBy']; // Mantienes tu auditoría y agregas la nuestra
+
+    protected function guardarHistorialInsert(array $data)
+    {
+        if (!$data['result'])
+            return $data;
+        $db = \Config\Database::connect();
+        $registro = $this->find($data['id']);
+        if ($registro) {
+            $registro['hist_accion'] = 'INSERT';
+            $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+            $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+            $db->table('casis_personal_historial')->insert($registro);
+        }
+        return $data;
+    }
+
+    protected function guardarHistorialUpdate(array $data)
+    {
+        if (!$data['result'])
+            return $data;
+        $db = \Config\Database::connect();
+        $ids = (array) $data['id'];
+        foreach ($ids as $id) {
+            $registro = $this->find($id);
+            if ($registro) {
+                $registro['hist_accion'] = 'UPDATE';
+                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+                $db->table('casis_personal_historial')->insert($registro);
+            }
+        }
+        return $data;
+    }
+
+    protected function guardarHistorialDelete(array $data)
+    {
+        $db = \Config\Database::connect();
+        $ids = (array) $data['id'];
+        foreach ($ids as $id) {
+            $registro = $this->find($id);
+            if ($registro) {
+                $registro['hist_accion'] = 'DELETE';
+                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+                $db->table('casis_personal_historial')->insert($registro);
+            }
+        }
+        return $data;
     }
 }

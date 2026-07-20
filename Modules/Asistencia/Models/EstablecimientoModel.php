@@ -24,7 +24,7 @@ class EstablecimientoModel extends Model
         'est_codigo',
         'est_ipress',
         'est_tipo',
-        'est_denominacion',
+        'est_nombre',
         'est_categoria',
         'est_ubigeo',
         'est_latitud',
@@ -38,13 +38,13 @@ class EstablecimientoModel extends Model
 
     protected $validationRules = [
         'est_mic_ide'      => 'required|integer',
-        'est_denominacion' => 'required|max_length[200]',
+        'est_nombre' => 'required|max_length[200]',
     ];
 
     public function obtenerPorMicrored(int $micIde)
     {
         return $this->where('est_mic_ide', $micIde)
-            ->orderBy('est_denominacion')
+            ->orderBy('est_nombre')
             ->findAll();
     }
     protected bool $allowEmptyInserts = false;

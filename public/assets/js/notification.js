@@ -181,7 +181,7 @@ $(document).ready(function () {
 
         verificarToast();
 
-    }, 5000);
+    }, 60000);
 
 
 });

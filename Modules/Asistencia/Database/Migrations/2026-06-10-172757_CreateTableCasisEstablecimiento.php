@@ -39,7 +39,7 @@ class CreateTableCasisEstablecimiento extends Migration
                 'null'       => true,
             ],
 
-            'est_denominacion' => [
+            'est_nombre' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 200,
             ],

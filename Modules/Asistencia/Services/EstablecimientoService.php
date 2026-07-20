@@ -34,10 +34,10 @@ class EstablecimientoService
             ->where('casis_establecimiento.deleted_at', null);
 
         if (!empty($busqueda)) {
-            $builder->like('casis_establecimiento.est_denominacion', $busqueda);
+            $builder->like('casis_establecimiento.est_nombre', $busqueda);
         }
 
-        return $builder->orderBy('casis_establecimiento.est_denominacion', 'ASC')->get()->getResultArray();
+        return $builder->orderBy('casis_establecimiento.est_nombre', 'ASC')->get()->getResultArray();
     }
 
     public function obtenerPorId(int $id): ?array

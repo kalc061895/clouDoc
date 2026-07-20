@@ -287,21 +287,32 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     });
 
     $routes->group('personal', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
-        // Vistas principales
-        $routes->get('/', 'PersonalController::nuevo');
+        // 1. Vistas Web
+        $routes->get('/', 'PersonalController::index');
         $routes->get('nuevo', 'PersonalController::nuevo');
         $routes->get('editar/(:num)', 'PersonalController::editar/$1');
 
-        // API Operaciones Core
+        // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
-            $routes->get('/', 'PersonalController::apiListar');
-            $routes->post('verificar-identidad', 'PersonalController::apiVerificarIdentidad');
-            $routes->post('/', 'PersonalController::apiCrear');
-            $routes->put('(:num)', 'PersonalController::apiActualizar/$1');
+            $routes->get('listar', 'PersonalController::apiListar');
+            $routes->post('guardar-wizard', 'PersonalController::apiGuardarWizard');
+            $routes->post('actualizar/(:num)', 'PersonalController::apiActualizarPersonal/$1');
+            $routes->post('baja/(:num)', 'PersonalController::apiDarDeBaja/$1');
+        });
 
-            // Historial, Movimientos e Incidencias (Bajas, rotaciones)
-            $routes->post('movimiento', 'PersonalController::apiRegistrarMovimiento');
-            $routes->post('baja/(:num)', 'PersonalController::apiRegistrarBaja/$1');
+        // 3. Alimentación de Selectores Dinámicos
+        $routes->group('select', function ($routes) {
+            $routes->get('tipos-documento', 'PersonalController::apiSelectTiposDocumento');
+            $routes->get('establecimientos', 'PersonalController::apiSelectEstablecimientos');
+            $routes->get('modalidades-contrato', 'PersonalController::apiSelectModalidadesContrato');
+            $routes->get('cargos', 'PersonalController::apiSelectCargos');
+            $routes->get('profesiones', 'PersonalController::apiSelectProfesiones');
+            $routes->get('colegios', 'PersonalController::apiSelectColegios');
+            $routes->get('especialidades', 'PersonalController::apiSelectEspecialidades');
+
+            // Dependientes (Filtros en cascada)
+            $routes->get('unidades', 'PersonalController::apiSelectUnidades');
+            $routes->get('oficinas', 'PersonalController::apiSelectOficinas');
         });
     });
 
