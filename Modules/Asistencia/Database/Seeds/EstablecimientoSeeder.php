@@ -411,7 +411,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- HOSPITAL DE REFERENCIA BASE ---
             [
-                'est_mic_ide' => 100,
+                'est_mic_ide' => 1,
                 'est_codigo' => '00003299',
                 'est_ipress' => '0000',
                 'est_tipo' => 'HOSPITAL',

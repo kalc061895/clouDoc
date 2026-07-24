@@ -35,13 +35,6 @@ class CreateTablePersonal extends Migration
                 'unsigned'   => true,
             ],
 
-            'perl_uo_ide' => [
-                'type'       => 'INT',
-                'constraint' => 10,
-                'unsigned'   => true,
-                'null'       => true,
-            ],
-
             'perl_ofi_ide' => [
                 'type'       => 'INT',
                 'constraint' => 10,
@@ -180,7 +173,6 @@ class CreateTablePersonal extends Migration
 
         $this->forge->addKey('perl_per_ide');
         $this->forge->addKey('perl_est_ide');
-        $this->forge->addKey('perl_uo_ide');
         $this->forge->addKey('perl_ofi_ide');
         $this->forge->addKey('perl_car_ide');
         $this->forge->addKey('perl_mco_ide');
@@ -210,14 +202,6 @@ class CreateTablePersonal extends Migration
             'casis_establecimiento',
             'est_ide',
             'RESTRICT',
-            'CASCADE'
-        );
-
-        $this->forge->addForeignKey(
-            'perl_uo_ide',
-            'casis_unidades_organizacionales',
-            'uo_ide',
-            'SET NULL',
             'CASCADE'
         );
 

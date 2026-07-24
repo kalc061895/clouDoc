@@ -12,12 +12,12 @@ class OficinaSeeder extends Seeder
         $now = date('Y-m-d H:i:s');
 
         // 1. Mapeo referencial de los IDs de 'casis_tipo_oficina'
-        $tofi_direccion    = 100;
-        $tofi_oficina      = 200;
-        $tofi_departamento = 300;
-        $tofi_unidad       = 400;
-        $tofi_area         = 500;
-        $tofi_servicio     = 600;
+        $tofi_direccion    = 1;
+        $tofi_oficina      = 2;
+        $tofi_departamento = 3;
+        $tofi_unidad       = 4;
+        $tofi_area         = 5;
+        $tofi_servicio     = 6;
 
         // ID del Establecimiento por defecto
         $est_ide_defecto = 29;

@@ -4,10 +4,10 @@ namespace Modules\Asistencia\Models;
 
 use CodeIgniter\Model;
 
-class PersonalHistorialModel extends Model
+class PersonalProfesionHistorialModel extends Model
 {
-    protected $table            = 'casis_personal_historial';
-    protected $primaryKey       = 'hist_perl_ide';
+    protected $table            = 'casis_personal_profesion_historial';
+    protected $primaryKey       = 'hist_pp_ide';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
 
@@ -15,23 +15,18 @@ class PersonalHistorialModel extends Model
     protected $protectFields    = true;
 
     protected $allowedFields    = [
-        'perl_ide',
-        'perl_per_ide',
-        'perl_est_ide',
-        'perl_ofi_ide',
-        'perl_car_ide',
-        'perl_mco_ide',
-        'perl_se_ide',
-        'perl_codigo',
-        'perl_fecha_inicio',
-        'perl_fecha_termino',
-        'perl_fecha_cese',
-        'perl_numero_colegiatura',
-        'perl_plaza',
-        'perl_nivel',
-        'perl_estado',
-        'perl_regimen_laboral',
-        'perl_observacion',
+        'pp_ide',
+        'pp_perl_ide',
+        'pp_principal',
+        'pp_pro_ide',
+        'pp_col_ide',
+        'pp_se_ide',
+        'pp_numero_colegiatura',
+        'pp_rne',
+        'pp_habilitado',
+        'pp_fecha_habilitacion',
+        'pp_fecha_vencimiento',
+        'pp_observacion',
         'hist_accion',
         'hist_hecho_por',
         'hist_creado_en',
@@ -49,9 +44,10 @@ class PersonalHistorialModel extends Model
 
     // Reglas de validación básicas
     protected $validationRules = [
-        'perl_ide'     => 'required|integer',
-        'perl_per_ide' => 'required|integer',
-        'hist_accion'  => 'required|in_list[INSERT,UPDATE,DELETE]',
+        'pp_ide'      => 'required|integer',
+        'pp_perl_ide' => 'required|integer',
+        'pp_pro_ide'  => 'required|integer',
+        'hist_accion' => 'required|in_list[INSERT,UPDATE,DELETE]',
     ];
 
     protected $skipValidation       = false;

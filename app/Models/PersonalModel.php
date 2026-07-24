@@ -13,7 +13,7 @@ class PersonalModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'perl_per_dni',
+        'perl_per_ide',
         'perl_codigo',
         'perl_tipo_contrato',
         'perl_fecha_inicio',
@@ -91,8 +91,8 @@ class PersonalModel extends Model
         //$this->select('asis_estado_ide.est_nombre AS nombre_estado');
 
 
-        // Realiza el JOIN con la tabla asis_persona (usando perl_per_dni)
-        $this->join('asis_persona', 'asis_persona.per_dni = asis_personal.perl_per_dni', 'left');
+        // Realiza el JOIN con la tabla asis_persona (usando perl_per_ide)
+        $this->join('asis_persona', 'asis_persona.per_dni = asis_personal.perl_per_ide', 'left');
 
         // Realiza el JOIN con la tabla asis_especialidad (usando perl_esp_ide)
         // Asegúrate de que 'asis_especialidad' y 'esp_ide' sean los nombres correctos de tu tabla y su PK.
@@ -109,7 +109,7 @@ class PersonalModel extends Model
 
         // Si se proporciona un ID, busca un registro específico
         if ($id !== null) {
-            return $this->where('perl_per_dni',$id)->first();
+            return $this->where('perl_per_ide',$id)->first();
         }
 
         // Si no se proporciona ID, retorna todos los registros con los JOINs

@@ -104,10 +104,6 @@ class CreateTableCasisPersona extends Migration
                 'null' => true,
             ],
 
-            'per_fecha_registro' => [
-                'type'    => 'TIMESTAMP',
-                'null'    => true,
-            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

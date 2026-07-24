@@ -167,7 +167,7 @@ class ProgramacionController extends BaseController
                 CONCAT(casis_persona.per_paterno, " ", casis_persona.per_materno) as apellidos,
                 IFNULL(casis_servicio.ser_nombre, "N/A") as cargo
             ')
-            ->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_dni', 'left')
+            ->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_ide', 'left')
             ->join('casis_servicio', 'casis_servicio.ser_ide = casis_personal.perl_ser_ide', 'left')
             ->findAll();
 

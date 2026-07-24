@@ -70,9 +70,9 @@ class AsisReporteBodyModel extends Model
         // Usamos 'inner' join porque se espera que cada registro de reporte_body tenga un personal asociado
         $builder->join('asis_personal', 'asis_personal.perl_ide = asis_reporte_body.rb_perl_ide', 'inner');
 
-        // JOIN con asis_persona usando perl_per_dni (que es la FK a per_dni)
+        // JOIN con asis_persona usando perl_per_ide (que es la FK a per_dni)
         // Esto nos permite filtrar por el DNI de la persona
-        $builder->join('asis_persona', 'asis_persona.per_dni = asis_personal.perl_per_dni', 'inner');
+        $builder->join('asis_persona', 'asis_persona.per_dni = asis_personal.perl_per_ide', 'inner');
         
         // JOIN con asis_reporte usando rb_rep_ide (que es la FK a rep_body)
         // Esto nos permite filtrar por el DNI de la persona

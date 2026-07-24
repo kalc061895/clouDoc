@@ -89,16 +89,16 @@ class PersonalModel extends Model
         'perl_se_ide' => 'permit_empty|is_natural_no_zero',
 
         'perl_codigo' =>
-            'permit_empty|max_length[20]|is_unique[casis_personal.perl_codigo,perl_ide,{perl_ide}]',
+        'permit_empty|max_length[20]|is_unique[casis_personal.perl_codigo,perl_ide,{perl_ide}]',
 
         'perl_fecha_inicio' =>
-            'permit_empty|valid_date',
+        'permit_empty|valid_date',
 
         'perl_fecha_termino' =>
-            'permit_empty|valid_date',
+        'permit_empty|valid_date',
 
         'perl_estado' =>
-            'permit_empty',
+        'permit_empty',
     ];
 
     protected $validationMessages = [
@@ -284,10 +284,20 @@ class PersonalModel extends Model
         foreach ($ids as $id) {
             $registro = $this->find($id);
             if ($registro) {
-                $registro['hist_accion'] = 'UPDATE';
-                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
-                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
-                $db->table('casis_personal_historial')->insert($registro);
+                $registro2['hist_accion'] = 'INSERT';
+                $registro2['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro2['hist_creado_en'] = date('Y-m-d H:i:s');
+
+                $registro2['phis_perl_ide'] = $registro['perl_ide'];
+                $registro2['phis_est_ide'] = $registro['perl_est_ide'];
+                $registro2['phis_ofi_ide'] = $registro['perl_ofi_ide'];
+                $registro2['phis_car_ide'] = $registro['perl_car_ide'];
+                $registro2['phis_mco_ide'] = $registro['perl_mco_ide'];
+                $registro2['phis_fecha_inicio'] = $registro['perl_fecha_inicio'];
+                $registro2['phis_fecha_termino'] = $registro['perl_fecha_termino'];
+                $registro2['phis_estado'] = $registro['perl_estado'];
+
+                $db->table('casis_personal_historial')->insert($registro2);
             }
         }
         return $data;
@@ -303,6 +313,15 @@ class PersonalModel extends Model
                 $registro['hist_accion'] = 'DELETE';
                 $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
                 $registro['hist_creado_en'] = date('Y-m-d H:i:s');
+                $registro['phis_perl_ide'] = $registro['perl_ide'];
+                $registro['phis_est_ide'] = $registro['perl_est_ide'];
+                $registro['phis_ofi_ide'] = $registro['perl_ofi_ide'];
+                $registro['phis_car_ide'] = $registro['perl_car_ide'];
+                $registro['phis_mco_ide'] = $registro['perl_mco_ide'];
+                $registro['phis_fecha_inicio'] = $registro['perl_fecha_inicio'];
+                $registro['phis_fecha_termino'] = $registro['perl_fecha_termino'];
+                $registro['phis_estado'] = $registro['perl_estado'];
+
                 $db->table('casis_personal_historial')->insert($registro);
             }
         }
