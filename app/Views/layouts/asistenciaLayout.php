@@ -574,12 +574,14 @@
                                             aria-labelledby="drop2">
                                             <div class="py-3 px-4 border-bottom">
                                                 <h5 class="mb-0 fs-4 fw-normal">
-                                                    <?php echo lang('Notification.notificacion'); ?></h5>
+                                                    <?php echo lang('Notification.notificacion'); ?>
+                                                </h5>
                                             </div>
                                             <div class="message-body" data-simplebar>
                                                 <div class="contenedorNotificaciones">
                                                     <p class="text-center">
-                                                        <?= lang('Notification.no_new_notifications') ?></p>
+                                                        <?= lang('Notification.no_new_notifications') ?>
+                                                    </p>
                                                 </div>
 
                                             </div>
@@ -2080,6 +2082,24 @@
 
         $(document).ready(function () {
             connectionCheckInterval = setInterval(checkInternetConnection, 30000); // Revisar cada minuto
+
+            // Ajuste automático de z-index para modales anidados
+            $(document).on('show.bs.modal', '.modal', function () {
+                const zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+
+            // Restaurar scroll al cerrar el modal superior
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                if ($('.modal:visible').length > 0) {
+                    setTimeout(function () {
+                        $(document.body).addClass('modal-open');
+                    }, 0);
+                }
+            });
         });
 
         toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');

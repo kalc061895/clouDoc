@@ -27,6 +27,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // GRUPO: ADMINISTRADOR (administrador/*)
     // ==========================================
     $routes->group('administrador', function ($routes) {
+
         // Personal
         $routes->get('personal', 'PersonalController::index');
         $routes->get('nuevo_personal', 'PersonalController::nuevo');
@@ -291,13 +292,31 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('/', 'PersonalController::index');
         $routes->get('nuevo', 'PersonalController::nuevo');
         $routes->get('editar/(:num)', 'PersonalController::editar/$1');
+        $routes->get('gestorpersonal', 'PersonalController::gestorPersonal');
 
+        // PARA IMPLEMENTAR LAS VISTAS EN PANEL DE GESTOR DE PERSONAL 
+        $routes->get('datos/(:num)', 'PersonalController::getPaneDatos/$1');
+        $routes->get('asistencia/(:num)', 'AsistenciaController::getPaneAsistencia/$1');
+        $routes->get('turnos/(:num)', 'TurnoController::getPaneTurnos/$1');
+        $routes->get('incidencias/(:num)', 'RegistroLicenciaController::getPaneIncidencias/$1');
+        $routes->get('vacaciones/(:num)', 'VacacionController::getPaneVacaciones/$1');
         // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
             $routes->get('listar', 'PersonalController::apiListar');
             $routes->post('guardar-wizard', 'PersonalController::apiGuardarWizard');
             $routes->post('actualizar/(:num)', 'PersonalController::apiActualizarPersonal/$1');
             $routes->post('baja/(:num)', 'PersonalController::apiDarDeBaja/$1');
+
+            $routes->get('fetch', 'PersonalController::fetch');
+            // Obtener datos individuales de un trabajador por ID (Para cargar los datos en el Modal)
+            $routes->get('show/(:num)', 'PersonalController::show/$1');
+
+            // Endpoints consumidos por los Javascripts de las vistas parciales
+            $routes->get('asistencia/(:num)', 'AsistenciaController::getByPersonal/$1');
+            $routes->get('turnos/(:num)', 'TurnoController::getByPersonal/$1');
+            $routes->get('incidencias/(:num)', 'LicenciaController::getByPersonal/$1');
+            $routes->get('vacaciones/(:num)', 'VacacionController::getByPersonal/$1');
+
         });
 
         // 3. Alimentación de Selectores Dinámicos
@@ -314,8 +333,20 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->get('unidades', 'PersonalController::apiSelectUnidades');
             $routes->get('oficinas', 'PersonalController::apiSelectOficinas');
         });
+
+
+
     });
 
+    $routes->group('licencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+
+        $routes->group('api', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+            $routes->get('tipos-activos', 'LicenciaController::tiposActivos');
+            $routes->get('personal/(:num)', 'LicenciaController::obtenerPorPersonal/$1');
+            $routes->post('guardar', 'LicenciaController::guardar');
+            $routes->post('eliminar/(:num)', 'LicenciaController::eliminar/$1');
+        });
+    });
 
 
 

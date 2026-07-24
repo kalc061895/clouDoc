@@ -182,7 +182,7 @@ class PersonalService
 
             // Si todo salió bien, confirmamos permanentemente en la base de datos
             $db->transComplete();
-            
+
             // 3. Verificamos el estado final de la transacción
             if ($db->transStatus() === false) {
                 // Obtenemos el último error de la base de datos
@@ -190,7 +190,7 @@ class PersonalService
 
                 return [
                     'status' => 'error',
-                    'message' => $msg.'Error ssssen la base de datos: ' . $error['message'],
+                    'message' => $msg . 'Error ssssen la base de datos: ' . $error['message'],
                     'code' => $error['code'] // Código numérico del error (ej. 1452 para llaves foráneas)
                 ];
             }
@@ -259,6 +259,93 @@ class PersonalService
         $builder->orderBy('p.per_paterno', 'ASC');
 
         return $builder->get()->getResultArray();
+    }
+
+    /**
+     * Obtiene el listado procesado para DataTables Server-Side
+     */
+    public function getListadoPersonalDatatable(array $requestData): array
+    {
+        $db = Database::connect();
+
+        // 1. Construir la consulta base
+        $builder = $db->table('casis_personal as pl');
+        $builder->select('
+            pl.perl_ide as id,
+            pl.perl_codigo as codigo,
+            p.per_numero_documento as documento,
+            CONCAT(p.per_paterno, " ", p.per_materno, ", ", p.per_nombre) as nombre_completo,
+            est.est_nombre as establecimiento,
+            car.car_nombre as cargo,
+            mco.mco_nombre as modalidad,
+            ofi.ofi_nombre as oficina,
+            pl.perl_estado as estado
+        ');
+        $builder->join('casis_persona p', 'p.per_ide = pl.perl_per_ide');
+        $builder->join('casis_establecimiento est', 'est.est_ide = pl.perl_est_ide');
+        $builder->join('casis_cargo car', 'car.car_ide = pl.perl_car_ide', 'left');
+        $builder->join('casis_oficina ofi', 'ofi.ofi_ide = pl.perl_ofi_ide', 'left');
+        $builder->join('casis_modalidad_contrato mco', 'mco.mco_ide = pl.perl_mco_ide', 'left');
+        $builder->where('pl.perl_estado = 1');
+
+        // Total de registros antes de filtrar
+        $totalRecords = $builder->countAllResults(false);
+
+        // 2. Aplicar Búsqueda / Filtros (si el usuario escribe en el input search)
+        $searchValue = $requestData['search']['value'] ?? null;
+        if (!empty($searchValue)) {
+            $builder->groupStart()
+                ->like('p.per_numero_documento', $searchValue)
+                ->orLike('p.per_paterno', $searchValue)
+                ->orLike('p.per_materno', $searchValue)
+                ->orLike('p.per_nombre', $searchValue)
+                ->orLike('pl.perl_codigo', $searchValue)
+                ->orLike('est.est_nombre', $searchValue)
+                ->orLike('car.car_nombre', $searchValue)
+                ->orLike('ofi.ofi_nombre', $searchValue)
+                ->groupEnd();
+        }
+
+        // Total de registros después de aplicar el filtro
+        $totalFiltered = $builder->countAllResults(false);
+
+        // 3. Ordenamiento dinámico enviado por DataTables
+        if (isset($requestData['order'][0])) {
+            $columnIndex = $requestData['order'][0]['column'];
+            $columnDir = $requestData['order'][0]['dir'];
+            $columns = [
+                0 => 'pl.perl_codigo',
+                1 => 'p.per_numero_documento',
+                2 => 'p.per_paterno',
+                3 => 'est.est_nombre',
+                4 => 'car.car_nombre',
+                5 => 'pl.perl_estado'
+            ];
+
+            if (isset($columns[$columnIndex])) {
+                $builder->orderBy($columns[$columnIndex], $columnDir);
+            }
+        } else {
+            $builder->orderBy('p.per_paterno', 'ASC');
+        }
+
+        // 4. Paginación
+        $length = $requestData['length'] ?? 10;
+        $start = $requestData['start'] ?? 0;
+
+        if ($length != -1) {
+            $builder->limit($length, $start);
+        }
+
+        $data = $builder->get()->getResultArray();
+
+        // 5. Retornar la estructura exacta requerida por DataTables
+        return [
+            "draw" => intval($requestData['draw'] ?? 1),
+            "recordsTotal" => $totalRecords,
+            "recordsFiltered" => $totalFiltered,
+            "data" => $data
+        ];
     }
 
     /**
@@ -360,7 +447,7 @@ class PersonalService
             'perl_mco_ide' => $datosPost['perl_mco_ide'],
             'perl_car_ide' => $datosPost['perl_car_ide'],
             'perl_est_ide' => $datosPost['perl_est_ide'],
-           
+
             'perl_ofi_ide' => !empty($datosPost['perl_ofi_ide']) ? $datosPost['perl_ofi_ide'] : null,
             'perl_fecha_inicio' => $datosPost['perl_fecha_inicio'],
 
@@ -377,5 +464,42 @@ class PersonalService
         $db->transComplete();
 
         return $db->transStatus();
+    }
+
+    public function getDatatablePersonal(array $request)
+    {
+        $db = Database::connect();
+        $builder = $db->table('vw_personal_activo');
+
+        // Total de registros sin filtrar
+        $recordsTotal = $builder->countAllResults(false);
+
+        // Búsqueda global (Servidor)
+        $searchValue = $request['search']['value'] ?? null;
+        if (!empty($searchValue)) {
+            $builder->groupStart()
+                ->like('personal_nombre', $searchValue)
+                ->orLike('per_dni', $searchValue)
+                ->orLike('per_codigo', $searchValue)
+                ->orLike('oficina_nombre', $searchValue)
+                ->orLike('establecimiento_nombre', $searchValue)
+                ->groupEnd();
+        }
+
+        // Total filtrado
+        $recordsFiltered = $builder->countAllResults(false);
+
+        // Paginación
+        $length = $request['length'] ?? 10;
+        $start = $request['start'] ?? 0;
+
+        $data = $builder->limit($length, $start)->get()->getResultArray();
+
+        return [
+            'draw' => intval($request['draw'] ?? 1),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data
+        ];
     }
 }

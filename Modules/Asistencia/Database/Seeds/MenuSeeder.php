@@ -144,8 +144,8 @@ class MenuSeeder extends Seeder
                 'icon'      => 'medal',
                 'order'     => 180,
                 'separator' => 'Calificaciones',
-            ],
-        ];
+                ],
+                ];
 
         // Insertar los padres y guardar sus IDs asignados en la base de datos
         $padresIds = [];
@@ -157,18 +157,13 @@ class MenuSeeder extends Seeder
         // 2. Definición de los Submenús (Hijos)
         // Mapeamos el 'tar_menu' original de CI3 al padre correspondiente creado arriba
         $submenus = [
-            // CONFIGURACION
-            ['parent' => 'CONFIGURACION', 'name' => 'Configurar Sistema', 'url' => 'configuracion/config', 'icon' => 'cogs', 'order' => 1],
-            ['parent' => 'CONFIGURACION', 'name' => 'Ver Personal (Admin)', 'url' => 'administrador/personal', 'icon' => 'users', 'order' => 2],
-            ['parent' => 'CONFIGURACION', 'name' => 'Aspecto', 'url' => 'configuracion/aspecto', 'icon' => 'palette', 'order' => 3],
-
+           
             // PERSONAL
-            ['parent' => 'PERSONAL', 'name' => 'Ver Planilla', 'url' => 'administrador/planilla', 'icon' => 'users', 'order' => 1],
-            ['parent' => 'PERSONAL', 'name' => 'Nuevo Personal', 'url' => 'administrador/nuevo_personal', 'icon' => 'user-plus', 'order' => 2],
-            ['parent' => 'PERSONAL', 'name' => 'Interno y Residente', 'url' => 'administrador/planilla_capacitacion', 'icon' => 'user-graduate', 'order' => 3],
-            ['parent' => 'PERSONAL', 'name' => 'Ver Personal', 'url' => 'administrador/planilla_observacion', 'icon' => 'eye', 'order' => 4],
-            ['parent' => 'PERSONAL', 'name' => 'Personal MicroRed', 'url' => 'administrador/planilla_microred', 'icon' => 'users', 'order' => 5],
-            ['parent' => 'PERSONAL', 'name' => 'Gestor de Personal', 'url' => 'administrador/planilla', 'icon' => 'user-cog', 'order' => 6],
+            ['parent' => 'PERSONAL', 'name' => 'Nuevo Personal', 'url' => 'personal/nuevo', 'icon' => 'user-plus', 'order' => 2],
+            ['parent' => 'PERSONAL', 'name' => 'Gestor de Personal', 'url' => 'personal/listado_personal', 'icon' => 'user-cog', 'order' => 6],
+            ['parent' => 'PERSONAL', 'name' => 'Personal MicroRed', 'url' => 'personal/listado_personal_microred', 'icon' => 'users', 'order' => 5],
+            ['parent' => 'PERSONAL', 'name' => 'Interno y Residente', 'url' => 'personal/listado_personal_capacitacion', 'icon' => 'user-graduate', 'order' => 3],
+            ['parent' => 'PERSONAL', 'name' => 'Ver Personal', 'url' => 'personal/listado_personal_observacion', 'icon' => 'eye', 'order' => 4],
 
             // ROL MENSUAL
             ['parent' => 'ROL_MENSUAL', 'name' => 'Asignar Prog. Turnos', 'url' => 'administrador/asignar_plan', 'icon' => 'user-clock', 'order' => 1],
@@ -176,15 +171,19 @@ class MenuSeeder extends Seeder
             ['parent' => 'ROL_MENSUAL', 'name' => 'Cambio de Turno (Admin)', 'url' => 'administrador/cambio_turno_user', 'icon' => 'exchange-alt', 'order' => 3],
 
             // ROL DE TURNOS
-            ['parent' => 'ROL_DE_TURNOS', 'name' => 'Mi Rol de Turnos', 'url' => 'usuario/rol', 'icon' => 'calendar-check', 'order' => 1],
-            ['parent' => 'ROL_DE_TURNOS', 'name' => 'Roles Por Usuario', 'url' => 'configuracion/cargar_rolusuario', 'icon' => 'users', 'order' => 2],
+            // ['parent' => 'ROL_DE_TURNOS', 'name' => 'Roles Por Usuario', 'url' => 'configuracion/cargar_rolusuario', 'icon' => 'users', 'order' => 2],
             ['parent' => 'ROL_DE_TURNOS', 'name' => 'Carga Masiva', 'url' => 'administrador/load_file_turnos', 'icon' => 'file-excel', 'order' => 3],
-
+            
             // ASISTENCIA
             ['parent' => 'ASISTENCIA', 'name' => 'Consultar Asistencia', 'url' => 'administrador/reporte_asistencia', 'icon' => 'calendar-check', 'order' => 1],
             ['parent' => 'ASISTENCIA', 'name' => 'Rectificar Asistencia', 'url' => 'administrador/asistencia', 'icon' => 'edit', 'order' => 2],
-            ['parent' => 'ASISTENCIA', 'name' => 'Mi Asistencia', 'url' => 'usuario/asistencia', 'icon' => 'user-check', 'order' => 3],
-
+            
+            // TRABAJADOR
+            ['parent' => 'TRABAJADOR', 'name' => 'Mi Asistencia', 'url' => 'usuario/asistencia', 'icon' => 'user-check', 'order' => 3],
+            ['parent' => 'TRABAJADOR', 'name' => 'Mi Rol de Turnos', 'url' => 'usuario/rol', 'icon' => 'calendar-check', 'order' => 1],
+            ['parent' => 'TRABAJADOR', 'name' => 'Asistencia Por Establecimiento', 'url' => 'usuario/asistencia_est', 'icon' => 'map-pin', 'order' => 1],
+            ['parent' => 'TRABAJADOR', 'name' => 'Marcar mi Asistencia', 'url' => 'usuario/reloj', 'icon' => 'fingerprint', 'order' => 1],
+            
             // DISPOSITIVO
             ['parent' => 'DISPOSITIVO', 'name' => 'Subir Datos', 'url' => 'marcar/prueba2', 'icon' => 'upload', 'order' => 1],
             ['parent' => 'DISPOSITIVO', 'name' => 'Cargar desde Ztkeco', 'url' => 'administrador/load_file', 'icon' => 'hdd', 'order' => 2],
@@ -205,6 +204,7 @@ class MenuSeeder extends Seeder
             ['parent' => 'REPORTES', 'name' => 'Ver Reportes', 'url' => 'administrador/listarreportes', 'icon' => 'folder-open', 'order' => 12],
             ['parent' => 'REPORTES', 'name' => 'Reporte Turnos TUASALUD', 'url' => 'tuasalud/reporte_rol_tuasalud', 'icon' => 'file-csv', 'order' => 13],
             ['parent' => 'REPORTES', 'name' => 'Reporte 40', 'url' => 'administrador/reporte_40', 'icon' => 'file-medical-alt', 'order' => 14],
+            ['parent' => 'REPORTES', 'name' => 'Kardex Total', 'url' => 'administrador/reporte_total_kardex', 'icon' => 'book', 'order' => 1],
 
             // PERFIL
             ['parent' => 'PERFIL', 'name' => 'Mis Datos', 'url' => 'usuario/perfil', 'icon' => 'user-id', 'order' => 1],
@@ -215,40 +215,25 @@ class MenuSeeder extends Seeder
             // VACACIONES
             ['parent' => 'VACACIONES', 'name' => 'Mis Vacaciones', 'url' => 'usuario/vacaciones', 'icon' => 'sun', 'order' => 1],
 
-            // RED DE SALUD
-            ['parent' => 'RED_DE_SALUD', 'name' => 'Usuarios del Sistema', 'url' => 'administrador/periferie', 'icon' => 'network-wired', 'order' => 1],
 
             // BASE DE DATOS (CRUDs)
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Gestor de Datos', 'url' => 'gestordb/listar_tablas', 'icon' => 'database', 'order' => 1],
+            
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Tareas', 'url' => 'gestordb/tarea', 'icon' => 'tasks', 'order' => 2],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Oficinas', 'url' => 'gestordb/oficina', 'icon' => 'briefcase', 'order' => 3],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Licencia', 'url' => 'gestordb/licencia', 'icon' => 'calendar-minus', 'order' => 4],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Turno', 'url' => 'gestordb/turno', 'icon' => 'hourglass-half', 'order' => 5],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Horario de Turnos', 'url' => 'gestordb/turno_horario', 'icon' => 'clock', 'order' => 6],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Cargo', 'url' => 'gestordb/cargo', 'icon' => 'user-tag', 'order' => 7],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Nivel de Acceso', 'url' => 'gestordb/rol', 'icon' => 'users-cog', 'order' => 8],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Distrito', 'url' => 'gestordb/distrito', 'icon' => 'map-marker', 'order' => 9],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Sector', 'url' => 'gestordb/microred', 'icon' => 'map-signs', 'order' => 10],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Usuarios de Sistema', 'url' => 'gestordb/usuario', 'icon' => 'users', 'order' => 11],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Establecimientos', 'url' => 'gestordb/establecimiento', 'icon' => 'hospital', 'order' => 12],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Asignar Tareas', 'url' => 'gestordb/asignar_tarea', 'icon' => 'tasks', 'order' => 13],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Modalidad', 'url' => 'gestordb/tipo_contrato', 'icon' => 'handshake', 'order' => 14],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Permisos', 'url' => 'gestordb/permiso', 'icon' => 'id-card', 'order' => 15],
+            ['parent' => 'BASE_DE_DATOS', 'name' => 'Usuarios del Sistema', 'url' => 'administrador/periferie', 'icon' => 'network-wired', 'order' => 1],
 
-            // MARCAR ASISTENCIA
-            ['parent' => 'MARCAR_ASISTENCIA', 'name' => 'Marcar mi Asistencia', 'url' => 'usuario/reloj', 'icon' => 'fingerprint', 'order' => 1],
+            
 
-            // RELOJ
-            ['parent' => 'RELOJ', 'name' => 'Marcar Asistencia', 'url' => 'usuario/reloj', 'icon' => 'clock', 'order' => 1],
-
-            // KARDEX
-            ['parent' => 'KARDEX', 'name' => 'Kardex Total', 'url' => 'administrador/reporte_total_kardex', 'icon' => 'book', 'order' => 1],
-
-            // ASISTENCIA POR PUESTO
-            ['parent' => 'ASISTENCIA_POR_PUESTO', 'name' => 'Asistencia Por Establecimiento', 'url' => 'usuario/asistencia_est', 'icon' => 'map-pin', 'order' => 1],
 
             // ESTABLECIMIENTOS
-            ['parent' => 'ESTABLECIMIENTOS', 'name' => 'Mapa de Establecimientos', 'url' => 'administrador/mapa_establecimiento', 'icon' => 'map-marked-alt', 'order' => 1],
+            ['parent' => 'MAPA DE ESTABLECIMIENTOS', 'name' => 'Mapa', 'url' => 'administrador/mapa_establecimiento', 'icon' => 'map-marked-alt', 'order' => 1],
 
             // CALIFICACION
             ['parent' => 'CALIFICACION', 'name' => 'Calificador MicroRed', 'url' => 'administrador/calificador_microred', 'icon' => 'award', 'order' => 1],

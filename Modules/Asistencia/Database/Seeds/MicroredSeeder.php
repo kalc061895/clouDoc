@@ -10,7 +10,7 @@ class MicroredSeeder extends Seeder
     {
         $data = [
             // RED 1: EJERCITO PERUANO
-            ['mic_red_ide' => 1, 'mic_codigo' => 'MR-01-NONE', 'mic_nombre' => 'NO PERTENECE A NINGUNA MICRORED', 'mic_ubicacion' => 'PUNO'],
+            ['mic_red_ide' => 100, 'mic_codigo' => 'MR-01-NONE', 'mic_nombre' => 'NO PERTENECE A NINGUNA MICRORED', 'mic_ubicacion' => 'PUNO'],
 
             // RED 2: AZANGARO
             ['mic_red_ide' => 2, 'mic_codigo' => 'MR-02-ALIA', 'mic_nombre' => 'ALIANZA', 'mic_ubicacion' => 'AZANGARO'],

@@ -402,7 +402,7 @@ Registro Integral de Personal
             if (result.isConfirmed && result.value.status === 'success') {
                 toastr.success('Personal dado de alta correctamente en la Red de Salud.');
                 setTimeout(() => {
-                    //window.location.href = '<?= base_url('personal') ?>';
+                    window.location.href = '<?= base_url('asistencia/personal') ?>';
                 }, 1500);
             }
         });

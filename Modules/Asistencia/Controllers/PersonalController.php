@@ -208,4 +208,39 @@ class PersonalController extends BaseController
         return $this->respond(['status' => 'success', 'data' => $data], 200);
     }
 
+    // Endpoint API para DataTables
+
+    // Carga la vista principal del Layout
+    public function gestorPersonal()
+    {
+        return view('Modules\Asistencia\Views\personal\gestor_personal_view');
+    }
+
+    // Endpoint API para DataTables
+    public function fetch()
+    {
+        $requestData = $this->request->getGet(); // o $this->request->getPost();
+        $response = $this->personalService->getListadoPersonalDatatable($requestData);
+
+        return $this->respond($response);
+    }
+
+    // Endpoint API para obtener los datos completos de un usuario para el Modal
+    public function show($id)
+    {
+        $db = \Config\Database::connect();
+        $person = $db->table('vw_personal_activo')->where('per_id', $id)->get()->getRowArray();
+
+        if (!$person) {
+            return $this->failNotFound('Personal no encontrado.');
+        }
+
+        return $this->respond($person);
+    }
+    public function getPaneDatos($id)
+    {
+        return $this->respond($person);
+    }
+
+
 }

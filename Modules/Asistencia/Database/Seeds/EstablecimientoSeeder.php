@@ -8,12 +8,14 @@ class EstablecimientoSeeder extends Seeder
 {
     public function run()
     {
+        $now = date('Y-m-d H:i:s');
+
         $data = [
             // --- MICRORRED: CABANILLAS ---
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003290',
-                'est_ipress' => 'RDR Nº 2084-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'AYACACHI',
                 'est_categoria' => 'I-1',
@@ -22,12 +24,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.19416187',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003291',
-                'est_ipress' => 'RDR N° 2049-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CABANILLAS',
                 'est_categoria' => 'I-3',
@@ -36,12 +38,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.34843352',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003292',
-                'est_ipress' => 'RDR Nº 2088-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'COLLANA CABANA',
                 'est_categoria' => 'I-1',
@@ -50,12 +52,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.24934809',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003293',
-                'est_ipress' => 'RDR Nº 2102-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'HUATAQUITA',
                 'est_categoria' => 'I-1',
@@ -64,12 +66,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.37849235',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003289',
-                'est_ipress' => 'RDR Nº 2042-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CABANA',
                 'est_categoria' => 'I-3',
@@ -78,12 +80,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.31799579',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 1, // CABANILLAS
                 'est_codigo' => '00003294',
-                'est_ipress' => 'RDR Nº 2086-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'TINCOPALCA',
                 'est_categoria' => 'I-1',
@@ -92,14 +94,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.75359439',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
             // --- MICRORRED: CONO SUR ---
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00037870',
-                'est_ipress' => 'RDR N° 0035-2026/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CSMC SAN ISIDRO LABRADOR',
                 'est_categoria' => 'I-3',
@@ -108,12 +110,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.12477756',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003315',
-                'est_ipress' => 'RDR Nº 2101-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'TAPARACHI',
                 'est_categoria' => 'I-2',
@@ -122,12 +124,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.12568175',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003295',
-                'est_ipress' => 'RDR Nº 2044-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CARACOTO',
                 'est_categoria' => 'I-3',
@@ -136,12 +138,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.10251128',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003298',
-                'est_ipress' => 'RDR Nº 2090-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SUCHIS',
                 'est_categoria' => 'I-1',
@@ -150,12 +152,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.02043383',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00027818',
-                'est_ipress' => 'RDR N° 0059-2026/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CSMC SAN ROMAN JULIACA',
                 'est_categoria' => 'I-3',
@@ -164,12 +166,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.13198252',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003304',
-                'est_ipress' => 'RDR Nº 2106-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'COLLANA JULIACA',
                 'est_categoria' => 'I-1',
@@ -178,26 +180,26 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.15193053',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003300',
-                'est_ipress' => 'RDR 2039-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
                 'est_nombre' => 'CONO SUR',
                 'est_categoria' => 'I-4',
                 'est_ubigeo' => '211101',
                 'est_latitud' => '-15.49956615',
                 'est_longitud' => '-70.12985587',
-                'est_radio' => 100, // I-4 mayor envergadura operativa
+                'est_radio' => 100,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 2, // CONO SUR
                 'est_codigo' => '00003302',
-                'est_ipress' => 'RDR Nº 2100-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => '9 DE OCTUBRE',
                 'est_categoria' => 'I-3',
@@ -206,14 +208,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.11093011',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
             // --- MICRORRED: JULIACA ---
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003287',
-                'est_ipress' => 'RDR Nº 2097-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'LARO',
                 'est_categoria' => 'I-1',
@@ -222,12 +224,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.27794679',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00015422',
-                'est_ipress' => 'RDR Nº 2040-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'GUADALUPE',
                 'est_categoria' => 'I-3',
@@ -236,12 +238,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.10929357',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003309',
-                'est_ipress' => '0081-2020/DRS-PUNO-DESP.DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'MARIANO MELGAR',
                 'est_categoria' => 'I-3',
@@ -250,12 +252,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.13631597',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003305',
-                'est_ipress' => 'RDR Nº 2096-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CHINGORA',
                 'est_categoria' => 'I-1',
@@ -264,12 +266,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.14833109',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003286',
-                'est_ipress' => 'RDR Nº 2099-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CALAPUJA',
                 'est_categoria' => 'I-2',
@@ -278,12 +280,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.21956852',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
-                'est_codigo' => '0002844', // Corregido formato de código
-                'est_ipress' => '0704-2021/DRS-PUNO-DESP-DSS',
+                'est_codigo' => '00002844', // Normalizado a 8 dígitos
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CSMC SAN MIGUEL ARCANGEL',
                 'est_categoria' => 'I-3',
@@ -292,12 +294,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.129653',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003288',
-                'est_ipress' => 'PENDIENTE',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'NICASIO',
                 'est_categoria' => 'I-2',
@@ -306,12 +308,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.25821908',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003296',
-                'est_ipress' => 'RDR N° 0062-2026/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CANCHI GRANDE',
                 'est_categoria' => 'I-2',
@@ -320,12 +322,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.04298376',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00013506',
-                'est_ipress' => 'RDR N° 2809-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'ESCURI',
                 'est_categoria' => 'I-2',
@@ -334,26 +336,26 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.13329981',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00037869',
-                'est_ipress' => 'RDR N° 0058-2026/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'HOGAR PROTEGIDO VIRGEN DE LAS MERCEDES',
-                'est_categoria' => 'I-1', // Asignado I-1 por infraestructura equivalente
+                'est_categoria' => 'I-1',
                 'est_ubigeo' => '211101',
                 'est_latitud' => '-15.8402218',
                 'est_longitud' => '-70.0218805',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003274',
-                'est_ipress' => 'PENDIENTE',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'ACHAYA',
                 'est_categoria' => 'I-2',
@@ -362,12 +364,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.1617126',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003317',
-                'est_ipress' => 'RDR Nº 2087-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'VILCAPATA',
                 'est_categoria' => 'I-2',
@@ -376,26 +378,26 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.0961408',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003280',
-                'est_ipress' => 'RDR N° 0037-2026/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'C.S. CLAS PUSI',
                 'est_categoria' => 'I-3',
                 'est_ubigeo' => '210605',
                 'est_latitud' => '-15.44116947',
-                'field_longitud' => '-69.92827959',
+                'est_longitud' => '-69.92827959', // Corregido el nombre de la clave
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 3, // JULIACA
                 'est_codigo' => '00003311',
-                'est_ipress' => 'RDR Nº 2046-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
                 'est_nombre' => 'REVOLUCION',
                 'est_categoria' => 'I-3',
@@ -404,14 +406,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.12664157',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
-            // --- HOSPITAL DE REFERENCIA BASE (SIN MICRORRED ASOCIADA DIRECTA) ---
+            // --- HOSPITAL DE REFERENCIA BASE ---
             [
-                'est_mic_ide' => 0, // NO PERTENECE A NINGUNA MICRORED
+                'est_mic_ide' => 100,
                 'est_codigo' => '00003299',
-                'est_ipress' => 'RDR Nº 1176-2023/DRS-PUNO-DESP',
+                'est_ipress' => '0000',
                 'est_tipo' => 'HOSPITAL',
                 'est_nombre' => 'HOSPITAL CARLOS MONGE MEDRANO',
                 'est_categoria' => 'II-2',
@@ -420,14 +422,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.11945789',
                 'est_radio' => 150,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
             // --- MICRORRED: SAMAN ---
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003275',
-                'est_ipress' => 'RDR Nº 2043-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CAMINACA',
                 'est_categoria' => 'I-3',
@@ -436,12 +438,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.07238718',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003276',
-                'est_ipress' => 'RDR Nº 2047-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SAMAN',
                 'est_categoria' => 'I-3',
@@ -450,12 +452,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.02053224',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003277',
-                'est_ipress' => 'RDR Nº 2080-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CHUCARIPO',
                 'est_categoria' => 'I-2',
@@ -464,12 +466,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-69.9739593',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003312',
-                'est_ipress' => 'RDR 2092-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SAN PEDRO COLLANA',
                 'est_categoria' => 'I-1',
@@ -478,12 +480,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.11156759',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00007399',
-                'est_ipress' => 'RDR Nº 2082-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'JASSANA GRANDE',
                 'est_categoria' => 'I-1',
@@ -492,12 +494,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.04148822',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003279',
-                'est_ipress' => 'RDR Nº 2105-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'MUNI GRANDE',
                 'est_categoria' => 'I-2',
@@ -506,12 +508,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.00258127',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00015421',
-                'est_ipress' => 'RDR N° 2107-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CHACAMARCA',
                 'est_categoria' => 'I-1',
@@ -520,12 +522,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-69.92028417',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00006796',
-                'est_ipress' => 'RDR Nº 2103-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'MUNI CHICO',
                 'est_categoria' => 'I-1',
@@ -534,12 +536,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.01528874',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 4, // SAMAN
                 'est_codigo' => '00003278',
-                'est_ipress' => 'RDR Nº 2085-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'QUEJON MOCCO',
                 'est_categoria' => 'I-1',
@@ -548,14 +550,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.05247836',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
             // --- MICRORRED: SANTA ADRIANA ---
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003307',
-                'est_ipress' => 'RDR Nº 2098-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
                 'est_nombre' => 'ISLA',
                 'est_categoria' => 'I-2',
@@ -564,12 +566,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.26047882',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003314',
-                'est_ipress' => 'RDR Nº 2095-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SANTA MARIA',
                 'est_categoria' => 'I-3',
@@ -578,12 +580,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.1464084',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003303',
-                'est_ipress' => 'RDR Nº 2083-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CENTRAL ESQUEN',
                 'est_categoria' => 'I-1',
@@ -592,12 +594,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.17976686',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00029841',
-                'est_ipress' => '0716-2021/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'CSMC DIVINO NIÑO JESUS',
                 'est_categoria' => 'I-3',
@@ -606,12 +608,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.14428713',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003301',
-                'est_ipress' => 'RDR Nº 2048-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SANTA ADRIANA',
                 'est_categoria' => 'I-4',
@@ -620,12 +622,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.15438435',
                 'est_radio' => 100,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003313',
-                'est_ipress' => 'RDR Nº 2041-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'SANTA CATALINA',
                 'est_categoria' => 'I-3',
@@ -634,12 +636,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.14710242',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003308',
-                'est_ipress' => 'RDR 2045-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'JORGE CHAVEZ',
                 'est_categoria' => 'I-3',
@@ -648,12 +650,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.13931455',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003316',
-                'est_ipress' => 'RDR Nº 2108-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'UNOCOLLA',
                 'est_categoria' => 'I-2',
@@ -662,12 +664,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.18573532',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003306',
-                'est_ipress' => 'RDR Nº 2081-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'LOS CHOFERES',
                 'est_categoria' => 'I-3',
@@ -676,12 +678,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.14355121',
                 'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 5, // SANTA ADRIANA
                 'est_codigo' => '00003310',
-                'est_ipress' => 'RDR 2091-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'RANCHO PUCACHUPA',
                 'est_categoria' => 'I-2',
@@ -690,14 +692,14 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-70.23655403',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
 
             // --- MICRORRED: TARACO ---
             [
                 'est_mic_ide' => 6, // TARACO
                 'est_codigo' => '00003282',
-                'est_ipress' => 'RDR Nº 2104-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'HUANCOLLUSCO',
                 'est_categoria' => 'I-1',
@@ -706,12 +708,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-69.95602516',
                 'est_radio' => 50,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 6, // TARACO
                 'est_codigo' => '00003284',
-                'est_ipress' => 'RDR N° 2093-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'PUQUIS',
                 'est_categoria' => 'I-2',
@@ -720,12 +722,12 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-69.90922156',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 6, // TARACO
                 'est_codigo' => '00003283',
-                'est_ipress' => 'RDR Nº 2079-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
                 'est_nombre' => 'JASANA POCCELIN',
                 'est_categoria' => 'I-2',
@@ -734,39 +736,39 @@ class EstablecimientoSeeder extends Seeder
                 'est_longitud' => '-69.93212403',
                 'est_radio' => 60,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'est_mic_ide' => 6, // TARACO
-                'est_codigo' => '00003285',
-                'est_ipress' => 'RDR Nº 2094 -2024/DRS-PUNO-DESP-DSS',
-                'est_tipo' => 'PUESTO DE SALUD',
-                'est_nombre' => 'RAMIS',
-                'est_categoria' => 'I-2',
-                'est_ubigeo' => '210607',
-                'est_latitud' => '-15.27319245',
-                'est_longitud' => '-69.86780834',
-                'est_radio' => 60,
-                'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'created_at' => $now,
             ],
             [
                 'est_mic_ide' => 6, // TARACO
                 'est_codigo' => '00003281',
-                'est_ipress' => 'RDR Nº 2038-2024/DRS-PUNO-DESP-DSS',
+                'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
                 'est_nombre' => 'TARACO',
-                'est_categoria' => 'I-4',
+                'est_categoria' => 'I-3',
                 'est_ubigeo' => '210607',
-                'est_latitud' => '-15.29940903',
-                'est_longitud' => '-69.98018247',
-                'est_radio' => 100,
+                'est_latitud' => '-15.2974821',
+                'est_longitud' => '-69.9812403',
+                'est_radio' => 80,
                 'created_by' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]
+                'created_at' => $now,
+            ],
+            [
+                'est_mic_ide' => 6, // TARACO
+                'est_codigo' => '00003285',
+                'est_ipress' => '0000',
+                'est_tipo' => 'PUESTO DE SALUD',
+                'est_nombre' => 'RAMIS',
+                'est_categoria' => 'I-1',
+                'est_ubigeo' => '210607',
+                'est_latitud' => '-15.2512809',
+                'est_longitud' => '-69.8719201',
+                'est_radio' => 50,
+                'created_by' => 1,
+                'created_at' => $now,
+            ],
         ];
 
-        // Inserción masiva optimizada por Query Builder
+        // Batch insert into database table (adjust table name if necessary)
         $this->db->table('casis_establecimiento')->insertBatch($data);
     }
 }
