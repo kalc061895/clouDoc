@@ -159,7 +159,7 @@ class PersonalService
             // ----------------------------------------------------------------
             // PASO 3: Inserción en 'casis_personal_profesion'
             // ----------------------------------------------------------------
-            $profesionModel = new PersonalProfesionalModel();
+            $personalProfesionModel = new PersonalProfesionalModel();
 
             $dataProfesion = [
                 'pp_perl_ide' => $personalId, // Relación foránea con casis_personal
@@ -174,11 +174,11 @@ class PersonalService
                 'pp_estado' => 1
             ];
 
-            if (!$profesionModel->insert($dataProfesion)) {
-                throw new \Exception("Error al registrar el historial profesional: " . implode(', ', $profesionModel->errors()));
+            if (!$personalProfesionModel->insert($dataProfesion)) {
+                throw new \Exception("Error al registrar el historial profesional: " . implode(', ', $personalProfesionModel->errors()));
             }
 
-            $msg .= "Historial profesional registrado con ID: " . $profesionModel->getInsertID() . ". ";
+            $msg .= "Historial profesional registrado con ID: " . $personalProfesionModel->getInsertID() . ". ";
 
             // Si todo salió bien, confirmamos permanentemente en la base de datos
             $db->transComplete();
@@ -199,7 +199,6 @@ class PersonalService
                 'status' => 'success',
                 'message' => $msg . 'El alta del personal ha sido procesada con éxito.'
             ];
-
         } catch (\Exception $e) {
             // Si algo falla, se dispara el Rollback inmediato desaciendo los inserts previos
             $db->transRollback();
@@ -209,8 +208,6 @@ class PersonalService
                 'message' => $msg . $e->getMessage()
             ];
         }
-
-
     }
 
     public function getSelectColegios(?int $proIde = null): array
@@ -356,11 +353,14 @@ class PersonalService
         $db = \Config\Database::connect();
         $builder = $db->table('casis_personal as pl');
         $builder->select('
-        pl.*, 
-        p.per_tdi_ide, p.per_numero_documento, p.per_nombre, 
-        p.per_paterno, p.per_materno, p.per_sexo, p.per_fecha_nacimiento
-    ');
+            pl.*,
+            p.*,
+            pp.*,
+            p.per_tdi_ide, p.per_numero_documento, p.per_nombre, 
+            p.per_paterno, p.per_materno, p.per_sexo, p.per_fecha_nacimiento
+        ');
         $builder->join('casis_persona p', 'p.per_ide = pl.perl_per_ide');
+        $builder->join('casis_personal_profesion pp', 'pp.pp_perl_ide = pl.perl_ide');
         $builder->where('pl.perl_ide', $id);
 
         return $builder->get()->getRowArray();
@@ -383,85 +383,99 @@ class PersonalService
     /**
      * Actualiza el expediente del personal y genera un respaldo histórico del estado anterior.
      */
-    public function actualizarPersonalConHistorial(int $perlIde, array $datosPost): bool
+    public function actualizarPersonalConHistorial(int $perlIde, array $datosPost)
     {
         $db = Database::connect();
-        $personalModel = new PersonalModel();
         $personaModel = new PersonaModel();
+        $personalModel = new PersonalModel();
+        $personalProfesionModel = new PersonalProfesionalModel();
 
         // 1. Iniciar Transacción para asegurar consistencia atómica
-        $db->transStart();
 
-        // 2. Obtener la data actual (ANTES de modificarla) para el historial
-        $estadoAnterior = $db->table('casis_personal as pl')
-            ->select('pl.*, p.per_tdi_ide, p.per_numero_documento, p.per_nombre, p.per_paterno, p.per_materno, p.per_sexo, p.per_fecha_nacimiento')
-            ->join('casis_persona p', 'p.per_ide = pl.perl_per_ide')
-            ->where('pl.perl_ide', $perlIde)
-            ->get()
-            ->getRowArray();
+        try {
+            $db->transException(true)->transStart();
 
-        if (!$estadoAnterior) {
-            return false;
+            // Inicializamos los arrays de cada tabla
+            $dataPersona = [];     // Tabla persona (per_)
+            $dataLaboral = [];     // Tabla laboral (perl_)
+            $dataProfesion = [];   // Tabla profesión (pp_)
+
+            foreach ($datosPost as $key => $value) {
+                // Si empieza con 'per_' (y no con 'perl_')
+                if (strpos($key, 'per_') === 0) {
+                    $dataPersona[$key] = $value;
+                }
+                // Si empieza con 'perl_'
+                elseif (strpos($key, 'perl_') === 0) {
+                    $dataLaboral[$key] = $value;
+                }
+                // Si empieza con 'pp_'
+                elseif (strpos($key, 'pp_') === 0) {
+                    $dataProfesion[$key] = $value;
+                }
+            }
+            $idPersonal = $datosPost['perl_ide'] ?? null;
+
+            // 3. Buscar el registro laboral para extraer el perl_per_ide (ID de la Persona)
+            $registroLaboral = $personalModel->find($idPersonal);
+
+            $idPersona = $registroLaboral['perl_per_ide'];
+            unset($dataPersona['per_numero_documento']);
+
+            if ($personaModel->update($idPersona, $dataPersona)) {
+                log_message('info', 'Actualización laboral exitosa');
+            } else {
+                // 1. Ver errores del modelo (validaciones o campos no permitidos)
+                var_dump($personaModel->errors());
+
+                // 2. Ver la última consulta SQL
+                echo "<br>SQL: " . $personaModel->getLastQuery();
+                die();
+            }
+
+
+            unset($dataLaboral['perl_ide']);
+            unset($dataLaboral['perl_codigo']);
+            $personalModel = new PersonalModel();
+            if ($personalModel->update($idPersonal, $dataLaboral)) {
+                log_message('info', 'Actualización laboral exitosa');
+            } else {
+                // 1. Ver errores del modelo (validaciones o campos no permitidos)
+                var_dump($personalModel->errors());
+
+                // 2. Ver la última consulta SQL
+                //echo "<br>SQL: " . $personalModel->getLastQuery();
+                die();
+            }
+
+            $profesionExistente = $personalProfesionModel->where('pp_perl_ide', $idPersonal)->first();
+
+            if ($personalProfesionModel->update($profesionExistente['pp_ide'], $dataProfesion)) {
+                log_message('info', 'Actualización laboral exitosa');
+            } else {
+                // 1. Ver errores del modelo (validaciones o campos no permitidos)
+                var_dump($personalProfesionModel->errors());
+
+                // 2. Ver la última consulta SQL
+                echo "<br>SQL: " . $personalProfesionModel->getLastQuery();
+                die();
+            }
+
+
+
+
+
+            $db->transComplete();
+        } catch (\Exception $e) {
+            // Si algo falla, se dispara el Rollback inmediato desaciendo los inserts previos
+            $db->transRollback();
+
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
         }
 
-        // 3. Insertar la instantánea en la tabla de historial
-        // Guardamos toda la data anterior + metadatos de auditoría
-        $db->table('casis_personal_historial')->insert([
-            'h_perl_ide' => $estadoAnterior['perl_ide'],
-            'h_perl_codigo' => $estadoAnterior['perl_codigo'],
-            'h_perl_per_ide' => $estadoAnterior['perl_per_ide'],
-            'h_perl_est_ide' => $estadoAnterior['perl_est_ide'],
-            'h_perl_ofi_ide' => $estadoAnterior['perl_ofi_ide'],
-            'h_perl_car_ide' => $estadoAnterior['perl_car_ide'],
-            'h_perl_mco_ide' => $estadoAnterior['perl_mco_ide'],
-            'h_perl_fecha_inicio' => $estadoAnterior['perl_fecha_inicio'],
-            'h_pp_pro_ide' => $estadoAnterior['pp_pro_ide'],
-            'h_pp_col_ide' => $estadoAnterior['pp_col_ide'],
-            'h_pp_numero_colegiatura' => $estadoAnterior['pp_numero_colegiatura'],
-            'h_pp_se_ide' => $estadoAnterior['pp_se_ide'],
-            'h_pp_rne' => $estadoAnterior['pp_rne'],
-            'h_perl_estado' => $estadoAnterior['perl_estado'],
-            // Campos de control de auditoría
-            'h_fecha_modificacion' => date('Y-m-d H:i:s'),
-            'h_usuario_modifica' => session()->get('usu_ide') ?? 1 // ID del usuario en sesión
-        ]);
-
-        // 4. Preparar y actualizar la tabla base: Persona (`casis_persona`)
-        $dataPersona = [
-            'per_tdi_ide' => $datosPost['per_tdi_ide'],
-            'per_numero_documento' => $datosPost['per_numero_documento'],
-            'per_nombre' => $datosPost['per_nombre'],
-            'per_paterno' => $datosPost['per_paterno'],
-            'per_materno' => $datosPost['per_materno'],
-            'per_sexo' => $datosPost['per_sexo'],
-            'per_fecha_nacimiento' => $datosPost['per_fecha_nacimiento'],
-        ];
-        $personaModel->update($estadoAnterior['perl_per_ide'], $dataPersona);
-
-        // 5. Preparar y actualizar la tabla operativa: Personal (`casis_personal`)
-        // Manejo controlado de los campos opcionales del paso 3 del Wizard (Colegiaturas)
-        $proIde = !empty($datosPost['pp_pro_ide']) ? (int) $datosPost['pp_pro_ide'] : null;
-
-        $dataPersonal = [
-            'perl_codigo' => !empty($datosPost['perl_codigo']) ? strtoupper($datosPost['perl_codigo']) : null,
-            'perl_mco_ide' => $datosPost['perl_mco_ide'],
-            'perl_car_ide' => $datosPost['perl_car_ide'],
-            'perl_est_ide' => $datosPost['perl_est_ide'],
-
-            'perl_ofi_ide' => !empty($datosPost['perl_ofi_ide']) ? $datosPost['perl_ofi_ide'] : null,
-            'perl_fecha_inicio' => $datosPost['perl_fecha_inicio'],
-
-            // Lógica e integridad de profesión/colegio
-            'pp_pro_ide' => $proIde,
-            'pp_col_ide' => ($proIde && !empty($datosPost['pp_col_ide'])) ? $datosPost['pp_col_ide'] : null,
-            'pp_numero_colegiatura' => ($proIde && !empty($datosPost['pp_numero_colegiatura'])) ? $datosPost['pp_numero_colegiatura'] : null,
-            'pp_se_ide' => ($proIde && !empty($datosPost['pp_se_ide'])) ? $datosPost['pp_se_ide'] : null,
-            'pp_rne' => ($proIde && !empty($datosPost['pp_rne'])) ? $datosPost['pp_rne'] : null,
-        ];
-        $personalModel->update($perlIde, $dataPersonal);
-
-        // 6. Confirmar transacciones
-        $db->transComplete();
 
         return $db->transStatus();
     }

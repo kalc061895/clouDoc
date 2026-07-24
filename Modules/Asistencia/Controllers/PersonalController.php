@@ -72,7 +72,6 @@ class PersonalController extends BaseController
             'perl_mco_ide' => 'required',
             'perl_car_ide' => 'required',
             'perl_est_ide' => 'required',
-            'perl_fecha_ingreso' => 'required|valid_date',
         ];
 
         if (!$this->validate($rules)) {

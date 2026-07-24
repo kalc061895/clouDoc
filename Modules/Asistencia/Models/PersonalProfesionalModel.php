@@ -81,7 +81,7 @@ class PersonalProfesionalModel extends Model
 
     protected $beforeInsert = [];
 
-    protected $beforeUpdate = [];
+
 
     protected $beforeFind = [];
     protected $afterFind = [];
@@ -90,13 +90,15 @@ class PersonalProfesionalModel extends Model
     // ... Tus propiedades anteriores se mantienen ...
 
     protected $afterInsert = ['guardarHistorialInsert'];
+
     protected $afterUpdate = ['guardarHistorialUpdate'];
     protected $beforeDelete = ['guardarHistorialDelete'];
 
     protected function guardarHistorialInsert(array $data)
     {
-        if (!$data['result'])
+        if (!$data['result']) {
             return $data;
+        }
         $db = \Config\Database::connect();
         $registro = $this->find($data['id']);
         if ($registro) {
@@ -110,8 +112,10 @@ class PersonalProfesionalModel extends Model
 
     protected function guardarHistorialUpdate(array $data)
     {
-        if (!$data['result'])
+        if (!$data['result']) {
             return $data;
+        }
+
         $db = \Config\Database::connect();
         $ids = (array) $data['id'];
         foreach ($ids as $id) {

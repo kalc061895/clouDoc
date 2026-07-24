@@ -58,8 +58,8 @@ Registro Integral de Personal
                             <label class="form-label small fw-bold">Sexo</label>
                             <select class="form-select" name="per_sexo" required>
                                 <option value="">Seleccione...</option>
-                                <option value="MASCULINO">MASCULINO</option>
-                                <option value="FEMENINO">FEMENINO</option>
+                                <option value="M">MASCULINO</option>
+                                <option value="F">FEMENINO</option>
                             </select>
                         </div>
                         <div class="col-md-3">

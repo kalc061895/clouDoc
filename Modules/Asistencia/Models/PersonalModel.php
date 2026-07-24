@@ -67,7 +67,7 @@ class PersonalModel extends Model
     |--------------------------------------------------------------------------
     */
     protected $beforeInsert = ['setCreatedBy'];
-    protected $beforeUpdate = ['setUpdatedBy'];
+    protected $beforeUpdate = ['setUpdatedBy', 'guardarHistorialUpdate'];
 
     /*
     |--------------------------------------------------------------------------
@@ -262,8 +262,11 @@ class PersonalModel extends Model
 
     protected function guardarHistorialInsert(array $data)
     {
-        if (!$data['result'])
+        // 1. Validar de forma segura si la operación resulto exitosa (evita el "Undefined index")
+        if (empty($data['result'])) {
             return $data;
+        }
+
         $db = \Config\Database::connect();
         $registro = $this->find($data['id']);
         if ($registro) {
@@ -277,29 +280,30 @@ class PersonalModel extends Model
 
     protected function guardarHistorialUpdate(array $data)
     {
-        if (!$data['result'])
+        // 1. Validar de forma segura si la operación resulto exitosa (evita el "Undefined index")
+        if (empty($data['result'])) {
             return $data;
+        }
+
         $db = \Config\Database::connect();
-        $ids = (array) $data['id'];
+
+        // 2. Normalizar el/los IDs que se actualizaron
+        $ids = (array) ($data['id'] ?? []);
+
         foreach ($ids as $id) {
             $registro = $this->find($id);
             if ($registro) {
-                $registro2['hist_accion'] = 'INSERT';
-                $registro2['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
-                $registro2['hist_creado_en'] = date('Y-m-d H:i:s');
+                $registro['hist_accion']    = 'UPDATE';
+                $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
+                $registro['hist_creado_en'] = date('Y-m-d H:i:s');
 
-                $registro2['phis_perl_ide'] = $registro['perl_ide'];
-                $registro2['phis_est_ide'] = $registro['perl_est_ide'];
-                $registro2['phis_ofi_ide'] = $registro['perl_ofi_ide'];
-                $registro2['phis_car_ide'] = $registro['perl_car_ide'];
-                $registro2['phis_mco_ide'] = $registro['perl_mco_ide'];
-                $registro2['phis_fecha_inicio'] = $registro['perl_fecha_inicio'];
-                $registro2['phis_fecha_termino'] = $registro['perl_fecha_termino'];
-                $registro2['phis_estado'] = $registro['perl_estado'];
+                // Opcional: Eliminar la PK si la tabla de historial usa un autoincremental propio
+                // unset($registro['per_ide']); // o perl_ide según corresponda
 
-                $db->table('casis_personal_historial')->insert($registro2);
+                $db->table('casis_personal_historial')->insert($registro);
             }
         }
+
         return $data;
     }
 
@@ -313,15 +317,6 @@ class PersonalModel extends Model
                 $registro['hist_accion'] = 'DELETE';
                 $registro['hist_hecho_por'] = (function_exists('auth') && auth()->loggedIn()) ? auth()->id() : null;
                 $registro['hist_creado_en'] = date('Y-m-d H:i:s');
-                $registro['phis_perl_ide'] = $registro['perl_ide'];
-                $registro['phis_est_ide'] = $registro['perl_est_ide'];
-                $registro['phis_ofi_ide'] = $registro['perl_ofi_ide'];
-                $registro['phis_car_ide'] = $registro['perl_car_ide'];
-                $registro['phis_mco_ide'] = $registro['perl_mco_ide'];
-                $registro['phis_fecha_inicio'] = $registro['perl_fecha_inicio'];
-                $registro['phis_fecha_termino'] = $registro['perl_fecha_termino'];
-                $registro['phis_estado'] = $registro['perl_estado'];
-
                 $db->table('casis_personal_historial')->insert($registro);
             }
         }
