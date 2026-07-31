@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use Modules\Asistencia\Models\LicenciaModel;
 use Modules\Asistencia\Models\RegistroLicenciaModel;
+use Modules\Asistencia\Services\LicenciaService;
+use Modules\Asistencia\Services\RegistroLicenciaService;
 use Modules\Asistencia\Models\RegistroLicenciaHistorialModel;
 
 class LicenciaController extends BaseController
@@ -14,6 +16,7 @@ class LicenciaController extends BaseController
 
     protected $licenciaModel;
     protected $registroLicenciaModel;
+    protected $registroLicenciaService;
     protected $historialModel;
     protected $db;
 
@@ -21,6 +24,7 @@ class LicenciaController extends BaseController
     {
         $this->licenciaModel = new LicenciaModel();
         $this->registroLicenciaModel = new RegistroLicenciaModel();
+        $this->registroLicenciaService = new RegistroLicenciaService();
         $this->historialModel = new RegistroLicenciaHistorialModel();
         $this->db = \Config\Database::connect();
     }
@@ -44,47 +48,37 @@ class LicenciaController extends BaseController
      */
     public function obtenerPorPersonal($perlIde)
     {
-        $mes = $this->request->getGet('mes');
-        $anio = $this->request->getGet('anio') ?? date('Y');
+        $licenciaService = new RegistroLicenciaService();
+        $mes  = $this->request->getGet('mes');
+        $anio = $this->request->getGet('anio');
 
-        $builder = $this->registroLicenciaModel
-            ->select('casis_registro_licencia.*, casis_licencia.lic_nombre, casis_licencia.lic_abreviatura, casis_licencia.lic_remunerado')
-            ->join('casis_licencia', 'casis_licencia.lic_ide = casis_registro_licencia.rl_lic_ide')
-            ->where('casis_registro_licencia.rl_perl_ide', $perlIde);
-
-        // Filtro opcional por Mes (sobre fecha_inicio)
-        if (!empty($mes)) {
-            $builder->where("DATE_FORMAT(casis_registro_licencia.rl_fecha_inicio, '%m')", str_pad($mes, 2, '0', STR_PAD_LEFT));
-        }
-
-        // Filtro por Año
-        if (!empty($anio)) {
-            $builder->where("DATE_FORMAT(casis_registro_licencia.rl_fecha_inicio, '%Y')", $anio);
-        }
-
-        $licencias = $builder->orderBy('casis_registro_licencia.rl_fecha_inicio', 'DESC')->findAll();
+        // Delegamos la lógica de consulta de negocio al Service
+        $licencias = $licenciaService->obtenerLicenciasPorPersonal((int)$perlIde, $mes, $anio);
 
         return $this->respond([
             'status' => 200,
-            'data' => $licencias
+            'data'   => $licencias
         ]);
     }
 
     /**
      * POST: /api/v1/licencias/guardar
-     * Guarda un nuevo registro de licencia y crea la entrada de auditoría
+     * Guarda un nuevo registro de licencia
      */
     public function guardar()
     {
+        $registroLicenciaService = new RegistroLicenciaService();
         $usuarioId = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
         $ip = $this->request->getIPAddress();
 
         // Reglas de validación
         $rules = [
-            'rl_perl_ide' => 'required|integer',
-            'rl_lic_ide' => 'required|integer',
+            'rl_perl_ide'     => 'required|integer',
+            'rl_lic_ide'      => 'required|integer',
             'rl_fecha_inicio' => 'required|valid_date',
-            'rl_fecha_fin' => 'required|valid_date',
+            'rl_fecha_fin'    => 'required|valid_date',
+            // Opcional: Validación de archivos subidos (max 10MB, PDF o imágenes)
+            'anexos.*'        => 'permit_empty|uploaded[anexos]|max_size[anexos,10240]|mime_in[anexos,application/pdf,image/jpg,image/jpeg,image/png]'
         ];
 
         if (!$this->validate($rules)) {
@@ -92,44 +86,32 @@ class LicenciaController extends BaseController
         }
 
         $datosInsert = [
-            'rl_perl_ide' => $this->request->getPost('rl_perl_ide'),
-            'rl_lic_ide' => $this->request->getPost('rl_lic_ide'),
-            'rl_fecha_inicio' => $this->request->getPost('rl_fecha_inicio'),
-            'rl_fecha_fin' => $this->request->getPost('rl_fecha_fin'),
+            'rl_perl_ide'         => $this->request->getPost('rl_perl_ide'),
+            'rl_lic_ide'          => $this->request->getPost('rl_lic_ide'),
+            'rl_fecha_inicio'     => $this->request->getPost('rl_fecha_inicio'),
+            'rl_fecha_fin'        => $this->request->getPost('rl_fecha_fin'),
             'rl_numero_documento' => $this->request->getPost('rl_numero_documento'),
-            'rl_fecha_documento' => $this->request->getPost('rl_fecha_documento') ?: null,
-            'rl_motivo' => $this->request->getPost('rl_motivo'),
-            'rl_estado' => 1,
-            'created_by' => $usuarioId
+            'rl_fecha_documento'  => $this->request->getPost('rl_fecha_documento') ?: null,
+            'rl_motivo'           => $this->request->getPost('rl_motivo'),
+            'rl_estado'           => 1,
+            'created_by'          => $usuarioId
         ];
 
-        $this->db->transStart();
+        // Obtener array de archivos (soporta tanto un archivo como múltiples con name="anexos[]")
+        $archivos = $this->request->getFiles()['anexos'] ?? $this->request->getFile('anexos');
 
-        // 1. Insertar en la tabla principal
-        $this->registroLicenciaModel->insert($datosInsert);
-        $rlIde = $this->registroLicenciaModel->getInsertID();
+        try {
+            // Llamada al Service
+            $rlIde = $registroLicenciaService->crearLicencia($datosInsert, $archivos, $ip, $usuarioId);
 
-        // 2. Registrar Auditoría (CREAR)
-        $this->historialModel->insert([
-            'his_rl_ide' => $rlIde,
-            'his_accion' => 'CREAR',
-            'his_datos_anteriores' => null,
-            'his_datos_nuevos' => json_encode($datosInsert),
-            'his_motivo_cambio' => 'Registro inicial de licencia/papeleta',
-            'his_ip' => $ip,
-            'created_by' => $usuarioId
-        ]);
-
-        $this->db->transComplete();
-
-        if ($this->db->transStatus() === false) {
-            return $this->failServerError('Error al procesar la transacción en la base de datos.');
+            return $this->respondCreated([
+                'status'  => 201,
+                'message' => 'Licencia y adjuntos registrados correctamente con auditoría.',
+                'id'      => $rlIde
+            ]);
+        } catch (\Exception $e) {
+            return $this->failServerError('Error al registrar la licencia: ' . $e->getMessage());
         }
-
-        return $this->respondCreated([
-            'status' => 201,
-            'message' => 'Licencia registrada correctamente con auditoría.'
-        ]);
     }
 
     /**
@@ -179,5 +161,4 @@ class LicenciaController extends BaseController
             'message' => 'Licencia eliminada y auditada con éxito.'
         ]);
     }
-
 }

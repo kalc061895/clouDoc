@@ -353,6 +353,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
 
     // Otros controladores específicos
     $routes->get('tuasalud/reporte_rol_tuasalud', 'TuasaludController::reporte');
+
+    $routes->get('adjuntos/ver/(:num)', 'AdjuntoController::ver/$1');
 });
 
 ###################### 

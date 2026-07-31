@@ -395,7 +395,7 @@
                 if (response.status === 'success') {
                     toastr.success(response.message || 'Datos actualizados correctamente.');
                     setTimeout(() => {
-                        //window.location.href = '<?= base_url('asistencia/personal') ?>';
+                        window.location.href = '<?= base_url('asistencia/personal') ?>';
                     }, 1000);
                 } else {
                     Swal.fire('Error', response.message || 'Ocurrió un inconveniente.', 'error');
