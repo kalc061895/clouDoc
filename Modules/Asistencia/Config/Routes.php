@@ -347,6 +347,16 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('eliminar/(:num)', 'LicenciaController::eliminar/$1');
         });
     });
+    
+    $routes->group('permiso', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+
+        $routes->group('api', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+            $routes->get('tipos-activos', 'PermisoController::tiposActivos');
+            $routes->get('personal/(:num)', 'PermisoController::obtenerPorPersonal/$1');
+            $routes->post('guardar', 'PermisoController::guardar');
+            $routes->post('eliminar/(:num)', 'PermisoController::eliminar/$1');
+        });
+    });
 
 
 

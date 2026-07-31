@@ -69,16 +69,28 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link d-flex align-items-center" id="tab-cambio-turno" data-bs-toggle="pill"
+                            data-bs-target="#pane-cambio-turno" type="button">
+                            <iconify-icon icon="solar:clock-circle-bold" class="me-1"></iconify-icon> Cambio Turno
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link d-flex align-items-center" id="tab-incidencias" data-bs-toggle="pill"
                             data-bs-target="#pane-incidencias" type="button">
-                            <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon> Incidencias /
-                            Papeletas
+                            <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon> Licencias
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link d-flex align-items-center" id="tab-permisos" data-bs-toggle="pill"
+                            data-bs-target="#pane-permisos" type="button">
+                            <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon> Permisos
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link d-flex align-items-center" id="tab-vacaciones" data-bs-toggle="pill"
                             data-bs-target="#pane-vacaciones" type="button">
-                            <iconify-icon icon="solar:palmtree-bold" class="me-1"></iconify-icon> Vacaciones
+                            <iconify-icon icon="solar:umbrella-bold" class="me-1"></iconify-icon> Vacaciones
                         </button>
                     </li>
                 </ul>
@@ -88,7 +100,9 @@
                     <div class="tab-pane fade show active" id="pane-datos">Cargando información...</div>
                     <div class="tab-pane fade" id="pane-asistencia">Cargando registros de asistencia...</div>
                     <div class="tab-pane fade" id="pane-turnos">Cargando rol de turnos...</div>
-                    <div class="tab-pane fade" id="pane-incidencias">Cargando incidencias y papeletas...</div>
+                    <div class="tab-pane fade" id="pane-cambio-turno">Cargando cambios de turno...</div>
+                    <div class="tab-pane fade" id="pane-incidencias">Cargando Historial de Licencias...</div>
+                    <div class="tab-pane fade" id="pane-permisos">Cargando Historial de Permisos...</div>
                     <div class="tab-pane fade" id="pane-vacaciones">Cargando historial de vacaciones...</div>
                 </div>
             </div>
@@ -105,7 +119,7 @@
     const URL_BASE = '<?= base_url('asistencia/personal') ?>';
     let idPersonalSeleccionado = null;
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         const tabla = $('#tablaPersonal').DataTable({
             processing: true,
             serverSide: true, // HABILITADO
@@ -113,27 +127,39 @@
                 url: `${URL_BASE}/api/fetch`,
                 type: 'GET'
             },
-            columns: [
-                { data: 'documento' },
-                { data: 'nombre_completo' },
-                { data: 'modalidad' },
-                { data: 'establecimiento' },
-                { data: 'oficina' },
-                { data: 'cargo', defaultContent: '<span class="text-muted small">NO ASIGNADO</span>' },
+            columns: [{
+                    data: 'documento'
+                },
+                {
+                    data: 'nombre_completo'
+                },
+                {
+                    data: 'modalidad'
+                },
+                {
+                    data: 'establecimiento'
+                },
+                {
+                    data: 'oficina'
+                },
+                {
+                    data: 'cargo',
+                    defaultContent: '<span class="text-muted small">NO ASIGNADO</span>'
+                },
                 {
                     data: 'estado',
                     className: 'text-center',
-                    render: function (data) {
-                        return data == 1
-                            ? '<span class="badge bg-light-success text-success fw-bold px-2 py-1">ACTIVO</span>'
-                            : '<span class="badge bg-light-danger text-danger fw-bold px-2 py-1">DE BAJA</span>';
+                    render: function(data) {
+                        return data == 1 ?
+                            '<span class="badge bg-light-success text-success fw-bold px-2 py-1">ACTIVO</span>' :
+                            '<span class="badge bg-light-danger text-danger fw-bold px-2 py-1">DE BAJA</span>';
                     }
                 },
                 {
                     data: 'id',
                     className: 'text-center',
                     orderable: false,
-                    render: function (data, type, row) {
+                    render: function(data, type, row) {
                         let btnBaja = '';
                         if (row.estado == 1) {
                             btnBaja = `
@@ -165,8 +191,18 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="abrirModalGestion(${data}, 'pane-cambio-turno', '${row.nombre_completo}', '${row.documento}')">
+                                            <iconify-icon icon="solar:clock-circle-bold" class="me-1 text-danger"></iconify-icon> Cambio de Turno
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="javascript:void(0)" onclick="abrirModalGestion(${data}, 'pane-incidencias', '${row.nombre_completo}', '${row.documento}')">
                                             <iconify-icon icon="solar:document-text-bold" class="me-1 text-warning"></iconify-icon> Incidencias / Papeletas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="abrirModalGestion(${data}, 'pane-permisos', '${row.nombre_completo}', '${row.documento}')">
+                                            <iconify-icon icon="solar:document-text-bold" class="me-1 text-warning"></iconify-icon> Permisos
                                         </a>
                                     </li>
                                     <li>
@@ -217,7 +253,7 @@
     }
 
     // Escuchar cambios manuales de pestañas dentro del Modal
-    $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+    $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
         const targetPaneId = $(e.target).attr('data-bs-target').replace('#', '');
         if (idPersonalSeleccionado) {
             cargarContenidoTab(idPersonalSeleccionado, targetPaneId);
@@ -230,11 +266,11 @@
 
         // 1. Loader visual mientras descarga la estructura del Pane
         $pane.html(`
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
-            <p class="mt-2 text-muted small mb-0">Cargando módulo...</p>
-        </div>
-    `);
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                <p class="mt-2 text-muted small mb-0">Cargando módulo...</p>
+            </div>
+        `);
 
         // Extrae el nombre del módulo: 'pane-incidencias' -> 'pane-incidencias' o 'incidencias'
         const endpoint = paneId.replace('pane-', '');
@@ -244,11 +280,11 @@
             url: `${URL_BASE}/${endpoint}/${id}`,
             type: 'GET',
             dataType: 'html', // IMPORTANTE: Recibimos la vista PHP renderizada
-            success: function (htmlView) {
+            success: function(htmlView) {
                 // Se inyecta el HTML y jQuery ejecuta automáticamente el <script> interno del pane
                 $pane.html(htmlView);
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.error(`Error al cargar el módulo ${endpoint}:`, error);
                 $pane.html(`
                 <div class="alert alert-danger d-flex align-items-center mb-0 p-3" role="alert">
