@@ -194,7 +194,8 @@ class RegistroLicenciaService
             $this->db->transComplete();
 
             if ($this->db->transStatus() === false) {
-                throw new DatabaseException('Error al completar la transacción de guardado de licencia.');
+                $this->db->transRollback();
+                throw new \Exception('Error al completar la transacción de guardado de licencia.');
             }
 
             return $rlIde;

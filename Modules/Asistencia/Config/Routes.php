@@ -285,6 +285,28 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('profesion-especialidades', 'DatabaseController::apiCrearRelacionProfesionEspecialidades');
             $routes->delete('profesion-especialidades/(:num)', 'DatabaseController::apiEliminarRelacionProfesionEspecialidades/$1');
         });
+
+        // Vista
+        $routes->get('periodos', 'PeriodoController::periodos');
+
+        // Endpoints API
+        $routes->group('api', function ($routes) {
+            $routes->get('periodos', 'PeriodoController::apiListarPeriodos');
+            $routes->get('periodos/calcular-fechas', 'PeriodoController::apiCalcularFechas');
+            $routes->get('periodos-grupo/(:num)', 'PeriodoController::apiPeriodosPorGrupo/$1');
+            $routes->post('periodos', 'PeriodoController::apiCrearPeriodo');
+            $routes->put('periodos/(:num)', 'PeriodoController::apiActualizarPeriodo/$1');
+            $routes->delete('periodos/(:num)', 'PeriodoController::apiEliminarPeriodo/$1');
+        });
+        $routes->get('grupo-corte', 'PeriodoController::gruposCorte');
+
+        $routes->group('api', function ($routes) {
+            $routes->get('grupos-corte', 'PeriodoController::apiListarGruposCorte');
+            $routes->post('grupos-corte', 'PeriodoController::apiCrearGrupoCorte');
+            $routes->put('grupos-corte/(:num)', 'PeriodoController::apiActualizarGrupoCorte/$1');
+            $routes->delete('grupos-corte/(:num)', 'PeriodoController::apiEliminarGrupoCorte/$1');
+        });
+
     });
 
     $routes->group('personal', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
@@ -347,7 +369,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('eliminar/(:num)', 'LicenciaController::eliminar/$1');
         });
     });
-    
+
     $routes->group('permiso', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
 
         $routes->group('api', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
