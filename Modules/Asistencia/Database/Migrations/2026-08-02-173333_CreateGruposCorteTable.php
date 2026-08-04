@@ -55,7 +55,7 @@ class CreateGruposCorteTable extends Migration
                 'constraint' => '150',
                 'comment' => 'Ej: ASISTENCIAL HOSPITAL, ADMINISTRATIVOS RED, CAS D.L. 1057',
             ],
-            'gco_regimen_laboral' => [
+            'gco_mco_ide' => [
                 'type' => 'VARCHAR',
                 'constraint' => '50',
                 'null' => true,

@@ -33,7 +33,6 @@ class PersonalModel extends Model
         'perl_plaza',
         'perl_nivel',
         'perl_estado',
-        'perl_regimen_laboral',
         'perl_observacion',
 
         // Auditoría
@@ -322,4 +321,25 @@ class PersonalModel extends Model
         }
         return $data;
     }
+
+    /**
+     * Obtiene la ubicación jerárquica completa del personal.
+     */
+    public function obtenerUbicacionInstitucional(int $personalId): ?array
+    {
+        return $this->select('
+                casis_personal.perl_ide, 
+                casis_personal.perl_est_ide, 
+                casis_personal.perl_mco_ide,
+                e.est_mic_ide AS microred_id,
+                r.red_ide AS red_id,
+                r.red_dir_ide AS diresa_id
+            ')
+            ->join('casis_establecimiento e', 'e.est_ide = casis_personal.perl_est_ide AND e.deleted_at IS NULL', 'left')
+            ->join('casis_microred m', 'm.mic_ide = e.est_mic_ide AND m.deleted_at IS NULL', 'left')
+            ->join('casis_red r', 'r.red_ide = m.mic_red_ide AND r.deleted_at IS NULL', 'left')
+            ->find($personalId);
+    }
+
+
 }

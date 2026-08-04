@@ -70,50 +70,47 @@ Gestión de Grupos de Corte
                                 placeholder="Ej. Corte General - Nombrados D.L. 276">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-bold">Régimen Laboral</label>
-                            <select class="form-select" id="gco_regimen_laboral">
-                                <option value="">-- Todos los Regímenes --</option>
-                                <option value="276">D.L. 276</option>
-                                <option value="1057">D.L. 1057 (CAS)</option>
-                                <option value="728">D.L. 728</option>
-                                <option value="30057">Ley 30057 (Servir)</option>
+                            <label class="form-label small fw-bold">Modalidad de Contrato / Régimen</label>
+                            <select class="form-select" id="gco_mco_ide">
+                                <option value="">-- Cargar modalidades... --</option>
                             </select>
                         </div>
 
-                        <!-- JERARQUÍA DE SELECCIÓN -->
+                        <!-- JERARQUÍA DE SELECCIÓN EN CASCADA -->
                         <div class="col-12">
                             <hr class="my-1 text-muted">
                         </div>
                         <div class="col-12">
-                            <span class="badge bg-light text-primary border">Alcance Jerárquico (Seleccione
-                                Establecimiento para autollenar la cadena)</span>
+                            <span class="badge bg-light text-primary border">
+                                Alcance Jerárquico (Filtre de Superior a Inferior)
+                            </span>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Establecimiento</label>
-                            <select class="form-select" id="establecimiento_id" onchange="alCambiarEstablecimiento()">
-                                <option value="">-- Ninguno (Aplica a nivel superior) --</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Microred</label>
-                            <select class="form-select" id="microred_id" onchange="alCambiarMicrored()">
-                                <option value="">-- Ninguna --</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Red de Salud</label>
-                            <select class="form-select" id="red_id" onchange="alCambiarRed()">
-                                <option value="">-- Ninguna --</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">DIRESA *</label>
+                            <label class="form-label small fw-bold">1. DIRESA *</label>
                             <select class="form-select" id="diresa_id" required>
                                 <option value="">-- Seleccione DIRESA --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">2. Red de Salud</label>
+                            <select class="form-select" id="red_id" disabled>
+                                <option value="">-- Seleccione DIRESA primero --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">3. Microred</label>
+                            <select class="form-select" id="microred_id" disabled>
+                                <option value="">-- Seleccione Red primero --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">4. Establecimiento</label>
+                            <select class="form-select" id="establecimiento_id" disabled>
+                                <option value="">-- Seleccione Microred primero --</option>
                             </select>
                         </div>
 
@@ -161,35 +158,41 @@ Gestión de Grupos de Corte
 
 <?= $this->section('pageScripts') ?>
 <script>
+    // URLs de la API
     const urlApiGrupos = '<?= base_url('asistencia/gestordb/api/grupos-corte') ?>';
     const urlBaseApi = '<?= base_url('asistencia/gestordb/api') ?>';
+    const urlApiModalidades = '<?= base_url('asistencia/personal/select/modalidades-contrato') ?>';
+    const urlApiDiresas = '<?= base_url('asistencia/gestordb/api/diresas') ?>';
+    const urlApiRedes = '<?= base_url('asistencia/gestordb/api/redes') ?>';
+    const urlApiMicroredes = '<?= base_url('asistencia/gestordb/api/microredes') ?>';
+    const urlApiEstablecimientos = '<?= base_url('asistencia/gestordb/api/establecimientos') ?>';
 
     let tabla;
     let modalGrupo = new bootstrap.Modal(document.getElementById('modalGrupo'));
+    let mapaModalidades = {};
 
-    // Caché local para la relación jerárquica
-    let listaEstablecimientos = [];
-    let listaMicroredes = [];
-    let listaRedes = [];
+    $(document).ready(function() {
+        // Inicializar selectores base
+        cargarDiresas();
+        cargarModalidadesContrato();
 
-    $(document).ready(function () {
-        cargarLookups();
-
+        // Inicializar DataTable
         tabla = $('#tablaGrupos').DataTable({
             "ajax": {
                 "url": urlApiGrupos,
                 "type": "GET",
-                "data": function (d) {
+                "data": function(d) {
                     d.estado = $('#filtroEstado').val();
                 },
                 "dataSrc": "data"
             },
-            "columns": [
-                { "data": "gco_ide" },
+            "columns": [{
+                    "data": "gco_ide"
+                },
                 {
                     "data": "gco_nombre",
                     "className": "fw-bold text-dark",
-                    "render": function (data, type, row) {
+                    "render": function(data, type, row) {
                         let nivel = 'DIRESA General';
                         if (row.establecimiento_id) nivel = `Establecimiento ID: ${row.establecimiento_id}`;
                         else if (row.microred_id) nivel = `Microred ID: ${row.microred_id}`;
@@ -198,50 +201,59 @@ Gestión de Grupos de Corte
                         return `
                             <div>
                                 <span>${data}</span>
-                                <div class="text-muted small fw-normal"><iconify-icon icon="solar:structure-bold" class="me-1"></iconify-icon>${nivel}</div>
+                                <div class="text-muted small fw-normal">
+                                    <iconify-icon icon="solar:structure-bold" class="me-1"></iconify-icon>${nivel}
+                                </div>
                             </div>
                         `;
                     }
                 },
                 {
-                    "data": "gco_regimen_laboral",
-                    "render": function (data) {
-                        return data ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle">${data}</span>`
-                            : '<span class="badge bg-secondary-subtle text-secondary border">Todos</span>';
+                    "data": "gco_mco_ide",
+                    "render": function(data) {
+                        if (!data) {
+                            return '<span class="badge bg-secondary-subtle text-secondary border">Todos los Regímenes</span>';
+                        }
+                        let textoModalidad = mapaModalidades[data] || `Modalidad (${data})`;
+                        return `<span class="badge bg-primary-subtle text-primary border border-primary-subtle">${textoModalidad}</span>`;
                     }
                 },
                 {
                     "data": "gco_dia_inicio",
                     "className": "text-center font-monospace fw-bold",
-                    "render": function (data) { return `Día ${data}`; }
+                    "render": function(data) {
+                        return `Día ${data}`;
+                    }
                 },
                 {
                     "data": "gco_dia_fin",
                     "className": "text-center font-monospace fw-bold",
-                    "render": function (data) { return `Día ${data}`; }
+                    "render": function(data) {
+                        return `Día ${data}`;
+                    }
                 },
                 {
                     "data": "gco_mes_desfasado",
                     "className": "text-center",
-                    "render": function (data) {
-                        return data == 1
-                            ? '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Sí (-1 Mes)</span>'
-                            : '<span class="badge bg-light text-muted border">No</span>';
+                    "render": function(data) {
+                        return data == 1 ?
+                            '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Sí (-1 Mes)</span>' :
+                            '<span class="badge bg-light text-muted border">No</span>';
                     }
                 },
                 {
                     "data": "gco_estado",
-                    "render": function (data) {
-                        return data === 'ACTIVO'
-                            ? '<span class="badge bg-success-subtle text-success border border-success-subtle">ACTIVO</span>'
-                            : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">INACTIVO</span>';
+                    "render": function(data) {
+                        return data === 'ACTIVO' ?
+                            '<span class="badge bg-success-subtle text-success border border-success-subtle">ACTIVO</span>' :
+                            '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">INACTIVO</span>';
                     }
                 },
                 {
                     "data": null,
                     "orderable": false,
                     "className": "text-end",
-                    "render": function (data, type, row) {
+                    "render": function(data, type, row) {
                         return `
                             <button class="btn btn-outline-warning btn-sm me-1 rounded-circle p-1 d-inline-flex align-items-center justify-content-center" 
                                     onclick='abrirModalEditar(${JSON.stringify(row)})' title="Editar" style="width: 32px; height: 32px;">
@@ -260,94 +272,143 @@ Gestión de Grupos de Corte
             }
         });
 
-        $('#formGrupo').on('submit', function (e) {
+        // Event Listeners de la UI
+        $('#formGrupo').on('submit', function(e) {
             e.preventDefault();
             guardarGrupo();
         });
+
+        $('#diresa_id').on('change', function() {
+            cargarRedesPorDiresa($(this).val());
+        });
+
+        $('#red_id').on('change', function() {
+            cargarMicroredesPorRed($(this).val());
+        });
+
+        $('#microred_id').on('change', function() {
+            cargarEstablecimientosPorMicrored($(this).val());
+        });
     });
 
-    // Cargar combos de apoyo desde los endpoints Lookups de la API
-    function cargarLookups() {
-        // Diresas
-        $.get(`${urlBaseApi}/diresas`, function (res) {
+    // Cargar Modalidades
+    function cargarModalidadesContrato() {
+        return $.get(urlApiModalidades, function(res) {
+            let options = '<option value="">-- Todos los Regímenes --</option>';
+            const items = res.data || res;
+
+            mapaModalidades = {};
+            items.forEach(m => {
+                const id = m.mco_ide || m.id || m.value;
+                const nombre = m.mco_nombre || m.nombre || m.text || m.mco_descripcion;
+
+                mapaModalidades[id] = nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            });
+
+            $('#gco_mco_ide').html(options);
+
+            if (tabla) {
+                tabla.rows().invalidate().draw(false);
+            }
+        }).fail(function() {
+            $('#gco_mco_ide').html('<option value="">-- Error al cargar modalidades --</option>');
+        });
+    }
+
+    // Cargar Selects Jerárquicos
+    function cargarDiresas() {
+        return $.get(urlApiDiresas, function(res) {
             let options = '<option value="">-- Seleccione DIRESA --</option>';
             const items = res.data || res;
             items.forEach(d => {
-                options += `<option value="${d.dir_ide || d.id}">${d.dir_nombre || d.nombre}</option>`;
+                options += `<option value="${d.dir_ide}">${d.dir_nombre}</option>`;
             });
             $('#diresa_id').html(options);
         });
-
-        // Redes
-        $.get(`${urlBaseApi}/redes-lookup`, function (res) {
-            listaRedes = res.data || res;
-            let options = '<option value="">-- Ninguna --</option>';
-            listaRedes.forEach(r => {
-                options += `<option value="${r.red_ide || r.id}">${r.red_nombre || r.nombre}</option>`;
-            });
-            $('#red_id').html(options);
-        });
-
-        // Microredes
-        $.get(`${urlBaseApi}/microredes-lookup`, function (res) {
-            listaMicroredes = res.data || res;
-            let options = '<option value="">-- Ninguna --</option>';
-            listaMicroredes.forEach(m => {
-                options += `<option value="${m.mre_ide || m.id}">${m.mre_nombre || m.nombre}</option>`;
-            });
-            $('#microred_id').html(options);
-        });
-
-        // Establecimientos
-        $.get(`${urlBaseApi}/establecimientos-lookup`, function (res) {
-            listaEstablecimientos = res.data || res;
-            let options = '<option value="">-- Ninguno (Aplica a nivel superior) --</option>';
-            listaEstablecimientos.forEach(e => {
-                options += `<option value="${e.est_ide || e.id}">${e.est_nombre || e.nombre}</option>`;
-            });
-            $('#establecimiento_id').html(options);
-        });
     }
 
-    // AUTOSELECCIÓN EN CASCADA
-    function alCambiarEstablecimiento() {
-        const estId = $('#establecimiento_id').val();
-        if (!estId) return;
+    function cargarRedesPorDiresa(diresaId, redSeleccionada = null) {
+        let $red = $('#red_id');
+        let $mic = $('#microred_id');
+        let $est = $('#establecimiento_id');
 
-        const est = listaEstablecimientos.find(item => (item.est_ide || item.id) == estId);
-        if (est) {
-            if (est.microred_id || est.est_mre_ide) {
-                $('#microred_id').val(est.microred_id || est.est_mre_ide);
-                alCambiarMicrored();
-            }
+        $mic.html('<option value="">-- Seleccione Red primero --</option>').prop('disabled', true);
+        $est.html('<option value="">-- Seleccione Microred primero --</option>').prop('disabled', true);
+
+        if (!diresaId) {
+            $red.html('<option value="">-- Seleccione DIRESA primero --</option>').prop('disabled', true);
+            return Promise.resolve();
         }
+
+        $red.html('<option value="">Cargando redes...</option>').prop('disabled', true);
+
+        return $.get(urlApiRedes, function(res) {
+            const items = res.data || res;
+            const filtradas = items.filter(r => r.red_dir_ide == diresaId);
+
+            let options = '<option value="">-- Todas las Redes (Aplica a DIRESA) --</option>';
+            filtradas.forEach(r => {
+                options += `<option value="${r.red_ide}">${r.red_nombre}</option>`;
+            });
+
+            $red.html(options).prop('disabled', false);
+            if (redSeleccionada) $red.val(redSeleccionada);
+        });
     }
 
-    function alCambiarMicrored() {
-        const mreId = $('#microred_id').val();
-        if (!mreId) return;
+    function cargarMicroredesPorRed(redId, microredSeleccionada = null) {
+        let $mic = $('#microred_id');
+        let $est = $('#establecimiento_id');
 
-        const mre = listaMicroredes.find(item => (item.mre_ide || item.id) == mreId);
-        if (mre) {
-            if (mre.red_id || mre.mre_red_ide) {
-                $('#red_id').val(mre.red_id || mre.mre_red_ide);
-                alCambiarRed();
-            }
+        $est.html('<option value="">-- Seleccione Microred primero --</option>').prop('disabled', true);
+
+        if (!redId) {
+            $mic.html('<option value="">-- Seleccione Red primero --</option>').prop('disabled', true);
+            return Promise.resolve();
         }
+
+        $mic.html('<option value="">Cargando microredes...</option>').prop('disabled', true);
+
+        return $.get(urlApiMicroredes, function(res) {
+            const items = res.data || res;
+            const filtradas = items.filter(m => m.mic_red_ide == redId);
+
+            let options = '<option value="">-- Todas las Microredes (Aplica a Red) --</option>';
+            filtradas.forEach(m => {
+                options += `<option value="${m.mic_ide}">${m.mic_nombre}</option>`;
+            });
+
+            $mic.html(options).prop('disabled', false);
+            if (microredSeleccionada) $mic.val(microredSeleccionada);
+        });
     }
 
-    function alCambiarRed() {
-        const redId = $('#red_id').val();
-        if (!redId) return;
+    function cargarEstablecimientosPorMicrored(microredId, establecimientoSeleccionado = null) {
+        let $est = $('#establecimiento_id');
 
-        const red = listaRedes.find(item => (item.red_ide || item.id) == redId);
-        if (red) {
-            if (red.diresa_id || red.red_dir_ide) {
-                $('#diresa_id').val(red.diresa_id || red.red_dir_ide);
-            }
+        if (!microredId) {
+            $est.html('<option value="">-- Seleccione Microred primero --</option>').prop('disabled', true);
+            return Promise.resolve();
         }
+
+        $est.html('<option value="">Cargando establecimientos...</option>').prop('disabled', true);
+
+        return $.get(urlApiEstablecimientos, function(res) {
+            const items = res.data || res;
+            const filtradas = items.filter(e => e.est_mic_ide == microredId);
+
+            let options = '<option value="">-- Todos los Establecimientos (Aplica a Microred) --</option>';
+            filtradas.forEach(e => {
+                options += `<option value="${e.est_ide}">${e.est_nombre}</option>`;
+            });
+
+            $est.html(options).prop('disabled', false);
+            if (establecimientoSeleccionado) $est.val(establecimientoSeleccionado);
+        });
     }
 
+    // Acciones de Modal
     function filtrarTabla() {
         tabla.ajax.reload(null, false);
     }
@@ -355,27 +416,36 @@ Gestión de Grupos de Corte
     function abrirModalCrear() {
         $('#formGrupo')[0].reset();
         $('#gco_ide').val('');
-        $('#gco_estado').val('ACTIVO');
-        $('#gco_mes_desfasado').val('0');
+        $('#red_id, #microred_id, #establecimiento_id')
+            .html('<option value="">-- Seleccione nivel superior --</option>')
+            .prop('disabled', true);
+
         $('#modalTitulo').text('Nuevo Grupo de Corte');
         modalGrupo.show();
     }
 
-    function abrirModalEditar(data) {
+    async function abrirModalEditar(data) {
         $('#formGrupo')[0].reset();
         $('#gco_ide').val(data.gco_ide);
         $('#gco_nombre').val(data.gco_nombre);
-        $('#gco_regimen_laboral').val(data.gco_regimen_laboral || '');
-
-        $('#diresa_id').val(data.diresa_id || '');
-        $('#red_id').val(data.red_id || '');
-        $('#microred_id').val(data.microred_id || '');
-        $('#establecimiento_id').val(data.establecimiento_id || '');
-
+        $('#gco_mco_ide').val(data.gco_mco_ide || '');
         $('#gco_dia_inicio').val(data.gco_dia_inicio);
         $('#gco_dia_fin').val(data.gco_dia_fin);
-        $('#gco_mes_desfasado').val(data.gco_mes_desfasado || 0);
+        $('#gco_mes_desfasado').val(data.gco_mes_desfasado);
         $('#gco_estado').val(data.gco_estado);
+
+        if (data.diresa_id) {
+            $('#diresa_id').val(data.diresa_id);
+            await cargarRedesPorDiresa(data.diresa_id, data.red_id);
+
+            if (data.red_id) {
+                await cargarMicroredesPorRed(data.red_id, data.microred_id);
+
+                if (data.microred_id) {
+                    await cargarEstablecimientosPorMicrored(data.microred_id, data.establecimiento_id);
+                }
+            }
+        }
 
         $('#modalTitulo').text('Editar Grupo de Corte');
         modalGrupo.show();
@@ -395,7 +465,7 @@ Gestión de Grupos de Corte
             microred_id: $('#microred_id').val() || null,
             establecimiento_id: $('#establecimiento_id').val() || null,
             gco_nombre: $('#gco_nombre').val(),
-            gco_regimen_laboral: $('#gco_regimen_laboral').val() || null,
+            gco_mco_ide: $('#gco_mco_ide').val() || null,
             gco_dia_inicio: $('#gco_dia_inicio').val(),
             gco_dia_fin: $('#gco_dia_fin').val(),
             gco_mes_desfasado: $('#gco_mes_desfasado').val(),
@@ -406,23 +476,27 @@ Gestión de Grupos de Corte
             url: url,
             type: metodo,
             data: datos,
-            success: function (response) {
+            success: function(response) {
                 if (response.status === 'success') {
                     toastr.success(response.message);
                     modalGrupo.hide();
                     tabla.ajax.reload(null, false);
                 }
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 let errorMsg = 'Error en el servidor.';
                 if (xhr.responseJSON && xhr.responseJSON.messages) {
-                    errorMsg = typeof xhr.responseJSON.messages === 'object'
-                        ? Object.values(xhr.responseJSON.messages).join('<br>')
-                        : xhr.responseJSON.messages;
+                    errorMsg = typeof xhr.responseJSON.messages === 'object' ?
+                        Object.values(xhr.responseJSON.messages).join('<br>') :
+                        xhr.responseJSON.messages;
                 }
-                Swal.fire({ icon: 'error', title: '¡Error!', html: errorMsg });
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Error!',
+                    html: errorMsg
+                });
             },
-            complete: function () {
+            complete: function() {
                 $('#btnGuardar').prop('disabled', false).text('Guardar');
             }
         });
@@ -442,14 +516,18 @@ Gestión de Grupos de Corte
                 $.ajax({
                     url: `${urlApiGrupos}/${id}`,
                     type: 'DELETE',
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status === 'success') {
                             toastr.success(response.message);
                             tabla.ajax.reload(null, false);
                         }
                     },
-                    error: function (xhr) {
-                        Swal.fire({ icon: 'error', title: '¡Error!', text: 'No se pudo eliminar el grupo.' });
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Error!',
+                            text: 'No se pudo eliminar el grupo.'
+                        });
                     }
                 });
             }

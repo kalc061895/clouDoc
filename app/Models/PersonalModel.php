@@ -28,7 +28,6 @@ class PersonalModel extends Model
         'perl_observacion',
         'perl_tipo_colegio',
         'perl_numero_colegio',
-        'perl_regimen_laboral',
         
         
     ];

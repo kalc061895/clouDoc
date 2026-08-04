@@ -331,6 +331,27 @@
         window.guardarLicencia = function(e) {
             e.preventDefault();
 
+            const fechaInicio = $('#rl_fecha_inicio').val();
+            const fechaFin = $('#rl_fecha_fin').val();
+
+            // 1. Validar que ambas fechas estén ingresadas
+            if (!fechaInicio || !fechaFin) {
+                Swal.fire('Atención', 'Debe seleccionar ambas fechas (Inicio y Fin).', 'warning');
+                return false;
+            }
+
+            // 2. Comparar fechas (YYYY-MM-DD permite comparación directa de strings o por objeto Date)
+            if (new Date(fechaFin) < new Date(fechaInicio)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Rango de fechas inválido',
+                    text: 'La fecha fin debe ser mayor o igual a la fecha de inicio.'
+                });
+
+                $('#rl_fecha_fin').focus();
+                return false; // Interrumpe el envío del formulario
+            }
+
             // Reemplazamos .serialize() por FormData para procesar los archivos
             const formElement = document.getElementById('formLicencia');
             const formData = new FormData(formElement);
@@ -440,7 +461,17 @@
                         },
                         dataType: 'json'
                     }).fail((xhr) => {
-                        const errorMsg = xhr.responseJSON?.message || 'No se pudo eliminar el registro.';
+
+                        // 1. Obtener el cuerpo de la respuesta JSON enviada por CodeIgniter
+                        const res = xhr.responseJSON;
+
+                        // 2. Buscar el mensaje probando las posibles rutas de la API
+                        const errorMsg = res?.messages?.error ||
+                            res?.message ||
+                            (typeof res?.messages === 'string' ? res.messages : null) ||
+                            'No se pudo eliminar el registro.';
+
+                        // 3. Mostrar el mensaje en SweetAlert2
                         Swal.showValidationMessage(`Error: ${errorMsg}`);
                     });
                 },

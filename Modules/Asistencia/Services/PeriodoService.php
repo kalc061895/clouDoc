@@ -5,6 +5,7 @@ namespace Modules\Asistencia\Services;
 use Modules\Asistencia\Models\PeriodoModel;
 use Modules\Asistencia\Models\GrupoCorteModel;
 
+
 class PeriodoService
 {
     protected $periodoModel;
@@ -139,7 +140,7 @@ class PeriodoService
         if ($search) {
             $builder->groupStart()
                 ->like('gco_nombre', $search)
-                ->orLike('gco_regimen_laboral', $search)
+                ->orLike('gco_mco_ide', $search)
                 ->groupEnd();
         }
 
@@ -165,5 +166,88 @@ class PeriodoService
     public function eliminarGrupoCorte(int $id)
     {
         return $this->grupoCorteModel->delete($id);
+    }
+
+    public function validarPeriodo(int $personalId, string $fecha): array
+    {
+
+        // 1. Resolver el período jerárquico
+        $periodoModel = new PeriodoModel();
+        $periodo = $periodoModel->resolverPeriodoPorPersonalYFecha($personalId, $fecha);
+
+        // 2. Escenario A: No existe ningún período aperturado en la jerarquía
+        if (!$periodo) {
+            return [
+                'permitido' => false,
+                'codigo'    => 'PERIODO_NO_EXISTE',
+                'mensaje'   => "No existe un período de corte configurado para la fecha {$fecha} en el establecimiento del trabajador ni en sus instancias superiores."
+            ];
+        }
+        // 3. Escenario B: El período existe pero está CERRADO o EN_PROCESO
+        $estado = $periodo['per_estado'] ?? '';
+
+        switch ($estado) {
+            case 'ABIERTO':
+                return [
+                    'permitido'  => true,
+                    'codigo'     => 'OK',
+                    'mensaje'    => 'Operación permitida.',
+                    'messages'    => 'Operación permitida.',
+                    'periodo_id' => $periodo['per_ide'],
+                    'periodo'    => $periodo
+                ];
+
+            case 'REABIERTO':
+                return [
+                    'permitido'  => true,
+                    'codigo'     => 'PERIODO_REABIERTO',
+                    'mensaje'    => "Atención: El período '{$periodo['per_nombre']}' está REABIERTO. Las modificaciones quedarán registradas en auditoría.",
+                    'messages'    => "Atención: El período '{$periodo['per_nombre']}' está REABIERTO. Las modificaciones quedarán registradas en auditoría.",
+                    'periodo_id' => $periodo['per_ide'],
+                    'periodo'    => $periodo
+                ];
+
+            case 'PROGRAMADO':
+                return [
+                    'permitido'  => false,
+                    'codigo'     => 'PERIODO_PROGRAMADO',
+                    'estado'     => $estado,
+                    'mensaje'    => "El período '{$periodo['per_nombre']}' aún está PROGRAMADO y no ha sido aperturado para el registro de asistencias.",
+                    'messages'    => "El período '{$periodo['per_nombre']}' aún está PROGRAMADO y no ha sido aperturado para el registro de asistencias.",
+                    'periodo_id' => $periodo['per_ide']
+                ];
+
+            case 'EN_EVALUACION':
+                return [
+                    'permitido'  => false, // Cambiar a true si el usuario actual es Administrador/Jefe
+                    'codigo'     => 'PERIODO_EN_EVALUACION',
+                    'estado'     => $estado,
+                    'mensaje'    => "El período '{$periodo['per_nombre']}' está EN EVALUACIÓN por la oficina de RRHH. Registro temporalmente bloqueado para revisión.",
+                    'messages'    => "El período '{$periodo['per_nombre']}' está EN EVALUACIÓN por la oficina de RRHH. Registro temporalmente bloqueado para revisión.",
+                    'periodo_id' => $periodo['per_ide']
+                ];
+
+            case 'CERRADO':
+            default:
+                return [
+                    'permitido'  => false,
+                    'codigo'     => 'PERIODO_CERRADO',
+                    'estado'     => $estado,
+                    'mensaje'    => "El período '{$periodo['per_nombre']}' se encuentra CERRADO. No se permiten modificaciones en la fecha {$fecha}.",
+                    'messages'    => "El período '{$periodo['per_nombre']}' se encuentra CERRADO. No se permiten modificaciones en la fecha {$fecha}.",
+                    'periodo_id' => $periodo['per_ide']
+                ];
+        }
+    }
+
+    public function validarPermisoPeriodo(int $perlIde, string $fecha): void
+    {
+        
+        // Tu método actual que devuelve el array ['permitido' => ..., 'mensaje' => ...]
+        $res = $this->validarPeriodo($perlIde, $fecha);
+
+        if (!$res['permitido']) {
+            throw new \Exception($res['mensaje']);
+        }
     }
 }

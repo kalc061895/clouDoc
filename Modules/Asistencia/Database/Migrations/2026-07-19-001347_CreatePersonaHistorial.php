@@ -61,7 +61,6 @@ class CreatePersonaHistorial extends Migration
             'perl_plaza' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'perl_nivel' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'perl_estado' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
-            'perl_regimen_laboral' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
             'perl_observacion' => ['type' => 'TEXT', 'null' => true],
             // Meta Historial
             'hist_accion' => ['type' => 'ENUM', 'constraint' => ['INSERT', 'UPDATE', 'DELETE']],

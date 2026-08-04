@@ -77,7 +77,6 @@ class LicenciaController extends BaseController
             'rl_lic_ide'      => 'required|integer',
             'rl_fecha_inicio' => 'required|valid_date',
             'rl_fecha_fin'    => 'required|valid_date',
-            // Opcional: Validación de archivos subidos (max 10MB, PDF o imágenes)
             'anexos.*'        => 'permit_empty|uploaded[anexos]|max_size[anexos,10240]|mime_in[anexos,application/pdf,image/jpg,image/jpeg,image/png]'
         ];
 
@@ -97,68 +96,49 @@ class LicenciaController extends BaseController
             'created_by'          => $usuarioId
         ];
 
-        // Obtener array de archivos (soporta tanto un archivo como múltiples con name="anexos[]")
+        // Obtener archivos adjuntos
         $archivos = $this->request->getFiles()['anexos'] ?? $this->request->getFile('anexos');
 
         try {
-            // Llamada al Service
+            // Llamada al Service (Valida el período e inserta)
             $rlIde = $registroLicenciaService->crearLicencia($datosInsert, $archivos, $ip, $usuarioId);
 
             return $this->respondCreated([
                 'status'  => 201,
-                'message' => 'Licencia y adjuntos registrados correctamente con auditoría.',
+                'message' => 'Licencia y adjuntos registrados correctamente.',
                 'id'      => $rlIde
             ]);
         } catch (\Exception $e) {
-            return $this->failServerError('Error al registrar la licencia: ' . $e->getMessage());
+            // Retorna error 400 legible para el cliente AJAX/API cuando falla el período o la transacción
+            return $this->fail($e->getMessage(), 400);
         }
     }
 
     /**
      * POST: /api/v1/licencias/eliminar/(:num)
-     * Realiza Soft Delete y guarda la traza de auditoría con motivo
      */
     public function eliminar($rlIde)
     {
-        $usuarioId = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
-        $ip = $this->request->getIPAddress();
-        $motivoCambio = $this->request->getPost('motivo_cambio') ?? 'Eliminación del registro';
+        $licenciaService = new RegistroLicenciaService();
+        try {
+            $usuarioId    = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
+            $ip           = $this->request->getIPAddress();
+            $motivoCambio = $this->request->getPost('motivo_cambio') ?? 'Eliminación del registro';
 
-        // Buscar registro antes de eliminar
-        $licenciaExistente = $this->registroLicenciaModel->find($rlIde);
+            $licenciaService->eliminarLicencia((int) $rlIde, (int) $usuarioId, $ip, $motivoCambio);
 
-        if (!$licenciaExistente) {
-            return $this->failNotFound('No se encontró el registro de licencia especificado.');
+            return $this->respond([
+                'status'  => 200,
+                'message' => 'Licencia eliminada y auditada con éxito.'
+            ]);
+
+        } catch (\Exception $e) {
+            // Manejo de códigos HTTP específicos según la excepción
+            if ($e->getCode() === 404) {
+                return $this->failNotFound($e->getMessage());
+            }
+
+            return $this->failServerError($e->getMessage());
         }
-
-        $this->db->transStart();
-
-        // 1. Marcar usuario que elimina en la tabla principal
-        $this->registroLicenciaModel->update($rlIde, ['deleted_by' => $usuarioId]);
-
-        // 2. Ejecutar Soft Delete (marca deleted_at)
-        $this->registroLicenciaModel->delete($rlIde);
-
-        // 3. Registrar Auditoría (ELIMINAR)
-        $this->historialModel->insert([
-            'his_rl_ide' => $rlIde,
-            'his_accion' => 'ELIMINAR',
-            'his_datos_anteriores' => json_encode($licenciaExistente),
-            'his_datos_nuevos' => null,
-            'his_motivo_cambio' => $motivoCambio,
-            'his_ip' => $ip,
-            'created_by' => $usuarioId
-        ]);
-
-        $this->db->transComplete();
-
-        if ($this->db->transStatus() === false) {
-            return $this->failServerError('No se pudo completar la eliminación del registro.');
-        }
-
-        return $this->respond([
-            'status' => 200,
-            'message' => 'Licencia eliminada y auditada con éxito.'
-        ]);
     }
 }

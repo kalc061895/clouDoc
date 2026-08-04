@@ -30,7 +30,6 @@ class PersonalHistorialModel extends Model
         'perl_plaza',
         'perl_nivel',
         'perl_estado',
-        'perl_regimen_laboral',
         'perl_observacion',
         'hist_accion',
         'hist_hecho_por',

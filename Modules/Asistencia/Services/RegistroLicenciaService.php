@@ -5,6 +5,7 @@ namespace Modules\Asistencia\Services;
 use Modules\Asistencia\Models\RegistroLicenciaModel;
 use Modules\Asistencia\Models\RegistroLicenciaHistorialModel;
 use Modules\Asistencia\Models\AdjuntoModel;
+use Modules\Asistencia\Services\PeriodoService;
 
 class RegistroLicenciaService
 {
@@ -14,12 +15,15 @@ class RegistroLicenciaService
     protected $fileUploadService;
     protected $db;
 
+    protected $periodoService;
+
     public function __construct()
     {
         $this->registroLicenciaModel = new RegistroLicenciaModel();
         $this->historialModel        = new RegistroLicenciaHistorialModel();
         $this->adjuntoModel          = new AdjuntoModel();
         $this->fileUploadService     = new FileUploadService();
+        $this->periodoService        = new PeriodoService();
         $this->db                    = \Config\Database::connect();
     }
 
@@ -28,6 +32,11 @@ class RegistroLicenciaService
      */
     public function registrarLicencia(array $datos, $archivosHttp = null, ?int $usuarioId = null, ?string $ip = null): bool|array
     {
+
+
+
+
+
         $usuarioId = $usuarioId ?? session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
         $ip        = $ip ?? service('request')->getIPAddress();
 
@@ -161,23 +170,25 @@ class RegistroLicenciaService
     /**
      * Registrar una licencia, su auditoría y sus archivos adjuntos físicamente y en la BD.
      * 
-     * @param array $datosInsert
-     * @param array|null $archivos Archivos recibidos desde $request->getFiles() o $request->getFileMultiple()
-     * @param string $ip
-     * @param int $usuarioId
-     * @return int ID de la licencia creada
      * @throws \Exception
      */
     public function crearLicencia(array $datosInsert, $archivos, string $ip, int $usuarioId): int
     {
+        // Valida el período; si está cerrado/programado lanza la Exception automáticamente
+        $this->periodoService->validarPermisoPeriodo((int) ($datosInsert['rl_perl_ide'] ?? 0), $datosInsert['rl_fecha_inicio'] ?? date('Y-m-d'));
+
         $this->db->transStart();
 
         try {
-            // 1. Insertar Licencia
-            $this->registroLicenciaModel->insert($datosInsert);
+            // 3. Insertar Licencia
+            if ($this->registroLicenciaModel->insert($datosInsert) === false) {
+                $errores = implode(', ', $this->registroLicenciaModel->errors());
+                throw new \Exception('Error de validación en el modelo: ' . $errores);
+            }
+
             $rlIde = $this->registroLicenciaModel->getInsertID();
 
-            // 2. Registrar Auditoría
+            // 4. Registrar Auditoría
             $this->historialModel->insert([
                 'his_rl_ide'           => $rlIde,
                 'his_accion'           => 'CREAR',
@@ -188,14 +199,13 @@ class RegistroLicenciaService
                 'created_by'           => $usuarioId
             ]);
 
-            // 3. Procesar y guardar Archivos Adjuntos
+            // 5. Procesar y guardar Archivos Adjuntos
             $this->procesarAdjuntos($archivos, $rlIde, $usuarioId);
 
             $this->db->transComplete();
 
             if ($this->db->transStatus() === false) {
-                $this->db->transRollback();
-                throw new \Exception('Error al completar la transacción de guardado de licencia.');
+                throw new \Exception('Error al completar la transacción de guardado de licencia en la base de datos.');
             }
 
             return $rlIde;
@@ -205,6 +215,54 @@ class RegistroLicenciaService
         }
     }
 
+    /**
+     * Elimina una licencia (Soft Delete), valida el período y registra la auditoría.
+     *
+     * @throws Exception Si el registro no existe, si el período no lo permite o por fallo en BD.
+     */
+    public function eliminarLicencia(int $rlIde, int $usuarioId, string $ip, string $motivoCambio = 'Eliminación del registro'): bool
+    {
+        // 1. Buscar registro antes de eliminar
+        $licencia = $this->registroLicenciaModel->find($rlIde);
+
+        if (!$licencia) {
+            throw new \Exception("No se encontró el registro de licencia especificado.", 404);
+        }
+
+        // 2. Validar disponibilidad del período de corte asociado a la fecha de la licencia
+        $perlIde = (int) ($licencia['rl_perl_ide'] ?? 0);
+        $fecha   = $licencia['rl_fecha_inicio'] ?? date('Y-m-d');
+
+        $this->periodoService->validarPermisoPeriodo($perlIde, $fecha);
+
+        // 3. Iniciar Transacción
+        $this->db->transStart();
+
+        // Marcar usuario que realiza la eliminación
+        $this->registroLicenciaModel->update($rlIde, ['deleted_by' => $usuarioId]);
+
+        // Ejecutar Soft Delete (poblar deleted_at)
+        $this->registroLicenciaModel->delete($rlIde);
+
+        // Registrar Auditoría
+        $this->historialModel->insert([
+            'his_rl_ide'           => $rlIde,
+            'his_accion'           => 'ELIMINAR',
+            'his_datos_anteriores' => json_encode($licencia),
+            'his_datos_nuevos'     => null,
+            'his_motivo_cambio'    => $motivoCambio,
+            'his_ip'               => $ip,
+            'created_by'           => $usuarioId
+        ]);
+
+        $this->db->transComplete();
+
+        if ($this->db->transStatus() === false) {
+            throw new \Exception("No se pudo completar la eliminación del registro en la base de datos.", 500);
+        }
+
+        return true;
+    }
     /**
      * Procesa, mueve al disco y registra en BD los adjuntos recibidos
      */
