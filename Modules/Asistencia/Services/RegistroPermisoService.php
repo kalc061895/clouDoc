@@ -1,52 +1,42 @@
 <?php
 
 namespace Modules\Asistencia\Services;
-use Modules\Asistencia\Models\PermisoModel;
+
+use Modules\Asistencia\Models\RegistroPermisoModel;
+use Modules\Asistencia\Models\RegistroPermisoHistorialModel;
 use Modules\Asistencia\Models\AdjuntoModel;
-
-
-
-use CodeIgniter\Database\Exceptions\DatabaseException;
+use Modules\Asistencia\Services\PeriodoService;
+use Exception;
 
 class RegistroPermisoService
 {
-    protected $db;
-    protected $permisoModel;
+    protected $registroPermisoModel;
+    protected $historialModel;
     protected $adjuntoModel;
+    protected $db;
 
+    protected $periodoService;
     public function __construct()
     {
-        $this->db = \Config\Database::connect();
-        $this->permisoModel = new PermisoModel();
-        $this->adjuntoModel = new AdjuntoModel();
+        $this->registroPermisoModel = new RegistroPermisoModel();
+        $this->historialModel        = new RegistroPermisoHistorialModel();
+        $this->adjuntoModel         = new AdjuntoModel();
+        $this->db                   = \Config\Database::connect();
+        $this->periodoService       = new PeriodoService();
     }
 
     /**
-     * Obtiene el listado de permisos filtrado por personal, mes y año.
+     * Obtiene los permisos registrados de un trabajador, incluyendo el catálogo (pero_) y sus adjuntos.
      */
-    public function obtenerPermisosPorPersonal(int $perIde, ?int $mes = null, ?int $anio = null): array
+    public function obtenerPermisosPorPersonal(int $perlIde, ?string $mes = null, ?string $anio = null): array
     {
-        $builder = $this->db->table('rh_permiso p')
-            ->select('p.*, tp.tip_nombre as tipo_nombre, tp.tip_remunerado')
-            ->join('rh_tipo_permiso tp', 'tp.tip_ide = p.tip_ide')
-            ->where('p.per_ide', $perIde)
-            ->where('p.perm_estado', 1);
+        $permisos = $this->registroPermisoModel->obtenerPorPersonalConTipo($perlIde, $mes, $anio);
 
-        if ($mes) {
-            $builder->where('MONTH(p.perm_fecha)', $mes);
-        }
-
-        if ($anio) {
-            $builder->where('YEAR(p.perm_fecha)', $anio);
-        }
-
-        $permisos = $builder->orderBy('p.perm_fecha', 'DESC')->get()->getResultArray();
-
-        // Adjuntar archivos correspondientes a cada permiso
-        foreach ($permisos as &$permiso) {
-            $permiso['adjuntos'] = $this->adjuntoModel
-                ->where('perm_ide', $permiso['perm_ide'])
-                ->where('padj_estado', 1)
+        foreach ($permisos as &$item) {
+            $item['adjuntos'] = $this->adjuntoModel
+                ->where('adj_modulo', 'PERMISO')
+                ->where('adj_registro_id', $item['rp_ide'])
+                ->orderBy('adj_orden', 'ASC')
                 ->findAll();
         }
 
@@ -54,117 +44,149 @@ class RegistroPermisoService
     }
 
     /**
-     * Registra un nuevo permiso con sus archivos adjuntos.
+     * Registra un permiso/papeleta con sus archivos adjuntos e historial de auditoría.
      */
-    public function registrarPermiso(array $datos, array $archivos): array
+    public function crearPermiso(array $data, $archivos, string $ip, int $usuarioId): int
     {
-        // 1. Validar que no exista cruce de horarios en la misma fecha
-        if ($this->existeCruceHorario($datos['per_ide'], $datos['perm_fecha'], $datos['perm_hora_inicio'], $datos['perm_hora_fin'])) {
-            return [
-                'status'  => false,
-                'message' => 'El personal ya registra un permiso o papeleta en el rango de horas ingresado.'
-            ];
-        }
 
-        // 2. Calcular minutos totales acumulados
-        $minutosTotales = $this->calcularDiferenciaMinutos($datos['perm_hora_inicio'], $datos['perm_hora_fin']);
+        $perlIde = (int) ($data['rp_perl_ide'] ?? 0);
+        $fecha   = $data['rp_fecha'] ?? date('Y-m-d');
 
-        $dataInsert = [
-            'per_ide'          => $datos['per_ide'],
-            'tip_ide'          => $datos['tipo_permiso_id'],
-            'perm_fecha'       => $datos['perm_fecha'],
-            'perm_hora_inicio' => $datos['perm_hora_inicio'],
-            'perm_hora_fin'    => $datos['perm_hora_fin'],
-            'perm_minutos'     => $minutosTotales,
-            'perm_numero_doc'  => $datos['perm_numero_doc'] ?? null,
-            'perm_motivo'      => $datos['perm_motivo'] ?? null,
-            'perm_estado'      => 1,
-            'created_at'       => date('Y-m-d H:i:s')
-        ];
+        $this->periodoService->validarPermisoPeriodo($perlIde, $fecha);
 
-        $this->db->transStart();
+        $this->db->transException(true)->transBegin();
 
-        // Insertar cabecera de permiso
-        $permIde = $this->permisoModel->insert($dataInsert, true);
+        try {
+            $rpIde = $this->registroPermisoModel->insert($data);
 
-        // 3. Procesar archivos adjuntos si existen
-        if (!empty($archivos['adjuntos'])) {
-            $this->procesarAdjuntos($permIde, $archivos['adjuntos']);
-        }
-
-        $this->db->transComplete();
-
-        if ($this->db->transStatus() === false) {
-            return [
-                'status'  => false,
-                'message' => 'Ocurrió un error al guardar la papeleta en la base de datos.'
-            ];
-        }
-
-        return [
-            'status'  => true,
-            'message' => 'Papeleta de permiso registrada correctamente.',
-            'perm_ide' => $permIde
-        ];
-    }
-
-    /**
-     * Procesa y mueve los archivos físicos al directorio de destino guardando la meta en la BD.
-     */
-    private function procesarAdjuntos(int $permIde, array $files): void
-    {
-        $uploadPath = WRITEPATH . 'uploads/permisos/' . date('Y/m/');
-
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-        }
-
-        foreach ($files as $file) {
-            if ($file->isValid() && !$file->hasMoved()) {
-                $nombreOriginal = $file->getClientName();
-                $nombreNuevo    = $file->getRandomName();
-
-                $file->move($uploadPath, $nombreNuevo);
-
-                $this->adjuntoModel->insert([
-                    'perm_ide'          => $permIde,
-                    'padj_nombre_orig'  => $nombreOriginal,
-                    'padj_nombre_archivo' => 'uploads/permisos/' . date('Y/m/') . $nombreNuevo,
-                    'padj_extension'    => $file->getClientExtension(),
-                    'padj_tamano'       => $file->getSize(),
-                    'padj_estado'       => 1,
-                    'created_at'        => date('Y-m-d H:i:s')
-                ]);
+            if (!$rpIde) {
+                $erroresModelo = implode(', ', $this->registroPermisoModel->errors());
+                throw new Exception("Error de validación en RegistroPermisoModel: " . $erroresModelo);
             }
+
+            // Procesar archivos subidos
+            if (!empty($archivos)) {
+                $filesToProcess = is_array($archivos) ? $archivos : [$archivos];
+                $orden = 1;
+
+                foreach ($filesToProcess as $file) {
+                    if ($file && $file->isValid() && !$file->hasMoved()) {
+                        $newName   = $file->getRandomName();
+                        $relativePath = 'uploads/permisos/' . $newName;
+
+                        $file->move(WRITEPATH . 'uploads/permisos', $newName);
+
+                        $insertAdjunto = $this->adjuntoModel->insert([
+                            'adj_modulo'          => 'PERMISO',
+                            'adj_registro_id'     => $rpIde,
+                            'adj_local_path'      => $relativePath,
+                            'adj_drive_path'      => null,
+                            'adj_nombre_original' => $file->getClientName(),
+                            'adj_mime_type'       => $file->getClientMimeType(),
+                            'adj_tamano'          => $file->getSize(),
+                            'adj_orden'           => $orden++,
+                            'created_by'          => $usuarioId
+                        ]);
+
+                        if (!$insertAdjunto) {
+                            $erroresAdj = implode(', ', $this->adjuntoModel->errors());
+                            throw new Exception("Error al insertar en AdjuntoModel: " . $erroresAdj);
+                        }
+                    }
+                }
+            }
+
+            // Historial de auditoría inicial
+            $insertHistorial = $this->historialModel->insert([
+                'rph_rp_ide'     => $rpIde,
+                'rph_accion'     => 'CREAR',
+                'rph_datos_anteriores' => null,
+                'rph_datos_nuevos'     => json_encode($data),
+                'rph_motivo_cambio'    => 'Registro inicial de la papeleta/permiso por horas.',
+                'rph_ip'         => $ip,
+                'created_by'     => $usuarioId,
+                'created_at'     => date('Y-m-d H:i:s')
+            ]);
+
+            if (!$insertHistorial) {
+                $erroresHist = implode(', ', $this->historialModel->errors());
+                throw new Exception("Error al guardar en HistorialModel: " . $erroresHist);
+            }
+
+            $this->db->transCommit();
+
+            return $rpIde;
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            throw new Exception("Fallo transaccional: " . $e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
     /**
-     * Valida si existe un permiso activo en el mismo rango de horas.
+     * Aplica borrado lógico (Soft Delete) del permiso guardando motivo y usuario que elimina.
      */
-    private function existeCruceHorario(int $perIde, string $fecha, string $horaInicio, string $horaFin): bool
+    public function eliminarPermiso(int $rpIde, int $usuarioId, string $ip, string $motivo): bool
     {
-        return $this->permisoModel
-            ->where('per_ide', $perIde)
-            ->where('perm_fecha', $fecha)
-            ->where('perm_estado', 1)
-            ->groupStart()
-                ->where("('$horaInicio' BETWEEN perm_hora_inicio AND perm_hora_fin)")
-                ->orWhere("('$horaFin' BETWEEN perm_hora_inicio AND perm_hora_fin)")
-                ->orWhere("(perm_hora_inicio BETWEEN '$horaInicio' AND '$horaFin')")
-            ->groupEnd()
-            ->countAllResults() > 0;
-    }
+        $permiso = $this->registroPermisoModel->find($rpIde);
 
-    /**
-     * Calcula los minutos netos entre dos horas HH:MM.
-     */
-    private function calcularDiferenciaMinutos(string $hInicio, string $hFin): int
-    {
-        $inicio = new \DateTime($hInicio);
-        $fin    = new \DateTime($hFin);
-        $diff   = $inicio->diff($fin);
+        if (!$permiso) {
+            throw new Exception("No se encontró el registro de licencia especificado.", 404);
+        }
 
-        return ($diff->h * 60) + $diff->i;
+        // 2. Validar disponibilidad del período de corte asociado a la fecha de la licencia
+        $perlIde = (int) ($permiso['rp_perl_ide'] ?? 0);
+        $fecha   = $permiso['rp_fecha'] ?? date('Y-m-d');
+
+        $this->periodoService->validarPermisoPeriodo($perlIde, $fecha);
+
+
+        // Activar excepciones en transacciones y comenzar de forma manual
+        $this->db->transException(true)->transBegin();
+
+        try {
+            // 1. Guardar motivo de cambio y usuario que elimina antes del soft delete
+            $updateResult = $this->registroPermisoModel->update($rpIde, [
+                'rph_motivo_cambio' => $motivo,
+                'deleted_by'       => $usuarioId
+            ]);
+
+            if (!$updateResult) {
+                $erroresModel = implode(', ', $this->registroPermisoModel->errors());
+                throw new Exception("Error al actualizar motivo/usuario en RegistroPermisoModel: " . $erroresModel);
+            }
+
+            // 2. Ejecutar Soft Delete (llena automáticamente deleted_at)
+            $deleteResult = $this->registroPermisoModel->delete($rpIde);
+
+            if (!$deleteResult) {
+                $erroresDelete = implode(', ', $this->registroPermisoModel->errors());
+                throw new Exception("Error al ejecutar delete en RegistroPermisoModel: " . $erroresDelete);
+            }
+
+            // 3. Registrar auditoría de eliminación
+            $insertHistorial = $this->historialModel->insert([
+                'rph_rp_ide'     => $rpIde,
+                'rph_accion'     => 'ELIMINACION',
+                'rph_detalle'    => 'Motivo: ' . $motivo,
+                'rph_ip'         => $ip,
+                'rph_usuario_id' => $usuarioId,
+                'created_at'     => date('Y-m-d H:i:s')
+            ]);
+
+            if (!$insertHistorial) {
+                $erroresHist = implode(', ', $this->historialModel->errors());
+                throw new Exception("Error al insertar auditoría en HistorialModel: " . $erroresHist);
+            }
+
+            // Confirmar transacción
+            $this->db->transCommit();
+
+            return true;
+        } catch (\Throwable $e) {
+            // Revertir cambios en caso de cualquier error (base de datos o código)
+            $this->db->transRollback();
+
+            throw new Exception("Fallo al eliminar permiso: " . $e->getMessage(), (int)$e->getCode(), $e);
+        }
     }
 }

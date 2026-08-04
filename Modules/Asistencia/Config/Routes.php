@@ -320,7 +320,9 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('datos/(:num)', 'PersonalController::getPaneDatos/$1');
         $routes->get('asistencia/(:num)', 'AsistenciaController::getPaneAsistencia/$1');
         $routes->get('turnos/(:num)', 'TurnoController::getPaneTurnos/$1');
+        $routes->get('cambio-turno/(:num)', 'TurnoController::getPaneCambioTurno/$1');
         $routes->get('incidencias/(:num)', 'RegistroLicenciaController::getPaneIncidencias/$1');
+        $routes->get('permisos/(:num)', 'RegistroPermisoController::getPanePermisos/$1');
         $routes->get('vacaciones/(:num)', 'VacacionController::getPaneVacaciones/$1');
         // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
@@ -370,9 +372,9 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         });
     });
 
-    $routes->group('permiso', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
-
-        $routes->group('api', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+    // --- GRUPO PERMISOS / PAPELETAS ---
+    $routes->group('permiso', function ($routes) {
+        $routes->group('api', function ($routes) {
             $routes->get('tipos-activos', 'PermisoController::tiposActivos');
             $routes->get('personal/(:num)', 'PermisoController::obtenerPorPersonal/$1');
             $routes->post('guardar', 'PermisoController::guardar');

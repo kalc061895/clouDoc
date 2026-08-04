@@ -5,97 +5,135 @@ namespace Modules\Asistencia\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Asistencia\Services\RegistroPermisoService;
+use Modules\Asistencia\Models\PermisoModel;
 use CodeIgniter\API\ResponseTrait;
+
 class PermisoController extends BaseController
 {
+
     use ResponseTrait;
 
-    protected $permisoService;
+    protected $permisoModel;
+    protected $registroPermisoService;
 
     public function __construct()
     {
-        $this->permisoService = new RegistroPermisoService();
+        $this->permisoModel           = new PermisoModel();
+        $this->registroPermisoService = new RegistroPermisoService();
     }
 
     /**
-     * GET /api/permisos/personal/{perIde}
+     * GET: /permiso/api/tipos-activos
      */
-    public function listarPorPersonal($perIde = null)
+    public function tiposActivos()
     {
-        if (!$perIde) {
-            return $this->fail('Identificador de personal no proporcionado.', 400);
-        }
+        $tipos = $this->permisoModel->activos();
+        return $this->respond([
+            'status' => 200,
+            'data'   => $tipos
+        ]);
+    }
 
+    /**
+     * GET: /permiso/api/personal/(:num)
+     */
+    public function obtenerPorPersonal($perlIde)
+    {
         $mes  = $this->request->getGet('mes');
         $anio = $this->request->getGet('anio');
 
-        $data = $this->permisoService->obtenerPermisosPorPersonal((int)$perIde, $mes ? (int)$mes : null, $anio ? (int)$anio : null);
+        $permisos = $this->registroPermisoService->obtenerPermisosPorPersonal((int)$perlIde, $mes, $anio);
 
         return $this->respond([
-            'status' => true,
-            'data'   => $data
+            'status' => 200,
+            'data'   => $permisos
         ]);
     }
 
     /**
-     * POST /api/permisos/guardar
+     * POST: /permiso/api/guardar
      */
     public function guardar()
     {
-        // 1. Reglas de Validación de Inputs
+        $usuarioId = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
+        $ip        = $this->request->getIPAddress();
+
         $rules = [
-            'per_ide'          => 'required|integer',
-            'tipo_permiso_id'  => 'required|integer',
-            'perm_fecha'       => 'required|valid_date[Y-m-d]',
-            'perm_hora_inicio' => 'required',
-            'perm_hora_fin'    => 'required',
-            'adjuntos.*'       => 'max_size[adjuntos,5120]|ext_in[adjuntos,pdf,png,jpg,jpeg]' // Máx 5MB por archivo
+            'rp_perl_ide'    => 'required|integer',
+            'rp_pero_ide'    => 'required|integer',
+            'rp_fecha'       => 'required|valid_date[Y-m-d]',
+            'rp_hora_salida' => 'required',
+            'rp_hora_retorno'    => 'required',
+            'anexos.*'       => 'permit_empty|uploaded[anexos]|max_size[anexos,10240]|mime_in[anexos,application/pdf,image/jpg,image/jpeg,image/png]'
         ];
 
         if (!$this->validate($rules)) {
-            return $this->fail($this->validator->getErrors(), 422);
+            return $this->failValidationErrors($this->validator->getErrors());
         }
 
-        $datos = $this->request->getPost();
-        $archivos = [
-            'adjuntos' => $this->request->getFileMultiple('adjuntos')
+        $horaInicio = $this->request->getPost('rp_hora_salida');
+        $horaFin    = $this->request->getPost('rp_hora_retorno');
+
+        if (strtotime($horaFin) <= strtotime($horaInicio)) {
+            return $this->failValidationErrors([
+                'rp_hora_retorno' => 'La hora fin debe ser posterior a la hora de inicio.'
+            ]);
+        }
+
+        $datosInsert = [
+            'rp_perl_ide'         => $this->request->getPost('rp_perl_ide'),
+            'rp_pero_ide'         => $this->request->getPost('rp_pero_ide'),
+            'rp_fecha'            => $this->request->getPost('rp_fecha'),
+            'rp_hora_salida'      => $horaInicio,
+            'rp_hora_retorno'         => $horaFin,
+            'rp_numero_documento' => $this->request->getPost('rp_numero_documento'),
+            'rp_fecha_documento'  => $this->request->getPost('rp_fecha_documento') ?: null,
+            'rp_motivo'           => $this->request->getPost('rp_motivo'),
+            'rp_estado'           => 1,
+            'created_by'          => $usuarioId
         ];
 
-        // 2. Ejecutar Guardado en Servicio
-        $resultado = $this->permisoService->registrarPermiso($datos, $archivos);
+        $archivos = $this->request->getFiles()['anexos'] ?? $this->request->getFile('anexos');
 
-        if (!$resultado['status']) {
-            return $this->fail($resultado['message'], 400);
+        try {
+            $rpIde = $this->registroPermisoService->crearPermiso($datosInsert, $archivos, $ip, $usuarioId);
+
+            return $this->respondCreated([
+                'status'  => 201,
+                'message' => 'Permiso / Papeleta registrada correctamente.',
+                'id'      => $rpIde
+            ]);
+        } catch (\Exception $e) {
+            return $this->fail($e->getMessage(), 400);
         }
-
-        return $this->respondCreated([
-            'status'  => true,
-            'message' => $resultado['message'],
-            'perm_ide' => $resultado['perm_ide']
-        ]);
     }
 
     /**
-     * POST /api/permisos/eliminar/{id}
+     * POST: /permiso/api/eliminar/(:num)
      */
-    public function eliminar($id = null)
+    public function eliminar($rpIde)
     {
-        if (!$id) {
-            return $this->fail('ID de papeleta no válido.', 400);
+        try {
+            $usuarioId    = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
+            $ip           = $this->request->getIPAddress();
+            $motivoCambio = $this->request->getPost('motivo_cambio');
+
+            if (empty(trim($motivoCambio))) {
+                return $this->failValidationErrors(['motivo_cambio' => 'El motivo de eliminación es obligatorio.']);
+            }
+
+            $this->registroPermisoService->eliminarPermiso((int) $rpIde, (int) $usuarioId, $ip, $motivoCambio);
+
+            return $this->respond([
+                'status'  => 200,
+                'message' => 'Permiso eliminado y auditado con éxito.'
+            ]);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return $this->failNotFound($e->getMessage());
+            }
+
+            return $this->failServerError($e->getMessage());
         }
-
-        $permisoModel = new PermisoModel();
-
-        // Soft delete (desactivación lógica)
-        $updated = $permisoModel->update($id, ['perm_estado' => 0]);
-
-        if (!$updated) {
-            return $this->fail('No se pudo anular el permiso.', 500);
-        }
-
-        return $this->respond([
-            'status'  => true,
-            'message' => 'Papeleta de permiso anulada correctamente.'
-        ]);
     }
 }

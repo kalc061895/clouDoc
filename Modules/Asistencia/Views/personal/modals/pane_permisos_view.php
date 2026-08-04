@@ -1,160 +1,153 @@
-<div class="container-fluid py-3">
-    <!-- Cabecera de la Sección -->
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <div>
-            <h4 class="fw-bold mb-0 text-dark">
-                <iconify-icon icon="solar:clock-circle-bold-duotone" class="text-primary me-2 align-middle"></iconify-icon>
-                Control de Permisos y Papeletas
-            </h4>
-            <p class="text-muted small mb-0">Gestión e historial de papeletas de salida e incidencias por horas.</p>
-        </div>
-        <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1 shadow-sm" onclick="nuevoPermiso()">
-            <iconify-icon icon="solar:add-circle-bold" class="fs-5"></iconify-icon>
-            <span>Nueva Papeleta</span>
+<!-- Header del Pane con Filtros y Botón Nuevo -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-2 border-bottom">
+    <div>
+        <h6 class="fw-bold mb-0 text-dark d-flex align-items-center">
+            <iconify-icon icon="solar:clock-square-bold" class="text-primary me-2 fs-5"></iconify-icon>
+            Permisos y Papeletas por Horas
+        </h6>
+        <small class="text-muted">Historial de salidas por horas y papeletas de permiso registradas.</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <!-- Filtro Mes -->
+        <select id="filtroMesPermiso" class="form-select form-select-sm" style="width: 130px;" onchange="cargarListadoPermisos()">
+            <option value="">-- Todo el año --</option>
+            <?php foreach ($meses as $mes): ?>
+                <?php
+                $valMes = str_pad($mes['numero'], 2, '0', STR_PAD_LEFT);
+                $selected = ($valMes == date('m')) ? 'selected' : '';
+                ?>
+                <option value="<?= $valMes ?>" <?= $selected ?>>
+                    <?= esc($mes['nombre']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <!-- Filtro Año -->
+        <select id="filtroAnioPermiso" class="form-select form-select-sm" style="width: 100px;" onchange="cargarListadoPermisos()">
+            <?php foreach ($anios as $anio): ?>
+                <?php $selected = ($anio['numero'] == date('Y')) ? 'selected' : ''; ?>
+                <option value="<?= $anio['numero'] ?>" <?= $selected ?>>
+                    <?= esc($anio['nombre']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <!-- Botón Registrar -->
+        <button class="btn btn-sm btn-primary d-flex align-items-center text-nowrap" onclick="abrirModalFormPermiso()">
+            <iconify-icon icon="solar:add-circle-bold" class="me-1 fs-6"></iconify-icon> Nuevo Permiso
         </button>
-    </div>
-
-    <!-- Filtros de Búsqueda -->
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body p-3">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-3">
-                    <label for="filtroMesPermiso" class="form-label small fw-semibold">Mes</label>
-                    <select id="filtroMesPermiso" class="form-select form-select-sm" onchange="cargarListadoPermisos()">
-                        <?php
-                        $meses = [1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'];
-                        $mesActual = (int)date('m');
-                        foreach ($meses as $num => $nombre): ?>
-                            <option value="<?= $num ?>" <?= $num === $mesActual ? 'selected' : '' ?>><?= $nombre ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="filtroAnioPermiso" class="form-label small fw-semibold">Año</label>
-                    <select id="filtroAnioPermiso" class="form-select form-select-sm" onchange="cargarListadoPermisos()">
-                        <?php
-                        $anioActual = (int)date('Y');
-                        for ($a = $anioActual; $a >= $anioActual - 2; $a--): ?>
-                            <option value="<?= $a ?>"><?= $a ?></option>
-                        <?php endfor; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="cargarListadoPermisos()">
-                        <iconify-icon icon="solar:magnifer-linear" class="me-1"></iconify-icon> Filtrar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabla con DataTables RowGroup -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-3">
-            <div class="table-responsive">
-                <table id="tablaPermisos" class="table table-hover align-middle w-100 border">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-center" style="width: 40px;">#</th>
-                            <th>Tipo Permiso</th> <!-- Columna Agrupadora (Oculta por DataTables) -->
-                            <th>Fecha y Horario</th>
-                            <th>Tiempo</th>
-                            <th>Documento / Papeleta</th>
-                            <th class="text-center">Anexos</th>
-                            <th>Motivo</th>
-                            <th class="text-center" style="width: 80px;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyPermisos">
-                        <!-- Carga dinámica mediante JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- ==========================================
-     MODAL: REGISTRAR / EDITAR PERMISO
-=========================================== -->
-<div class="modal fade" id="modalRegistroPermiso" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title fs-6 fw-bold text-dark d-flex align-items-center gap-2">
-                    <iconify-icon icon="solar:document-add-bold" class="text-primary fs-5"></iconify-icon>
-                    <span id="modalPermisoTitulo">Registrar Nueva Papeleta / Permiso</span>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Tabla de Registros -->
+<div class="table-responsive">
+    <table class="table table-sm table-hover table-bordered align-middle mb-0" id="tblPermisos">
+        <thead class="text-secondary small">
+            <tr>
+                <th style="width: 40px;" class="text-center">#</th>
+                <th>Tipo de Permiso</th>
+                <th>Fecha</th>
+                <th>Horario (Inicio - Fin)</th>
+                <th>Doc. Sustento</th>
+                <th>Anexos</th>
+                <th>Motivo / Observación</th>
+                <th class="text-center">Estado</th>
+                <th style="width: 90px;" class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tbodyPermisos">
+            <tr>
+                <td colspan="9" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Cargando listado de permisos...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL ANIDADO: Registrar / Editar Permiso  -->
+<!-- ========================================== -->
+<div class="modal fade" id="modalFormPermiso" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title text-light fw-bold" id="titleModalPermiso">
+                    <iconify-icon icon="solar:document-add-bold" class="me-1"></iconify-icon> Registrar Permiso / Papeleta
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="formRegistroPermiso" enctype="multipart/form-data">
-                <input type="hidden" id="per_ide" name="per_ide" value="<?= $perl_ide ?? '' ?>">
-                <input type="hidden" id="perm_ide" name="perm_ide">
+            <form id="formPermiso" onsubmit="guardarPermiso(event)" enctype="multipart/form-data">
+                <div class="modal-body row g-3">
+                    <input type="hidden" id="rp_ide" name="rp_ide">
+                    <input type="hidden" id="rp_perl_ide" name="rp_perl_ide" value="<?= $perl_ide ?>">
 
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <!-- Tipo de Permiso -->
-                        <div class="col-md-8">
-                            <label for="tipo_permiso_id" class="form-label small fw-semibold">Tipo de Permiso / Incidencia <span class="text-danger">*</span></label>
-                            <select class="form-select form-select-sm" id="tipo_permiso_id" name="tipo_permiso_id" required>
-                                <option value="" selected disabled>Seleccione una opción...</option>
-                                <!-- Se llena vía API o mediante backend -->
-                            </select>
-                        </div>
+                    <!-- Tipo de Permiso -->
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Tipo de Permiso <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" id="rp_pero_ide" name="rp_pero_ide" required>
+                            <option value="">-- Seleccione Tipo --</option>
+                        </select>
+                    </div>
 
-                        <!-- Número de Documento / Papeleta -->
-                        <div class="col-md-4">
-                            <label for="perm_numero_doc" class="form-label small fw-semibold">N° Papeleta / Memo</label>
-                            <input type="text" class="form-control form-control-sm" id="perm_numero_doc" name="perm_numero_doc" placeholder="Ej: PAP-2026-0012">
-                        </div>
+                    <!-- Fecha del Permiso -->
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Fecha de Permiso <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control form-control-sm" id="rp_fecha" name="rp_fecha" required>
+                    </div>
 
-                        <!-- Fecha del Permiso -->
-                        <div class="col-md-4">
-                            <label for="perm_fecha" class="form-label small fw-semibold">Fecha del Permiso <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control form-control-sm" id="perm_fecha" name="perm_fecha" required>
-                        </div>
+                    <!-- Horas Inicio / Fin -->
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Hora Inicio <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control form-control-sm" id="rp_hora_salida" name="rp_hora_salida" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Hora Fin <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control form-control-sm" id="rp_hora_retorno" name="rp_hora_retorno" required>
+                    </div>
 
-                        <!-- Hora Inicio -->
-                        <div class="col-md-4">
-                            <label for="perm_hora_inicio" class="form-label small fw-semibold">Hora Salida <span class="text-danger">*</span></label>
-                            <input type="time" class="form-control form-control-sm" id="perm_hora_inicio" name="perm_hora_inicio" onchange="calcularDiferenciaHoras()" required>
-                        </div>
-
-                        <!-- Hora Fin -->
-                        <div class="col-md-4">
-                            <label for="perm_hora_fin" class="form-label small fw-semibold">Hora Retorno <span class="text-danger">*</span></label>
-                            <input type="time" class="form-control form-control-sm" id="perm_hora_fin" name="perm_hora_fin" onchange="calcularDiferenciaHoras()" required>
-                        </div>
-
-                        <!-- Calculador informativo de horas -->
-                        <div class="col-12">
-                            <div class="alert alert-soft-primary py-2 px-3 mb-0 d-flex align-items-center justify-content-between rounded">
-                                <span class="small text-muted">Tiempo acumulado estimado:</span>
-                                <span class="fw-bold text-primary" id="lblTiempoCalculado">0 hrs 0 min</span>
-                            </div>
-                        </div>
-
-                        <!-- Motivo / Sustento -->
-                        <div class="col-12">
-                            <label for="perm_motivo" class="form-label small fw-semibold">Motivo o Justificación</label>
-                            <textarea class="form-control form-control-sm" id="perm_motivo" name="perm_motivo" rows="2" placeholder="Describa brevemente el motivo de la salida..."></textarea>
-                        </div>
-
-                        <!-- Adjuntar Documentos / Papeletas firmadas -->
-                        <div class="col-12">
-                            <label for="adjuntos_permiso" class="form-label small fw-semibold">Adjuntar Sustentos / Archivos (PDF, JPG, PNG)</label>
-                            <input class="form-control form-control-sm" type="file" id="adjuntos_permiso" name="adjuntos[]" multiple accept=".pdf,.png,.jpg,.jpeg">
-                            <div class="form-text extra-small">Puedes seleccionar múltiples archivos para sustentación.</div>
+                    <!-- Badge informativo de horas calculadas -->
+                    <div class="col-12 mt-1">
+                        <div id="cntHoras" class="text-end small fw-semibold text-muted" style="font-size: 0.8rem;">
+                            <!-- Se llena dinámicamente con JS -->
                         </div>
                     </div>
-                </div>
 
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" id="btnGuardarPermiso">
-                        <iconify-icon icon="solar:diskette-bold"></iconify-icon>
-                        <span>Guardar Permiso</span>
+                    <!-- Documento de Sustento -->
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">N° Doc. Sustento</label>
+                        <input type="text" class="form-control form-control-sm" id="rp_numero_documento" name="rp_numero_documento" placeholder="Ej: Papeleta N° 045-2026">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold">Fecha Documento</label>
+                        <input type="date" class="form-control form-control-sm" id="rp_fecha_documento" name="rp_fecha_documento">
+                    </div>
+
+                    <!-- Campo de Carga de Múltiples Anexos -->
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
+                            <span>Adjuntar Anexos / Sustentos (Opcional)</span>
+                            <span class="badge bg-light-secondary text-muted">Formatos: PDF, JPG, PNG</span>
+                        </label>
+                        <input type="file" class="form-control form-control-sm" id="anexos_permiso" name="anexos[]" multiple accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="form-text text-muted small" style="font-size: 0.75rem;">
+                            Puedes seleccionar uno o varios archivos manteniendo presionada la tecla Ctrl.
+                        </div>
+                    </div>
+
+                    <!-- Motivo -->
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Motivo / Observación</label>
+                        <textarea class="form-control form-control-sm" id="rp_motivo" name="rp_motivo" rows="2" placeholder="Detalle la razón de la solicitud de permiso..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer py-2 bg-light">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-sm btn-primary" id="btnGuardarPermiso">
+                        <iconify-icon icon="solar:diskette-bold" class="me-1"></iconify-icon> Guardar Registro
                     </button>
                 </div>
             </form>
@@ -162,189 +155,374 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MODAL SECUNDARIO: Ver Anexos Adjuntos      -->
+<!-- ========================================== -->
+<div class="modal fade" id="modalVerAnexosPermisos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow border-0">
+            <div class="modal-header py-2 bg-light">
+                <h6 class="modal-title fw-bold text-dark small">
+                    <iconify-icon icon="solar:paperclip-bold" class="me-1 text-primary"></iconify-icon> Documentos Anexos
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2" id="bodyAnexosPermisosList">
+                <!-- Dinámico -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script Lógico para Permisos -->
 <script>
-    const URL_BASE_PERMISO = '<?= base_url() ?>';
-    const PERL_IDE = '<?= $perl_ide ?? 0 ?>';
+    (function() {
+        const URL_BASE_PERMISO = "<?= base_url('asistencia/permiso') ?>";
+        const URL_BASE_SISTEMA = "<?= base_url() ?>";
+        const PERL_IDE = <?= $perl_ide ?>;
 
-    $(document).ready(function() {
-        cargarListadoPermisos();
-    });
-
-    // 1. Cargar datos con DataTables y RowGroup
-    window.cargarListadoPermisos = function() {
-        const mes = $('#filtroMesPermiso').val();
-        const anio = $('#filtroAnioPermiso').val();
-
-        if ($.fn.DataTable.isDataTable('#tablaPermisos')) {
-            $('#tablaPermisos').DataTable().destroy();
+        // Cargar tipos de permiso
+        function cargarTiposPermiso() {
+            $.get(`${URL_BASE_PERMISO}/api/tipos-activos`, function(res) {
+                if (res.status === 200) {
+                    let options = '<option value="">-- Seleccione Tipo --</option>';
+                    res.data.forEach(item => {
+                        const esGoce = item.pero_remunerado == 1 ? 'Con Goce' : 'Sin Goce';
+                        options += `<option value="${item.pero_ide}">${item.pero_nombre} (${esGoce})</option>`;
+                    });
+                    $('#rp_pero_ide').html(options);
+                }
+            });
         }
 
-        $('#tbodyPermisos').html(`
-        <tr>
-            <td colspan="8" class="text-center py-4 text-muted">
-                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-                Consultando papeletas...
-            </td>
-        </tr>
-    `);
+        // Listar permisos aplicando filtros
+        window.cargarListadoPermisos = function() {
+            const mes = $('#filtroMesPermiso').val();
+            const anio = $('#filtroAnioPermiso').val();
+            const $tbody = $('#tbodyPermisos');
 
-        $.ajax({
-            url: `${URL_BASE_PERMISO}/api/permisos/personal/${PERL_IDE}`,
-            type: 'GET',
-            data: {
-                mes: mes,
-                anio: anio
-            },
-            dataType: 'json',
-            success: function(res) {
-                const data = res.data || [];
+            $tbody.html(`
+            <tr>
+                <td colspan="9" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                    Consultando registros...
+                </td>
+            </tr>
+            `);
 
-                $('#tablaPermisos').DataTable({
-                    data: data,
-                    destroy: true,
-                    responsive: true,
-                    pageLength: 10,
-                    order: [
-                        [1, 'asc']
-                    ], // Ordena por tipo de permiso
-                    columns: [{
-                            data: null,
-                            render: (data, type, row, meta) => meta.row + 1,
-                            className: 'text-center text-muted small'
-                        },
-                        {
-                            data: 'tipo_nombre',
-                            visible: false // Oculta columna agrupadora
-                        },
-                        {
-                            data: null,
-                            className: 'small text-nowrap',
-                            render: function(row) {
-                                return `
-                                <iconify-icon icon="solar:calendar-minimalistic-bold" class="text-primary me-1"></iconify-icon>
-                                <b>${row.perm_fecha}</b> 
-                                <span class="text-muted ms-1">(${row.perm_hora_inicio} - ${row.perm_hora_fin})</span>
-                            `;
-                            }
-                        },
-                        {
-                            data: null,
-                            className: 'text-center small',
-                            render: function(row) {
-                                const min = calcularMinutosTotales(row.perm_hora_inicio, row.perm_hora_fin);
-                                return `<span class="badge bg-light-primary text-primary border border-primary-subtle">${formatearMinutos(min)}</span>`;
-                            }
-                        },
-                        {
-                            data: 'perm_numero_doc',
-                            className: 'small',
-                            render: data => data ?? '<span class="text-muted">-</span>'
-                        },
-                        {
-                            data: 'adjuntos',
-                            className: 'text-center',
-                            render: function(adjuntos) {
-                                if (adjuntos && adjuntos.length > 0) {
-                                    const jsonAnexos = esc(JSON.stringify(adjuntos));
-                                    return `
+            $.ajax({
+                url: `${URL_BASE_PERMISO}/api/personal/${PERL_IDE}`,
+                type: 'GET',
+                data: {
+                    mes: mes,
+                    anio: anio
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.data && res.data.length > 0) {
+                        let html = '';
+                        res.data.forEach((item, index) => {
+                            const esRemunerado = item.pero_remunerado == 1 ?
+                                '<span class="badge bg-light-success text-success border border-success ms-1">Con Goce</span>' :
+                                '<span class="badge bg-light-danger text-danger border border-danger ms-1">Sin Goce</span>';
+
+                            let anexosHtml = '<span class="text-muted small">-</span>';
+                            if (item.adjuntos && item.adjuntos.length > 0) {
+                                const jsonAnexos = esc(JSON.stringify(item.adjuntos));
+                                anexosHtml = `
                                     <button class="btn btn-xs btn-outline-info d-inline-flex align-items-center gap-1 py-0 px-2" 
-                                            onclick='verAnexos(${jsonAnexos})' title="Ver anexos">
+                                            onclick='verAnexosPermiso(${jsonAnexos})' title="Ver anexos">
                                         <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
-                                        <span class="fw-bold">${adjuntos.length}</span>
+                                        <span class="fw-bold">${item.adjuntos.length}</span>
                                     </button>
                                 `;
-                                }
-                                return '<span class="text-muted small">-</span>';
                             }
-                        },
-                        {
-                            data: 'perm_motivo',
-                            className: 'small text-truncate',
-                            render: data => data ?? '-'
-                        },
-                        {
-                            data: 'perm_ide',
-                            className: 'text-center',
-                            orderable: false,
-                            render: function(id) {
-                                return `
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="eliminarPermiso(${id})">
-                                        <iconify-icon icon="solar:trash-bin-trash-bold"></iconify-icon>
-                                    </button>
-                                </div>
-                            `;
-                            }
-                        }
-                    ],
-                    rowGroup: {
-                        dataSrc: 'tipo_nombre',
-                        startRender: function(rows, group) {
-                            let totalMinutos = 0;
 
-                            rows.data().each(function(item) {
-                                totalMinutos += calcularMinutosTotales(item.perm_hora_inicio, item.perm_hora_fin);
-                            });
-
-                            return $('<tr class="table-light border-bottom border-primary border-2"/>')
-                                .append(`
-                                <td colspan="7" class="py-2">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <iconify-icon icon="solar:clock-circle-bold" class="text-primary fs-5"></iconify-icon>
-                                            <span class="fw-bold text-uppercase text-dark">${group}</span>
-                                        </div>
-                                        <span class="badge bg-primary fs-6 px-3 py-1">
-                                            Total Acumulado: ${formatearMinutos(totalMinutos)}
-                                        </span>
+                            html += `
+                            <tr>
+                                <td class="text-center text-muted small">${index + 1}</td>
+                                <td>
+                                    <span class="fw-semibold text-dark">${item.pero_nombre}</span>
+                                    ${esRemunerado}
+                                </td>
+                                <td class="small text-nowrap">
+                                    <iconify-icon icon="solar:calendar-bold" class="text-primary me-1"></iconify-icon>
+                                    ${item.rp_fecha}
+                                </td>
+                                <td class="small text-nowrap">
+                                    <iconify-icon icon="solar:clock-circle-bold" class="text-info me-1"></iconify-icon>
+                                    ${item.rp_hora_salida} - ${item.rp_hora_retorno}
+                                </td>
+                                <td class="small">${item.rp_numero_documento ?? '<span class="text-muted">-</span>'}</td>
+                                <td class="text-center">${anexosHtml}</td>
+                                <td class="small text-truncate" style="max-width: 180px;" title="${item.rp_motivo ?? ''}">
+                                    ${item.rp_motivo ?? '-'}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light-primary text-primary">Registrado</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="eliminarPermiso(${item.rp_ide})">
+                                            <iconify-icon icon="solar:trash-bin-trash-bold"></iconify-icon>
+                                        </button>
                                     </div>
                                 </td>
-                            `);
-                        }
-                    },
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                            </tr>
+                            `;
+                        });
+                        $tbody.html(html);
+                    } else {
+                        $tbody.html(`
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">
+                                <iconify-icon icon="solar:document-medicine-bold-duotone" class="fs-2 d-block mb-1 text-secondary"></iconify-icon>
+                                No se encontraron permisos registrados en este periodo.
+                            </td>
+                        </tr>
+                        `);
                     }
-                });
-            },
-            error: function() {
-                $('#tbodyPermisos').html('<tr><td colspan="8" class="text-center text-danger py-3">Error al conectar con el servidor.</td></tr>');
+                },
+                error: function() {
+                    $tbody.html('<tr><td colspan="9" class="text-center text-danger py-3">Error al conectar con la API de Permisos.</td></tr>');
+                }
+            });
+        };
+
+        // Modal para visualizar anexos
+        window.verAnexosPermiso = function(listaAdjuntos) {
+            let listHtml = '<div class="list-group list-group-flush small">';
+            listaAdjuntos.forEach(adj => {
+                const urlArchivo = `${URL_BASE_SISTEMA}/asistencia/adjuntos/ver/${adj.adj_ide}`;
+                let icono = 'solar:file-text-bold';
+
+                if (adj.adj_mime_type) {
+                    if (adj.adj_mime_type.includes('pdf')) icono = 'solar:file-pdf-bold';
+                    else if (adj.adj_mime_type.includes('image')) icono = 'solar:gallery-wide-bold';
+                    else if (adj.adj_mime_type.includes('word') || adj.adj_mime_type.includes('document')) icono = 'solar:document-bold';
+                }
+
+                listHtml += `
+                    <a href="${urlArchivo}" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2">
+                        <div class="text-truncate me-2" style="max-width: 250px;" title="${adj.adj_nombre_original}">
+                            <iconify-icon icon="${icono}" class="text-primary me-1 fs-6 align-middle"></iconify-icon>
+                            <span class="align-middle">${adj.adj_nombre_original}</span>
+                        </div>
+                        <iconify-icon icon="solar:square-share-line-bold" class="fs-5 text-secondary" title="Abrir en pestaña nueva"></iconify-icon>
+                    </a>
+                `;
+            });
+            listHtml += '</div>';
+
+            $('#bodyAnexosPermisosList').html(listHtml);
+            const modalElement = document.getElementById('modalVerAnexosPermisos');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        };
+
+        // Modal Abrir
+        window.abrirModalFormPermiso = function() {
+            $('#formPermiso')[0].reset();
+            $('#rp_ide').val('');
+            $('#cntHoras').empty();
+            const modal = new bootstrap.Modal(document.getElementById('modalFormPermiso'));
+            modal.show();
+        };
+
+        // Guardar Permiso
+        window.guardarPermiso = function(e) {
+            e.preventDefault();
+
+            const hInicio = $('#rp_hora_salida').val();
+            const hFin = $('#rp_hora_retorno').val();
+
+            if (!hInicio || !hFin) {
+                Swal.fire('Atención', 'Debe especificar ambas horas (Inicio y Fin).', 'warning');
+                return false;
             }
-        });
-    };
 
-    // 2. Funciones auxiliares de tiempo
-    function calcularMinutosTotales(hInicio, hFin) {
-        if (!hInicio || !hFin) return 0;
-        const [h1, m1] = hInicio.split(':').map(Number);
-        const [h2, m2] = hFin.split(':').map(Number);
-        const minInicio = h1 * 60 + m1;
-        const minFin = h2 * 60 + m2;
-        return (minFin > minInicio) ? (minFin - minInicio) : 0;
-    }
+            if (hFin <= hInicio) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Rango de horario inválido',
+                    text: 'La hora fin debe ser mayor a la hora de inicio.'
+                });
+                $('#rp_hora_retorno').focus();
+                return false;
+            }
 
-    function formatearMinutos(min) {
-        const horas = Math.floor(min / 60);
-        const minutosRestantes = min % 60;
-        let resultado = '';
-        if (horas > 0) resultado += `${horas} hrs `;
-        resultado += `${minutosRestantes} min`;
-        return resultado;
-    }
+            const formElement = document.getElementById('formPermiso');
+            const formData = new FormData(formElement);
+            const $btn = $('#btnGuardarPermiso');
 
-    function calcularDiferenciaHoras() {
-        const inicio = $('#perm_hora_inicio').val();
-        const fin = $('#perm_hora_fin').val();
-        if (inicio && fin) {
-            const totalMin = calcularMinutosTotales(inicio, fin);
-            $('#lblTiempoCalculado').text(formatearMinutos(totalMin));
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Guardando...');
+
+            $.ajax({
+                url: `${URL_BASE_PERMISO}/api/guardar`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(res) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalFormPermiso')).hide();
+                    cargarListadoPermisos();
+
+                    toastr.success(
+                        res.message || 'Permiso guardado correctamente.',
+                        '¡Éxito!', {
+                            positionClass: 'toast-top-right',
+                            timeOut: 3000
+                        }
+                    );
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Ocurrió un error inesperado al guardar.';
+
+                    if (xhr.responseJSON?.messages) {
+                        if (typeof xhr.responseJSON.messages === 'object') {
+                            errorMsg = Object.values(xhr.responseJSON.messages).join('<br>');
+                        } else {
+                            errorMsg = xhr.responseJSON.messages;
+                        }
+                    } else if (xhr.responseJSON?.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+
+                    toastr.error(errorMsg, 'Error al guardar', {
+                        positionClass: 'toast-top-right',
+                        timeOut: 4000
+                    });
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html('<iconify-icon icon="solar:diskette-bold" class="me-1"></iconify-icon> Guardar Registro');
+                }
+            });
+        };
+
+        // Eliminar Permiso con Auditoría
+        window.eliminarPermiso = function(rpIde) {
+            const modalAbierto = document.querySelector('.modal.show');
+            const targetElement = modalAbierto ? modalAbierto : 'body';
+
+            Swal.fire({
+                title: '¿Eliminar registro?',
+                text: 'Escriba el motivo de la eliminación para el registro de auditoría:',
+                icon: 'warning',
+                input: 'textarea',
+                inputPlaceholder: 'Ingrese el motivo aquí...',
+                inputAttributes: {
+                    'aria-label': 'Motivo de la eliminación',
+                    rows: '3'
+                },
+                target: targetElement,
+                heightAuto: false,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-danger me-2',
+                    cancelButton: 'btn btn-sm btn-secondary'
+                },
+                buttonsStyling: false,
+                didOpen: () => {
+                    if (document.activeElement) document.activeElement.blur();
+                    setTimeout(() => {
+                        const textarea = Swal.getInput();
+                        if (textarea) textarea.focus();
+                    }, 150);
+                },
+                inputValidator: (value) => {
+                    if (!value || !value.trim()) {
+                        return 'Debe especificar un motivo para poder eliminar el registro.';
+                    }
+                },
+                showLoaderOnConfirm: true,
+                preConfirm: (motivo) => {
+                    return $.ajax({
+                        url: `${URL_BASE_PERMISO}/api/eliminar/${rpIde}`,
+                        type: 'POST',
+                        data: {
+                            motivo_cambio: motivo
+                        },
+                        dataType: 'json'
+                    }).fail((xhr) => {
+                        const res = xhr.responseJSON;
+                        const errorMsg = res?.messages?.error ||
+                            res?.message ||
+                            (typeof res?.messages === 'string' ? res.messages : null) ||
+                            'No se pudo eliminar el registro.';
+                        Swal.showValidationMessage(`Error: ${errorMsg}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Eliminado!',
+                        text: 'El permiso ha sido eliminado correctamente.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        target: targetElement,
+                        heightAuto: false
+                    });
+                    cargarListadoPermisos();
+                }
+            });
+        };
+
+        // Escapar strings HTML
+        function esc(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
         }
+
+        // Init
+        cargarTiposPermiso();
+        cargarListadoPermisos();
+    })();
+
+    // Cálculo dinámico de diferencia de horas
+    function calcularHorasPermiso() {
+        const hInicio = $('#rp_hora_salida').val();
+        const hFin = $('#rp_hora_retorno').val();
+
+        if (hInicio && hFin) {
+            const start = new Date(`1970-01-01T${hInicio}:00`);
+            const end = new Date(`1970-01-01T${hFin}:00`);
+
+            if (end > start) {
+                const diffMs = end - start;
+                const diffMins = Math.floor(diffMs / 60000);
+                const hrs = Math.floor(diffMins / 60);
+                const mins = diffMins % 60;
+
+                let texto = `${hrs} hora(s)`;
+                if (mins > 0) texto += ` con ${mins} min.`;
+
+                $('#cntHoras').html(`
+                    <span class="badge bg-light-primary text-primary border border-primary-subtle">
+                        <iconify-icon icon="solar:clock-circle-bold" class="me-1"></iconify-icon>
+                        Total: ${texto}
+                    </span>
+                `);
+                return;
+            } else {
+                $('#cntHoras').html(`
+                    <span class="badge bg-light-danger text-danger border border-danger-subtle">
+                        La hora fin debe ser mayor a la hora de inicio
+                    </span>
+                `);
+                return;
+            }
+        }
+        $('#cntHoras').empty();
     }
 
-    function nuevoPermiso() {
-        $('#formRegistroPermiso')[0].reset();
-        $('#perm_ide').val('');
-        $('#lblTiempoCalculado').text('0 hrs 0 min');
-        $('#modalRegistroPermiso').modal('show');
-    }
+    $('#rp_hora_salida, #rp_hora_retorno').on('change input', calcularHorasPermiso);
 </script>
