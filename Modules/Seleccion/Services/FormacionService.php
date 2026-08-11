@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\FormacionModel;
-use App\Models\Contratacion\AnexoModel;
-use App\Models\Contratacion\PostulanteModel;
+use Modules\Seleccion\Models\FormacionModel;
+use Modules\Seleccion\Models\AnexoModel;
+use Modules\Seleccion\Models\PostulanteModel;
 
 
 class FormacionService

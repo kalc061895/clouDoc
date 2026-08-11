@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Services\Contratacion\ConvocatoriaService;
-use App\Models\Contratacion\PostulacionModel;
-use App\Models\Contratacion\FormacionModel;
-use App\Models\Contratacion\ExperienciaModel;
-use App\Models\Contratacion\ExtraModel;
-use App\Models\Contratacion\PlazaModel;
-use App\Models\Contratacion\PostulanteModel;
-use App\Models\Contratacion\ConvocatoriaModel;
+use Modules\Seleccion\Services\ConvocatoriaService;
+use Modules\Seleccion\Models\PostulacionModel;
+use Modules\Seleccion\Models\FormacionModel;
+use Modules\Seleccion\Models\ExperienciaModel;
+use Modules\Seleccion\Models\ExtraModel;
+use Modules\Seleccion\Models\PlazaModel;
+use Modules\Seleccion\Models\PostulanteModel;
+use Modules\Seleccion\Models\ConvocatoriaModel;
 
 
 use Dompdf\Dompdf;

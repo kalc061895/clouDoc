@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Services\Contratacion\PostulanteService;
+use Modules\Seleccion\Services\PostulanteService;
 
 class PostulanteController extends BaseController
 {

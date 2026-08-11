@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\ExperienciaModel;
-use App\Models\Contratacion\AnexoModel;
-use App\Models\Contratacion\PostulanteModel;
+use Modules\Seleccion\Models\ExperienciaModel;
+use Modules\Seleccion\Models\AnexoModel;
+use Modules\Seleccion\Models\PostulanteModel;
 use CodeIgniter\Shield\Models\UserModel;
 
 class ExperienciaService

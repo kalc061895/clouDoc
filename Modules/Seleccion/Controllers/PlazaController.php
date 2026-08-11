@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\Contratacion\PlazaModel;
+use Modules\Seleccion\Models\PlazaModel;
 class PlazaController extends BaseController
 {
     protected $plazaModel;

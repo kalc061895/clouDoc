@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\CapacitacionModel;
-use App\Models\Contratacion\AnexoModel;
-use App\Models\Contratacion\PostulanteModel;
-use App\Models\Contratacion\FormacionModel;
+use Modules\Seleccion\Models\CapacitacionModel;
+use Modules\Seleccion\Models\AnexoModel;
+use Modules\Seleccion\Models\PostulanteModel;
+use Modules\Seleccion\Models\FormacionModel;
 
 class CapacitacionService
 {

@@ -1,7 +1,7 @@
 <?php
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
-$routes->group('contrato', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+$routes->group('contrato', ['namespace' => 'Modules\Seleccion\Controllers'], function ($routes) {
     ############################## CONTRATACION #############################
 
     /**

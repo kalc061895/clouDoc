@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\ConvocatoriaModel;
-use App\Models\Contratacion\PostulacionModel;
-use App\Models\Contratacion\PostulanteModel;
-use App\Models\Contratacion\PlazaModel;
-use App\Models\Contratacion\FormacionModel;
-use App\Models\Contratacion\ExperienciaModel;
-use App\Models\Contratacion\ExtraModel; 
-use App\Models\Contratacion\CalificacionPreviaModel;
-use App\Models\Contratacion\CapacitacionModel;
+use Modules\Seleccion\Models\ConvocatoriaModel;
+use Modules\Seleccion\Models\PostulacionModel;
+use Modules\Seleccion\Models\PostulanteModel;
+use Modules\Seleccion\Models\PlazaModel;
+use Modules\Seleccion\Models\FormacionModel;
+use Modules\Seleccion\Models\ExperienciaModel;
+use Modules\Seleccion\Models\ExtraModel; 
+use Modules\Seleccion\Models\CalificacionPreviaModel;
+use Modules\Seleccion\Models\CapacitacionModel;
 
 
 class EvaluacionService

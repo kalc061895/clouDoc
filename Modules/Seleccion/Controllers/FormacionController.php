@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Services\Contratacion\FormacionService;
+use Modules\Seleccion\Services\FormacionService;
 class FormacionController extends BaseController
 {
     protected $service;

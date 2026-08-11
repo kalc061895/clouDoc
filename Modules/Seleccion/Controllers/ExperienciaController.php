@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\Contratacion\ExperienciaModel;
-use App\Models\Contratacion\AnexoModel;
-use App\Services\Contratacion\ExperienciaService;
+use Modules\Seleccion\Models\ExperienciaModel;
+use Modules\Seleccion\Models\AnexoModel;
+use Modules\Seleccion\Services\ExperienciaService;
 
 class ExperienciaController extends BaseController
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Controllers\Contratacion;
+namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Services\Contratacion\EvaluacionService;
-use App\Models\Contratacion\CalificacionPreviaModel;
-use App\Services\Contratacion\CalificacionPreviaService;
+use Modules\Seleccion\Services\EvaluacionService;
+use Modules\Seleccion\Models\CalificacionPreviaModel;
+use Modules\Seleccion\Services\CalificacionPreviaService;
 
 class EvaluacionController extends BaseController
 {

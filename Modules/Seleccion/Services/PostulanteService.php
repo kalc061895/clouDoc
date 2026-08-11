@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\PostulanteModel;
+use Modules\Seleccion\Models\PostulanteModel;
 
 class PostulanteService
 {

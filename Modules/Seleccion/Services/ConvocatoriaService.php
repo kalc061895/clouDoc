@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\ConvocatoriaModel;
-use App\Models\Contratacion\PostulacionModel;
-use App\Models\Contratacion\PostulanteModel;
-use App\Models\Contratacion\PlazaModel;
+use Modules\Seleccion\Models\ConvocatoriaModel;
+use Modules\Seleccion\Models\PostulacionModel;
+use Modules\Seleccion\Models\PostulanteModel;
+use Modules\Seleccion\Models\PlazaModel;
 
 
 
@@ -29,7 +29,7 @@ class ConvocatoriaService
         return $this->convocatoriaModel->orderBy('id_convocatoria', 'DESC')->findAll();
     }
 
-    public function obtener($id)
+    public function obtener(int $id)
     {
         return $this->convocatoriaModel->find($id);
     }
@@ -57,7 +57,7 @@ class ConvocatoriaService
         ];
     }
 
-    public function eliminar($id): array
+    public function eliminar(int $id): array
     {
         if (!$this->convocatoriaModel->find($id)) {
             return [

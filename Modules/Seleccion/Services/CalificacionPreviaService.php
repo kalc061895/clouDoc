@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Contratacion;
+namespace Modules\Seleccion\Services;
 
-use App\Models\Contratacion\CalificacionPreviaModel;
-use App\Models\Contratacion\PLazaModel;
+use Modules\Seleccion\Models\CalificacionPreviaModel;
+use Modules\Seleccion\Models\PLazaModel;
 
 class CalificacionPreviaService
 {
@@ -82,7 +82,7 @@ class CalificacionPreviaService
         return $data;
     }
 
-    public function resultadosPorPlazaConvocatoria($idPlaza, $idConvocatoria)
+    public function resultadosPorPlazaConvocatoria(int $idPlaza, int $idConvocatoria)
     {
         $model = new CalificacionPreviaModel();
         $plazaModel = new PlazaModel();

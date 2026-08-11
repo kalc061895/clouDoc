@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Contratacion;
+namespace Modules\Seleccion\Models;
 
 use CodeIgniter\Model;
 
