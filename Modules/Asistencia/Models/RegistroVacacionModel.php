@@ -6,16 +6,17 @@ use CodeIgniter\Model;
 
 class RegistroVacacionModel extends Model
 {
-    protected $table            = 'casis_registro_vacacion';
-    protected $primaryKey       = 'rv_ide';
+    protected $table = 'casis_registro_vacacion';
+    protected $primaryKey = 'rv_ide';
 
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
+    protected $returnType = 'array';
 
     protected $protectFields = true;
 
     protected $allowedFields = [
         'rv_vac_ide',
+        'rv_perl_ide', // Agregado para optimizar búsquedas por personal
         'rv_fecha_inicio',
         'rv_fecha_fin',
         'rv_dias',
@@ -29,18 +30,12 @@ class RegistroVacacionModel extends Model
     ];
 
     protected $useSoftDeletes = true;
-    protected $deletedField   = 'deleted_at';
+    protected $deletedField = 'deleted_at';
 
     protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
 
-    public function obtenerPorPeriodo($vacIde)
-    {
-        return $this->where('rv_vac_ide', $vacIde)
-            ->orderBy('rv_fecha_inicio')
-            ->findAll();
-    }
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
@@ -48,22 +43,53 @@ class RegistroVacacionModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $dateFormat    = 'datetime';
+    protected $dateFormat = 'datetime';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $validationRules = [];
+    protected $validationMessages = [];
+    protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
     // Callbacks
     protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
+
+    /**
+     * Obtiene los registros de uso por período de vacaciones
+     */
+    public function obtenerPorPeriodo($vacIde)
+    {
+        return $this->where('rv_vac_ide', $vacIde)
+            ->where('rv_estado', 1)
+            ->orderBy('rv_fecha_inicio', 'DESC')
+            ->findAll();
+    }
+
+    /**
+     * Verifica si el personal ya tiene vacaciones registradas que se crucen con las fechas indicadas
+     */
+    public function existeSolapamiento(int $perlIde, string $fechaInicio, string $fechaFin, ?int $ignoreId = null): bool
+    {
+        $builder = $this->where('rv_perl_ide', $perlIde)
+            ->where('rv_estado', 1)
+            ->groupStart()
+            ->where("'$fechaInicio' BETWEEN rv_fecha_inicio AND rv_fecha_fin")
+            ->orWhere("'$fechaFin' BETWEEN rv_fecha_inicio AND rv_fecha_fin")
+            ->orWhere("rv_fecha_inicio BETWEEN '$fechaInicio' AND '$fechaFin'")
+            ->groupEnd();
+
+        if ($ignoreId) {
+            $builder->where('rv_ide !=', $ignoreId);
+        }
+
+        return $builder->countAllResults() > 0;
+    }
 }
