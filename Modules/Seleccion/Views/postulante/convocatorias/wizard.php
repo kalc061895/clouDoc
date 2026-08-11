@@ -377,7 +377,7 @@ $(document).ready(function () {
     function cargarPlazas() {
         
         
-        $.getJSON('postulante/listarplazas', function (res) {
+        $.getJSON('contrato/postulante/listarplazas', function (res) {
             let html = '<option value="">Seleccione una plaza</option>';
             res.forEach(p => {
                 html += `
@@ -421,7 +421,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
 
                 $.ajax({
-                    url: 'postulante/postulacion/confirmar',
+                    url: 'contrato/postulante/postulacion/confirmar',
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -463,7 +463,7 @@ $(document).ready(function () {
     $(document).ready(function() {
 
         function cargarInformacionExtra() {
-            $.getJSON('postulante/extra/listar', function(res) {
+            $.getJSON('contrato/postulante/extra/listar', function(res) {
                 let html = '';
                 res.forEach(e => {
                     html += `
@@ -505,7 +505,7 @@ $(document).ready(function () {
             }
 
             $.ajax({
-                url: "<?=base_url('postulante/extra/guardar')?>",
+                url: "<?=base_url('contrato/postulante/extra/guardar')?>",
                 type: 'POST',
                 data: formDataExtra,
                 processData: false,
@@ -538,7 +538,7 @@ $(document).ready(function () {
                 if (result.isConfirmed) {
 
                     $.ajax({
-                        url: 'postulante/extra/eliminar/' + id,
+                        url: 'contrato/postulante/extra/eliminar/' + id,
                         type: 'POST',
                         dataType: 'json',
                         success: function(res) {
@@ -572,7 +572,7 @@ $(document).ready(function () {
     $(document).ready(function() {
 
         function cargarCapacitaciones() {
-            $.getJSON('postulante/capacitaciones/listar', function(res) {
+            $.getJSON('contrato/postulante/capacitaciones/listar', function(res) {
 
                 let html = '';
 
@@ -629,7 +629,7 @@ $(document).ready(function () {
             formData.append('archivo', $('#cap_archivo')[0].files[0]);
 
             $.ajax({
-                url: 'postulante/capacitaciones/guardar',
+                url: 'contrato/postulante/capacitaciones/guardar',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -663,7 +663,7 @@ $(document).ready(function () {
                 if (result.isConfirmed) {
 
                     $.ajax({
-                        url: 'postulante/capacitaciones/eliminar/' + id,
+                        url: 'contrato/postulante/capacitaciones/eliminar/' + id,
                         type: 'POST',
                         dataType: 'json',
                         success: function(res) {
@@ -697,7 +697,7 @@ $(document).ready(function () {
     $(document).ready(function() {
 
         function cargarExperiencia() {
-            $.getJSON('postulante/experiencia/listar', function(res) {
+            $.getJSON('contrato/postulante/experiencia/listar', function(res) {
                 let html = '';
                 res.forEach(e => {
                     html += `
@@ -740,7 +740,7 @@ $(document).ready(function () {
             }
 
             $.ajax({
-                url: 'postulante/experiencia/guardar',
+                url: 'contrato/postulante/experiencia/guardar',
                 type: 'POST',
                 data: formDataExperiencia,
                 processData: false,
@@ -773,7 +773,7 @@ $(document).ready(function () {
                 if (result.isConfirmed) {
 
                     $.ajax({
-                        url: 'postulante/experiencia/eliminar/' + id,
+                        url: 'contrato/postulante/experiencia/eliminar/' + id,
                         type: 'POST',
                         dataType: 'json',
                         success: function(res) {
@@ -813,7 +813,7 @@ $(document).ready(function () {
     $(document).ready(function() {
 
         function cargarFormacion() {
-            $.getJSON('postulante/formacion/listar', function(res) {
+            $.getJSON('contrato/postulante/formacion/listar', function(res) {
                 let html = '';
                 res.forEach(f => {
                     html += `
@@ -858,7 +858,7 @@ $(document).ready(function () {
 
 
             $.ajax({
-                url: 'postulante/formacion/guardar',
+                url: 'contrato/postulante/formacion/guardar',
                 type: 'POST',
                 data: formDataFormacion,
                 processData: false,
@@ -890,7 +890,7 @@ $(document).ready(function () {
                 if (result.isConfirmed) {
 
                     $.ajax({
-                        url: 'postulante/formacion/eliminar/' + id,
+                        url: 'contrato/postulante/formacion/eliminar/' + id,
                         type: 'POST',
                         dataType: 'json',
                         success: function(res) {
@@ -921,7 +921,7 @@ $(document).ready(function () {
 <!-- GUARDAR DATOS PERSONALES-->
 <script>
     function cargarDataPersonal() {
-        $.getJSON('postulante/ver-datos', function(res) {
+        $.getJSON('contrato/postulante/ver-datos', function(res) {
 
             $('#postulante_id').val(res.postulante_id),
                 $('#dni').val(res.dni),
@@ -957,7 +957,7 @@ $(document).ready(function () {
             }
 
             $.ajax({
-                url: 'postulante/guardar-datos',
+                url: 'contrato/postulante/guardar-datos',
                 type: 'POST',
                 dataType: 'json',
                 data: data,
@@ -1017,7 +1017,7 @@ $(document).ready(function () {
         formData.append('id_postulacion', $('#id_postulacion').val());
 
         $.ajax({
-            url: 'postulante/postulacion/datos-personales',
+            url: 'contrato/postulante/postulacion/datos-personales',
             type: 'POST',
             data: formData,
             processData: false,

@@ -65,6 +65,6 @@ class PostulanteController extends BaseController
     }
     public function verResultado()
     {
-        return view('contratacion/postulante/ver_resultado');
+        return view('Modules\Seleccion\Views\postulante/ver_resultado');
     }
 }

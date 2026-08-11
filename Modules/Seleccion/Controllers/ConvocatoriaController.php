@@ -17,7 +17,7 @@ class ConvocatoriaController extends BaseController
 
     public function index()
     {
-        return view('contratacion/convocatorias/inicio');
+        return view('Modules\Seleccion\Views\convocatorias/inicio');
     }
 
     public function listar()
@@ -50,7 +50,7 @@ class ConvocatoriaController extends BaseController
 
     public function vigentes()
     {
-        return view('contratacion/postulante/convocatorias/inicio');
+        return view('Modules\Seleccion\Views\postulante/convocatorias/inicio');
     }
 
     public function listarVigentes()

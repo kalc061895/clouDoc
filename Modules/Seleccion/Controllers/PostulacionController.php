@@ -134,7 +134,7 @@ class PostulacionController extends BaseController
 
 
         // 📄 Vista PDF
-        $html = view('contratacion/pdf/constancia_postulacion', [
+        $html = view('Modules\Seleccion\Views\pdf/constancia_postulacion', [
             'postulacion'  => $postulacion,
             'usuario'      => $postulante,
             'convocatoria' => $convocatoria,
@@ -219,7 +219,7 @@ class PostulacionController extends BaseController
 
 
         // 📄 Vista PDF
-        $html = view('contratacion/pdf/constancia_postulacion', [
+        $html = view('Modules\Seleccion\Views\pdf/constancia_postulacion', [
             'postulacion'  => $postulacion,
             'usuario'      => $postulante,
             'convocatoria' => $convocatoria,

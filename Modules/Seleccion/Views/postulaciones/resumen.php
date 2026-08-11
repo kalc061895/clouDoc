@@ -47,7 +47,7 @@
 
         // 🔹 Cargar convocatorias
         setTimeout(() => {
-            $.getJSON('admin/postulacion/convocatorias', function(data) {
+            $.getJSON('contrato/admin/postulacion/convocatorias', function(data) {
 
                 var html = '<option value="">Seleccione convocatoria</option>';
 
@@ -78,7 +78,7 @@
                 return;
             }
 
-            $.getJSON('admin/postulacion/plazas/' + id, function(data) {
+            $.getJSON('contrato/admin/postulacion/plazas/' + id, function(data) {
 
                 let html = '';
                 let total = 0;

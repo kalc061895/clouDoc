@@ -185,7 +185,7 @@
         // Cargar tabla
         function cargarTabla() {
             $.ajax({
-                url: 'admin/convocatorias/listar',
+                url: 'contrato/admin/convocatorias/listar',
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
@@ -226,7 +226,7 @@
             let formData = $(this).serialize();
 
             $.ajax({
-                url: 'admin/convocatorias/guardar',
+                url: 'contrato/admin/convocatorias/guardar',
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
@@ -251,7 +251,7 @@
             let id = $(this).data('id');
 
             $.ajax({
-                url: 'admin/convocatorias/editar/' + id,
+                url: 'contrato/admin/convocatorias/editar/' + id,
                 type: 'GET',
                 dataType: 'json',
                 success: function(conv) {
@@ -285,7 +285,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: 'admin/convocatorias/eliminar/' + id,
+                        url: 'contrato/admin/convocatorias/eliminar/' + id,
                         type: 'POST',
                         dataType: 'json',
                         success: function(res) {
@@ -329,7 +329,7 @@
     });
 
     function cargarPlazasModal(idConvocatoria) {
-        $.getJSON('admin/plazas/listar/' + idConvocatoria, function(data) {
+        $.getJSON('contrato/admin/plazas/listar/' + idConvocatoria, function(data) {
 
             tablaPlazasModal.clear().rows.add(data.map(p => {
                 return [
@@ -358,7 +358,7 @@
         e.preventDefault();
 
         $.ajax({
-            url: 'admin/plazas/guardar',
+            url: 'contrato/admin/plazas/guardar',
             type: 'POST',
             data: $(this).serialize(),
             dataType: 'json',
@@ -373,7 +373,7 @@
     $(document).on('click', '.btn-editar-plaza', function() {
         let id = $(this).data('id');
 
-        $.getJSON('admin/plazas/editar/' + id, function(p) {
+        $.getJSON('contrato/admin/plazas/editar/' + id, function(p) {
             $('#id_plaza').val(p.id_plaza);
             $('[name="codigo_plaza"]').val(p.codigo_plaza);
             $('[name="establecimiento"]').val(p.establecimiento);
@@ -391,7 +391,7 @@
             showCancelButton: true
         }).then(r => {
             if (r.isConfirmed) {
-                $.post('admin/plazas/eliminar/' + id, function() {
+                $.post('contrato/admin/plazas/eliminar/' + id, function() {
                     cargarPlazasModal($('#plaza_id_convocatoria').val());
                     Swal.fire('Eliminado', '', 'success');
                 }, 'json');

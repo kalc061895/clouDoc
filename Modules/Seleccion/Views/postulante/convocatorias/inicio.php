@@ -22,7 +22,7 @@
                 <input type="hidden" id="id_postulacion">
 
                 <!-- AQUÍ VA TU WIZARD -->
-                <?= view('contratacion/postulante/convocatorias/wizard') ?>
+                <?= view('Modules\Seleccion\Views\postulante/convocatorias/wizard') ?>
             </div>
 
         </div>
@@ -35,7 +35,7 @@
 
         let idConv = $(this).data('convocatoria');
 
-        $.post('postulante/postulacion/iniciar', {
+        $.post('contrato/postulante/postulacion/iniciar', {
             id_convocatoria: idConv
         }, function(res) {
 
@@ -56,7 +56,7 @@
 
     $(document).ready(function() {
 
-        $.getJSON('postulante/convocatorias/listar', function(data) {
+        $.getJSON('contrato/postulante/convocatorias/listar', function(data) {
 
             if (data.length === 0) {
                 $('#contenedorConvocatorias').html(

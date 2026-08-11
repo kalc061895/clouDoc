@@ -19,7 +19,7 @@ class EvaluacionController extends BaseController
 
     public function index()
     {
-        return view('contratacion/comision/evaluacion');
+        return view('Modules\Seleccion\Views\comision/evaluacion');
     }
 
     public function convocatorias()
@@ -29,14 +29,14 @@ class EvaluacionController extends BaseController
         );
     }
 
-    public function postulantes($idConvocatoria)
+    public function postulantes(int $idConvocatoria)
     {
         return $this->response->setJSON(
             $this->service->listarPostulantes($idConvocatoria)
         );
     }
 
-    public function postulacion($idPostulacion)
+    public function postulacion(int $idPostulacion)
     {
         return view(
             'contratacion/comision/evaluar_postulacion',
@@ -56,9 +56,9 @@ class EvaluacionController extends BaseController
     }
     public function resultados()
     {
-        return view('contratacion/reporte/inicio');
+        return view('Modules\Seleccion\Views\reporte/inicio');
     }
-    public function resultadosPreEvaluacion($idConvocatoria)
+    public function resultadosPreEvaluacion(int $idConvocatoria)
     {
         $calificacionPreviaService = new CalificacionPreviaService();
         return $this->response->setJSON(

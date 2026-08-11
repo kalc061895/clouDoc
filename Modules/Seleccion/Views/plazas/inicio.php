@@ -74,7 +74,7 @@
     function cargarPlazas() {
         var idConv = $('#id_convocatoria').val();
 
-        $.getJSON('admin/plazas/listar/' + idConv, function(data) {
+        $.getJSON('contrato/admin/plazas/listar/' + idConv, function(data) {
             tablaPlazas.clear().rows.add(data.map(p => {
                 return [
                     p.id_plaza,
@@ -100,7 +100,7 @@
     $('#formPlaza').submit(function(e) {
         e.preventDefault();
 
-        $.post('admin/plazas/guardar', $(this).serialize(), function(res) {
+        $.post('contrato/admin/plazas/guardar', $(this).serialize(), function(res) {
             $('#modalPlaza').modal('hide');
             $('#formPlaza')[0].reset();
             cargarPlazas();
@@ -110,7 +110,7 @@
 
     // Editar
     $(document).on('click', '.btn-editar', function() {
-        $.getJSON('admin/plazas/editar/' + $(this).data('id'), function(p) {
+        $.getJSON('contrato/admin/plazas/editar/' + $(this).data('id'), function(p) {
             $('#id_plaza').val(p.id_plaza);
             $('#id_convocatoria_form').val(p.id_convocatoria);
             $('[name="codigo_plaza"]').val(p.codigo_plaza);
@@ -130,7 +130,7 @@
             showCancelButton: true
         }).then(r => {
             if (r.isConfirmed) {
-                $.post('admin/plazas/eliminar/' + id, function() {
+                $.post('contrato/admin/plazas/eliminar/' + id, function() {
                     cargarPlazas();
                     Swal.fire('Eliminado', '', 'success');
                 }, 'json');

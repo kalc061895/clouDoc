@@ -16,7 +16,7 @@ class PlazaController extends BaseController
 
     public function index()
     {
-        return view('contratacion/plazas/inicio');
+        return view('Modules\Seleccion\Views\plazas/inicio');
     }
 
     public function listar($idConvocatoria)

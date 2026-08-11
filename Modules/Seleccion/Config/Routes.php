@@ -11,67 +11,67 @@ $routes->group('contrato', ['namespace' => 'Modules\Seleccion\Controllers'], fun
 
         $routes->group('convocatorias', function ($routes) {
 
-            $routes->get('/', 'Contratacion\ConvocatoriaController::index');
-            $routes->get('listar', 'Contratacion\ConvocatoriaController::listar');
-            $routes->post('guardar', 'Contratacion\ConvocatoriaController::guardar');
-            $routes->get('editar/(:num)', 'Contratacion\ConvocatoriaController::editar/$1');
-            $routes->post('eliminar/(:num)', 'Contratacion\ConvocatoriaController::eliminar/$1');
+            $routes->get('/', 'ConvocatoriaController::index');
+            $routes->get('listar', 'ConvocatoriaController::listar');
+            $routes->post('guardar', 'ConvocatoriaController::guardar');
+            $routes->get('editar/(:num)', 'ConvocatoriaController::editar/$1');
+            $routes->post('eliminar/(:num)', 'ConvocatoriaController::eliminar/$1');
         });
 
         $routes->group('plazas', function ($routes) {
 
-            $routes->get('/', 'Contratacion\PlazaController::index');
-            $routes->get('listar/(:num)', 'Contratacion\PlazaController::listar/$1'); // id_convocatoria
-            $routes->post('guardar', 'Contratacion\PlazaController::guardar');
-            $routes->get('editar/(:num)', 'Contratacion\PlazaController::editar/$1');
-            $routes->post('eliminar/(:num)', 'Contratacion\PlazaController::eliminar/$1');
+            $routes->get('/', 'PlazaController::index');
+            $routes->get('listar/(:num)', 'PlazaController::listar/$1'); // id_convocatoria
+            $routes->post('guardar', 'PlazaController::guardar');
+            $routes->get('editar/(:num)', 'PlazaController::editar/$1');
+            $routes->post('eliminar/(:num)', 'PlazaController::eliminar/$1');
         });
 
         $routes->group('postulacion', function ($routes) {
 
-            $routes->get('resumen', 'Contratacion\AdminController::index');
-            $routes->get('listar/(:num)', 'Contratacion\AdminController::listarPostulaciones/$1'); // id_convocatoria
+            $routes->get('resumen', 'AdminController::index');
+            $routes->get('listar/(:num)', 'AdminController::listarPostulaciones/$1'); // id_convocatoria
 
-            $routes->get('', 'Contratacion\AdminController::index');
-            $routes->get('convocatorias', 'Contratacion\AdminController::convocatorias');
-            $routes->get('plazas/(:num)', 'Contratacion\AdminController::plazas/$1');
-            $routes->get('constancia/(:num)', 'Contratacion\PostulacionController::constanciaAdmin/$1');
+            $routes->get('', 'AdminController::index');
+            $routes->get('convocatorias', 'AdminController::convocatorias');
+            $routes->get('plazas/(:num)', 'AdminController::plazas/$1');
+            $routes->get('constancia/(:num)', 'PostulacionController::constanciaAdmin/$1');
         });
     });
 
     $routes->group('postulante', function ($routes) {
 
-        $routes->get('convocatorias', 'Contratacion\ConvocatoriaController::vigentes');
-        $routes->get('convocatorias/listar', 'Contratacion\ConvocatoriaController::listarVigentes');
-        $routes->post('postulacion/iniciar', 'Contratacion\PostulacionController::iniciar');
-        $routes->post('postulacion/datos-personales', 'Contratacion\PostulacionController::guardarDatos');
-        $routes->post('postulacion/formacion', 'Contratacion\FormacionController::guardar');
-        $routes->post('postulacion/experiencia', 'Contratacion\ExperienciaController::guardar');
-        $routes->post('anexos/subir', 'Contratacion\Postulante\AnexoController::subir');
-        $routes->get('resultado', 'Contratacion\PostulanteController::verResultado');
+        $routes->get('convocatorias', 'ConvocatoriaController::vigentes');
+        $routes->get('convocatorias/listar', 'ConvocatoriaController::listarVigentes');
+        $routes->post('postulacion/iniciar', 'PostulacionController::iniciar');
+        $routes->post('postulacion/datos-personales', 'PostulacionController::guardarDatos');
+        $routes->post('postulacion/formacion', 'FormacionController::guardar');
+        $routes->post('postulacion/experiencia', 'ExperienciaController::guardar');
+        $routes->post('anexos/subir', 'Postulante\AnexoController::subir');
+        $routes->get('resultado', 'PostulanteController::verResultado');
 
-        $routes->post('guardar-datos', 'Contratacion\PostulanteController::guardarDatos');
-        $routes->get('ver-datos', 'Contratacion\PostulanteController::verDatos');
+        $routes->post('guardar-datos', 'PostulanteController::guardarDatos');
+        $routes->get('ver-datos', 'PostulanteController::verDatos');
         $routes->group('formacion', function ($routes) {
-            $routes->post('guardar', 'Contratacion\FormacionController::guardar');
-            $routes->get('listar', 'Contratacion\FormacionController::listar');
-            $routes->post('eliminar/(:num)', 'Contratacion\FormacionController::eliminar/$1');
+            $routes->post('guardar', 'FormacionController::guardar');
+            $routes->get('listar', 'FormacionController::listar');
+            $routes->post('eliminar/(:num)', 'FormacionController::eliminar/$1');
         });
         $routes->group('experiencia', function ($routes) {
 
-            $routes->get('listar', 'Contratacion\ExperienciaController::listar');
-            $routes->post('guardar', 'Contratacion\ExperienciaController::guardar');
-            $routes->post('eliminar/(:num)', 'Contratacion\ExperienciaController::eliminar/$1');
+            $routes->get('listar', 'ExperienciaController::listar');
+            $routes->post('guardar', 'ExperienciaController::guardar');
+            $routes->post('eliminar/(:num)', 'ExperienciaController::eliminar/$1');
         });
 
         $routes->group('capacitaciones', function ($routes) {
-            $routes->get('listar', 'Contratacion\CapacitacionController::listar');
-            $routes->post('guardar', 'Contratacion\CapacitacionController::guardar');
-            $routes->post('eliminar/(:num)', 'Contratacion\CapacitacionController::eliminar/$1');
+            $routes->get('listar', 'CapacitacionController::listar');
+            $routes->post('guardar', 'CapacitacionController::guardar');
+            $routes->post('eliminar/(:num)', 'CapacitacionController::eliminar/$1');
         });
         $routes->group('extra', function ($routes) {
-            $routes->get('listar', 'Contratacion\InformacionExtraController::listar');
-            $routes->post('guardar', 'Contratacion\InformacionExtraController::guardar');
+            $routes->get('listar', 'InformacionExtraController::listar');
+            $routes->post('guardar', 'InformacionExtraController::guardar');
             $routes->post('eliminar/(:num)', 'Contratacion\InformacionExtraController::eliminar/$1');
         });
         $routes->get('listarplazas', 'Contratacion\PlazaController::listarPlazas');

@@ -9,7 +9,7 @@ class AdminController extends BaseController
 {
     public function index()
     {
-        return view('contratacion/postulaciones/resumen');
+        return view('Modules\Seleccion\Views\contratacion/postulaciones/resumen');
     }
     
     public function convocatorias()
@@ -20,7 +20,7 @@ class AdminController extends BaseController
         );
     }
 
-    public function plazas($idConvocatoria)
+    public function plazas(int $idConvocatoria)
     {
         $convocatoriaService = new ConvocatoriaService();
         return $this->response->setJSON(
