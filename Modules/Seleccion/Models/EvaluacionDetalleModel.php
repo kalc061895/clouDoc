@@ -4,22 +4,21 @@ namespace Modules\Seleccion\Models;
 
 use CodeIgniter\Model;
 
-class AnexoModel extends Model
+class EvaluacionDetalleModel extends Model
 {
-    protected $table = 'selec_anexos';
-    protected $primaryKey = 'ane_ide';
+    protected $table = 'selec_evaluacion_detalles';
+    protected $primaryKey = 'evd_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'ane_con_ide',
-        'ane_codigo',
-        'ane_nombre',
-        'ane_descripcion',
-        'ane_obligatorio',
-        'ane_condicion',
-        'ane_archivo_ide',
-        'ane_estado',
+        'evd_eva_ide',
+        'evd_cri_ide',
+        'evd_resultado',
+        'evd_cumple',
+        'evd_puntaje',
+        'evd_observacion',
+        'created_by',
     ];
 
     protected $useTimestamps = true;

@@ -1100,7 +1100,7 @@ Table selec_auditoria {
 
   aud_pto_ide bigint
   aud_con_ide bigint
-  aud_etapa_ide bigint
+  aud_eta_ide bigint
 }
 
 
@@ -1158,7 +1158,7 @@ Table selec_postulacion_declaraciones {
 
   pde_hash varchar(255)
 
-  pde_documento_ide bigint
+  pde_exd_ide bigint
 }
 
 
@@ -1343,7 +1343,7 @@ Ref: selec_notificaciones.not_pos_ide > selec_postulantes.pos_ide
 
 Ref: selec_auditoria.aud_pto_ide > selec_postulaciones.pto_ide
 Ref: selec_auditoria.aud_con_ide > selec_convocatorias.con_ide
-Ref: selec_auditoria.aud_etapa_ide > selec_etapas.eta_ide
+Ref: selec_auditoria.aud_eta_ide > selec_etapas.eta_ide
 
 
 // Versiones
@@ -1356,4 +1356,4 @@ Ref: selec_expediente_versiones.exv_pto_ide > selec_postulaciones.pto_ide
 
 Ref: selec_postulacion_declaraciones.pde_pto_ide > selec_postulaciones.pto_ide
 Ref: selec_postulacion_declaraciones.pde_tde_ide > selec_tipos_declaracion.tde_ide
-Ref: selec_postulacion_declaraciones.pde_documento_ide > selec_expediente_documentos.exd_ide
+Ref: selec_postulacion_declaraciones.pde_exd_ide > selec_expediente_documentos.exd_ide

@@ -4,22 +4,20 @@ namespace Modules\Seleccion\Models;
 
 use CodeIgniter\Model;
 
-class AnexoModel extends Model
+class FichaEvaluacionModel extends Model
 {
-    protected $table = 'selec_anexos';
-    protected $primaryKey = 'ane_ide';
+    protected $table = 'selec_fichas_evaluacion';
+    protected $primaryKey = 'fie_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'ane_con_ide',
-        'ane_codigo',
-        'ane_nombre',
-        'ane_descripcion',
-        'ane_obligatorio',
-        'ane_condicion',
-        'ane_archivo_ide',
-        'ane_estado',
+        'fie_con_ide',
+        'fie_nombre',
+        'fie_tipo',
+        'fie_version',
+        'fie_estado',
+        'fie_puntaje_maximo',
     ];
 
     protected $useTimestamps = true;

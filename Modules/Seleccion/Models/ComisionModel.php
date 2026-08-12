@@ -4,22 +4,19 @@ namespace Modules\Seleccion\Models;
 
 use CodeIgniter\Model;
 
-class AnexoModel extends Model
+class ComisionModel extends Model
 {
-    protected $table = 'selec_anexos';
-    protected $primaryKey = 'ane_ide';
+    protected $table = 'selec_comisiones';
+    protected $primaryKey = 'com_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'ane_con_ide',
-        'ane_codigo',
-        'ane_nombre',
-        'ane_descripcion',
-        'ane_obligatorio',
-        'ane_condicion',
-        'ane_archivo_ide',
-        'ane_estado',
+        'com_con_ide',
+        'com_numero',
+        'com_fecha_designacion',
+        'com_documento_ide',
+        'com_estado',
     ];
 
     protected $useTimestamps = true;

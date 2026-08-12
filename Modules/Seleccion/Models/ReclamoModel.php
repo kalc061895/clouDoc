@@ -4,22 +4,20 @@ namespace Modules\Seleccion\Models;
 
 use CodeIgniter\Model;
 
-class AnexoModel extends Model
+class ReclamoModel extends Model
 {
-    protected $table = 'selec_anexos';
-    protected $primaryKey = 'ane_ide';
+    protected $table = 'selec_reclamos';
+    protected $primaryKey = 'rec_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'ane_con_ide',
-        'ane_codigo',
-        'ane_nombre',
-        'ane_descripcion',
-        'ane_obligatorio',
-        'ane_condicion',
-        'ane_archivo_ide',
-        'ane_estado',
+        'rec_codigo',
+        'rec_pto_ide',
+        'rec_fecha',
+        'rec_motivo',
+        'rec_estado',
+        'created_by',
     ];
 
     protected $useTimestamps = true;
