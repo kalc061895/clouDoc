@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class ExtraModel extends Model
 {
-    protected $table            = 'informacion_extra';
+    protected $table            = 'selec_informacion_extra';
     protected $primaryKey       = 'id_extra';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

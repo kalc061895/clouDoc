@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class FormacionModel extends Model
 {
-    protected $table            = 'formacion_profesional';
+    protected $table            = 'selec_formacion_profesional';
     protected $primaryKey       = 'id_formacion';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

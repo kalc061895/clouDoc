@@ -1,0 +1,1359 @@
+////////////////////////////////////////////////////////////
+// SISTEMA DE CONVOCATORIAS Y CONCURSOS
+// DBML para selec_dbdiagram.io
+////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////
+// CATALOGOS GENERALES
+////////////////////////////////////////////////////////////
+
+Table selec_tipos_convocatoria {
+  tco_ide bigint [pk, increment]
+  tco_codigo varchar(50) [not null, unique]
+  tco_nombre varchar(150) [not null]
+  tco_descripcion varchar(255)
+  tco_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_estados_convocatoria {
+  eco_ide bigint [pk, increment]
+  eco_codigo varchar(50) [not null, unique]
+  eco_nombre varchar(100) [not null]
+  eco_descripcion varchar(255)
+  eco_orden int
+  eco_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_tipos_cargo {
+  tca_ide bigint [pk, increment]
+  tca_codigo varchar(50) [not null, unique]
+  tca_nombre varchar(100) [not null]
+  tca_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_grupos_ocupacionales {
+  gru_ide bigint [pk, increment]
+  gru_codigo varchar(50) [not null, unique]
+  gru_nombre varchar(100) [not null]
+  gru_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_niveles {
+  niv_ide bigint [pk, increment]
+  niv_codigo varchar(50) [not null, unique]
+  niv_nombre varchar(100) [not null]
+  niv_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_modalidades_vinculo {
+  mvi_ide bigint [pk, increment]
+  mvi_codigo varchar(50) [not null, unique]
+  mvi_nombre varchar(100) [not null]
+  mvi_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_profesiones {
+  pro_ide bigint [pk, increment]
+  pro_codigo varchar(50)
+  pro_nombre varchar(150) [not null]
+  pro_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_niveles_formacion {
+  nfo_ide bigint [pk, increment]
+  nfo_codigo varchar(50) [not null, unique]
+  nfo_nombre varchar(100) [not null]
+  nfo_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_tipos_documento {
+  tdo_ide bigint [pk, increment]
+  tdo_codigo varchar(30) [not null, unique]
+  tdo_nombre varchar(100) [not null]
+  tdo_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_estados_postulacion {
+  epo_ide bigint [pk, increment]
+  epo_codigo varchar(50) [not null, unique]
+  epo_nombre varchar(100) [not null]
+  epo_descripcion varchar(255)
+  epo_orden int
+}
+
+Table selec_estados_expediente {
+  eex_ide bigint [pk, increment]
+  eex_codigo varchar(50) [not null, unique]
+  eex_nombre varchar(100) [not null]
+}
+
+Table selec_tipos_archivo {
+  tar_ide bigint [pk, increment]
+  tar_codigo varchar(50) [not null, unique]
+  tar_nombre varchar(100) [not null]
+  tar_extension varchar(20)
+  tar_mime varchar(150)
+  tar_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+
+
+////////////////////////////////////////////////////////////
+// CONVOCATORIAS
+////////////////////////////////////////////////////////////
+
+Table selec_convocatorias {
+  con_ide bigint [pk, increment]
+
+  con_codigo varchar(50) [not null, unique]
+  con_numero varchar(50) [not null]
+  con_nombre varchar(255) [not null]
+
+  con_tco_ide bigint [not null]
+  con_eco_ide bigint [not null]
+
+  con_regimen_laboral varchar(100)
+  con_anio int [not null]
+
+  con_resolucion varchar(255)
+  con_descripcion text
+
+  con_fecha_publicacion datetime
+  con_fecha_inicio datetime
+  con_fecha_cierre datetime
+
+  con_responsable_ide bigint
+
+  con_observacion text
+
+  created_at datetime
+  updated_at datetime
+  deleted_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// DOCUMENTOS DE CONVOCATORIA
+////////////////////////////////////////////////////////////
+
+Table selec_convocatoria_documentos {
+  cod_ide bigint [pk, increment]
+
+  cod_con_ide bigint [not null]
+
+  cod_nombre varchar(255) [not null]
+  cod_descripcion varchar(255)
+
+  cod_tipo varchar(50)
+
+  cod_ruta varchar(500)
+  cod_nombre_interno varchar(255)
+
+  cod_mime varchar(150)
+  cod_tamanio bigint
+  cod_hash varchar(255)
+
+  cod_version int [default: 1]
+
+  cod_obligatorio boolean [default: false]
+
+  created_by bigint [not null]
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// CARGOS
+////////////////////////////////////////////////////////////
+
+Table selec_cargos {
+  car_ide bigint [pk, increment]
+
+  car_codigo varchar(50) [not null]
+  car_denominacion varchar(200) [not null]
+
+  car_especialidad varchar(150)
+
+  car_tca_ide bigint
+  car_gru_ide bigint
+  car_niv_ide bigint
+
+  car_pro_ide bigint
+
+  car_descripcion text
+
+  car_estado varchar(20) [not null, default: 'ACTIVO']
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// CARGOS DE UNA CONVOCATORIA
+////////////////////////////////////////////////////////////
+
+Table selec_convocatoria_cargos {
+  cco_ide bigint [pk, increment]
+
+  cco_con_ide bigint [not null]
+  cco_car_ide bigint [not null]
+
+  cco_numero_plazas int [not null]
+
+  cco_dependencia varchar(200)
+  cco_area varchar(200)
+
+  cco_est_ide bigint
+
+  cco_remuneracion decimal(12,2)
+
+  cco_observacion text
+
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    (cco_con_ide, cco_car_ide) [unique]
+  }
+}
+
+
+////////////////////////////////////////////////////////////
+// REQUISITOS DEL CARGO
+////////////////////////////////////////////////////////////
+
+Table selec_requisitos {
+  req_ide bigint [pk, increment]
+
+  req_cco_ide bigint [not null]
+
+  req_codigo varchar(50)
+  req_nombre varchar(255) [not null]
+  req_descripcion text
+
+  req_tipo varchar(50)
+  req_obligatorio boolean [default: true]
+
+  req_puntaje boolean [default: false]
+
+  req_orden int
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// FORMACION REQUERIDA
+////////////////////////////////////////////////////////////
+
+Table selec_requisito_formacion {
+  rfo_ide bigint [pk, increment]
+
+  rfo_req_ide bigint [not null]
+
+  rfo_nfo_ide bigint
+  rfo_pro_ide bigint
+
+  rfo_grado varchar(150)
+
+  rfo_obligatorio boolean [default: true]
+}
+
+
+////////////////////////////////////////////////////////////
+// EXPERIENCIA REQUERIDA
+////////////////////////////////////////////////////////////
+
+Table selec_requisito_experiencia {
+  rex_ide bigint [pk, increment]
+
+  rex_req_ide bigint [not null]
+
+  rex_anios int
+  rex_meses int
+  rex_dias int
+
+  rex_tipo_experiencia varchar(100)
+
+  rex_especifica boolean [default: false]
+
+  rex_descripcion text
+}
+
+
+////////////////////////////////////////////////////////////
+// CRONOGRAMA
+////////////////////////////////////////////////////////////
+
+Table selec_etapas {
+  eta_ide bigint [pk, increment]
+
+  eta_codigo varchar(50) [not null, unique]
+  eta_nombre varchar(150) [not null]
+
+  eta_descripcion varchar(255)
+
+  eta_orden int
+
+  eta_estado varchar(20) [not null, default: 'ACTIVO']
+}
+
+Table selec_convocatoria_etapas {
+  cet_ide bigint [pk, increment]
+
+  cet_con_ide bigint [not null]
+  cet_eta_ide bigint [not null]
+
+  cet_fecha_inicio date
+  cet_hora_inicio time
+
+  cet_fecha_cierre date
+  cet_hora_cierre time
+
+  cet_estado varchar(30)
+
+  cet_responsable_ide bigint
+
+  cet_observacion text
+
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    (cet_con_ide, cet_eta_ide) [unique]
+  }
+}
+
+
+////////////////////////////////////////////////////////////
+// POSTULANTES
+////////////////////////////////////////////////////////////
+
+Table selec_postulantes {
+  pos_ide bigint [pk, increment]
+
+  pos_tdo_ide bigint [not null]
+  pos_documento varchar(30) [not null, unique]
+
+  pos_nombres varchar(150) [not null]
+  pos_apellido_paterno varchar(100) [not null]
+  pos_apellido_materno varchar(100)
+
+  pos_fecha_nacimiento date
+  pos_sexo varchar(20)
+
+  pos_direccion varchar(255)
+
+  pos_dep_ide bigint
+  pos_prv_ide bigint
+  pos_dis_ide bigint
+
+  pos_telefono varchar(50)
+  pos_email varchar(150) [not null]
+
+  pos_password varchar(255)
+
+  pos_email_verificado boolean [default: false]
+
+  pos_estado varchar(20) [default: 'ACTIVO']
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// FORMACION ACADEMICA
+////////////////////////////////////////////////////////////
+
+Table selec_postulante_formacion {
+  pfo_ide bigint [pk, increment]
+
+  pfo_pos_ide bigint [not null]
+
+  pfo_nfo_ide bigint
+
+  pfo_institucion varchar(255)
+  pfo_carrera varchar(255)
+
+  pfo_grado varchar(150)
+
+  pfo_fecha_inicio date
+  pfo_fecha_culminacion date
+  pfo_fecha_obtencion date
+
+  pfo_documento_ide bigint
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// FORMACION PROFESIONAL
+////////////////////////////////////////////////////////////
+
+Table selec_postulante_profesiones {
+  ppr_ide bigint [pk, increment]
+
+  ppr_pos_ide bigint [not null]
+
+  ppr_pro_ide bigint
+
+  ppr_institucion varchar(255)
+
+  ppr_grado varchar(150)
+  ppr_titulo varchar(150)
+
+  ppr_fecha date
+
+  ppr_colegiatura varchar(100)
+  ppr_habilitacion varchar(100)
+
+  ppr_documento_ide bigint
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// EXPERIENCIA LABORAL
+////////////////////////////////////////////////////////////
+
+Table selec_postulante_experiencias {
+  pex_ide bigint [pk, increment]
+
+  pex_pos_ide bigint [not null]
+
+  pex_institucion varchar(255)
+  pex_cargo varchar(200)
+  pex_area varchar(200)
+
+  pex_mvi_ide bigint
+
+  pex_fecha_inicio date
+  pex_fecha_termino date
+
+  pex_dias_declarados int
+
+  pex_descripcion text
+
+  pex_documento_ide bigint
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// CAPACITACIONES
+////////////////////////////////////////////////////////////
+
+Table selec_postulante_capacitaciones {
+  pca_ide bigint [pk, increment]
+
+  pca_pos_ide bigint [not null]
+
+  pca_nombre varchar(255)
+  pca_institucion varchar(255)
+
+  pca_tipo varchar(100)
+
+  pca_fecha date
+
+  pca_horas decimal(8,2)
+
+  pca_modalidad varchar(100)
+
+  pca_documento_ide bigint
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// EXPEDIENTE / POSTULACION
+////////////////////////////////////////////////////////////
+
+Table selec_postulaciones {
+  pto_ide bigint [pk, increment]
+
+  pto_codigo varchar(50) [not null, unique]
+
+  pto_pos_ide bigint [not null]
+  pto_cco_ide bigint [not null]
+
+  pto_epo_ide bigint [not null]
+  pto_eex_ide bigint
+
+  pto_fecha_presentacion datetime
+
+  pto_confirmado boolean [default: false]
+
+  pto_ip varchar(45)
+
+  pto_hash_expediente varchar(255)
+
+  pto_observacion text
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// DOCUMENTOS DEL EXPEDIENTE
+////////////////////////////////////////////////////////////
+
+Table selec_expediente_documentos {
+  exd_ide bigint [pk, increment]
+
+  exd_pto_ide bigint [not null]
+
+  exd_tipo_documento varchar(100)
+
+  exd_nombre_original varchar(255)
+  exd_nombre_interno varchar(255)
+
+  exd_ruta varchar(500)
+
+  exd_mime varchar(150)
+
+  exd_tamanio bigint
+
+  exd_hash varchar(255)
+
+  exd_version int [default: 1]
+
+  exd_estado varchar(30)
+
+  created_by bigint [not null]
+
+  exd_fecha_carga datetime
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// ANEXOS / FORMATOS
+////////////////////////////////////////////////////////////
+
+Table selec_anexos {
+  ane_ide bigint [pk, increment]
+
+  ane_con_ide bigint [not null]
+
+  ane_codigo varchar(50)
+  ane_nombre varchar(255)
+
+  ane_descripcion text
+
+  ane_obligatorio boolean [default: false]
+
+  ane_condicion varchar(255)
+
+  ane_archivo_ide bigint
+
+  ane_estado varchar(20) [default: 'ACTIVO']
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// ANEXOS PRESENTADOS
+////////////////////////////////////////////////////////////
+
+Table selec_postulacion_anexos {
+  pan_ide bigint [pk, increment]
+
+  pan_pto_ide bigint [not null]
+  pan_ane_ide bigint [not null]
+
+  pan_exd_ide bigint
+
+  pan_presentado boolean [default: false]
+
+  pan_observacion text
+}
+
+
+////////////////////////////////////////////////////////////
+// VALIDACION DE INSCRIPCION
+////////////////////////////////////////////////////////////
+
+Table selec_validaciones_postulacion {
+  vpo_ide bigint [pk, increment]
+
+  vpo_pto_ide bigint [not null]
+
+  vpo_codigo varchar(100)
+  vpo_nombre varchar(255)
+
+  vpo_resultado boolean
+
+  vpo_observacion text
+
+  vpo_fecha datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// COMISION EVALUADORA
+////////////////////////////////////////////////////////////
+
+Table selec_comisiones {
+  com_ide bigint [pk, increment]
+
+  com_con_ide bigint [not null]
+
+  com_numero varchar(50)
+
+  com_fecha_designacion date
+
+  com_documento_ide bigint
+
+  com_estado varchar(20) [default: 'ACTIVA']
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_comision_miembros {
+  cmi_ide bigint [pk, increment]
+
+  cmi_com_ide bigint [not null]
+  cmi_usu_ide bigint [not null]
+
+  cmi_tipo varchar(30) [not null]
+
+  cmi_fecha_inicio datetime
+  cmi_fecha_fin datetime
+
+  cmi_documento_ide bigint
+
+  cmi_estado varchar(20) [default: 'ACTIVO']
+}
+
+
+////////////////////////////////////////////////////////////
+// MATRIZ DE EVALUACION
+////////////////////////////////////////////////////////////
+
+Table selec_fichas_evaluacion {
+  fie_ide bigint [pk, increment]
+
+  fie_con_ide bigint [not null]
+
+  fie_nombre varchar(255) [not null]
+
+  fie_tipo varchar(50)
+
+  fie_version int [default: 1]
+
+  fie_estado varchar(20) [default: 'ACTIVA']
+
+  fie_puntaje_maximo decimal(10,2)
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_criterios_evaluacion {
+  cri_ide bigint [pk, increment]
+
+  cri_fie_ide bigint [not null]
+
+  cri_codigo varchar(50)
+  cri_nombre varchar(255) [not null]
+
+  cri_descripcion text
+
+  cri_tipo varchar(50)
+
+  cri_puntaje_maximo decimal(10,2)
+
+  cri_obligatorio boolean [default: true]
+
+  cri_orden int
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// REGLAS DE PUNTAJE
+////////////////////////////////////////////////////////////
+
+Table selec_reglas_puntaje {
+  rpu_ide bigint [pk, increment]
+
+  rpu_cri_ide bigint [not null]
+
+  rpu_tipo varchar(50)
+
+  rpu_condicion varchar(255)
+
+  rpu_valor_min decimal(10,2)
+  rpu_valor_max decimal(10,2)
+
+  rpu_puntaje decimal(10,2)
+
+  rpu_formula text
+
+  rpu_orden int
+
+  rpu_estado varchar(20) [default: 'ACTIVO']
+}
+
+
+////////////////////////////////////////////////////////////
+// EVALUACIONES
+////////////////////////////////////////////////////////////
+
+Table selec_evaluaciones {
+  eva_ide bigint [pk, increment]
+
+  eva_pto_ide bigint [not null]
+  eva_fie_ide bigint [not null]
+
+  eva_com_ide bigint
+
+  eva_usu_ide bigint [not null]
+
+  eva_tipo varchar(50)
+
+  eva_estado varchar(30)
+
+  eva_puntaje_total decimal(10,2)
+
+  eva_fecha_inicio datetime
+  eva_fecha_fin datetime
+
+  eva_observacion text
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_evaluacion_detalles {
+  evd_ide bigint [pk, increment]
+
+  evd_eva_ide bigint [not null]
+
+  evd_cri_ide bigint [not null]
+
+  evd_resultado varchar(50)
+
+  evd_cumple boolean
+
+  evd_puntaje decimal(10,2)
+
+  evd_observacion text
+
+  created_by bigint [not null]
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// VALIDACION DE EXPERIENCIA
+////////////////////////////////////////////////////////////
+
+Table selec_experiencia_evaluaciones {
+  exe_ide bigint [pk, increment]
+
+  exe_eva_ide bigint [not null]
+  exe_pex_ide bigint [not null]
+
+  exe_resultado varchar(50)
+
+  exe_dias_declarados int
+  exe_dias_validados int
+
+  exe_puntaje decimal(10,2)
+
+  exe_observacion text
+
+  created_by bigint [not null]
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// REQUISITOS MINIMOS
+////////////////////////////////////////////////////////////
+
+Table selec_requisito_evaluaciones {
+  reqe_ide bigint [pk, increment]
+
+  reqe_eva_ide bigint [not null]
+  reqe_req_ide bigint [not null]
+
+  reqe_resultado varchar(30)
+
+  reqe_cumple boolean
+
+  reqe_observacion text
+
+  created_by bigint [not null]
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// RECLAMOS
+////////////////////////////////////////////////////////////
+
+Table selec_reclamos {
+  rec_ide bigint [pk, increment]
+
+  rec_codigo varchar(50) [not null, unique]
+
+  rec_pto_ide bigint [not null]
+
+  rec_fecha datetime
+
+  rec_motivo text
+
+  rec_estado varchar(50)
+
+  created_by bigint [not null]
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_reclamo_documentos {
+  red_ide bigint [pk, increment]
+
+  red_rec_ide bigint [not null]
+  red_exd_ide bigint
+
+  red_descripcion varchar(255)
+}
+
+Table selec_evaluacion_reclamos {
+  ere_ide bigint [pk, increment]
+
+  ere_rec_ide bigint [not null]
+
+  ere_com_ide bigint
+
+  created_by bigint [not null]
+
+  ere_decision varchar(50)
+
+  ere_fundamento text
+
+  ere_observacion text
+
+  ere_fecha datetime
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// ENTREVISTA
+////////////////////////////////////////////////////////////
+
+Table selec_entrevistas {
+  ent_ide bigint [pk, increment]
+
+  ent_con_ide bigint [not null]
+
+  ent_nombre varchar(255)
+
+  ent_fie_ide bigint
+
+  ent_puntaje_maximo decimal(10,2)
+
+  ent_estado varchar(20)
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_entrevista_postulaciones {
+  enp_ide bigint [pk, increment]
+
+  enp_ent_ide bigint [not null]
+  enp_pto_ide bigint [not null]
+
+  enp_fecha datetime
+
+  enp_puntaje decimal(10,2)
+
+  enp_estado varchar(30)
+
+  enp_observacion text
+
+  created_by bigint [not null]
+}
+
+
+////////////////////////////////////////////////////////////
+// BONIFICACIONES
+////////////////////////////////////////////////////////////
+
+Table selec_tipos_bonificacion {
+  tbo_ide bigint [pk, increment]
+
+  tbo_codigo varchar(50) [not null, unique]
+  tbo_nombre varchar(150) [not null]
+
+  tbo_descripcion text
+
+  tbo_tipo_calculo varchar(50)
+
+  tbo_estado varchar(20) [default: 'ACTIVO']
+}
+
+Table selec_bonificaciones {
+  bon_ide bigint [pk, increment]
+
+  bon_pto_ide bigint [not null]
+  bon_tbo_ide bigint [not null]
+
+  bon_porcentaje decimal(10,4)
+
+  bon_puntaje decimal(10,2)
+
+  bon_documento_ide bigint
+
+  bon_resultado varchar(50)
+
+  bon_fundamento text
+
+  created_by bigint [not null]
+
+  bon_fecha datetime
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// RESULTADOS
+////////////////////////////////////////////////////////////
+
+Table selec_resultados {
+  res_ide bigint [pk, increment]
+
+  res_pto_ide bigint [not null]
+
+  res_version int [not null, default: 1]
+
+  res_tipo varchar(50)
+
+  res_puntaje_curricular decimal(10,2)
+  res_puntaje_entrevista decimal(10,2)
+  res_puntaje_bonificacion decimal(10,2)
+
+  res_puntaje_total decimal(10,2)
+
+  res_orden_merito int
+
+  res_condicion varchar(50)
+
+  res_publicado boolean [default: false]
+
+  res_fecha datetime
+
+  created_by bigint [not null]
+
+  res_anterior_ide bigint
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// ACTAS
+////////////////////////////////////////////////////////////
+
+Table selec_actas {
+  act_ide bigint [pk, increment]
+
+  act_con_ide bigint [not null]
+
+  act_eta_ide bigint
+
+  act_numero varchar(50)
+
+  act_tipo varchar(100)
+
+  act_fecha datetime
+
+  act_descripcion text
+
+  act_acuerdos text
+
+  act_observaciones text
+
+  act_documento_ide bigint
+
+  act_estado varchar(30)
+
+  created_at datetime
+  updated_at datetime
+}
+
+Table selec_acta_participantes {
+  acp_ide bigint [pk, increment]
+
+  acp_act_ide bigint [not null]
+  acp_usu_ide bigint
+
+  acp_nombre varchar(255)
+
+  acp_cargo varchar(150)
+
+  acp_firma varchar(255)
+}
+
+
+////////////////////////////////////////////////////////////
+// NOTIFICACIONES
+////////////////////////////////////////////////////////////
+
+Table selec_tipos_notificacion {
+  tno_ide bigint [pk, increment]
+
+  tno_codigo varchar(50) [not null, unique]
+  tno_nombre varchar(150)
+
+  tno_asunto varchar(255)
+
+  tno_plantilla text
+
+  tno_estado varchar(20) [default: 'ACTIVO']
+}
+
+Table selec_notificaciones {
+  not_ide bigint [pk, increment]
+
+  not_tno_ide bigint
+
+  not_usu_ide bigint
+  not_pos_ide bigint
+
+  not_email varchar(150)
+
+  not_asunto varchar(255)
+
+  not_mensaje text
+
+  not_fecha_envio datetime
+
+  not_estado varchar(30)
+
+  not_error text
+}
+
+
+
+////////////////////////////////////////////////////////////
+// AUDITORIA
+////////////////////////////////////////////////////////////
+
+Table selec_auditoria {
+  aud_ide bigint [pk, increment]
+
+  aud_usu_ide bigint
+
+  aud_rol_ide bigint
+
+  aud_fecha datetime [not null]
+
+  aud_ip varchar(45)
+
+  aud_accion varchar(100)
+
+  aud_modulo varchar(100)
+
+  aud_tabla varchar(100)
+
+  aud_registro_ide bigint
+
+  aud_valor_anterior text
+  aud_valor_nuevo text
+
+  aud_motivo text
+
+  aud_pto_ide bigint
+  aud_con_ide bigint
+  aud_etapa_ide bigint
+}
+
+
+////////////////////////////////////////////////////////////
+// VERSIONAMIENTO DEL EXPEDIENTE
+////////////////////////////////////////////////////////////
+
+Table selec_expediente_versiones {
+  exv_ide bigint [pk, increment]
+
+  exv_pto_ide bigint [not null]
+
+  exv_version int [not null]
+
+  exv_hash varchar(255)
+
+  exv_fecha datetime
+
+  created_by bigint [not null]
+
+  exv_motivo text
+
+  exv_estado varchar(30)
+
+  created_at datetime
+}
+
+
+////////////////////////////////////////////////////////////
+// DECLARACIONES JURADAS
+////////////////////////////////////////////////////////////
+
+Table selec_tipos_declaracion {
+  tde_ide bigint [pk, increment]
+
+  tde_codigo varchar(50) [not null, unique]
+  tde_nombre varchar(150) [not null]
+
+  tde_contenido text
+
+  tde_estado varchar(20) [default: 'ACTIVO']
+}
+
+Table selec_postulacion_declaraciones {
+  pde_ide bigint [pk, increment]
+
+  pde_pto_ide bigint [not null]
+  pde_tde_ide bigint [not null]
+
+  pde_acepta boolean [not null]
+
+  pde_fecha datetime
+
+  pde_ip varchar(45)
+
+  pde_hash varchar(255)
+
+  pde_documento_ide bigint
+}
+
+
+////////////////////////////////////////////////////////////
+// RELACIONES
+////////////////////////////////////////////////////////////
+
+
+// Convocatorias
+
+Ref: selec_convocatorias.con_tco_ide > selec_tipos_convocatoria.tco_ide
+Ref: selec_convocatorias.con_eco_ide > selec_estados_convocatoria.eco_ide
+
+Ref: selec_convocatoria_documentos.cod_con_ide > selec_convocatorias.con_ide
+
+
+// Cargos
+
+Ref: selec_cargos.car_tca_ide > selec_tipos_cargo.tca_ide
+Ref: selec_cargos.car_gru_ide > selec_grupos_ocupacionales.gru_ide
+Ref: selec_cargos.car_niv_ide > selec_niveles.niv_ide
+Ref: selec_cargos.car_pro_ide > selec_profesiones.pro_ide
+
+Ref: selec_convocatoria_cargos.cco_con_ide > selec_convocatorias.con_ide
+Ref: selec_convocatoria_cargos.cco_car_ide > selec_cargos.car_ide
+
+
+// Requisitos
+
+Ref: selec_requisitos.req_cco_ide > selec_convocatoria_cargos.cco_ide
+
+Ref: selec_requisito_formacion.rfo_req_ide > selec_requisitos.req_ide
+Ref: selec_requisito_formacion.rfo_nfo_ide > selec_niveles_formacion.nfo_ide
+Ref: selec_requisito_formacion.rfo_pro_ide > selec_profesiones.pro_ide
+
+Ref: selec_requisito_experiencia.rex_req_ide > selec_requisitos.req_ide
+
+
+// Cronograma
+
+Ref: selec_convocatoria_etapas.cet_con_ide > selec_convocatorias.con_ide
+Ref: selec_convocatoria_etapas.cet_eta_ide > selec_etapas.eta_ide
+
+
+
+// Postulantes
+
+Ref: selec_postulantes.pos_tdo_ide > selec_tipos_documento.tdo_ide
+
+Ref: selec_postulante_formacion.pfo_pos_ide > selec_postulantes.pos_ide
+Ref: selec_postulante_formacion.pfo_nfo_ide > selec_niveles_formacion.nfo_ide
+
+Ref: selec_postulante_profesiones.ppr_pos_ide > selec_postulantes.pos_ide
+Ref: selec_postulante_profesiones.ppr_pro_ide > selec_profesiones.pro_ide
+
+Ref: selec_postulante_experiencias.pex_pos_ide > selec_postulantes.pos_ide
+Ref: selec_postulante_experiencias.pex_mvi_ide > selec_modalidades_vinculo.mvi_ide
+
+Ref: selec_postulante_capacitaciones.pca_pos_ide > selec_postulantes.pos_ide
+
+
+// Postulación
+
+Ref: selec_postulaciones.pto_pos_ide > selec_postulantes.pos_ide
+Ref: selec_postulaciones.pto_cco_ide > selec_convocatoria_cargos.cco_ide
+Ref: selec_postulaciones.pto_epo_ide > selec_estados_postulacion.epo_ide
+Ref: selec_postulaciones.pto_eex_ide > selec_estados_expediente.eex_ide
+
+Ref: selec_expediente_documentos.exd_pto_ide > selec_postulaciones.pto_ide
+
+
+Ref: selec_postulacion_anexos.pan_pto_ide > selec_postulaciones.pto_ide
+Ref: selec_postulacion_anexos.pan_ane_ide > selec_anexos.ane_ide
+Ref: selec_postulacion_anexos.pan_exd_ide > selec_expediente_documentos.exd_ide
+
+Ref: selec_validaciones_postulacion.vpo_pto_ide > selec_postulaciones.pto_ide
+
+
+// Formación / documentos
+
+Ref: selec_postulante_formacion.pfo_documento_ide > selec_expediente_documentos.exd_ide
+Ref: selec_postulante_profesiones.ppr_documento_ide > selec_expediente_documentos.exd_ide
+Ref: selec_postulante_experiencias.pex_documento_ide > selec_expediente_documentos.exd_ide
+Ref: selec_postulante_capacitaciones.pca_documento_ide > selec_expediente_documentos.exd_ide
+
+Ref: selec_anexos.ane_con_ide > selec_convocatorias.con_ide
+Ref: selec_anexos.ane_archivo_ide > selec_convocatoria_documentos.cod_ide
+
+
+// Comisión
+
+Ref: selec_comisiones.com_con_ide > selec_convocatorias.con_ide
+Ref: selec_comisiones.com_documento_ide > selec_convocatoria_documentos.cod_ide
+
+Ref: selec_comision_miembros.cmi_com_ide > selec_comisiones.com_ide
+
+Ref: selec_comision_miembros.cmi_documento_ide > selec_convocatoria_documentos.cod_ide
+
+
+// Evaluación
+
+Ref: selec_fichas_evaluacion.fie_con_ide > selec_convocatorias.con_ide
+
+Ref: selec_criterios_evaluacion.cri_fie_ide > selec_fichas_evaluacion.fie_ide
+
+Ref: selec_reglas_puntaje.rpu_cri_ide > selec_criterios_evaluacion.cri_ide
+
+Ref: selec_evaluaciones.eva_pto_ide > selec_postulaciones.pto_ide
+Ref: selec_evaluaciones.eva_fie_ide > selec_fichas_evaluacion.fie_ide
+Ref: selec_evaluaciones.eva_com_ide > selec_comisiones.com_ide
+
+
+Ref: selec_evaluacion_detalles.evd_eva_ide > selec_evaluaciones.eva_ide
+Ref: selec_evaluacion_detalles.evd_cri_ide > selec_criterios_evaluacion.cri_ide
+
+
+Ref: selec_experiencia_evaluaciones.exe_eva_ide > selec_evaluaciones.eva_ide
+Ref: selec_experiencia_evaluaciones.exe_pex_ide > selec_postulante_experiencias.pex_ide
+
+
+Ref: selec_requisito_evaluaciones.reqe_eva_ide > selec_evaluaciones.eva_ide
+Ref: selec_requisito_evaluaciones.reqe_req_ide > selec_requisitos.req_ide
+
+
+
+// Reclamos
+
+Ref: selec_reclamos.rec_pto_ide > selec_postulaciones.pto_ide
+
+
+Ref: selec_reclamo_documentos.red_rec_ide > selec_reclamos.rec_ide
+Ref: selec_reclamo_documentos.red_exd_ide > selec_expediente_documentos.exd_ide
+
+Ref: selec_evaluacion_reclamos.ere_rec_ide > selec_reclamos.rec_ide
+Ref: selec_evaluacion_reclamos.ere_com_ide > selec_comisiones.com_ide
+
+
+
+// Entrevista
+
+Ref: selec_entrevistas.ent_con_ide > selec_convocatorias.con_ide
+Ref: selec_entrevistas.ent_fie_ide > selec_fichas_evaluacion.fie_ide
+
+Ref: selec_entrevista_postulaciones.enp_ent_ide > selec_entrevistas.ent_ide
+Ref: selec_entrevista_postulaciones.enp_pto_ide > selec_postulaciones.pto_ide
+
+
+
+// Bonificaciones
+
+Ref: selec_bonificaciones.bon_pto_ide > selec_postulaciones.pto_ide
+Ref: selec_bonificaciones.bon_tbo_ide > selec_tipos_bonificacion.tbo_ide
+Ref: selec_bonificaciones.bon_documento_ide > selec_expediente_documentos.exd_ide
+
+
+
+// Resultados
+
+Ref: selec_resultados.res_pto_ide > selec_postulaciones.pto_ide
+
+Ref: selec_resultados.res_anterior_ide > selec_resultados.res_ide
+
+
+// Actas
+
+Ref: selec_actas.act_con_ide > selec_convocatorias.con_ide
+Ref: selec_actas.act_eta_ide > selec_etapas.eta_ide
+Ref: selec_actas.act_documento_ide > selec_convocatoria_documentos.cod_ide
+
+Ref: selec_acta_participantes.acp_act_ide > selec_actas.act_ide
+
+
+
+// Notificaciones
+
+Ref: selec_notificaciones.not_tno_ide > selec_tipos_notificacion.tno_ide
+
+Ref: selec_notificaciones.not_pos_ide > selec_postulantes.pos_ide
+
+
+// Auditoria
+
+Ref: selec_auditoria.aud_pto_ide > selec_postulaciones.pto_ide
+Ref: selec_auditoria.aud_con_ide > selec_convocatorias.con_ide
+Ref: selec_auditoria.aud_etapa_ide > selec_etapas.eta_ide
+
+
+// Versiones
+
+Ref: selec_expediente_versiones.exv_pto_ide > selec_postulaciones.pto_ide
+
+
+
+// Declaraciones
+
+Ref: selec_postulacion_declaraciones.pde_pto_ide > selec_postulaciones.pto_ide
+Ref: selec_postulacion_declaraciones.pde_tde_ide > selec_tipos_declaracion.tde_ide
+Ref: selec_postulacion_declaraciones.pde_documento_ide > selec_expediente_documentos.exd_ide

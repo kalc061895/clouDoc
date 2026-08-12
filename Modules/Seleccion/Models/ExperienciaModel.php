@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class ExperienciaModel extends Model
 {
-    protected $table            = 'experiencia_laboral';
+    protected $table            = 'selec_experiencia_laboral';
     protected $primaryKey       = 'id_experiencia';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

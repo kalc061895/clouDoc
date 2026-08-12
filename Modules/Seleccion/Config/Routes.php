@@ -1,8 +1,27 @@
 <?php
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
-$routes->group('contrato', ['namespace' => 'Modules\Seleccion\Controllers'], function ($routes) {
+$routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], function ($routes) {
     ############################## CONTRATACION #############################
+
+    // Vista Principal
+    $routes->get('convocatorias', 'ConvocatoriaController::index');
+
+    // 2. Endpoints AJAX para la misma vista
+    $routes->group('api', function ($routes) {
+        $routes->get('convocatorias', 'ConvocatoriaController::listarApi');
+        $routes->post('convocatorias', 'ConvocatoriaController::crearApi');
+        $routes->put('convocatorias/(:num)', 'ConvocatoriaController::actualizarApi/$1');
+        $routes->delete('convocatorias/(:num)', 'ConvocatoriaController::eliminarApi/$1');
+
+        // Lookups para cargar selects
+        $routes->get('tipos-convocatoria-lookup', 'ConvocatoriaController::tiposLookup');
+        $routes->get('estados-convocatoria-lookup', 'ConvocatoriaController::estadosLookup');
+    });
+
+
+
+
 
     /**
      * Rutas para la gestion de convocatorias

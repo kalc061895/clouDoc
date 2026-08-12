@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class CapacitacionModel extends Model
 {
-    protected $table            = 'capacitaciones';
+    protected $table            = 'selec_capacitaciones';
     protected $primaryKey       = 'id_capacitacion';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

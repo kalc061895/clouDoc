@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class CalificacionPreviaModel extends Model
 {
-    protected $table            = 'calificacion_previa';
+    protected $table            = 'selec_calificacion_previa';
     protected $primaryKey       = 'id_calificacion_previa';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

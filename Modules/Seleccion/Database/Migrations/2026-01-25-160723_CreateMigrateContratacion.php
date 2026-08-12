@@ -8,21 +8,7 @@ class CreateMigrateContratacion extends Migration
 {
     public function up()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | USERS (AUTH)
-        |--------------------------------------------------------------------------
-        */
-        $this->forge->addField([
-            'id' => [
-                'type' => 'INT',
-                'unsigned' => true,
-                'auto_increment' => true
-            ]
-        ]);
-        $this->forge->addKey('id', true);
-        $this->forge->createTable('users', true);
-
+        
         /*
         |--------------------------------------------------------------------------
         | POSTULANTES

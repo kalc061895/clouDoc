@@ -6,8 +6,8 @@ use CodeIgniter\Model;
 
 class AnexoModel extends Model
 {
-    protected $table            = 'anexos';
-    protected $primaryKey       = 'id_ANEXO';
+    protected $table            = 'selec_anexos';
+    protected $primaryKey       = 'id_anexo';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
