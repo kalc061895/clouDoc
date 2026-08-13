@@ -83,6 +83,7 @@ class ConvocatoriaController extends BaseController
             'con_nombre'  => 'required|max_length[255]',
             'con_tco_ide' => 'required|numeric',
             'con_eco_ide' => 'required|numeric',
+            'con_responsable_ide' => 'permit_empty|is_not_unique[users.id]',
         ];
 
         if (!$this->validate($rules)) {
@@ -115,6 +116,7 @@ class ConvocatoriaController extends BaseController
             'con_nombre'  => 'required|max_length[255]',
             'con_tco_ide' => 'required|numeric',
             'con_eco_ide' => 'required|numeric',
+            'con_responsable_ide' => 'permit_empty|is_not_unique[users.id]',
         ];
 
         if (!$this->validateData($datos, $rules)) {

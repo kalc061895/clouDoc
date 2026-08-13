@@ -124,7 +124,7 @@ Table selec_convocatorias {
   con_fecha_inicio datetime
   con_fecha_cierre datetime
 
-  con_responsable_ide bigint
+  con_responsable_ide bigint [note: 'UNSIGNED; referencia users.id']
 
   con_observacion text
 
@@ -156,6 +156,8 @@ Table selec_convocatoria_documentos {
   cod_hash varchar(255)
 
   cod_version int [default: 1]
+  cod_documento_padre_ide bigint [note: 'UNSIGNED; nullable']
+  cod_motivo_version varchar(255)
 
   cod_obligatorio boolean [default: false]
 
@@ -208,7 +210,7 @@ Table selec_convocatoria_cargos {
   cco_dependencia varchar(200)
   cco_area varchar(200)
 
-  cco_est_ide bigint
+  cco_establecimiento varchar(200)
 
   cco_remuneracion decimal(12,2)
 
@@ -318,7 +320,7 @@ Table selec_convocatoria_etapas {
 
   cet_estado varchar(30)
 
-  cet_responsable_ide bigint
+  cet_responsable_ide bigint [note: 'UNSIGNED; referencia users.id']
 
   cet_observacion text
 
@@ -1171,8 +1173,10 @@ Table selec_postulacion_declaraciones {
 
 Ref: selec_convocatorias.con_tco_ide > selec_tipos_convocatoria.tco_ide
 Ref: selec_convocatorias.con_eco_ide > selec_estados_convocatoria.eco_ide
+Ref: selec_convocatorias.con_responsable_ide > users.id
 
 Ref: selec_convocatoria_documentos.cod_con_ide > selec_convocatorias.con_ide
+Ref: selec_convocatoria_documentos.cod_documento_padre_ide > selec_convocatoria_documentos.cod_ide
 
 
 // Cargos
@@ -1201,6 +1205,7 @@ Ref: selec_requisito_experiencia.rex_req_ide > selec_requisitos.req_ide
 
 Ref: selec_convocatoria_etapas.cet_con_ide > selec_convocatorias.con_ide
 Ref: selec_convocatoria_etapas.cet_eta_ide > selec_etapas.eta_ide
+Ref: selec_convocatoria_etapas.cet_responsable_ide > users.id
 
 
 

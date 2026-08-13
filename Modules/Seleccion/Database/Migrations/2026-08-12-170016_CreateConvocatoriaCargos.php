@@ -39,9 +39,9 @@ class CreateConvocatoriaCargos extends Migration
                 'constraint' => 200,
                 'null' => true,
             ],
-            'cco_est_ide' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
+            'cco_establecimiento' => [
+                'type' => 'VARCHAR',
+                'constraint' => 200,
                 'null' => true,
             ],
             'cco_remuneracion' => [

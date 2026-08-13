@@ -65,6 +65,16 @@ class CreateConvocatoriaDocumentos extends Migration
                 'null' => true,
                 'default' => 1,
             ],
+            'cod_documento_padre_ide' => [
+                'type' => 'BIGINT',
+                'unsigned' => true,
+                'null' => true,
+            ],
+            'cod_motivo_version' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => true,
+            ],
             'cod_obligatorio' => [
                 'type' => 'BOOLEAN',
                 'null' => true,
@@ -83,6 +93,7 @@ class CreateConvocatoriaDocumentos extends Migration
 
         $this->forge->addKey('cod_ide', true);
         $this->forge->addForeignKey('cod_con_ide', 'selec_convocatorias', 'con_ide', 'CASCADE', 'RESTRICT');
+        $this->forge->addForeignKey('cod_documento_padre_ide', 'selec_convocatoria_documentos', 'cod_ide', 'RESTRICT', 'CASCADE');
 
         $this->forge->createTable('selec_convocatoria_documentos');
     }
