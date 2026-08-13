@@ -69,7 +69,7 @@ class CreateConvocatoriaEtapas extends Migration
         $this->forge->addUniqueKey(['cet_con_ide', 'cet_eta_ide']);
         $this->forge->addForeignKey('cet_con_ide', 'selec_convocatorias', 'con_ide', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('cet_eta_ide', 'selec_etapas', 'eta_ide', 'CASCADE', 'RESTRICT');
-        $this->forge->addForeignKey('cet_responsable_ide', 'users', 'id', 'RESTRICT', 'CASCADE');
+        
 
         $this->forge->createTable('selec_convocatoria_etapas');
     }
