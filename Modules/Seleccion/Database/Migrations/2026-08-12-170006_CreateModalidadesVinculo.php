@@ -25,6 +25,11 @@ class CreateModalidadesVinculo extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'mvi_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('mvi_ide', true);

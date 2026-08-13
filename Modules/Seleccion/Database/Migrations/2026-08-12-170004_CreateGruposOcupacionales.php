@@ -25,6 +25,11 @@ class CreateGruposOcupacionales extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'gru_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('gru_ide', true);

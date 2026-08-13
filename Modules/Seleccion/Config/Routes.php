@@ -5,7 +5,9 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     ############################## CONTRATACION #############################
 
     // Vista Principal
-    $routes->get('convocatorias', 'ConvocatoriaController::index');
+    $routes->get('/', 'ConvocatoriaWorkflowController::index');
+    $routes->get('convocatorias', 'ConvocatoriaWorkflowController::index');
+    $routes->get('convocatorias/(:num)', 'ConvocatoriaWorkflowController::detalle/$1');
 
     // 2. Endpoints AJAX para la misma vista
     $routes->group('api', function ($routes) {
@@ -26,7 +28,7 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     /**
      * Rutas para la gestion de convocatorias
      */
-    $routes->group('admin',  function ($routes) {
+    $routes->group('admin', function ($routes) {
 
         $routes->group('convocatorias', function ($routes) {
 
@@ -101,6 +103,103 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         );
     });
 
+    // API REST: catálogos administrativos de Selección.
+    $routes->get('api/tipos-convocatoria', 'TipoConvocatoriaController::index');
+    $routes->get('api/tipos-convocatoria/(:num)', 'TipoConvocatoriaController::show/$1');
+    $routes->post('api/tipos-convocatoria', 'TipoConvocatoriaController::create');
+    $routes->put('api/tipos-convocatoria/(:num)', 'TipoConvocatoriaController::update/$1');
+    $routes->delete('api/tipos-convocatoria/(:num)', 'TipoConvocatoriaController::delete/$1');
+
+    $routes->get('api/estados-convocatoria', 'EstadoConvocatoriaController::index');
+    $routes->get('api/estados-convocatoria/(:num)', 'EstadoConvocatoriaController::show/$1');
+    $routes->post('api/estados-convocatoria', 'EstadoConvocatoriaController::create');
+    $routes->put('api/estados-convocatoria/(:num)', 'EstadoConvocatoriaController::update/$1');
+    $routes->delete('api/estados-convocatoria/(:num)', 'EstadoConvocatoriaController::delete/$1');
+
+    $routes->get('api/tipos-cargo', 'TipoCargoController::index');
+    $routes->get('api/tipos-cargo/(:num)', 'TipoCargoController::show/$1');
+    $routes->post('api/tipos-cargo', 'TipoCargoController::create');
+    $routes->put('api/tipos-cargo/(:num)', 'TipoCargoController::update/$1');
+    $routes->delete('api/tipos-cargo/(:num)', 'TipoCargoController::delete/$1');
+
+    $routes->get('api/grupos-ocupacionales', 'GrupoOcupacionalController::index');
+    $routes->get('api/grupos-ocupacionales/(:num)', 'GrupoOcupacionalController::show/$1');
+    $routes->post('api/grupos-ocupacionales', 'GrupoOcupacionalController::create');
+    $routes->put('api/grupos-ocupacionales/(:num)', 'GrupoOcupacionalController::update/$1');
+    $routes->delete('api/grupos-ocupacionales/(:num)', 'GrupoOcupacionalController::delete/$1');
+
+    $routes->get('api/niveles', 'NivelController::index');
+    $routes->get('api/niveles/(:num)', 'NivelController::show/$1');
+    $routes->post('api/niveles', 'NivelController::create');
+    $routes->put('api/niveles/(:num)', 'NivelController::update/$1');
+    $routes->delete('api/niveles/(:num)', 'NivelController::delete/$1');
+
+    $routes->get('api/modalidades-vinculo', 'ModalidadVinculoController::index');
+    $routes->get('api/modalidades-vinculo/(:num)', 'ModalidadVinculoController::show/$1');
+    $routes->post('api/modalidades-vinculo', 'ModalidadVinculoController::create');
+    $routes->put('api/modalidades-vinculo/(:num)', 'ModalidadVinculoController::update/$1');
+    $routes->delete('api/modalidades-vinculo/(:num)', 'ModalidadVinculoController::delete/$1');
+
+    $routes->get('api/profesiones', 'ProfesionController::index');
+    $routes->get('api/profesiones/(:num)', 'ProfesionController::show/$1');
+    $routes->post('api/profesiones', 'ProfesionController::create');
+    $routes->put('api/profesiones/(:num)', 'ProfesionController::update/$1');
+    $routes->delete('api/profesiones/(:num)', 'ProfesionController::delete/$1');
+
+    $routes->get('api/niveles-formacion', 'NivelFormacionController::index');
+    $routes->get('api/niveles-formacion/(:num)', 'NivelFormacionController::show/$1');
+    $routes->post('api/niveles-formacion', 'NivelFormacionController::create');
+    $routes->put('api/niveles-formacion/(:num)', 'NivelFormacionController::update/$1');
+    $routes->delete('api/niveles-formacion/(:num)', 'NivelFormacionController::delete/$1');
+
+    $routes->get('api/tipos-documento', 'TipoDocumentoController::index');
+    $routes->get('api/tipos-documento/(:num)', 'TipoDocumentoController::show/$1');
+    $routes->post('api/tipos-documento', 'TipoDocumentoController::create');
+    $routes->put('api/tipos-documento/(:num)', 'TipoDocumentoController::update/$1');
+    $routes->delete('api/tipos-documento/(:num)', 'TipoDocumentoController::delete/$1');
+
+    $routes->get('api/estados-postulacion', 'EstadoPostulacionController::index');
+    $routes->get('api/estados-postulacion/(:num)', 'EstadoPostulacionController::show/$1');
+    $routes->post('api/estados-postulacion', 'EstadoPostulacionController::create');
+    $routes->put('api/estados-postulacion/(:num)', 'EstadoPostulacionController::update/$1');
+    $routes->delete('api/estados-postulacion/(:num)', 'EstadoPostulacionController::delete/$1');
+
+    $routes->get('api/estados-expediente', 'EstadoExpedienteController::index');
+    $routes->get('api/estados-expediente/(:num)', 'EstadoExpedienteController::show/$1');
+    $routes->post('api/estados-expediente', 'EstadoExpedienteController::create');
+    $routes->put('api/estados-expediente/(:num)', 'EstadoExpedienteController::update/$1');
+    $routes->delete('api/estados-expediente/(:num)', 'EstadoExpedienteController::delete/$1');
+
+    $routes->get('api/tipos-archivo', 'TipoArchivoController::index');
+    $routes->get('api/tipos-archivo/(:num)', 'TipoArchivoController::show/$1');
+    $routes->post('api/tipos-archivo', 'TipoArchivoController::create');
+    $routes->put('api/tipos-archivo/(:num)', 'TipoArchivoController::update/$1');
+    $routes->delete('api/tipos-archivo/(:num)', 'TipoArchivoController::delete/$1');
+
+    $routes->get('api/etapas', 'EtapaController::index');
+    $routes->get('api/etapas/(:num)', 'EtapaController::show/$1');
+    $routes->post('api/etapas', 'EtapaController::create');
+    $routes->put('api/etapas/(:num)', 'EtapaController::update/$1');
+    $routes->delete('api/etapas/(:num)', 'EtapaController::delete/$1');
+
+    $routes->get('api/tipos-bonificacion', 'TipoBonificacionController::index');
+    $routes->get('api/tipos-bonificacion/(:num)', 'TipoBonificacionController::show/$1');
+    $routes->post('api/tipos-bonificacion', 'TipoBonificacionController::create');
+    $routes->put('api/tipos-bonificacion/(:num)', 'TipoBonificacionController::update/$1');
+    $routes->delete('api/tipos-bonificacion/(:num)', 'TipoBonificacionController::delete/$1');
+
+    $routes->get('api/tipos-notificacion', 'TipoNotificacionController::index');
+    $routes->get('api/tipos-notificacion/(:num)', 'TipoNotificacionController::show/$1');
+    $routes->post('api/tipos-notificacion', 'TipoNotificacionController::create');
+    $routes->put('api/tipos-notificacion/(:num)', 'TipoNotificacionController::update/$1');
+    $routes->delete('api/tipos-notificacion/(:num)', 'TipoNotificacionController::delete/$1');
+
+    $routes->get('api/tipos-declaracion', 'TipoDeclaracionController::index');
+    $routes->get('api/tipos-declaracion/(:num)', 'TipoDeclaracionController::show/$1');
+    $routes->post('api/tipos-declaracion', 'TipoDeclaracionController::create');
+    $routes->put('api/tipos-declaracion/(:num)', 'TipoDeclaracionController::update/$1');
+    $routes->delete('api/tipos-declaracion/(:num)', 'TipoDeclaracionController::delete/$1');
+
     $routes->group('comision', function ($routes) {
 
         $routes->get('evaluacion', 'Contratacion\EvaluacionController::index');
@@ -111,6 +210,90 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->get('reporte', 'Contratacion\EvaluacionController::resultados');
         $routes->post('reporte/preevaluacion/(:num)', 'Contratacion\EvaluacionController::resultadosPreEvaluacion/$1');
     });
+    // ==========================================
+// Vistas de Gestión (Módulo Selección)
+// ==========================================
+    $routes->group('gestion', function ($routes) {
+
+        $routes->get('tipos-convocatoria', function () {
+            return view('Modules\Seleccion\Views\tipos_convocatoria\index');
+        });
+
+        $routes->get('estados-convocatoria', function () {
+            return view('Modules\Seleccion\Views\estados_convocatoria\index');
+        });
+
+        $routes->get('tipos-cargo', function () {
+            return view('Modules\Seleccion\Views\tipos_cargo\index');
+        });
+
+        $routes->get('grupos-ocupacionales', function () {
+            return view('Modules\Seleccion\Views\grupos_ocupacionales\index');
+        });
+
+        $routes->get('niveles', function () {
+            return view('Modules\Seleccion\Views\niveles\index');
+        });
+
+        $routes->get('modalidades-vinculo', function () {
+            return view('Modules\Seleccion\Views\modalidades_vinculo\index');
+        });
+
+        $routes->get('profesiones', function () {
+            return view('Modules\Seleccion\Views\profesiones\index');
+        });
+
+        $routes->get('niveles-formacion', function () {
+            return view('Modules\Seleccion\Views\niveles_formacion\index');
+        });
+
+        $routes->get('tipos-documento', function () {
+            return view('Modules\Seleccion\Views\tipos_documento\index');
+        });
+
+        $routes->get('estados-postulacion', function () {
+            return view('Modules\Seleccion\Views\estados_postulacion\index');
+        });
+
+        $routes->get('estados-expediente', function () {
+            return view('Modules\Seleccion\Views\estados_expediente\index');
+        });
+
+        $routes->get('tipos-archivo', function () {
+            return view('Modules\Seleccion\Views\tipos_archivo\index');
+        });
+
+        $routes->get('etapas', function () {
+            return view('Modules\Seleccion\Views\etapas\index');
+        });
+
+        $routes->get('tipos-bonificacion', function () {
+            return view('Modules\Seleccion\Views\tipos_bonificacion\index');
+        });
+
+        $routes->get('tipos-notificacion', function () {
+            return view('Modules\Seleccion\Views\tipos_notificacion\index');
+        });
+
+        $routes->get('tipos-declaracion', function () {
+            return view('Modules\Seleccion\Views\tipos_declaracion\index');
+        });
+    });
+
+
 });
+
+$routes->group('api/seleccion', ['namespace' => 'Modules\Seleccion\Controllers\Api'], static function ($routes) {
+    $routes->get('convocatorias', 'ConvocatoriaApiController::index');
+    $routes->get('convocatorias/(:num)', 'ConvocatoriaApiController::show/$1');
+    $routes->post('convocatorias', 'ConvocatoriaApiController::create');
+    $routes->put('convocatorias/(:num)', 'ConvocatoriaApiController::update/$1');
+    $routes->post('convocatorias/(:num)/publicar', 'ConvocatoriaApiController::publish/$1');
+});
+
+
+
+
+
 
 ###################### 

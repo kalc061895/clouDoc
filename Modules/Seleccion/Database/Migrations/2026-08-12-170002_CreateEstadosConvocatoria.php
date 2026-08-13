@@ -34,6 +34,11 @@ class CreateEstadosConvocatoria extends Migration
                 'type' => 'INT',
                 'null' => true,
             ],
+            'eco_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('eco_ide', true);

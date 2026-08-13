@@ -30,6 +30,11 @@ class CreateEstadosPostulacion extends Migration
                 'constraint' => 255,
                 'null' => true,
             ],
+            'epo_orden' => [
+                'type' => 'INT',
+                'null' => true,
+            ],
+            
         ]);
 
         $this->forge->addKey('epo_ide', true);

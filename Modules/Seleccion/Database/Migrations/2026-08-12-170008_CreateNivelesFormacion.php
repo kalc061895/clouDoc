@@ -25,6 +25,11 @@ class CreateNivelesFormacion extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'nfo_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('nfo_ide', true);

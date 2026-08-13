@@ -20,6 +20,11 @@ class CreateEstadosExpediente extends Migration
                 'constraint' => 50,
                 'null' => false,
             ],
+            'eex_nombre' => [
+                'type' => 'VARCHAR',
+                'constraint' => 100,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('eex_ide', true);

@@ -30,6 +30,11 @@ class CreateTiposConvocatoria extends Migration
                 'constraint' => 255,
                 'null' => true,
             ],
+            'tco_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('tco_ide', true);

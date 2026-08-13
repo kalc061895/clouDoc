@@ -93,6 +93,7 @@ class CreateConvocatorias extends Migration
         $this->forge->addUniqueKey('con_codigo');
         $this->forge->addForeignKey('con_tco_ide', 'selec_tipos_convocatoria', 'tco_ide', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('con_eco_ide', 'selec_estados_convocatoria', 'eco_ide', 'CASCADE', 'RESTRICT');
+        
 
         $this->forge->createTable('selec_convocatorias');
     }

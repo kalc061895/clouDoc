@@ -34,6 +34,11 @@ class CreateEtapas extends Migration
                 'type' => 'INT',
                 'null' => true,
             ],
+            'eta_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('eta_ide', true);

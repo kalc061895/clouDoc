@@ -22,6 +22,8 @@ class ConvocatoriaDocumentoModel extends Model
         'cod_tamanio',
         'cod_hash',
         'cod_version',
+        'cod_documento_padre_ide',
+        'cod_motivo_version',
         'cod_obligatorio',
         'created_by',
     ];
@@ -30,4 +32,3 @@ class ConvocatoriaDocumentoModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 }
-

@@ -17,7 +17,7 @@ class ConvocatoriaCargoModel extends Model
         'cco_numero_plazas',
         'cco_dependencia',
         'cco_area',
-        'cco_est_ide',
+        'cco_establecimiento',
         'cco_remuneracion',
         'cco_observacion',
     ];
@@ -26,4 +26,3 @@ class ConvocatoriaCargoModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 }
-

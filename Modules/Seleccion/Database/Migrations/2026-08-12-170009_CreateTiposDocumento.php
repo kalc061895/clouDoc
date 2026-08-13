@@ -25,6 +25,11 @@ class CreateTiposDocumento extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'tdo_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('tdo_ide', true);

@@ -25,6 +25,11 @@ class CreateNiveles extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'niv_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('niv_ide', true);

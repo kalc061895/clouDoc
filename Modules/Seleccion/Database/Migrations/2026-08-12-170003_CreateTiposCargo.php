@@ -25,6 +25,11 @@ class CreateTiposCargo extends Migration
                 'constraint' => 100,
                 'null' => false,
             ],
+            'tca_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('tca_ide', true);

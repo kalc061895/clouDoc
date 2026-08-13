@@ -35,6 +35,11 @@ class CreateTiposArchivo extends Migration
                 'constraint' => 150,
                 'null' => true,
             ],
+            'tar_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => false,
+            ],
         ]);
 
         $this->forge->addKey('tar_ide', true);
