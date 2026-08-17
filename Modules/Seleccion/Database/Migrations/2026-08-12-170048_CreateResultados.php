@@ -68,14 +68,33 @@ class CreateResultados extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
-            ],
             'res_anterior_ide' => [
                 'type' => 'BIGINT',
                 'unsigned' => true,
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
+                'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);

@@ -10,7 +10,7 @@ class ActaModel extends Model
     protected $primaryKey = 'act_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-
+    
     protected $allowedFields = [
         'act_con_ide',
         'act_eta_ide',

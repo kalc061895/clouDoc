@@ -33,11 +33,6 @@ class CreateExpedienteVersiones extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
-            ],
             'exv_motivo' => [
                 'type' => 'TEXT',
                 'null' => true,
@@ -45,6 +40,30 @@ class CreateExpedienteVersiones extends Migration
             'exv_estado' => [
                 'type' => 'VARCHAR',
                 'constraint' => 30,
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
+                'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);

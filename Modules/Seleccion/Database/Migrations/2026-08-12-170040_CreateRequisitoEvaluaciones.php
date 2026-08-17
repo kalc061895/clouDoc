@@ -38,10 +38,29 @@ class CreateRequisitoEvaluaciones extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
             'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
         ]);
 

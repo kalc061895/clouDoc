@@ -25,11 +25,6 @@ class CreateEvaluacionReclamos extends Migration
                 'unsigned' => true,
                 'null' => true,
             ],
-            'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
-            ],
             'ere_decision' => [
                 'type' => 'VARCHAR',
                 'constraint' => 50,
@@ -44,6 +39,30 @@ class CreateEvaluacionReclamos extends Migration
                 'null' => true,
             ],
             'ere_fecha' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],

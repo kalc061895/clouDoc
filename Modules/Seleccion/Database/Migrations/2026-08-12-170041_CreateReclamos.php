@@ -38,12 +38,27 @@ class CreateReclamos extends Migration
                 'constraint' => 50,
                 'null' => true,
             ],
-            'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
-            ],
             'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],

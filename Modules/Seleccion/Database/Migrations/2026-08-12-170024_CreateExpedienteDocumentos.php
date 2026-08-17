@@ -65,16 +65,31 @@ class CreateExpedienteDocumentos extends Migration
                 'constraint' => 30,
                 'null' => true,
             ],
-            'created_by' => [
-                'type' => 'BIGINT',
-                'unsigned' => true,
-                'null' => false,
-            ],
             'exd_fecha_carga' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
             'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_by' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'deleted_by' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
