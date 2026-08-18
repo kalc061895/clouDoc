@@ -34,6 +34,11 @@ class CreateTiposBonificacion extends Migration
                 'constraint' => 50,
                 'null' => true,
             ],
+            'tbo_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+                'null' => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

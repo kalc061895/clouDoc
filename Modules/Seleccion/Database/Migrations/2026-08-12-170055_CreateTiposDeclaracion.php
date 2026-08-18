@@ -20,6 +20,7 @@ class CreateTiposDeclaracion extends Migration
                 'constraint' => 50,
                 'null' => false,
             ],
+
             'tde_nombre' => [
                 'type' => 'VARCHAR',
                 'constraint' => 150,
@@ -28,6 +29,11 @@ class CreateTiposDeclaracion extends Migration
             'tde_contenido' => [
                 'type' => 'TEXT',
                 'null' => true,
+            ],
+            'tde_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+                'null' => false,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

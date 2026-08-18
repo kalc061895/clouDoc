@@ -34,6 +34,11 @@ class CreateTiposNotificacion extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
+            'tno_estado' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+                'null' => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
