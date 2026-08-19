@@ -3,11 +3,19 @@
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], function ($routes) {
     ############################## CONTRATACION #############################
-
-    // Vista Principal
+    // En app/Config/Routes.php o en el Routes.php de tu módulo
+    $routes->get('ver/documento', 'AdjuntoController::verDocumento');
+    // ==========================================
+    // Módulo Principal: Convocatorias Workflow
+    // ==========================================
     $routes->get('/', 'ConvocatoriaWorkflowController::index');
     $routes->get('convocatorias', 'ConvocatoriaWorkflowController::index');
-    $routes->get('convocatorias/(:num)', 'ConvocatoriaWorkflowController::detalle/$1');
+
+    // Vista de Configuración / Detalle (Resumen por defecto)
+    $routes->get('convocatorias/(:num)', 'ConvocatoriaWorkflowController::detalle/$1/resumen');
+
+    // Subpestañas dinámicas (cargos, requisitos, cronograma, documentos, anexos)
+    $routes->get('convocatorias/partial/(:num)/(:segment)', 'ConvocatoriaWorkflowController::obtenerPartial/$1/$2');
 
     // 2. Endpoints AJAX para la misma vista
     $routes->group('api', function ($routes) {
@@ -21,6 +29,27 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->get('estados-convocatoria-lookup', 'ConvocatoriaController::estadosLookup');
     });
 
+    $routes->group('admin', function ($routes) {
+
+
+
+        $routes->group('cargos-convocatoria', function ($routes) {
+            $routes->get('listar/(:num)', 'ConvocatoriaCargoController::listar/$1');
+            $routes->post('guardar', 'ConvocatoriaCargoController::guardar');
+            $routes->post('eliminar/(:num)', 'ConvocatoriaCargoController::eliminar/$1');
+        });
+        $routes->group('etapas-convocatoria', function ($routes) {
+            $routes->get('listar/(:num)', 'ConvocatoriaEtapaController::listar/$1');
+            $routes->post('guardar', 'ConvocatoriaEtapaController::guardar');
+            $routes->post('eliminar/(:num)', 'ConvocatoriaEtapaController::eliminar/$1');
+        });
+
+        $routes->group('documentos-convocatoria', function ($routes) {
+            $routes->get('listar/(:num)', 'ConvocatoriaDocumentoController::listar/$1');
+            $routes->post('guardar', 'ConvocatoriaDocumentoController::guardar');
+            $routes->post('eliminar/(:num)', 'ConvocatoriaDocumentoController::eliminar/$1');
+        });
+    });
 
 
 
@@ -122,6 +151,13 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     $routes->put('api/tipos-cargo/(:num)', 'TipoCargoController::update/$1');
     $routes->delete('api/tipos-cargo/(:num)', 'TipoCargoController::delete/$1');
 
+    $routes->get('api/cargo', 'CargoController::index');
+    $routes->get('api/cargo/(:num)', 'CargoController::show/$1');
+    $routes->post('api/cargo', 'CargoController::create');
+    $routes->put('api/cargo/(:num)', 'CargoController::update/$1');
+    $routes->delete('api/cargo/(:num)', 'CargoController::delete/$1');
+
+
     $routes->get('api/grupos-ocupacionales', 'GrupoOcupacionalController::index');
     $routes->get('api/grupos-ocupacionales/(:num)', 'GrupoOcupacionalController::show/$1');
     $routes->post('api/grupos-ocupacionales', 'GrupoOcupacionalController::create');
@@ -211,8 +247,9 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->post('reporte/preevaluacion/(:num)', 'Contratacion\EvaluacionController::resultadosPreEvaluacion/$1');
     });
     // ==========================================
-// Vistas de Gestión (Módulo Selección)
-// ==========================================
+    // Vistas de Gestión (Módulo Selección)
+    // ==========================================
+
     $routes->group('gestion', function ($routes) {
 
         $routes->get('tipos-convocatoria', function () {
@@ -221,6 +258,10 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
 
         $routes->get('estados-convocatoria', function () {
             return view('Modules\Seleccion\Views\estados_convocatoria\index');
+        });
+
+        $routes->get('cargo', function () {
+            return view('Modules\Seleccion\Views\cargo\index');
         });
 
         $routes->get('tipos-cargo', function () {
@@ -279,10 +320,9 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
             return view('Modules\Seleccion\Views\tipos_declaracion\index');
         });
     });
-
-
 });
 
+// Endpoint API para la cabecera e info pública
 $routes->group('api/seleccion', ['namespace' => 'Modules\Seleccion\Controllers\Api'], static function ($routes) {
     $routes->get('convocatorias', 'ConvocatoriaApiController::index');
     $routes->get('convocatorias/(:num)', 'ConvocatoriaApiController::show/$1');

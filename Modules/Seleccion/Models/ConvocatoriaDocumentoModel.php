@@ -6,10 +6,11 @@ use CodeIgniter\Model;
 
 class ConvocatoriaDocumentoModel extends Model
 {
-    protected $table = 'selec_convocatoria_documentos';
-    protected $primaryKey = 'cod_ide';
+    protected $table            = 'selec_convocatoria_documentos';
+    protected $primaryKey       = 'cod_ide';
     protected $useAutoIncrement = true;
-    protected $returnType = 'array';
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = true;
 
     protected $allowedFields = [
         'cod_con_ide',
@@ -26,9 +27,24 @@ class ConvocatoriaDocumentoModel extends Model
         'cod_motivo_version',
         'cod_obligatorio',
         'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     protected $useTimestamps = true;
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
+
+    /**
+     * Obtiene los documentos configurados para una convocatoria.
+     */
+    public function getDocumentosPorConvocatoria(int $convocatoriaId): array
+    {
+        return $this->where('cod_con_ide', $convocatoriaId)
+            ->orderBy('cod_obligatorio', 'DESC')
+            ->orderBy('cod_nombre', 'ASC')
+            ->findAll();
+    }
 }

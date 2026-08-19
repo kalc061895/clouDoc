@@ -91,7 +91,10 @@ abstract class CatalogCrudService
         }
     }
 
-    private function onlyAllowed(array $data): array { return array_intersect_key($data, array_flip(array_keys($this->rules))); }
+    private function onlyAllowed(array $data): array
+    {
+        return array_intersect_key($data, array_flip(array_keys($this->rules)));
+    }
     private function validate(array $data, bool $creating): array
     {
         $rules = $this->rules;

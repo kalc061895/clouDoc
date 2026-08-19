@@ -26,5 +26,23 @@ class ConvocatoriaEtapaModel extends Model
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
-}
 
+    /**
+     * Obtiene el cronograma de la convocatoria ordenado cronológicamente.
+     */
+    public function getEtapasPorConvocatoria(int $convocatoriaId): array
+    {
+        return $this->select('
+                selec_convocatoria_etapas.*,
+                e.eta_nombre,
+                e.eta_orden,
+                e.eta_codigo,
+                e.eta_descripcion
+            ')
+            ->join('selec_etapas e', 'e.eta_ide = selec_convocatoria_etapas.cet_eta_ide')
+            ->where('cet_con_ide', $convocatoriaId)
+            ->orderBy('e.eta_orden', 'ASC')
+            ->orderBy('cet_fecha_inicio', 'ASC')
+            ->findAll();
+    }
+}
