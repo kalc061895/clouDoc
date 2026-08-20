@@ -30,9 +30,6 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     });
 
     $routes->group('admin', function ($routes) {
-
-
-
         $routes->group('cargos-convocatoria', function ($routes) {
             $routes->get('listar/(:num)', 'ConvocatoriaCargoController::listar/$1');
             $routes->post('guardar', 'ConvocatoriaCargoController::guardar');
@@ -51,7 +48,12 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         });
     });
 
-
+    $routes->group('postulacion', function ($routes) {
+        $routes->get('/', 'PostulacionController::index');
+        $routes->get('iniciar/(:num)', 'PostulacionController::iniciar/$1');
+        $routes->post('guardar', 'PostulacionController::guardar');
+        $routes->get('ver/(:num)', 'PostulacionController::ver/$1');
+    });
 
 
     /**

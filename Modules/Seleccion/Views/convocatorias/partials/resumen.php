@@ -225,7 +225,7 @@
 
                         <div
                             class="fs-3 fw-bold text-dark"
-                            id="resumenDocs">
+                            id="resumenDocumentos">
                             0
                         </div>
 
@@ -329,7 +329,7 @@
 
                         <span
                             class="badge bg-light text-dark"
-                            id="chkEtapaCount">
+                            id="chkEtapasCount">
                             0
                         </span>
 
@@ -355,7 +355,7 @@
 
                         <span
                             class="badge bg-light text-dark"
-                            id="chkDocCount">
+                            id="chkDocumentosCount">
                             0
                         </span>
 
@@ -426,6 +426,20 @@
             validarCheckItem('#iconCargo', count > 0);
             verificarChecklist();
         });
+        // Cargar métricas y validar el checklist para publicar
+        $.get('<?= base_url('seleccion/admin/etapas-convocatoria/listar/' . $convocatoriaId) ?>', r => {
+            const count = Array.isArray(r.data || r) ? (r.data || r).length : 0;
+            $('#resumenEtapas, #chkEtapasCount').text(count);
+            validarCheckItem('#iconEtapas', count > 0);
+            verificarChecklist();
+        });
+        // Cargar métricas y validar el checklist para publicar
+        $.get('<?= base_url('seleccion/admin/documentos-convocatoria/listar/' . $convocatoriaId) ?>', r => {
+            const count = Array.isArray(r.data || r) ? (r.data || r).length : 0;
+            $('#resumenDocumentos, #chkDocumentosCount').text(count);
+            validarCheckItem('#iconDocumentos', count > 0);
+            verificarChecklist();
+        });
     }
 
     function validarCheckItem(elementId, status) {
@@ -439,30 +453,80 @@
 
     function verificarChecklist() {
         const cargosOk = $('#iconCargo').hasClass('text-success');
+        const etapasOk = $('#iconEtapas').hasClass('text-success');
+        const documentosOk = $('#iconDocumentos').hasClass('text-success');
         // Si cumple los mínimos, se habilita el botón de publicación
-        if (cargosOk) {
+        if (cargosOk > 0 && etapasOk > 0 && documentosOk > 0) {
             $('#btnPublicar').prop('disabled', false);
         }
     }
 
     function publicarConvocatoria() {
-        if (!confirm('¿Está seguro de publicar esta convocatoria? Una vez publicada será visible para los postulantes.')) return;
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
 
-        const $btn = $('#btnPublicar').prop('disabled', true);
+        Swal.fire({
+            title: '¿Publicar esta convocatoria?',
+            text: 'Una vez publicada será visible públicamente para que los postulantes inicien su registro.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-send me-1"></i> Sí, publicar ahora',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) return;
 
-        $.post('<?= base_url('api/seleccion/convocatorias/' . $convocatoriaId . '/publicar') ?>')
-            .done(r => {
-                if (r.ok || r.status) {
-                    alert('¡Convocatoria publicada con éxito!');
-                    location.reload();
-                } else {
-                    alert(r.message || 'Error al publicar la convocatoria');
-                }
-            })
-            .fail(err => {
-                const msg = err.responseJSON ? err.responseJSON.message : 'Error al intentar publicar';
-                alert(msg);
-            })
-            .always(() => $btn.prop('disabled', false));
+            const $btn = $('#btnPublicar').prop('disabled', true);
+
+            // Notificación visual durante el proceso AJAX
+            Toast.fire({
+                icon: 'info',
+                title: 'Publicando convocatoria...'
+            });
+
+            $.post('<?= base_url('api/seleccion/convocatorias/' . $convocatoriaId . '/publicar') ?>')
+                .done(r => {
+                    if (r.ok || r.status) {
+                        Swal.fire({
+                            title: '¡Publicada!',
+                            text: r.message || 'La convocatoria ha sido publicada con éxito.',
+                            icon: 'success',
+                            confirmButtonColor: '#0d6efd',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Atención',
+                            text: r.message || 'No se pudo publicar la convocatoria.',
+                            icon: 'warning',
+                            confirmButtonColor: '#0d6efd'
+                        });
+                    }
+                })
+                .fail(err => {
+                    const msg = (err.responseJSON && err.responseJSON.message) ?
+                        err.responseJSON.message :
+                        'Error de servidor al intentar publicar.';
+
+                    Swal.fire({
+                        title: 'Error',
+                        text: msg,
+                        icon: 'error',
+                        confirmButtonColor: '#dc3545'
+                    });
+                })
+                .always(() => {
+                    $btn.prop('disabled', false);
+                });
+        });
     }
 </script>
