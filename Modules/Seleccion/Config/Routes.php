@@ -51,8 +51,28 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     $routes->group('postulacion', function ($routes) {
         $routes->get('/', 'PostulacionController::index');
         $routes->get('iniciar/(:num)', 'PostulacionController::iniciar/$1');
-        $routes->post('guardar', 'PostulacionController::guardar');
-        $routes->get('ver/(:num)', 'PostulacionController::ver/$1');
+
+        $routes->group('iniciar', function ($routes) {
+            
+            $routes->post('(:num)/resumen', 'PostulanteController::resumen');
+
+            // Redirección si se refresca (F5) en una parcial
+            $routes->get('(:num)/(:any)', function ($convocatoriaId) {
+                return redirect()->to(base_url("seleccion/postulacion/iniciar/{$convocatoriaId}"));
+            });
+        });
+
+        $routes->group('postulante', function ($routes) {
+            $routes->get('datos-personales/(:num)', 'PostulanteController::datosPersonales');
+            $routes->post('ver-datos', 'PostulanteController::verDatos');
+            $routes->post('guardar-datos', 'PostulanteController::guardarDatos');
+        });
+
+        $routes->group('profesion', function ($routes) {
+            $routes->get('formacion-profesional/(:num)', 'PostulanteProfesionController::formacionProfesional');
+            $routes->post('ver-datos', 'PostulanteController::verDatos');
+            $routes->post('guardar-profesion', 'PostulanteProfesionController::guardarProfesion');
+        });
     });
 
 

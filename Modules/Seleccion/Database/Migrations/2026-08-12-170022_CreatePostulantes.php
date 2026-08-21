@@ -95,6 +95,11 @@ class CreatePostulantes extends Migration
                 'null' => true,
                 'default' => 'ACTIVO',
             ],
+            'pos_user_id' => [
+                'type' => 'BIGINT',
+                'unsigned' => true,
+                'null' => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -124,6 +129,7 @@ class CreatePostulantes extends Migration
         $this->forge->addKey('pos_ide', true);
         $this->forge->addUniqueKey('pos_documento');
         $this->forge->addForeignKey('pos_tdo_ide', 'selec_tipos_documento', 'tdo_ide', 'CASCADE', 'RESTRICT');
+        $this->forge->addForeignKey('pos_user_id', 'users', 'id', 'CASCADE', 'RESTRICT');
 
         $this->forge->createTable('selec_postulantes');
     }

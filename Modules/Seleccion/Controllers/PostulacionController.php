@@ -42,11 +42,4 @@ class PostulacionController extends BaseController
         return view('Modules\Seleccion\Views\postulante\iniciar', $data);
     }
 
-    public function guardar()
-    {
-        $postulanteId = session()->get('pos_ide') ?? session()->get('user_id');
-        $resultado    = $this->postulacionService->guardarPostulacion($this->request, (int)$postulanteId);
-
-        return $this->response->setJSON($resultado);
-    }
 }

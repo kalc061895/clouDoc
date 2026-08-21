@@ -59,6 +59,36 @@ Configuración de Convocatoria
                 </iconify-icon>
                 Documentos
             </a>
+            <a
+                href="#"
+                class="nav-link <?= ($seccionActiva === 'fichas') ? 'active' : '' ?>"
+                data-seccion="fichas">
+                <iconify-icon
+                    icon="solar:folder-with-files-bold"
+                    class="me-1">
+                </iconify-icon>
+                fichas
+            </a>
+            <a
+                href="#"
+                class="nav-link <?= ($seccionActiva === 'actas') ? 'active' : '' ?>"
+                data-seccion="actas">
+                <iconify-icon
+                    icon="solar:folder-with-files-bold"
+                    class="me-1">
+                </iconify-icon>
+                actas
+            </a>
+            <a
+                href="#"
+                class="nav-link <?= ($seccionActiva === 'comision') ? 'active' : '' ?>"
+                data-seccion="comision">
+                <iconify-icon
+                    icon="solar:folder-with-files-bold"
+                    class="me-1">
+                </iconify-icon>
+                comision
+            </a>
 
         </div>
     </div>
@@ -80,218 +110,108 @@ Configuración de Convocatoria
 <?= $this->section('pageScripts') ?>
 <script>
     (function() {
-        const convocatoriaId =
-            <?= json_encode($convocatoriaId) ?>;
-        let seccionActual =
-            <?= json_encode($seccionActiva) ?>;
+        const convocatoriaId = <?= json_encode($convocatoriaId) ?>;
+        let seccionActual = <?= json_encode($seccionActiva) ?>;
         let requestPartial = null;
         const urls = {
             convocatoria: '<?= base_url('api/seleccion/convocatorias') ?>',
             partial: '<?= base_url('seleccion/convocatorias/partial') ?>',
             configuracion: '<?= base_url('seleccion/convocatorias') ?>'
         };
+
         $(document).ready(function() {
             cargarCabecera();
             cargarPartial(seccionActual);
-            $('#navTabsConvocatoria')
-                .on('click', '.nav-link', function(e) {
-                    e.preventDefault();
-                    const nuevaSeccion =
-                        $(this).data('seccion');
-                    // No hacer una nueva petición
-                    // si ya estamos en esa sección.
-                    if (
-                        nuevaSeccion === seccionActual &&
-                        $('#contenedorPartial').children().length
-                    ) {
-                        return;
-                    }
-                    cambiarSeccion(nuevaSeccion);
-                });
-            window.addEventListener(
-                'popstate',
-                function() {
-                    const seccion =
-                        obtenerSeccionDesdeUrl();
-                    if (seccion) {
-                        cambiarSeccion(
-                            seccion,
-                            false
-                        );
-                    }
+
+            $('#navTabsConvocatoria').on('click', '.nav-link', function(e) {
+                e.preventDefault();
+                const nuevaSeccion = $(this).data('seccion');
+
+                // No hacer una nueva petición si ya estamos en esa sección.
+                if (nuevaSeccion === seccionActual && $('#contenedorPartial').children().length) {
+                    return;
                 }
-            );
+                cambiarSeccion(nuevaSeccion);
+            });
+
+            // ELIMINADO: Ya no necesitamos escuchar el evento 'popstate' 
+            // porque no estamos alterando el historial del navegador.
         });
 
-        function cambiarSeccion(
-            nuevaSeccion,
-            actualizarUrl = true
-        ) {
+        function cambiarSeccion(nuevaSeccion) { // Quitamos el parámetro actualizarUrl
             if (!nuevaSeccion) {
                 nuevaSeccion = 'resumen';
             }
-            seccionActual =
-                nuevaSeccion;
-            $('#navTabsConvocatoria .nav-link')
-                .removeClass('active');
-            $(
-                    '#navTabsConvocatoria .nav-link[data-seccion="' +
-                    nuevaSeccion +
-                    '"]'
-                )
-                .addClass('active');
-            if (actualizarUrl) {
-                const nuevaUrl =
-                    urls.configuracion +
-                    '/' +
-                    convocatoriaId +
-                    '/' +
-                    nuevaSeccion;
-                history.pushState({
-                        seccion: nuevaSeccion
-                    },
-                    '',
-                    nuevaUrl
-                );
-            }
+            seccionActual = nuevaSeccion;
+
+            $('#navTabsConvocatoria .nav-link').removeClass('active');
+            $('#navTabsConvocatoria .nav-link[data-seccion="' + nuevaSeccion + '"]').addClass('active');
+
+            // ELIMINADO: history.pushState ya no se ejecuta aquí, 
+            // por lo que la URL del navegador se mantendrá intacta.
+
             cargarPartial(nuevaSeccion);
         }
 
         function cargarCabecera() {
             mostrarCabeceraLoading();
-            $.get(
-                    urls.convocatoria +
-                    '/' +
-                    convocatoriaId
-                )
+            $.get(urls.convocatoria + '/' + convocatoriaId)
                 .done(function(r) {
-                    const data =
-                        r.data || r;
-                    if (
-                        !data ||
-                        !data.con_codigo
-                    ) {
-                        mostrarCabeceraError(
-                            'Convocatoria no encontrada.'
-                        );
+                    const data = r.data || r;
+                    if (!data || !data.con_codigo) {
+                        mostrarCabeceraError('Convocatoria no encontrada.');
                         return;
                     }
-                    const codigo =
-                        escapeHtml(
-                            data.con_codigo
-                        );
-                    const nombre =
-                        escapeHtml(
-                            data.con_nombre ||
-                            'Sin denominación'
-                        );
-                    const numero =
-                        escapeHtml(
-                            data.con_numero ||
-                            ''
-                        );
-                    const estado =
-                        data.eco_nombre ||
-                        'BORRADOR';
-                    const estadoCodigo =
-                        data.eco_codigo ||
-                        '';
-                    let estadoClass =
-                        'bg-secondary';
-                    if (
-                        estadoCodigo === 'PUBLICADA'
-                    ) {
-                        estadoClass =
-                            'bg-success';
-                    } else if (
-                        estadoCodigo === 'CERRADA'
-                    ) {
-                        estadoClass =
-                            'bg-dark';
-                    } else if (
-                        estadoCodigo === 'ANULADA'
-                    ) {
-                        estadoClass =
-                            'bg-danger';
+                    const codigo = escapeHtml(data.con_codigo);
+                    const nombre = escapeHtml(data.con_nombre || 'Sin denominación');
+                    const numero = escapeHtml(data.con_numero || '');
+                    const estado = data.eco_nombre || 'BORRADOR';
+                    const estadoCodigo = data.eco_codigo || '';
+                    let estadoClass = 'bg-secondary';
+
+                    if (estadoCodigo === 'PUBLICADA') {
+                        estadoClass = 'bg-success';
+                    } else if (estadoCodigo === 'CERRADA') {
+                        estadoClass = 'bg-dark';
+                    } else if (estadoCodigo === 'ANULADA') {
+                        estadoClass = 'bg-danger';
                     }
+
                     $('#cabecera').html(`
-                    <div
-                    class="d-flex flex-column flex-md-row
-                           justify-content-between
-                           align-items-md-center
-                           gap-3">
-                           <div>
-                    <div
-                            class="d-flex align-items-center
-                                   mb-1">
-                                   <iconify-icon
-                                icon="solar:document-text-bold"
-                                class="text-primary me-2"
-                                style="font-size:1.5rem;">
-                            </iconify-icon>
-                            <h4
-                                class="fw-bold text-dark mb-0">
-                                ${codigo}
-                                </h4>
-                            </div>
-                                                <div
-                            class="fw-semibold text-dark">
-                            ${nombre}
-                            </div>
-                                                ${
-                            numero
-                                ? `
-                                    <small
-                                        class="text-muted">
-                                        ${numero}
-                                        </small>
-                                  `
-                                : ''
-                        }
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <iconify-icon icon="solar:document-text-bold" class="text-primary me-2" style="font-size:1.5rem;"></iconify-icon>
+                                    <h4 class="fw-bold text-dark mb-0">${codigo}</h4>
                                 </div>
-                                        <div>
-                                        <span
-                            class="badge ${estadoClass}
-                                   px-3 py-2">
-                                   ${escapeHtml(estado)}
-                            </span>
+                                <div class="fw-semibold text-dark">${nombre}</div>
+                                ${numero ? `<small class="text-muted">${numero}</small>` : ''}
+                            </div>
+                            <div>
+                                <span class="badge ${estadoClass} px-3 py-2">${escapeHtml(estado)}</span>
+                            </div>
                         </div>
-                    </div>
-                `);
+                    `);
                 })
                 .fail(function() {
-                    mostrarCabeceraError(
-                        'Error al obtener los datos de la convocatoria.'
-                    );
+                    mostrarCabeceraError('Error al obtener los datos de la convocatoria.');
                 });
         }
 
         function mostrarCabeceraLoading() {
             $('#cabecera').html(`
-            <div class="d-flex align-items-center">
-            <div
-                    class="spinner-border spinner-border-sm
-                           text-primary me-2"
-                    role="status">
-                </div>
-                <span class="text-muted small">
-                Cargando información
-                    de la convocatoria...
-                    </span>
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    <span class="text-muted small">Cargando información de la convocatoria...</span>
                 </div>
             `);
         }
 
         function mostrarCabeceraError(mensaje) {
             $('#cabecera').html(`
-            <div
-                class="alert alert-danger
-                       border-0 mb-0 py-2">
-                       <iconify-icon
-                    icon="solar:danger-triangle-bold"
-                    class="me-1">
-                </iconify-icon>
-                ${escapeHtml(mensaje)}
+                <div class="alert alert-danger border-0 mb-0 py-2">
+                    <iconify-icon icon="solar:danger-triangle-bold" class="me-1"></iconify-icon>
+                    ${escapeHtml(mensaje)}
                 </div>
             `);
         }
@@ -301,45 +221,29 @@ Configuración de Convocatoria
             if (requestPartial) {
                 requestPartial.abort();
             }
-            requestPartial =
-                $.ajax({
-                    url: urls.partial +
-                        '/' +
-                        convocatoriaId +
-                        '/' +
-                        encodeURIComponent(seccion),
+            requestPartial = $.ajax({
+                    url: urls.partial + '/' + convocatoriaId + '/' + encodeURIComponent(seccion),
                     type: 'GET',
                     cache: false
                 })
                 .done(function(html) {
-                    $('#contenedorPartial')
-                        .html(html);
+                    $('#contenedorPartial').html(html);
                 })
                 .fail(function(xhr, status) {
-                    // No mostrar error cuando nosotros
-                    // cancelamos la petición anterior.
-                    if (
-                        status === 'abort'
-                    ) {
+                    if (status === 'abort') {
                         return;
                     }
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'No se pudo cargar el contenido ' +
-                            'de la sección seleccionada.'
+                        text: 'No se pudo cargar el contenido de la sección seleccionada.'
                     });
                     $('#contenedorPartial').html(`
-                    <div
-                        class="alert alert-danger
-                               border-0 mb-0">
-                               <iconify-icon
-                            icon="solar:danger-triangle-bold"
-                            class="me-1">
-                        </iconify-icon>
+                    <div class="alert alert-danger border-0 mb-0">
+                        <iconify-icon icon="solar:danger-triangle-bold" class="me-1"></iconify-icon>
                         Error al cargar la sección.
-                        </div>
-                    `);
+                    </div>
+                `);
                 })
                 .always(function() {
                     requestPartial = null;
@@ -348,43 +252,15 @@ Configuración de Convocatoria
 
         function mostrarPartialLoading() {
             $('#contenedorPartial').html(`
-            <div class="text-center py-5">
-            <div
-                    class="spinner-border text-primary"
-                    role="status">
-                </div>
-                <p
-                    class="text-muted small mt-2 mb-0">
-                    Cargando sección...
-                    </p>
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted small mt-2 mb-0">Cargando sección...</p>
                 </div>
             `);
         }
 
-        function obtenerSeccionDesdeUrl() {
-            const partes =
-                window.location.pathname
-                .split('/')
-                .filter(Boolean);
-            const posiblesSecciones = [
-                'resumen',
-                'cargos',
-                'cronograma',
-                'documentos'
-            ];
-            const ultimaParte =
-                partes[partes.length - 1];
-            return posiblesSecciones.includes(
-                    ultimaParte
-                ) ?
-                ultimaParte :
-                'resumen';
-        }
-
         function escapeHtml(text) {
-            return $('<div>')
-                .text(text || '')
-                .html();
+            return $('<div>').text(text || '').html();
         }
     })();
 </script>

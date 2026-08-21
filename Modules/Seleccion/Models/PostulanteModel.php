@@ -28,6 +28,7 @@ class PostulanteModel extends Model
         'pos_password',
         'pos_email_verificado',
         'pos_estado',
+        'pos_user_id',
     ];
 
     protected $useTimestamps = true;
