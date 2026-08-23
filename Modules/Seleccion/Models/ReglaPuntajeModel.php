@@ -22,5 +22,11 @@ class ReglaPuntajeModel extends Model
         'rpu_orden',
         'rpu_estado',
     ];
+
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $useSoftDeletes = true;
+    protected $deletedField = 'deleted_at';
 }
 

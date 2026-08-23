@@ -41,10 +41,38 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
             $routes->post('eliminar/(:num)', 'ConvocatoriaEtapaController::eliminar/$1');
         });
 
+
         $routes->group('documentos-convocatoria', function ($routes) {
             $routes->get('listar/(:num)', 'ConvocatoriaDocumentoController::listar/$1');
             $routes->post('guardar', 'ConvocatoriaDocumentoController::guardar');
             $routes->post('eliminar/(:num)', 'ConvocatoriaDocumentoController::eliminar/$1');
+        });
+
+        $routes->group('requisitos', static function ($routes) {
+            $routes->get('partial/(:num)', 'RequisitoController::renderPartial/$1');
+            $routes->post('store', 'RequisitoController::store');
+            $routes->post('update/(:num)', 'RequisitoController::update/$1');
+            $routes->delete('delete/(:num)', 'RequisitoController::delete/$1');
+        });
+        $routes->group('comisiones', static function ($routes) {
+            $routes->get('listar/(:num)', 'ComisionConvocatoriaController::listar/$1');
+            $routes->post('guardar', 'ComisionConvocatoriaController::guardar');
+            $routes->post('eliminar/(:num)', 'ComisionConvocatoriaController::eliminar/$1');
+            $routes->get('miembros/(:num)', 'ComisionConvocatoriaController::miembros/$1');
+            $routes->post('miembros/guardar', 'ComisionConvocatoriaController::guardarMiembro');
+            $routes->post('miembros/eliminar/(:num)', 'ComisionConvocatoriaController::eliminarMiembro/$1');
+            $routes->get('usuarios', 'ComisionConvocatoriaController::usuarios');
+        });
+        $routes->group('fichas-evaluacion', static function ($routes) {
+            $routes->get('listar/(:num)', 'FichaEvaluacionController::listar/$1');
+            $routes->post('guardar', 'FichaEvaluacionController::guardar');
+            $routes->post('eliminar/(:num)', 'FichaEvaluacionController::eliminar/$1');
+            $routes->get('criterios/(:num)', 'FichaEvaluacionController::criterios/$1');
+            $routes->post('criterios/guardar', 'FichaEvaluacionController::guardarCriterio');
+            $routes->post('criterios/eliminar/(:num)', 'FichaEvaluacionController::eliminarCriterio/$1');
+            $routes->get('reglas/(:num)', 'FichaEvaluacionController::reglas/$1');
+            $routes->post('reglas/guardar', 'FichaEvaluacionController::guardarRegla');
+            $routes->post('reglas/eliminar/(:num)', 'FichaEvaluacionController::eliminarRegla/$1');
         });
     });
 
@@ -53,7 +81,7 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->get('iniciar/(:num)', 'PostulacionController::iniciar/$1');
 
         $routes->group('iniciar', function ($routes) {
-            
+
             $routes->post('(:num)/resumen', 'PostulanteController::resumen');
 
             // Redirección si se refresca (F5) en una parcial

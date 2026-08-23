@@ -33,7 +33,7 @@ class ConvocatoriaWorkflowController extends BaseController
         }
 
         // Secciones permitidas en la navegación
-        $seccionesValidas = ['resumen', 'cargos', 'requisitos', 'cronograma', 'documentos', 'anexos'];
+        $seccionesValidas = ['resumen', 'cargos', 'requisitos', 'cronograma', 'documentos', 'anexos', 'comision', 'evaluacion'];
         if (!in_array($seccion, $seccionesValidas, true)) {
             $seccion = 'resumen';
         }
@@ -104,7 +104,7 @@ class ConvocatoriaWorkflowController extends BaseController
     // En ConvocatoriasController.php
     public function obtenerPartial($id, $seccion)
     {
-        $vistasPermitidas = ['resumen', 'cargos', 'requisitos', 'cronograma', 'documentos', 'anexos'];
+        $vistasPermitidas = ['resumen', 'cargos', 'requisitos', 'cronograma', 'documentos', 'anexos', 'comision', 'evaluacion'];
 
         if (!in_array($seccion, $vistasPermitidas)) {
             return $this->response->setStatusCode(404)->setBody('Sección no válida');

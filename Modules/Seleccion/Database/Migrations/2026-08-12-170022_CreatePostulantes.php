@@ -96,9 +96,9 @@ class CreatePostulantes extends Migration
                 'default' => 'ACTIVO',
             ],
             'pos_user_id' => [
-                'type' => 'BIGINT',
+                'type' => 'INT',
                 'unsigned' => true,
-                'null' => true,
+                'null' => false,
             ],
             'created_at' => [
                 'type' => 'DATETIME',

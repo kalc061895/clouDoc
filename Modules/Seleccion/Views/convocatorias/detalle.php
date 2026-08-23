@@ -6,9 +6,7 @@ Configuración de Convocatoria
 <div class="card bg-white p-4">
     <div id="cabecera" class="mb-4">
         <div class="d-flex align-items-center">
-            <div
-                class="spinner-border spinner-border-sm text-primary me-2"
-                role="status">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
             </div>
             <span class="text-muted small">
                 Cargando información de la convocatoria...
@@ -16,89 +14,63 @@ Configuración de Convocatoria
         </div>
     </div>
     <div class="mb-4">
-        <div
-            class="nav nav-pills flex-column flex-md-row gap-2"
-            id="navTabsConvocatoria">
-            <a href="#"
-                class="nav-link <?= ($seccionActiva === 'resumen') ? 'active' : '' ?>"
-                data-seccion="resumen">
-                <iconify-icon
-                    icon="solar:widget-2-bold"
-                    class="me-1">
-                </iconify-icon>
+        <div class="nav nav-pills flex-column flex-md-row gap-2" id="navTabsConvocatoria">
+            <!-- Resumen -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'resumen') ? 'active' : '' ?>" data-seccion="resumen">
+                <iconify-icon icon="solar:widget-2-bold" class="me-1"></iconify-icon>
                 Resumen
             </a>
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'cargos') ? 'active' : '' ?>"
-                data-seccion="cargos">
-                <iconify-icon
-                    icon="solar:case-bold"
-                    class="me-1">
-                </iconify-icon>
+
+            <!-- Cargos y plazas -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'cargos') ? 'active' : '' ?>" data-seccion="cargos">
+                <iconify-icon icon="solar:case-bold" class="me-1"></iconify-icon>
                 Cargos y plazas
             </a>
 
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'cronograma') ? 'active' : '' ?>"
+            <!-- Cronograma -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'cronograma') ? 'active' : '' ?>"
                 data-seccion="cronograma">
-                <iconify-icon
-                    icon="solar:calendar-mark-bold"
-                    class="me-1">
-                </iconify-icon>
+                <iconify-icon icon="solar:calendar-mark-bold" class="me-1"></iconify-icon>
                 Cronograma
             </a>
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'documentos') ? 'active' : '' ?>"
+
+            <!-- Documentos -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'documentos') ? 'active' : '' ?>"
                 data-seccion="documentos">
-                <iconify-icon
-                    icon="solar:folder-with-files-bold"
-                    class="me-1">
-                </iconify-icon>
+                <iconify-icon icon="solar:folder-with-files-bold" class="me-1"></iconify-icon>
                 Documentos
             </a>
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'fichas') ? 'active' : '' ?>"
-                data-seccion="fichas">
-                <iconify-icon
-                    icon="solar:folder-with-files-bold"
-                    class="me-1">
-                </iconify-icon>
-                fichas
-            </a>
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'actas') ? 'active' : '' ?>"
-                data-seccion="actas">
-                <iconify-icon
-                    icon="solar:folder-with-files-bold"
-                    class="me-1">
-                </iconify-icon>
-                actas
-            </a>
-            <a
-                href="#"
-                class="nav-link <?= ($seccionActiva === 'comision') ? 'active' : '' ?>"
-                data-seccion="comision">
-                <iconify-icon
-                    icon="solar:folder-with-files-bold"
-                    class="me-1">
-                </iconify-icon>
-                comision
+
+            <!-- Requisitos -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'requisitos') ? 'active' : '' ?>"
+                data-seccion="requisitos">
+                <iconify-icon icon="solar:clipboard-check-bold" class="me-1"></iconify-icon>
+                Requisitos
             </a>
 
+            <!-- Comisión -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'comision') ? 'active' : '' ?>" data-seccion="comision">
+                <iconify-icon icon="solar:users-group-two-rounded-bold" class="me-1"></iconify-icon>
+                Comisión
+            </a>
+
+            <!-- Evaluación -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'evaluacion') ? 'active' : '' ?>"
+                data-seccion="evaluacion">
+                <iconify-icon icon="solar:notes-bold" class="me-1"></iconify-icon>
+                Evaluación
+            </a>
+
+            <!-- Actas -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'actas') ? 'active' : '' ?>" data-seccion="actas">
+                <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon>
+                Actas
+            </a>
         </div>
     </div>
-    <div
-        id="contenedorPartial"
-        class="border rounded bg-light p-3">
+    <div id="contenedorPartial" class="border rounded bg-light p-3">
         <div class="text-center py-5">
-            <div
-                class="spinner-border text-primary"
-                role="status">
+            <div class="spinner-border text-primary" role="status">
             </div>
             <p class="text-muted small mt-2 mb-0">
                 Cargando sección...
@@ -109,7 +81,7 @@ Configuración de Convocatoria
 <?= $this->endSection() ?>
 <?= $this->section('pageScripts') ?>
 <script>
-    (function() {
+    (function () {
         const convocatoriaId = <?= json_encode($convocatoriaId) ?>;
         let seccionActual = <?= json_encode($seccionActiva) ?>;
         let requestPartial = null;
@@ -117,13 +89,14 @@ Configuración de Convocatoria
             convocatoria: '<?= base_url('api/seleccion/convocatorias') ?>',
             partial: '<?= base_url('seleccion/convocatorias/partial') ?>',
             configuracion: '<?= base_url('seleccion/convocatorias') ?>'
+
         };
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             cargarCabecera();
             cargarPartial(seccionActual);
 
-            $('#navTabsConvocatoria').on('click', '.nav-link', function(e) {
+            $('#navTabsConvocatoria').on('click', '.nav-link', function (e) {
                 e.preventDefault();
                 const nuevaSeccion = $(this).data('seccion');
 
@@ -156,7 +129,7 @@ Configuración de Convocatoria
         function cargarCabecera() {
             mostrarCabeceraLoading();
             $.get(urls.convocatoria + '/' + convocatoriaId)
-                .done(function(r) {
+                .done(function (r) {
                     const data = r.data || r;
                     if (!data || !data.con_codigo) {
                         mostrarCabeceraError('Convocatoria no encontrada.');
@@ -193,7 +166,7 @@ Configuración de Convocatoria
                         </div>
                     `);
                 })
-                .fail(function() {
+                .fail(function () {
                     mostrarCabeceraError('Error al obtener los datos de la convocatoria.');
                 });
         }
@@ -222,14 +195,14 @@ Configuración de Convocatoria
                 requestPartial.abort();
             }
             requestPartial = $.ajax({
-                    url: urls.partial + '/' + convocatoriaId + '/' + encodeURIComponent(seccion),
-                    type: 'GET',
-                    cache: false
-                })
-                .done(function(html) {
+                url: urls.partial + '/' + convocatoriaId + '/' + encodeURIComponent(seccion),
+                type: 'GET',
+                cache: false
+            })
+                .done(function (html) {
                     $('#contenedorPartial').html(html);
                 })
-                .fail(function(xhr, status) {
+                .fail(function (xhr, status) {
                     if (status === 'abort') {
                         return;
                     }
@@ -245,7 +218,7 @@ Configuración de Convocatoria
                     </div>
                 `);
                 })
-                .always(function() {
+                .always(function () {
                     requestPartial = null;
                 });
         }

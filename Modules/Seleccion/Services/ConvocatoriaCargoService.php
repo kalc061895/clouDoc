@@ -3,15 +3,21 @@
 namespace Modules\Seleccion\Services;
 
 use Modules\Seleccion\Models\ConvocatoriaCargoModel;
+use Modules\Seleccion\Models\ConvocatoriaModel;
+use Modules\Seleccion\Models\CargoModel;
 use Throwable;
 
 class ConvocatoriaCargoService
 {
     protected ConvocatoriaCargoModel $model;
+    protected ConvocatoriaModel $convocatoriaModel;
+    protected CargoModel $cargoModel;
 
     public function __construct()
     {
         $this->model = new ConvocatoriaCargoModel();
+        $this->convocatoriaModel = new ConvocatoriaModel();
+        $this->cargoModel = new CargoModel();
     }
 
     /**
@@ -60,7 +66,29 @@ class ConvocatoriaCargoService
 
         // Verificar duplicados (Un mismo cargo maestro no debería estar repetido en la misma convocatoria)
         $id = !empty($data['cco_ide']) ? (int) $data['cco_ide'] : null;
-        if ($this->esDuplicado((int) $data['cco_con_ide'], (int) $data['cco_car_ide'], $id)) {
+        $convocatoriaId = (int) $data['cco_con_ide'];
+        $cargoId = (int) $data['cco_car_ide'];
+
+        if (!$this->convocatoriaModel->find($convocatoriaId)) {
+            return ['ok' => false, 'code' => 404, 'message' => 'La convocatoria seleccionada no existe.'];
+        }
+
+        if (!$this->cargoModel->find($cargoId)) {
+            return ['ok' => false, 'code' => 404, 'message' => 'El cargo seleccionado no existe.'];
+        }
+
+        if ($id) {
+            $registroActual = $this->model->find($id);
+            if (!$registroActual) {
+                return ['ok' => false, 'code' => 404, 'message' => 'La plaza que desea actualizar no existe.'];
+            }
+
+            if ((int) $registroActual['cco_con_ide'] !== $convocatoriaId) {
+                return ['ok' => false, 'code' => 422, 'message' => 'La plaza no pertenece a la convocatoria indicada.'];
+            }
+        }
+
+        if ($this->esDuplicado($convocatoriaId, $cargoId, $id)) {
             return [
                 'ok'      => false,
                 'code'    => 409,

@@ -20,5 +20,11 @@ class ComisionMiembroModel extends Model
         'cmi_documento_ide',
         'cmi_estado',
     ];
+
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $useSoftDeletes = true;
+    protected $deletedField = 'deleted_at';
 }
 
