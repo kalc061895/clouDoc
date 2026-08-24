@@ -1,8 +1,8 @@
 <!-- SECCIÓN DE DOCUMENTOS GENERADOS POR EL SISTEMA -->
 <div class="card border-primary mb-4 shadow-sm">
-    <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+    <div class="card-header bg-primary d-flex align-items-center gap-2">
         <iconify-icon icon="solar:document-bold-duotone" width="20"></iconify-icon>
-        <h6 class="mb-0">Formatos y Documentos Generados</h6>
+        <h6 class="mb-0 text-light">Formatos y Documentos Generados</h6>
     </div>
     <div class="card-body">
         <p class="text-muted small mb-3">
@@ -62,9 +62,6 @@
 </div>
 
 <!-- TUS OTROS ANEXOS EXISTENTES -->
-<h5 class="mb-1 mt-4">Otros anexos</h5>
-<p class="text-muted small">Adjunte los documentos solicitados para esta convocatoria.</p>
-<!-- ... (aquí continúa tu tabla de anexos original) ... -->
 <h5 class="mb-1">Otros anexos</h5>
 <p class="text-muted small">Adjunte los documentos solicitados para esta convocatoria.</p>
 <div class="table-responsive">
