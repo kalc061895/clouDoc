@@ -23,7 +23,8 @@ class AuthGroups extends ShieldAuthGroups
      * --------------------------------------------------------------------
      * The group that a newly registered user is added to.
      */
-    public string $defaultGroup = 'user';
+    //public string $defaultGroup = 'user';
+    public string $defaultGroup = 'postulante';
 
     /**
      * --------------------------------------------------------------------
@@ -68,6 +69,10 @@ class AuthGroups extends ShieldAuthGroups
         'asistencia' => [
             'title'       => 'Encargado del Area de Control y asistencia y permanencia',
             'description' => 'Gestion de Asistencia y permanencia de los trabajadores',
+        ],
+        'postulante' => [
+            'title'       => 'Postulante',
+            'description' => 'Usuario que participa en una convocatoria',
         ],
     ];
 
@@ -118,6 +123,7 @@ class AuthGroups extends ShieldAuthGroups
             'beta.access',
         ],
         'user' => [],
+        'postulante' => [],
         'beta' => [
             'beta.access',
         ],

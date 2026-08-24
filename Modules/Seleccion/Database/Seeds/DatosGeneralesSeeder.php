@@ -28,7 +28,7 @@ class DatosGeneralesSeeder extends Seeder
 
         // 3. Tipos de Cargo
         $this->db->table('selec_tipos_cargo')->insertBatch([
-            ['tca_codigo' => 'ASISTENCIAL', 'tca_nombre' => 'Personal Assistencial de Salud', 'tca_estado' => 'ACTIVO'],
+            ['tca_codigo' => 'ASISTENCIAL', 'tca_nombre' => 'Personal Asistencial de Salud', 'tca_estado' => 'ACTIVO'],
             ['tca_codigo' => 'ADMINISTRATIVO', 'tca_nombre' => 'Personal Administrativo', 'tca_estado' => 'ACTIVO'],
             ['tca_codigo' => 'DIRECTIVO', 'tca_nombre' => 'Empleado de Confianza / Directivo', 'tca_estado' => 'ACTIVO'],
         ]);
@@ -44,7 +44,6 @@ class DatosGeneralesSeeder extends Seeder
         // 5. Niveles
         $this->db->table('selec_niveles')->insertBatch([
             ['niv_codigo' => 'PF-1', 'niv_nombre' => 'Profesional Nivel 1', 'niv_estado' => 'ACTIVO'],
-            ['niv_codigo' => 'PF-2', 'niv_nombre' => 'Profesional Nivel 2', 'niv_estado' => 'ACTIVO'],
             ['niv_codigo' => 'TC-1', 'niv_nombre' => 'Técnico Nivel 1', 'niv_estado' => 'ACTIVO'],
             ['niv_codigo' => 'AUX-1', 'niv_nombre' => 'Auxiliar Nivel 1', 'niv_estado' => 'ACTIVO'],
             ['niv_codigo' => 'F-1', 'niv_nombre' => 'Nivel F-1 / Jefatura', 'niv_estado' => 'ACTIVO'],
@@ -64,16 +63,29 @@ class DatosGeneralesSeeder extends Seeder
 
         // 7. Profesiones
         $this->db->table('selec_profesiones')->insertBatch([
-            ['pro_codigo' => 'MED', 'pro_nombre' => 'Medicina Humana', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'ENF', 'pro_nombre' => 'Enfermería', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'OBS', 'pro_nombre' => 'Obstetricia', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'TEC_MED', 'pro_nombre' => 'Tecnología Médica', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'ING_SYS', 'pro_nombre' => 'Ingeniería de Sistemas / Informática / Software', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'ADM', 'pro_nombre' => 'Administración de Empresas', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'CONT', 'pro_nombre' => 'Contabilidad', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'DER', 'pro_nombre' => 'Derecho', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'TEC_ENF', 'pro_nombre' => 'Técnico en Enfermería', 'pro_estado' => 'ACTIVO'],
-            ['pro_codigo' => 'TEC_ADM', 'pro_nombre' => 'Técnico en Administración', 'pro_estado' => 'ACTIVO'],
+           
+            ['pro_codigo' => 'TEC_MED', 'pro_nombre' => 'TECNOLGO MEDICO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ING_SYS', 'pro_nombre' => 'INGENIERO DE SISTEMAS', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'MED_CIR', 'pro_nombre' => 'MEDICO CIRUJANO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ASIS_SOC', 'pro_nombre' => 'ASISTENTE SOCIAL', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ENF', 'pro_nombre' => 'ENFERMERA/O', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'NUT', 'pro_nombre' => 'NUTRICIONISTA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'OBS', 'pro_nombre' => 'OBSTETRA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_LAB', 'pro_nombre' => 'TECNICO EN LABORATORIO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'CONT', 'pro_nombre' => 'CONTADOR', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ING_EST', 'pro_nombre' => 'INGENIERO ESTADISTICO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'SEC_COMP', 'pro_nombre' => 'SECUNDARIA COMPLETA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_REH', 'pro_nombre' => 'TECNICO EN REHABILITACION', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ING_ELEC', 'pro_nombre' => 'ING ELECTRONICO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_MANT', 'pro_nombre' => 'TECNICO EN MANTENIMIENTO', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_RAD', 'pro_nombre' => 'TECNICO EN RADIOLOGIA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_CONT', 'pro_nombre' => 'TECNICO EN CONTABILIDAD', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_ADM', 'pro_nombre' => 'TECNICO EN ADMINISTRACION', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_COMP', 'pro_nombre' => 'TECNICO EN COMPUTACION E INFORMATICA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_FAR', 'pro_nombre' => 'TECNICO EN FARMACIA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'TEC_EST', 'pro_nombre' => 'TECNICO EN ESTADISTICA', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'ING_CIV', 'pro_nombre' => 'INGENIERO CIVIL', 'pro_estado' => 'ACTIVO'],
+            ['pro_codigo' => 'CONT_PUB', 'pro_nombre' => 'CONTADOR PUBLICO', 'pro_estado' => 'ACTIVO'],
         ]);
 
         // 8. Niveles de Formación
@@ -87,6 +99,7 @@ class DatosGeneralesSeeder extends Seeder
             ['nfo_codigo' => 'UNIV_TIT', 'nfo_nombre' => 'Universitaria - Titulado con Colegiatura Habilitada', 'nfo_estado' => 'ACTIVO'],
             ['nfo_codigo' => 'MAESTRIA', 'nfo_nombre' => 'Grado académico de Maestría', 'nfo_estado' => 'ACTIVO'],
             ['nfo_codigo' => 'DOCTORADO', 'nfo_nombre' => 'Grado académico de Doctorado', 'nfo_estado' => 'ACTIVO'],
+            ['nfo_codigo' => 'ESPECIALIZACION', 'nfo_nombre' => 'Grado académico de Especialización', 'nfo_estado' => 'ACTIVO'],
         ]);
 
         // 9. Tipos de Documento de Identidad
@@ -100,11 +113,13 @@ class DatosGeneralesSeeder extends Seeder
         // 10. Estados de Postulación
         $this->db->table('selec_estados_postulacion')->insertBatch([
             ['epo_codigo' => 'REGISTRADA', 'epo_nombre' => 'Postulación Registrada', 'epo_descripcion' => 'Postulación enviada por el usuario', 'epo_orden' => 1],
+            ['epo_codigo' => 'REGISTRANDO', 'epo_nombre' => 'Postulación en Proceso', 'epo_descripcion' => 'Postulación iniciada por el usuario', 'epo_orden' => 1],
             ['epo_codigo' => 'APTO_CV', 'epo_nombre' => 'Apto Curricular', 'epo_descripcion' => 'Cumple con los requisitos mínimos de CV', 'epo_orden' => 2],
             ['epo_codigo' => 'NO_APTO_CV', 'epo_nombre' => 'No Apto Curricular', 'epo_descripcion' => 'No cumple con requisitos o la documentación obligatoria', 'epo_orden' => 3],
             ['epo_codigo' => 'APTO_ENT', 'epo_nombre' => 'Apto para Entrevista', 'epo_descripcion' => 'Aprobó las fases preliminares / evaluaciones técnicas', 'epo_orden' => 4],
             ['epo_codigo' => 'GANADOR', 'epo_nombre' => 'Ganador', 'epo_descripcion' => 'Obtuvo el máximo puntaje y la plaza', 'epo_orden' => 5],
             ['epo_codigo' => 'ACCESITARIO', 'epo_nombre' => 'Accesitario', 'epo_descripcion' => 'Queda en lista de reserva en orden de mérito', 'epo_orden' => 6],
+            ['epo_codigo' => 'PRESENTADO', 'epo_nombre' => 'Postulación completada', 'epo_descripcion' => 'Postulación completada por el usuario', 'epo_orden' => 1],
             ['epo_codigo' => 'DESCALIFICADO', 'epo_nombre' => 'Descalificado', 'epo_descripcion' => 'Incurrió en alguna causal de eliminación o inasistencia', 'epo_orden' => 7],
         ]);
 

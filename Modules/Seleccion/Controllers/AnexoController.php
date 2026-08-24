@@ -54,4 +54,7 @@ class AnexoController extends BaseController
         $res = $this->service->eliminar($id);
         return $this->response->setStatusCode($res['code'])->setJSON($res);
     }
+
+    
+
 }

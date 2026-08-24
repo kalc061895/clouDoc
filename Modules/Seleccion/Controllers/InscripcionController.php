@@ -3,7 +3,7 @@
 namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
-use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteProfesionModel, TipoDeclaracionModel, ProfesionModel, NivelFormacionModel, ModalidadVinculoModel};
+use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteProfesionModel, TipoDeclaracionModel, ProfesionModel, NivelFormacionModel, ModalidadVinculoModel,TipoDocumentoModel};
 use Modules\Seleccion\Services\InscripcionService;
 
 class InscripcionController extends BaseController
@@ -36,47 +36,57 @@ class InscripcionController extends BaseController
             $user = $this->usuario();
             $post = $this->inscripcion->postulacionActual($user, $convocatoriaId);
             $pos = $this->inscripcion->postulanteActual($user);
-            $data = ['convocatoriaId' => $convocatoriaId, 'postulacion' => $post, 'postulante' => $pos, 'editable' => !$post || (!(bool) $post['pto_confirmado'] && strtoupper($post['epo_codigo']) !== 'PRESENTADO')];
+            $data = [
+                'convocatoriaId' => $convocatoriaId,
+                'postulacion' => $post,
+                'postulante' => $pos,
+                'editable' => !$post || (!(bool) $post['pto_confirmado'] && strtoupper($post['epo_codigo']) !== 'PRESENTADO')
+            ];
             switch ($tab) {
                 case 'plaza':
                     $data['plazas'] = (new ConvocatoriaCargoModel())->getCargosPorConvocatoria($convocatoriaId);
                     break;
                 case 'datos':
+                    $data['tipo_documentos'] = (
+                        new TipoDocumentoModel())
+                        ->where('tdo_estado', 'ACTIVO')
+                        ->findAll();
+
                     break;
                 case 'profesional':
                     $data['registros'] = (new PostulanteProfesionModel())->where('ppr_pos_ide', $pos['pos_ide'] ?? 0)
-                    ->join('selec_expediente_documentos', 'exd_ide = ppr_documento_ide', 'left')
-                    ->join('selec_profesiones', 'pro_ide = ppr_pro_ide', 'left')
-                    ->findAll();
-                    $data['profesion'] = (new ProfesionModel())->where('pro_estado','ACTIVO')->findAll();
+                        ->join('selec_expediente_documentos', 'exd_ide = ppr_documento_ide', 'left')
+                        ->join('selec_profesiones', 'pro_ide = ppr_pro_ide', 'left')
+                        ->findAll();
+                    $data['profesion'] = (new ProfesionModel())->where('pro_estado', 'ACTIVO')->findAll();
 
                     break;
                 case 'academica':
                     $data['registros'] = (new PostulanteFormacionModel())->where('pfo_pos_ide', $pos['pos_ide'] ?? 0)
-                    ->join('selec_niveles_formacion', 'nfo_ide = pfo_nfo_ide', 'left')
-                    ->join('selec_expediente_documentos', 'exd_ide = pfo_documento_ide', 'left')
-                    ->findAll();
+                        ->join('selec_niveles_formacion', 'nfo_ide = pfo_nfo_ide', 'left')
+                        ->join('selec_expediente_documentos', 'exd_ide = pfo_documento_ide', 'left')
+                        ->findAll();
                     $data['niveles'] = (new NivelFormacionModel())->where('nfo_estado', 'ACTIVO')->findAll();
                     break;
                 case 'experiencia':
                     $data['registros'] = (new PostulanteExperienciaModel())->where('pex_pos_ide', $pos['pos_ide'] ?? 0)->join('selec_modalidades_vinculo', 'mvi_ide = pex_mvi_ide', 'left')->join('selec_expediente_documentos', 'exd_ide = pex_documento_ide', 'left')
-                    ->findAll();
+                        ->findAll();
                     $data['modalidades'] = (new ModalidadVinculoModel())->where('mvi_estado', 'ACTIVO')->findAll();
                     break;
                 case 'capacitaciones':
                     $data['registros'] = (new PostulanteCapacitacionModel())->where('pca_pos_ide', $pos['pos_ide'] ?? 0)
-                    ->join('selec_expediente_documentos', 'exd_ide = pca_documento_ide', 'left')
-                    ->findAll();
+                        ->join('selec_expediente_documentos', 'exd_ide = pca_documento_ide', 'left')
+                        ->findAll();
 
                     break;
                 case 'anexos':
                     $data['anexos'] = (new AnexoModel())->where('ane_con_ide', $convocatoriaId)
-                    ->where('ane_estado', 'ACTIVO')->findAll();
+                        ->where('ane_estado', 'ACTIVO')->findAll();
 
                     $data['presentados'] = (new PostulacionAnexoModel())
-                    ->where('pan_pto_ide', $post['pto_ide'])
-                    ->join('selec_expediente_documentos', 'exd_ide = pan_exd_ide', 'left')
-                    ->findAll();
+                        ->where('pan_pto_ide', $post['pto_ide'])
+                        ->join('selec_expediente_documentos', 'exd_ide = pan_exd_ide', 'left')
+                        ->findAll();
 
                     break;
                 case 'dj':

@@ -39,7 +39,7 @@ Ficha Digital de Inscripción
                 <div class="col-md-4">
                     <div class="text-muted small">Convocatoria</div>
                     <div class="fw-bold">
-                        <?= esc($convocatoriaId) ?>
+                        <?= esc($convocatoria['con_nombre']??'Nombre de la Convocatoria') ?>
                     </div>
                 </div>
 
@@ -47,14 +47,14 @@ Ficha Digital de Inscripción
                     <div class="text-muted small">Postulante</div>
                     <div class="fw-bold" id="resumen-postulante">
                         <!-- Cargar mediante AJAX o evento -->
-                        Por completar
+                        <?= $postulacion['epo_descripcion'] ?? 'Por completar' ?> 
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="text-muted small">Estado de inscripción</div>
                     <span class="badge bg-warning text-dark">
-                        EN PROCESO
+                        <?= $postulacion['epo_nombre'] ?? 'NO INSCRITO' ?> 
                     </span>
                 </div>
             </div>

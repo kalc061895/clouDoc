@@ -1,7 +1,10 @@
 <?php
+
 namespace Modules\Seleccion\Controllers;
+
 use App\Controllers\BaseController;
 use Modules\Seleccion\Services\ComisionService;
+
 class ComisionConvocatoriaController extends BaseController
 {
     private ComisionService $service;
@@ -39,7 +42,20 @@ class ComisionConvocatoriaController extends BaseController
     }
     public function usuarios()
     {
-        return $this->response->setJSON(['ok' => true, 'data' => db_connect()->table('users')->select('id, username,nombres,paterno,materno,cargo')->orderBy('username')->get()->getResultArray()]);
+        $db = db_connect();
+
+        $usuarios = $db->table('users u')
+            ->select('u.id, u.username, u.nombres, u.paterno, u.materno, u.cargo')
+            ->join('auth_groups_users agu', 'agu.user_id = u.id')
+            ->where('agu.group', 'comision')
+            ->orderBy('u.username', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON([
+            'ok'   => true,
+            'data' => $usuarios,
+        ]);
     }
     private function responder(array $r)
     {
