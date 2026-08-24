@@ -3,7 +3,7 @@
 namespace Modules\Seleccion\Controllers;
 
 use App\Controllers\BaseController;
-use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteProfesionModel, TipoDeclaracionModel, ProfesionModel, NivelFormacionModel, ModalidadVinculoModel,TipoDocumentoModel};
+use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteProfesionModel, TipoDeclaracionModel, ProfesionModel, NivelFormacionModel, ModalidadVinculoModel, TipoDocumentoModel, PostulantesOtroModel};
 use Modules\Seleccion\Services\InscripcionService;
 
 class InscripcionController extends BaseController
@@ -68,6 +68,7 @@ class InscripcionController extends BaseController
                         ->findAll();
                     $data['niveles'] = (new NivelFormacionModel())->where('nfo_estado', 'ACTIVO')->findAll();
                     break;
+
                 case 'experiencia':
                     $data['registros'] = (new PostulanteExperienciaModel())->where('pex_pos_ide', $pos['pos_ide'] ?? 0)->join('selec_modalidades_vinculo', 'mvi_ide = pex_mvi_ide', 'left')->join('selec_expediente_documentos', 'exd_ide = pex_documento_ide', 'left')
                         ->findAll();
@@ -89,12 +90,19 @@ class InscripcionController extends BaseController
                         ->findAll();
 
                     break;
+                case 'otros':
+                    $data['registros'] = (new PostulantesOtroModel())->where('otr_pos_ide', $pos['pos_ide'] ?? 0)
+                        ->join('selec_expediente_documentos', 'exd_ide = otr_documento_ide', 'left')
+                        ->findAll();
+
+                    break;
                 case 'dj':
                     $data['declaraciones'] = (new TipoDeclaracionModel())->where('tde_estado', 'ACTIVO')->findAll();
 
                     $data['aceptadas'] = $post ? array_column((new PostulacionDeclaracionModel())->where('pde_pto_ide', $post['pto_ide'])->findAll(), 'pde_acepta', 'pde_tde_ide') : [];
 
                     break;
+
                 case 'confirmacion':
                     $data['validaciones'] = $post ? $this->inscripcion->validar($user, $convocatoriaId) : [];
                     break;

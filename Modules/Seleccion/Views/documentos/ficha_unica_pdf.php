@@ -64,7 +64,7 @@
 
         /* Magia CSS de Dompdf para la Numeración "Página X de Y" */
         .page-number:before {
-            content: "Página " counter(page) ;
+            content: "Página " counter(page);
         }
 
         /* Estilos de Secciones y Tablas */
@@ -232,11 +232,11 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th >#</th>
-                <th >Nivel Académico</th>
-                <th >Especialidad / Carrera / Denominación</th>
-                <th >Institución Universitaria / Pedagógica</th>
-                <th >Nivel Alcanzado</th>
+                <th>#</th>
+                <th>Nivel Académico</th>
+                <th>Especialidad / Carrera / Denominación</th>
+                <th>Institución Universitaria / Pedagógica</th>
+                <th>Nivel Alcanzado</th>
             </tr>
         </thead>
         <tbody>
@@ -278,11 +278,11 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th >#</th>
-                <th >Tipo</th>
-                <th >Nombre del Curso / Evento / Diplomado</th>
-                <th >Institución Certificadora</th>
-                <th  class="text-center">Horas Lectivas</th>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Nombre del Curso / Evento / Diplomado</th>
+                <th>Institución Certificadora</th>
+                <th class="text-center">Horas Lectivas</th>
             </tr>
         </thead>
         <tbody>
@@ -315,6 +315,7 @@
                 <th style="width: 36%;">Cargo / Función Desempeñada</th>
                 <th style="width: 15%;" class="text-center">Inicio</th>
                 <th style="width: 15%;" class="text-center">Fin</th>
+                <th style="width: 15%;" class="text-center">Dias</th>
             </tr>
         </thead>
         <tbody>
@@ -327,6 +328,14 @@
                         <td><?= esc($exp['pex_cargo']) ?></td>
                         <td class="text-center"><?= esc($exp['pex_fecha_inicio']) ?></td>
                         <td class="text-center"><?= esc($exp['pex_fecha_termino']) ?></td>
+                        <td class="text-center">
+                            <?php
+                            $inicio = new DateTime($exp['pex_fecha_inicio']);
+                            $fin = new DateTime($exp['pex_fecha_termino']);
+                            $dias = $inicio->diff($fin)->days + 1;
+                            ?>
+                            <?= $dias ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -336,33 +345,30 @@
             <?php endif; ?>
         </tbody>
     </table>
-    <!-- V. EXPERIENCIA LABORAL -->
-    <div class="section-header">VI. Identificación Institucional</div>
+    <!-- VI. IDENTIFICACION INTITUCIONAL-->
+    <div class="section-header">VI. Identificación Institucional y Otros Anexos</div>
     <table class="data-table">
         <thead>
             <tr>
-                <th >#</th>
-                <th >Tipo</th>
-                <th >Entidad / Empresa</th>
-                <th  class="text-center">Inicio</th>
-                <th  class="text-center">Fin</th>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($resolucion)): ?>
+            <?php if (!empty($identificacion)): ?>
                 <?php $i = 1;
-                foreach ($resolucion as $exp): ?>
+                foreach ($identificacion as $exp): ?>
                     <tr>
                         <td class="text-center"><?= $i++ ?></td>
-                        <td><?= esc($exp['pex_institucion']) ?></td>
-                        <td><?= esc($exp['pex_cargo']) ?></td>
-                        <td class="text-center"><?= esc($exp['pex_fecha_inicio']) ?></td>
-                        <td class="text-center"><?= esc($exp['pex_fecha_termino']) ?></td>
+                        <td><?= esc($exp['otr_tipo']) ?></td>
+                        <td><?= esc($exp['otr_descripcion']) ?></td>
+                        
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5" class="text-center">No registra resolucion laboral.</td>
+                    <td colspan="5" class="text-center">No registra identificacion laboral.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

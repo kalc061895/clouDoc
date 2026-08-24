@@ -52,6 +52,7 @@ class DatosGeneralesSeeder extends Seeder
         // 6. Modalidades de Vínculo (Experiencia previa)
         $this->db->table('selec_modalidades_vinculo')->insertBatch([
             ['mvi_codigo' => 'PUB_CAS', 'mvi_nombre' => 'Sector Público - Contrato CAS', 'mvi_estado' => 'ACTIVO'],
+            ['mvi_codigo' => 'PUB_276', 'mvi_nombre' => 'Sector Público - Contrato 276', 'mvi_estado' => 'ACTIVO'],
             ['mvi_codigo' => 'PUB_NOM', 'mvi_nombre' => 'Sector Público - Nombrado / Planta', 'mvi_estado' => 'ACTIVO'],
             ['mvi_codigo' => 'PUB_LOC', 'mvi_nombre' => 'Sector Público - Locación de Servicios (Terceros)', 'mvi_estado' => 'ACTIVO'],
             ['mvi_codigo' => 'PRIV_DEP', 'mvi_nombre' => 'Sector Privado - Dependiente (Planilla)', 'mvi_estado' => 'ACTIVO'],
@@ -59,6 +60,7 @@ class DatosGeneralesSeeder extends Seeder
             ['mvi_codigo' => 'PRACT_PRO', 'mvi_nombre' => 'Prácticas Profesionales', 'mvi_estado' => 'ACTIVO'],
             ['mvi_codigo' => 'SEC_SERUMS', 'mvi_nombre' => 'SERUMS (Sector Salud)', 'mvi_estado' => 'ACTIVO'],
             ['mvi_codigo' => 'SEC_RESID', 'mvi_nombre' => 'Residentado Médico / Especialidad', 'mvi_estado' => 'ACTIVO'],
+            ['mvi_codigo' => 'OTROS', 'mvi_nombre' => 'Otras Modalidades', 'mvi_estado' => 'ACTIVO'],
         ]);
 
         // 7. Profesiones

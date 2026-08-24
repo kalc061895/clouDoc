@@ -10,6 +10,7 @@ use Modules\Seleccion\Services\PostulanteProfesionService;
 use Modules\Seleccion\Models\PostulanteProfesionModel;
 use Modules\Seleccion\Models\PostulanteCapacitacionModel;
 use Modules\Seleccion\Models\PostulanteExperienciaModel;
+use Modules\Seleccion\Models\PostulantesOtroModel;
 
 
 class GenerarDocumentoService
@@ -97,7 +98,11 @@ class GenerarDocumentoService
             ->findAll();
 
         $experiencia = (new PostulanteExperienciaModel())->where('pex_pos_ide', $postulante['pos_ide'] ?? 0)->join('selec_modalidades_vinculo', 'mvi_ide = pex_mvi_ide', 'left')->join('selec_expediente_documentos', 'exd_ide = pex_documento_ide', 'left')
-            ->findAll();;
+            ->findAll();
+
+        $identificacion = (new PostulantesOtroModel())->where('otr_pos_ide', $postulante['pos_ide'] ?? 0)
+            ->join('selec_expediente_documentos', 'exd_ide = otr_documento_ide', 'left')
+            ->findAll();
 
 
         return [
@@ -124,6 +129,7 @@ class GenerarDocumentoService
             'formacion' => $formacion,
             'capacitaciones' => $capacitacion,
             'experiencia' => $experiencia,
+            'identificacion' => $identificacion,
             'convocatoria' => [
                 'numero'     => 'CAS N° 001-2026',
                 'ejecutora'  => 'RED DE SALUD SAN ROMÁN - UE 403',

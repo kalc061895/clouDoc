@@ -65,7 +65,7 @@ class GenerarDocumentoController extends BaseController
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
             // para que se descargue automaticamente
-            //->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"')
             ->setBody($dompdf->output());
     }
 }

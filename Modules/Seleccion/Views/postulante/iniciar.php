@@ -133,22 +133,31 @@ Ficha Digital de Inscripción
                     <button class="nav-link text-nowrap" id="tab-anexos" data-bs-toggle="tab"
                         data-bs-target="#panel-anexos" type="button" role="tab">
                         <iconify-icon icon="solar:folder-with-files-bold" class="me-1"></iconify-icon>
-                        <span class="d-none d-lg-inline">7. Otros anexos</span>
+                        <span class="d-none d-lg-inline">7. Anexos</span>
                         <span class="d-lg-none">Anexos</span>
                     </button>
                 </li>
 
                 <!-- TAB 8 -->
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link text-nowrap" id="tab-otros" data-bs-toggle="tab" data-bs-target="#panel-otros"
+                        type="button" role="tab">
+                        <iconify-icon icon="solar:shield-check-bold" class="me-1"></iconify-icon>
+                        <span class="d-none d-lg-inline">8. Otros Documentos</span>
+                        <span class="d-lg-none">Otros</span>
+                    </button>
+                </li>
+                <!-- TAB 9 -->
+                <li class="nav-item" role="presentation">
                     <button class="nav-link text-nowrap" id="tab-dj" data-bs-toggle="tab" data-bs-target="#panel-dj"
                         type="button" role="tab">
                         <iconify-icon icon="solar:shield-check-bold" class="me-1"></iconify-icon>
-                        <span class="d-none d-lg-inline">8. Declaraciones juradas</span>
+                        <span class="d-none d-lg-inline">9. Declaraciones juradas</span>
                         <span class="d-lg-none">DD.JJ.</span>
                     </button>
                 </li>
 
-                <!-- TAB 9 -->
+                <!-- TAB 10 -->
                 <li class="nav-item" role="presentation">
                     <button class="nav-link text-nowrap" id="tab-confirmacion" data-bs-toggle="tab"
                         data-bs-target="#panel-confirmacion" type="button" role="tab">
@@ -187,6 +196,9 @@ Ficha Digital de Inscripción
                 <div class="tab-pane fade" id="panel-dj" role="tabpanel">
                     <div id="contenido-dj"></div>
                 </div>
+                <div class="tab-pane fade" id="panel-otros" role="tabpanel">
+                    <div id="contenido-otros"></div>
+                </div>
                 <div class="tab-pane fade" id="panel-confirmacion" role="tabpanel">
                     <div id="contenido-confirmacion"></div>
                 </div>
@@ -214,6 +226,7 @@ Ficha Digital de Inscripción
             capacitaciones: '<?= base_url('seleccion/postulacion/inscripcion/partial') ?>',
             anexos: '<?= base_url('seleccion/postulacion/inscripcion/partial') ?>',
             dj: '<?= base_url('seleccion/postulacion/inscripcion/partial') ?>',
+            otros: '<?= base_url('seleccion/postulacion/inscripcion/partial') ?>',
             confirmacion: '<?= base_url('seleccion/postulacion/inscripcion/partial') ?>'
         };
 

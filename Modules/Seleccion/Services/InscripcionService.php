@@ -3,7 +3,7 @@
 namespace Modules\Seleccion\Services;
 
 use CodeIgniter\HTTP\Files\UploadedFile;
-use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, EstadoPostulacionModel, ExpedienteDocumentoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulacionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteModel, PostulanteProfesionModel, TipoDeclaracionModel, ValidacionPostulacionModel};
+use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, EstadoPostulacionModel, ExpedienteDocumentoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulacionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteModel, PostulanteProfesionModel, PostulantesOtroModel, TipoDeclaracionModel, ValidacionPostulacionModel};
 
 /** Servicio de dominio para la ficha de inscripción. Ningún controlador decide el estado de una postulación. */
 class InscripcionService
@@ -100,10 +100,50 @@ class InscripcionService
     {
         $post = $this->requerirEditable($userId, $convocatoriaId);
         $mapa = [
-            'profesional' => [PostulanteProfesionModel::class, 'ppr_ide', 'ppr_pos_ide', ['ppr_pro_ide', 'ppr_institucion', 'ppr_grado', 'ppr_titulo', 'ppr_fecha', 'ppr_colegiatura', 'ppr_habilitacion'], 'ppr_documento_ide'],
-            'academica' => [PostulanteFormacionModel::class, 'pfo_ide', 'pfo_pos_ide', ['pfo_nfo_ide', 'pfo_institucion', 'pfo_carrera', 'pfo_grado', 'pfo_fecha_inicio', 'pfo_fecha_culminacion', 'pfo_fecha_obtencion'], 'pfo_documento_ide'],
-            'experiencia' => [PostulanteExperienciaModel::class, 'pex_ide', 'pex_pos_ide', ['pex_institucion', 'pex_cargo', 'pex_area', 'pex_mvi_ide', 'pex_fecha_inicio', 'pex_fecha_termino', 'pex_descripcion'], 'pex_documento_ide'],
-            'capacitaciones' => [PostulanteCapacitacionModel::class, 'pca_ide', 'pca_pos_ide', ['pca_nombre', 'pca_institucion', 'pca_tipo', 'pca_fecha', 'pca_horas', 'pca_modalidad'], 'pca_documento_ide'],
+            'profesional' => [
+                PostulanteProfesionModel::class,
+                'ppr_ide',
+                'ppr_pos_ide',
+                ['ppr_pro_ide', 'ppr_institucion', 'ppr_grado', 'ppr_titulo', 'ppr_fecha', 'ppr_colegiatura', 'ppr_habilitacion'],
+                'ppr_documento_ide'
+            ],
+            'academica' => [
+                PostulanteFormacionModel::class,
+                'pfo_ide',
+                'pfo_pos_ide',
+                ['pfo_nfo_ide', 'pfo_institucion', 'pfo_carrera', 'pfo_grado', 'pfo_fecha_inicio', 'pfo_fecha_culminacion', 'pfo_fecha_obtencion'],
+                'pfo_documento_ide'
+            ],
+            'otros' => [
+                PostulantesOtroModel::class,
+                'otr_ide',
+                'otr_pos_ide',
+                [
+                    'otr_tipo',
+                    'otr_nombre',
+                    'otr_institucion',
+                    'otr_descripcion',
+                    'otr_fecha_expedicion',
+                    'otr_fecha_inicio',
+                    'otr_fecha_fin',
+                    'otr_folios',
+                ],
+                'otr_documento_ide'
+            ],
+            'experiencia' => [
+                PostulanteExperienciaModel::class,
+                'pex_ide',
+                'pex_pos_ide',
+                ['pex_institucion', 'pex_cargo', 'pex_area', 'pex_mvi_ide', 'pex_fecha_inicio', 'pex_fecha_termino', 'pex_descripcion'],
+                'pex_documento_ide'
+            ],
+            'capacitaciones' => [
+                PostulanteCapacitacionModel::class,
+                'pca_ide',
+                'pca_pos_ide',
+                ['pca_nombre', 'pca_institucion', 'pca_tipo', 'pca_fecha', 'pca_horas', 'pca_modalidad'],
+                'pca_documento_ide'
+            ],
         ];
         if (!isset($mapa[$tipo]))
             throw new \InvalidArgumentException('Tipo de registro inválido.');
@@ -147,7 +187,13 @@ class InscripcionService
     public function eliminarRegistro(int $userId, int $convocatoriaId, string $tipo, int $id): void
     {
         $post = $this->requerirEditable($userId, $convocatoriaId);
-        $mapa = ['profesional' => [PostulanteProfesionModel::class, 'ppr_ide', 'ppr_pos_ide'], 'academica' => [PostulanteFormacionModel::class, 'pfo_ide', 'pfo_pos_ide'], 'experiencia' => [PostulanteExperienciaModel::class, 'pex_ide', 'pex_pos_ide'], 'capacitaciones' => [PostulanteCapacitacionModel::class, 'pca_ide', 'pca_pos_ide']];
+        $mapa = [
+            'profesional' => [PostulanteProfesionModel::class, 'ppr_ide', 'ppr_pos_ide'],
+            'academica' => [PostulanteFormacionModel::class, 'pfo_ide', 'pfo_pos_ide'],
+            'otros' => [PostulantesOtroModel::class, 'otr_ide', 'otr_pos_ide'],
+            'experiencia' => [PostulanteExperienciaModel::class, 'pex_ide', 'pex_pos_ide'],
+            'capacitaciones' => [PostulanteCapacitacionModel::class, 'pca_ide', 'pca_pos_ide']
+        ];
         if (!isset($mapa[$tipo]))
             throw new \InvalidArgumentException('Tipo inválido.');
         [$clase, $pk, $fk] = $mapa[$tipo];
