@@ -30,11 +30,18 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     });
 
     $routes->group('admin', function ($routes) {
+        $routes->group('anexos', function ($routes) {
+            $routes->get('listar/(:num)', 'AnexoController::listar/$1');
+            $routes->post('guardar', 'AnexoController::guardar');
+            $routes->post('eliminar/(:num)', 'AnexoController::eliminar/$1');
+        });
+
         $routes->group('cargos-convocatoria', function ($routes) {
             $routes->get('listar/(:num)', 'ConvocatoriaCargoController::listar/$1');
             $routes->post('guardar', 'ConvocatoriaCargoController::guardar');
             $routes->post('eliminar/(:num)', 'ConvocatoriaCargoController::eliminar/$1');
         });
+
         $routes->group('etapas-convocatoria', function ($routes) {
             $routes->get('listar/(:num)', 'ConvocatoriaEtapaController::listar/$1');
             $routes->post('guardar', 'ConvocatoriaEtapaController::guardar');
@@ -79,6 +86,19 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
     $routes->group('postulacion', function ($routes) {
         $routes->get('/', 'PostulacionController::index');
         $routes->get('iniciar/(:num)', 'PostulacionController::iniciar/$1');
+
+        // Ficha de inscripción: las acciones siempre se resuelven contra el usuario autenticado.
+        $routes->group('inscripcion', function ($routes) {
+            $routes->get('partial/(:num)/(:segment)', 'InscripcionController::partial/$1/$2');
+            $routes->post('plaza/(:num)', 'InscripcionController::plaza/$1');
+            $routes->post('datos/(:num)', 'InscripcionController::datos/$1');
+            $routes->post('registro/(:num)/(:segment)', 'InscripcionController::guardar/$1/$2');
+            $routes->delete('registro/(:num)/(:segment)/(:num)', 'InscripcionController::eliminar/$1/$2/$3');
+            $routes->post('anexo/(:num)/(:num)', 'InscripcionController::anexo/$1/$2');
+            $routes->post('declaracion/(:num)/(:num)', 'InscripcionController::declaracion/$1/$2');
+            $routes->post('validar/(:num)', 'InscripcionController::validar/$1');
+            $routes->post('confirmar/(:num)', 'InscripcionController::confirmar/$1');
+        });
 
         $routes->group('iniciar', function ($routes) {
 

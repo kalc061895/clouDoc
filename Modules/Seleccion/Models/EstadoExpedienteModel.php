@@ -15,5 +15,10 @@ class EstadoExpedienteModel extends Model
         'eex_codigo',
         'eex_nombre',
     ];
+    protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 }
 

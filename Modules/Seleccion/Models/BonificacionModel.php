@@ -25,6 +25,10 @@ class BonificacionModel extends Model
 
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
-    protected $updatedField = '';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
+
+    protected $useSoftDeletes = true;
+
 }
 

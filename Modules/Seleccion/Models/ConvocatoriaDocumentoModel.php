@@ -31,11 +31,12 @@ class ConvocatoriaDocumentoModel extends Model
         'deleted_by',
     ];
 
-    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
+
 
     /**
      * Obtiene los documentos configurados para una convocatoria.

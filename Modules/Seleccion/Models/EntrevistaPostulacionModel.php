@@ -20,5 +20,10 @@ class EntrevistaPostulacionModel extends Model
         'enp_observacion',
         'created_by',
     ];
+    protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 }
 

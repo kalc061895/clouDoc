@@ -66,6 +66,11 @@ Configuración de Convocatoria
                 <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon>
                 Actas
             </a>
+            <!-- anexos -->
+            <a href="#" class="nav-link <?= ($seccionActiva === 'anexos') ? 'active' : '' ?>" data-seccion="anexos">
+                <iconify-icon icon="solar:document-text-bold" class="me-1"></iconify-icon>
+                Anexos
+            </a>
         </div>
     </div>
     <div id="contenedorPartial" class="border rounded bg-light p-3">

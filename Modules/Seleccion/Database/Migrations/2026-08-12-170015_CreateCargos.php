@@ -73,17 +73,20 @@ class CreateCargos extends Migration
                 'null' => true,
             ],
             'created_by' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
+    'type' => 'BIGINT',
+    'unsigned' => true,
+    'null' => true,
+],
             'updated_by' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
+    'type' => 'BIGINT',
+    'unsigned' => true,
+    'null' => true,
+],
             'deleted_by' => [
-                'type' => 'DATETIME',
-                'null' => true,
-            ],
+    'type' => 'BIGINT',
+    'unsigned' => true,
+    'null' => true,
+],
         ]);
 
         $this->forge->addKey('car_ide', true);

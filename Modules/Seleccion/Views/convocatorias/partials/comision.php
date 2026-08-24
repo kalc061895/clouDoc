@@ -67,8 +67,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal Miembro (Declarado estáticamente en el DOM) -->
+<!-- Modal Miembro (Declarado estáticamente en el DOM) -->
     <div class="modal fade" id="modalMiembro" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">

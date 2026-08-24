@@ -18,5 +18,10 @@ class RequisitoFormacionModel extends Model
         'rfo_grado',
         'rfo_obligatorio',
     ];
+    protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 }
 

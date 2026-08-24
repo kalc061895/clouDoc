@@ -26,6 +26,9 @@ class ConvocatoriaEtapaModel extends Model
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
+
+    protected $useSoftDeletes = true;
 
     /**
      * Obtiene el cronograma de la convocatoria ordenado cronológicamente.

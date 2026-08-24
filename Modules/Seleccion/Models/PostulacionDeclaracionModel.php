@@ -20,5 +20,10 @@ class PostulacionDeclaracionModel extends Model
         'pde_hash',
         'pde_exd_ide',
     ];
+    protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 }
 

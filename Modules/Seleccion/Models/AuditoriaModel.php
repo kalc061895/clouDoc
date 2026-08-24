@@ -27,5 +27,11 @@ class AuditoriaModel extends Model
         'aud_con_ide',
         'aud_eta_ide',
     ];
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
+
+    protected $useSoftDeletes = true;
 }
 

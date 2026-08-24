@@ -10,6 +10,9 @@ class PostulanteExperienciaModel extends Model
     protected $primaryKey = 'pex_ide';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
+    protected $softDelete = true;
+
+
 
     protected $allowedFields = [
         'pex_pos_ide',
@@ -25,7 +28,9 @@ class PostulanteExperienciaModel extends Model
     ];
 
     protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 }
 
