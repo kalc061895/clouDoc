@@ -95,11 +95,11 @@
     <table>
         <tr>
             <td width="30%" class="fw-bold">Nombres y Apellidos:</td>
-            <td><?= esc($postulante['nombres_apellidos'] ?? '') ?></td>
+            <td><?= esc($postulante['nombres_completos'] ?? '') ?></td>
         </tr>
         <tr>
             <td class="fw-bold">N° DNI:</td>
-            <td><?= esc($postulante['dni'] ?? '') ?></td>
+            <td><?= esc($postulante['documento'] ?? '') ?></td>
         </tr>
         <tr>
             <td class="fw-bold">Cargo al que postula:</td>
@@ -107,7 +107,7 @@
         </tr>
         <tr>
             <td class="fw-bold">Código de plaza AIRHSP:</td>
-            <td><?= esc($postulante['codigo_airhsp'] ?? '') ?></td>
+            <td><?= esc($postulante['codigo_airhsp'] ?? '-') ?></td>
         </tr>
     </table>
 
@@ -132,26 +132,26 @@
             <tr>
                 <td>a. Título profesional</td>
                 <td class="text-center">30 puntos</td>
-                <td class="text-center"><?= $eval['titulo_profesional_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['titulo_profesional_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['titulo_profesional_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['titulo_profesional_rev'] ?? '' ?></td>
             </tr>
             <tr>
                 <td>b. Título de especialidad (si corresponde)</td>
                 <td class="text-center">10 puntos</td>
-                <td class="text-center"><?= $eval['titulo_especialidad_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['titulo_especialidad_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['titulo_especialidad_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['titulo_especialidad_rev'] ?? '' ?></td>
             </tr>
             <tr>
                 <td>c. Grado de doctorado</td>
                 <td class="text-center">10 puntos</td>
-                <td class="text-center"><?= $eval['doctorado_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['doctorado_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['doctorado_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['doctorado_rev'] ?? '' ?></td>
             </tr>
             <tr>
                 <td>d. Grado de maestría</td>
                 <td class="text-center">05 puntos</td>
-                <td class="text-center"><?= $eval['maestria_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['maestria_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['maestria_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $profesion['maestria_rev'] ?? '' ?></td>
             </tr>
             <tr class="fw-bold bg-light">
                 <td>B. Diplomados, eventos y cursos de capacitación</td>
@@ -162,14 +162,14 @@
             <tr>
                 <td>a. Cursos iguales o mayores a 500 hrs. lectivas, 02 puntos por cada certificado máximo 5 certificados</td>
                 <td class="text-center">10 puntos</td>
-                <td class="text-center"><?= $eval['cursos_mayores_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['cursos_mayores_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $capacitaciones['cursos_mayores_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $capacitaciones['cursos_mayores_rev'] ?? '' ?></td>
             </tr>
             <tr>
                 <td>b. Cursos menores a 500 hrs. lectivas, 0.02 punto por cada hora lectiva se calificarán máximo 500 horas acumuladas.</td>
                 <td class="text-center">10 puntos</td>
-                <td class="text-center"><?= $eval['cursos_menores_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['cursos_menores_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $capacitaciones['cursos_menores_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $capacitaciones['cursos_menores_rev'] ?? '' ?></td>
             </tr>
             <tr class="fw-bold bg-light">
                 <td>C. Identificación institucional</td>
@@ -180,32 +180,33 @@
             <tr>
                 <td>a. Resolución de Encargo o Designación 0.5 punto por cada resolución (máximo 5)</td>
                 <td class="text-center">2.5 puntos</td>
-                <td class="text-center"><?= $eval['res_encargo_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['res_encargo_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $identificacion['res_encargo_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $identificacion['res_encargo_rev'] ?? '' ?></td>
             </tr>
             <tr>
                 <td>b. Resolución de Felicitación 0.5 punto por cada resolución (máximo 5)</td>
                 <td class="text-center">2.5 puntos</td>
-                <td class="text-center"><?= $eval['res_felicitacion_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['res_felicitacion_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $identificacion['res_felicitacion_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $identificacion['res_felicitacion_rev'] ?? '' ?></td>
             </tr>
             <tr class="fw-bold bg-light">
                 <td>D. Experiencia laboral</td>
                 <td class="text-center">20 puntos</td>
-                <td></td>
-                <td></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+
             </tr>
             <tr>
                 <td>a. Experiencia Laboral General* 04 puntos por año (Máximo 5 años)</td>
                 <td class="text-center">20 puntos</td>
-                <td class="text-center"><?= $eval['exp_general_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['exp_general_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $experiencia['exp_general_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $experiencia['exp_general_rev'] ?? '' ?></td>
             </tr>
             <tr class="fw-bold bg-light">
                 <td class="text-end">TOTAL</td>
                 <td class="text-center">100 puntos</td>
-                <td class="text-center"><?= $eval['total_auto'] ?? '' ?></td>
-                <td class="text-center"><?= $eval['total_rev'] ?? '' ?></td>
+                <td class="text-center"><?= $total['total_auto'] ?? '' ?></td>
+                <td class="text-center"><?= $total['total_rev'] ?? '' ?></td>
             </tr>
         </tbody>
     </table>
@@ -233,9 +234,9 @@
             <td width="33%">REVISIÓN (Evaluador)</td>
         </tr>
         <tr style="height: 45px;">
-            <td class="text-center fw-bold"><?= $eval['total_auto'] ?? '' ?></td>
+            <td class="text-center fw-bold"><?= $total['total_auto'] ?? '' ?></td>
             <td></td>
-            <td class="text-center fw-bold"><?= $eval['total_rev'] ?? '' ?></td>
+            <td class="text-center fw-bold"><?= $total['total_rev'] ?? '' ?></td>
         </tr>
     </table>
 
@@ -256,47 +257,47 @@
             <tr>
                 <td>Licenciado de las Fuerzas Armadas</td>
                 <td class="text-center">10%</td>
-                <td class="text-center"><?= $bonif['ffaa_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['ffaa_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['ffaa_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['ffaa_obs'] ?? '') ?></td>
             </tr>
             <tr>
                 <td>Personas con Discapacidad</td>
                 <td class="text-center">15%</td>
-                <td class="text-center"><?= $bonif['discapacidad_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['discapacidad_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['discapacidad_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['discapacidad_obs'] ?? '') ?></td>
             </tr>
             <tr class="bg-light fw-bold">
-                <td colspan="4">Quintil de Pobreza: (Decreto Supremo Nº 007 – 2008 – SA) HASTA SERUMS 2022-II</td>
+                <td colspan="4">Quintil de Pobreza: (Decreto Supremo Nº 007  2008  SA) HASTA SERUMS 2022-II</td>
             </tr>
             <tr>
                 <td>– Quintil 1</td>
                 <td class="text-center">15%</td>
-                <td class="text-center"><?= $bonif['q1_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['q1_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['q1_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['q1_obs'] ?? '') ?></td>
             </tr>
             <tr>
                 <td>– Quintil 2</td>
                 <td class="text-center">10%</td>
-                <td class="text-center"><?= $bonif['q2_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['q2_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['q2_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['q2_obs'] ?? '') ?></td>
             </tr>
             <tr>
                 <td>– Quintil 3</td>
                 <td class="text-center">5%</td>
-                <td class="text-center"><?= $bonif['q3_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['q3_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['q3_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['q3_obs'] ?? '') ?></td>
             </tr>
             <tr>
                 <td>– Quintil 4</td>
                 <td class="text-center">2%</td>
-                <td class="text-center"><?= $bonif['q4_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['q4_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['q4_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['q4_obs'] ?? '') ?></td>
             </tr>
             <tr>
                 <td>– Quintil 5</td>
                 <td class="text-center">0%</td>
-                <td class="text-center"><?= $bonif['q5_rev'] ?? '' ?></td>
-                <td><?= esc($bonif['q5_obs'] ?? '') ?></td>
+                <td class="text-center"><?= $bonificacion['q5_rev'] ?? '' ?></td>
+                <td><?= esc($bonificacion['q5_obs'] ?? '') ?></td>
             </tr>
             <tr class="bg-light fw-bold">
                 <td colspan="4">– Grado de dificultad: (Resolución Ministerial 361-2023/MINSA. A PARTIR DE SERUMS 2023-I</td>

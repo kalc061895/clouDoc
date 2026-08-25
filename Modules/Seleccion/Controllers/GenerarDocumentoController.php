@@ -34,17 +34,19 @@ class GenerarDocumentoController extends BaseController
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\ficha_unica_pdf', $data, 'FichaUnica_' . $data['postulante']['documento']. '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\ficha_unica_pdf', $data, 'FichaUnica_' . $data['postulante']['pos_documento']. '.pdf');
     }
 
     public function generarFichaAutoevaluacion($convocatoriaId)
     {
+
         $data = $this->docService->obtenerDatosAutoevaluacion($convocatoriaId);
         if (empty($data['postulante'])) {
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\autoevaluacion_pdf', $data, 'Autoevaluacion_' . $data['postulante']['pos_documento'] . '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\autoevaluacion_pdf', $data, 'Autoevaluacion_' . $data['postulante']['documento'] . '.pdf');
+
     }
 
     private function _renderPdf(string $viewPath, array $data, string $filename)
@@ -55,7 +57,7 @@ class GenerarDocumentoController extends BaseController
 
         $html = view($viewPath, $data);
         
-        //return $html;
+        return $html;
 
         
         $dompdf->loadHtml($html);

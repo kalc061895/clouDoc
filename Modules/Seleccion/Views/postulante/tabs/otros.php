@@ -92,12 +92,22 @@
                                 <label class="form-label small fw-semibold">Tipo / Categoria <span class="text-danger">*</span></label>
                                 <select class="form-select" name="otr_tipo" required>
                                     <option value="">-- Seleccione Opción --</option>
-                                    <option value="SERUMS">SERUMS</option>
                                     <option value="COLEGIATURA">COLEGIATURA</option>
                                     <option value="CONADIS">CONADIS</option>
-                                    <option value="FF.AA.">FF.AA.</option>
+                                    <option value="FFAA">FF.AA.</option>
                                     <option value="LICENCIA">LICENCIA</option>
-                                    <option value="RESOLUCION">RESOLUCION</option>
+                                    <option value="ENCARGATURA">RESOLUCION DE ENCARGATURA</option>
+                                    <option value="FELICITACION">RESOLUCION DE FELICITACION</option>
+                                    <option value="QUINTIL 1">QUINTIL 1</option>
+                                    <option value="QUINTIL 2">QUINTIL 2</option>
+                                    <option value="QUINTIL 3">QUINTIL 3</option>
+                                    <option value="QUINTIL 4">QUINTIL 4</option>
+                                    <option value="QUINTIL 5">QUINTIL 5</option>
+                                    <option value="GD 1">GRADO DIFICULTAD 1</option>
+                                    <option value="GD 2">GRADO DIFICULTAD 2</option>
+                                    <option value="GD 3">GRADO DIFICULTAD 3</option>
+                                    <option value="GD 4">GRADO DIFICULTAD 4</option>
+                                    <option value="GD 5">GRADO DIFICULTAD 5</option>
                                     <option value="OTROS">OTROS</option>
 
                                 </select>

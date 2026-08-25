@@ -95,11 +95,9 @@
 
 <body>
 
-    <div class="text-bold" style="font-size: 11pt;">
-        ID POSTULACION: <?= esc($codigo_inscripcion ?? '') ?>
-    </div>
+
     <div class="text-bold" style="font-size: 10pt;">
-        SOLICITA: Postular al concurso para contrato temporal por remplazo <?= esc($num_convocatoria ?? '') ?> bajo el D.L N° 276
+        SOLICITA: Postular a <?= esc($num_convocatoria ?? '') ?>
     </div>
 
     <div class="mt-30 text-bold">
@@ -110,11 +108,20 @@
     </div>
 
     <div class="mt-30 justify">
-        El que suscribe, <span class="text-bold"><?= esc($nombres) ?> <?= esc($apellidos) ?></span>, con DNI N° <span class="text-bold"><?= esc($documento) ?></span>, domiciliado legalmente en <span class="text-bold"><?= esc($direccion) ?></span>, del Distrito de Juliaca, Provincia de San Román, Región de Puno, ante usted con el debido respeto me presento y expongo:
+        El que suscribe, <span class="text-bold"><?= esc($nombres) ?> <?= esc($apellidos) ?></span>, con DNI N° <span
+            class="text-bold"><?= esc($documento) ?></span>, domiciliado legalmente en <span
+            class="text-bold"><?= esc($direccion) ?></span>, del Distrito de Juliaca, Provincia de San Román, Región de
+        Puno, ante usted con el debido respeto me presento y expongo:
     </div>
 
     <div class="mt-30 justify">
-        Que, teniendo conocimiento del concurso para contrato por reemplazo que se llevará a cabo en la Unidad Ejecutora 403 Salud San Román de la Dirección Regional de Salud Puno y reuniendo los requisitos necesarios para postular a la plaza de: <span class="text-bold"><?= esc($cargo) ?></span>, solicito a Usted tenga a bien acepte mi participación en el presente concurso, para lo cual me someto a lo dispuesto por las normas vigentes sobre el ingreso a la Administración Pública, por lo que <b>DECLARO BAJO JURAMENTO</b> conocer las bases del presente concurso y los perfiles de las Plazas publicadas, además manifiesto que la información proporcionada en la FICHA DE INSCRIPCION y AUTO EVALUACION es auténtica, veraz y conforme.
+        Que, teniendo conocimiento del concurso para contrato por reemplazo que se llevará a cabo en la Unidad Ejecutora
+        403 Salud San Román de la Dirección Regional de Salud Puno y reuniendo los requisitos necesarios para postular a
+        la plaza de: <span class="text-bold"><?= esc($cargo) ?></span>, solicito a Usted tenga a bien acepte mi
+        participación en el presente concurso, para lo cual me someto a lo dispuesto por las normas vigentes sobre el
+        ingreso a la Administración Pública, por lo que <b>DECLARO BAJO JURAMENTO</b> conocer las bases del presente
+        concurso y los perfiles de las Plazas publicadas, además manifiesto que la información proporcionada en la FICHA
+        DE INSCRIPCION y AUTO EVALUACION es auténtica, veraz y conforme.
     </div>
 
     <div class="mt-30 text-right">
@@ -132,7 +139,8 @@
             <td style="width: 50%; text-align: left; vertical-align: bottom;">
                 <b>DNI: <?= esc($documento) ?></b><br>
                 <b>Teléfono: <?= esc($telefono) ?></b><br>
-                <b>Email: <?= esc($email) ?></b>
+                <b>Email: <?= esc($email) ?></b><br>
+                <b>ID: <?= esc($codigo_inscripcion ?? '') ?></b>
             </td>
 
             <!-- Columna Central: Firma (Alineado al centro) -->
@@ -144,7 +152,8 @@
 
             <!-- Columna Derecha: Huella (Alineado a la derecha) -->
             <td style="width: 20%; text-align: right; vertical-align: bottom;">
-                <div class="huella-box" style="border: 1px solid #000; width: 80px; height: 100px; display: inline-block; text-align: center; line-height: 100px; font-size: 11px;">
+                <div class="huella-box"
+                    style="border: 1px solid #000; width: 80px; height: 100px; display: inline-block; text-align: center; line-height: 100px; font-size: 11px;">
                     Huella digital
                 </div>
             </td>

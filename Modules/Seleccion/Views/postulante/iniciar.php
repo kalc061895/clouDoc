@@ -39,7 +39,7 @@ Ficha Digital de Inscripción
                 <div class="col-md-4">
                     <div class="text-muted small">Convocatoria</div>
                     <div class="fw-bold">
-                        <?= esc($convocatoria['con_nombre']??'Nombre de la Convocatoria') ?>
+                        <?= esc($convocatoria['con_nombre'] ?? 'Nombre de la Convocatoria') ?>
                     </div>
                 </div>
 
@@ -47,14 +47,14 @@ Ficha Digital de Inscripción
                     <div class="text-muted small">Postulante</div>
                     <div class="fw-bold" id="resumen-postulante">
                         <!-- Cargar mediante AJAX o evento -->
-                        <?= $postulacion['epo_descripcion'] ?? 'Por completar' ?> 
+                        <?= $postulacion['epo_descripcion'] ?? 'Por completar' ?>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="text-muted small">Estado de inscripción</div>
                     <span class="badge bg-warning text-dark">
-                        <?= $postulacion['epo_nombre'] ?? 'NO INSCRITO' ?> 
+                        <?= $postulacion['epo_nombre'] ?? 'NO INSCRITO' ?>
                     </span>
                 </div>
             </div>
@@ -130,21 +130,21 @@ Ficha Digital de Inscripción
 
                 <!-- TAB 7 -->
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link text-nowrap" id="tab-anexos" data-bs-toggle="tab"
-                        data-bs-target="#panel-anexos" type="button" role="tab">
-                        <iconify-icon icon="solar:folder-with-files-bold" class="me-1"></iconify-icon>
-                        <span class="d-none d-lg-inline">7. Anexos</span>
-                        <span class="d-lg-none">Anexos</span>
+                    <button class="nav-link text-nowrap" id="tab-otros" data-bs-toggle="tab"
+                        data-bs-target="#panel-otros" type="button" role="tab">
+                        <iconify-icon icon="solar:shield-check-bold" class="me-1"></iconify-icon>
+                        <span class="d-none d-lg-inline">7. Otros Documentos</span>
+                        <span class="d-lg-none">Otros</span>
                     </button>
                 </li>
 
                 <!-- TAB 8 -->
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link text-nowrap" id="tab-otros" data-bs-toggle="tab" data-bs-target="#panel-otros"
-                        type="button" role="tab">
-                        <iconify-icon icon="solar:shield-check-bold" class="me-1"></iconify-icon>
-                        <span class="d-none d-lg-inline">8. Otros Documentos</span>
-                        <span class="d-lg-none">Otros</span>
+                    <button class="nav-link text-nowrap" id="tab-anexos" data-bs-toggle="tab"
+                        data-bs-target="#panel-anexos" type="button" role="tab">
+                        <iconify-icon icon="solar:folder-with-files-bold" class="me-1"></iconify-icon>
+                        <span class="d-none d-lg-inline">8. Anexos</span>
+                        <span class="d-lg-none">Anexos</span>
                     </button>
                 </li>
                 <!-- TAB 9 -->
