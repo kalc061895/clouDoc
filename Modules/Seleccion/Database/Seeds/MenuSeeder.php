@@ -292,7 +292,7 @@ class MenuSeeder extends Seeder
             [
                 'id'        => 520,
                 'type'      => 'folder',
-                'parent_id' => 500,
+                'parent_id' => null,
                 'name'      => 'Portal Postulante',
                 'abbr'      => 'POST',
                 'url'       => '#',
@@ -305,10 +305,10 @@ class MenuSeeder extends Seeder
             [
                 'id'        => 521,
                 'type'      => 'item',
-                'parent_id' => 520,
+                'parent_id' => null,
                 'name'      => 'Convocatorias Vigentes',
                 'abbr'      => 'CONV-VIG',
-                'url'       => 'seleccion/postulante/convocatorias',
+                'url'       => 'seleccion/postulacion',
                 'icon'      => 'fas fa-folder-open',
                 'order'     => 521,
                 'status'    => 1,
@@ -318,9 +318,9 @@ class MenuSeeder extends Seeder
                 'id'        => 522,
                 'type'      => 'item',
                 'parent_id' => 520,
-                'name'      => 'Mis Datos Personales',
+                'name'      => 'Mis Reclamos',
                 'abbr'      => 'DAT-PERS',
-                'url'       => 'seleccion/postulante/ver-datos',
+                'url'       => 'seleccion/postulante/reclamos',
                 'icon'      => 'fas fa-id-card',
                 'order'     => 522,
                 'status'    => 1,
@@ -330,50 +330,15 @@ class MenuSeeder extends Seeder
                 'id'        => 523,
                 'type'      => 'item',
                 'parent_id' => 520,
-                'name'      => 'Formación Académica',
+                'name'      => 'Constancia de Potulacion',
                 'abbr'      => 'FORM',
-                'url'       => 'seleccion/postulante/formacion/listar',
+                'url'       => 'seleccion/postulante/constancia',
                 'icon'      => 'fas fa-graduation-cap',
                 'order'     => 523,
                 'status'    => 1,
                 'separator' => 0
             ],
-            [
-                'id'        => 524,
-                'type'      => 'item',
-                'parent_id' => 520,
-                'name'      => 'Experiencia Laboral',
-                'abbr'      => 'EXP',
-                'url'       => 'seleccion/postulante/experiencia/listar',
-                'icon'      => 'fas fa-user-tie',
-                'order'     => 524,
-                'status'    => 1,
-                'separator' => 0
-            ],
-            [
-                'id'        => 525,
-                'type'      => 'item',
-                'parent_id' => 520,
-                'name'      => 'Capacitaciones',
-                'abbr'      => 'CAP',
-                'url'       => 'seleccion/postulante/capacitaciones/listar',
-                'icon'      => 'fas fa-certificate',
-                'order'     => 525,
-                'status'    => 1,
-                'separator' => 0
-            ],
-            [
-                'id'        => 526,
-                'type'      => 'item',
-                'parent_id' => 520,
-                'name'      => 'Información Extra',
-                'abbr'      => 'EXTRA',
-                'url'       => 'seleccion/postulante/extra/listar',
-                'icon'      => 'fas fa-plus-circle',
-                'order'     => 526,
-                'status'    => 1,
-                'separator' => 0
-            ],
+            
             [
                 'id'        => 527,
                 'type'      => 'item',
@@ -386,6 +351,7 @@ class MenuSeeder extends Seeder
                 'status'    => 1,
                 'separator' => 0
             ],
+
             [
                 'id'        => 528,
                 'type'      => 'item',

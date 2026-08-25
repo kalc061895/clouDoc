@@ -8,7 +8,7 @@ use Modules\Seleccion\Models\PostulanteModel;
 use Modules\Seleccion\Models\PlazaModel;
 use Modules\Seleccion\Models\FormacionModel;
 use Modules\Seleccion\Models\ExperienciaModel;
-use Modules\Seleccion\Models\ExtraModel; 
+use Modules\Seleccion\Models\ExtraModel;
 use Modules\Seleccion\Models\CalificacionPreviaModel;
 use Modules\Seleccion\Models\CapacitacionModel;
 
@@ -77,41 +77,127 @@ class EvaluacionService
             ->first();
         $formacion = $formacionModel
             ->where('id_postulante', $postulacion['id_postulante'])
-            ->join('anexos','anexos.id_anexo = formacion_profesional.id_anexo','join')
+            ->join('anexos', 'anexos.id_anexo = formacion_profesional.id_anexo', 'join')
             ->orderBy('fecha_inicio', 'DESC')
             ->findAll();
         $experiencia = $experienciaModel
             ->where('id_postulante', $postulacion['id_postulante'])
-            ->join('anexos','anexos.id_anexo = experiencia_laboral.id_anexo','join')
+            ->join('anexos', 'anexos.id_anexo = experiencia_laboral.id_anexo', 'join')
             ->orderBy('fecha_inicio', 'DESC')
             ->findAll();
         $capacitacion = $capacitacionModel
             ->where('id_postulante', $postulacion['id_postulante'])
-            ->join('anexos','anexos.id_anexo = capacitaciones.id_anexo','join')
+            ->join('anexos', 'anexos.id_anexo = capacitaciones.id_anexo', 'join')
             ->findAll();
         $extra = $extraModel
-            ->select('informacion_extra.*, anexos.ruta') 
-            ->where('id_postulante', $postulacion['id_postulante']) 
-            ->join('anexos','anexos.id_anexo = informacion_extra.id_anexo','join')
+            ->select('informacion_extra.*, anexos.ruta')
+            ->where('id_postulante', $postulacion['id_postulante'])
+            ->join('anexos', 'anexos.id_anexo = informacion_extra.id_anexo', 'join')
             ->findAll();
         $calificacionPrevia = $calificacionPreviaModel
             ->where('id_postulacion', $idPostulacion)
             ->where('id_postulante', $postulacion['id_postulante'])
             ->first();
-        
+
         $post = [
             'postulacion' => $postulacion,
             'postulante' => $postulante,
             'formacion' => $formacion,
-            'experiencia' => $experiencia,  
+            'experiencia' => $experiencia,
             'capacitacion' => $capacitacion,
             'extra' => $extra,
             'calificacionPrevia' => $calificacionPrevia
         ];
 
         return $post;
-
     }
 
+    /**
+     * Registra o actualiza una evaluación curricular completa
+     */
+    public function guardarEvaluacion(array $datos): bool
+    {
+        $this->db->transStart();
 
+        $usuarioId = session('usu_ide') ?? 1; // ID de usuario en sesión
+
+        // 1. Preparar Cabecera de Evaluación
+        $dataEvaluacion = [
+            'eva_pto_ide'       => $datos['pto_ide'],
+            'eva_fie_ide'       => $datos['fie_ide'],
+            'eva_com_ide'       => $datos['com_ide'] ?? null,
+            'eva_usu_ide'       => $usuarioId,
+            'eva_tipo'          => $datos['eva_tipo'] ?? 'CURRICULAR',
+            'eva_estado'        => $datos['eva_estado'] ?? 'EVALUADO',
+            'eva_puntaje_total' => $datos['puntaje_total'] ?? 0.00,
+            'eva_fecha_inicio'  => $datos['fecha_inicio'] ?? date('Y-m-d H:i:s'),
+            'eva_fecha_fin'     => date('Y-m-d H:i:s'),
+            'eva_observacion'   => $datos['observacion'] ?? null,
+            'created_by'        => $usuarioId,
+            'updated_by'        => $usuarioId,
+        ];
+
+        // Guardar o actualizar cabecera
+        $evaIde = $this->evaluacionModel->insert($dataEvaluacion, true);
+
+        // 2. Guardar Detalles de Criterios (selec_evaluacion_detalles)
+        if (!empty($datos['criterios']) && is_array($datos['criterios'])) {
+            foreach ($datos['criterios'] as $criIde => $criterio) {
+                $dataDetalle = [
+                    'evd_eva_ide'     => $evaIde,
+                    'evd_cri_ide'     => $criIde,
+                    'evd_cumple'      => isset($criterio['cumple']) ? 1 : 0,
+                    'evd_puntaje'     => $criterio['puntaje'] ?? 0.00,
+                    'evd_observacion' => $criterio['observacion'] ?? null,
+                    'created_by'      => $usuarioId,
+                ];
+                $this->detalleModel->insert($dataDetalle);
+            }
+        }
+
+        // 3. Guardar Validación de Experiencias Laborales (selec_evaluacion_experiencia)
+        if (!empty($datos['experiencias']) && is_array($datos['experiencias'])) {
+            foreach ($datos['experiencias'] as $exp) {
+                $diasDeclarados = (int) ($exp['dias_declarados'] ?? 0);
+                $diasValidados  = (int) ($exp['dias_validados'] ?? 0);
+
+                $dataExp = [
+                    'exe_eva_ide'         => $evaIde,
+                    'exe_pex_ide'         => $exp['pex_ide'],
+                    'exe_resultado'       => $exp['resultado'] ?? 'VALIDADO',
+                    'exe_dias_declarados' => $diasDeclarados,
+                    'exe_dias_validados'  => $diasValidados,
+                    'exe_puntaje'         => $exp['puntaje'] ?? 0.00,
+                    'exe_observacion'     => $exp['observacion'] ?? null,
+                    'created_by'          => $usuarioId,
+                ];
+                $this->experienciaModel->insert($dataExp);
+            }
+        }
+
+        $this->db->transComplete();
+
+        if ($this->db->transStatus() === false) {
+            throw new DatabaseException('Error al registrar la evaluación en la base de datos.');
+        }
+
+        return true;
+    }
+
+    /**
+     * Helper para calcular y convertir días acumulados a Años, Meses y Días
+     */
+    public function calcularTiempoFormateado(int $totalDias): array
+    {
+        $anios = Math.floor($totalDias / 365);
+        $meses = Math.floor(($totalDias % 365) / 30);
+        $dias  = ($totalDias % 365) % 30;
+
+        return [
+            'anios' => (int) $anios,
+            'meses' => (int) $meses,
+            'dias'  => (int) $dias,
+            'total_dias' => $totalDias
+        ];
+    }
 }

@@ -3,7 +3,7 @@
 namespace Modules\Seleccion\Services;
 
 use CodeIgniter\HTTP\Files\UploadedFile;
-use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, EstadoPostulacionModel, ExpedienteDocumentoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulacionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteModel, PostulanteProfesionModel, PostulantesOtroModel, TipoDeclaracionModel, ValidacionPostulacionModel};
+use Modules\Seleccion\Models\{AnexoModel, ConvocatoriaCargoModel, EstadoPostulacionModel, ExpedienteDocumentoModel, PostulacionAnexoModel, PostulacionDeclaracionModel, PostulacionModel, PostulanteCapacitacionModel, PostulanteExperienciaModel, PostulanteFormacionModel, PostulanteModel, PostulanteProfesionModel, PostulantesOtroModel, TipoDeclaracionModel, ValidacionPostulacionModel, ConvocatoriaModel};
 
 /** Servicio de dominio para la ficha de inscripción. Ningún controlador decide el estado de una postulación. */
 class InscripcionService
@@ -36,7 +36,8 @@ class InscripcionService
     public function assertEditable(array $postulacion): void
     {
         if ((bool) $postulacion['pto_confirmado'] || strtoupper((string) $postulacion['epo_codigo']) === 'PRESENTADO') {
-            throw new \DomainException('El expediente ya fue presentado y no puede modificarse.');
+            
+            //throw new \DomainException('El expediente ya fue presentado y no puede modificarse.');
         }
     }
 
@@ -61,8 +62,9 @@ class InscripcionService
             throw new \DomainException('No está configurado el estado REGISTRANDO.');
         $this->db->transBegin();
         try {
+            $conv = (new ConvocatoriaModel())->find($convocatoriaId);
             // El índice único de pto_codigo es la barrera final ante concurrencia.
-            $codigo = 'CAS-' . str_pad((string) $convocatoriaId, 3, '0', STR_PAD_LEFT) . '-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(4)));
+            $codigo = 'C-' . $conv['con_ide'] . '-' . $conv['con_codigo'] . '-' . $conv['con_anio'] . '-' . strtoupper(bin2hex(random_bytes(4)));
             $id = $this->postulaciones->insert(['pto_codigo' => $codigo, 'pto_pos_ide' => $postulante['pos_ide'], 'pto_cco_ide' => $cargoId, 'pto_epo_ide' => $estado['epo_ide'], 'pto_confirmado' => false], true);
             if (!$id || !$this->db->transStatus())
                 throw new \RuntimeException('No se pudo crear la postulación.');
@@ -233,22 +235,51 @@ class InscripcionService
         $post = $this->requerirEditable($userId, $convocatoriaId);
         $pos = $this->postulantes->find($post['pto_pos_ide']);
         $checks = [
-            ['PLAZA', 'Plaza seleccionada', !empty($post['pto_cco_ide']), 'Seleccione una plaza.'],
-            ['DATOS', 'Datos personales completos', !empty($pos['pos_documento']) && !empty($pos['pos_nombres']) && !empty($pos['pos_apellido_paterno']) && !empty($pos['pos_email']), 'Complete los datos personales obligatorios.'],
-            ['DECLARACIONES', 'Declaraciones juradas', $this->declaracionesCompletas($post['pto_ide']), 'Acepte todas las declaraciones activas.'],
-            ['ANEXOS', 'Anexos obligatorios', $this->anexosCompletos($post['pto_ide'], $convocatoriaId), 'Faltan anexos obligatorios.'],
+            [
+                'PLAZA',
+                'Plaza seleccionada',
+                !empty($post['pto_cco_ide']),
+                'Seleccione una plaza.'
+            ],
+            [
+                'DATOS',
+                'Datos personales completos',
+                !empty($pos['pos_documento']) && !empty($pos['pos_nombres']) && !empty($pos['pos_apellido_paterno']) && !empty($pos['pos_email']),
+                'Complete los datos personales obligatorios.'
+            ],
+            [
+                'DECLARACIONES',
+                'Declaraciones juradas',
+                $this->declaracionesCompletas($post['pto_ide']),
+                'Acepte todas las declaraciones activas.'
+            ],
+            [
+                'ANEXOS',
+                'Anexos obligatorios',
+                $this->anexosCompletos($post['pto_ide'], $convocatoriaId),
+                'Faltan anexos obligatorios.'
+            ],
         ];
+
         // Requisitos configurados para la plaza. Estas comprobaciones validan la declaración,
         // no asignan puntaje ni sustituyen la revisión posterior de la comisión.
+
         $requisitos = $this->db->table('selec_requisitos')->where('req_cco_ide', $post['pto_cco_ide'])->where('req_obligatorio', true)->get()->getResultArray();
+
         $profesiones = (new PostulanteProfesionModel())->where('ppr_pos_ide', $post['pto_pos_ide'])->findAll();
+
         $formaciones = (new PostulanteFormacionModel())->where('pfo_pos_ide', $post['pto_pos_ide'])->findAll();
+
         $diasExperiencia = (int) ($this->db->table('selec_postulante_experiencias')->selectSum('pex_dias_declarados')->where('pex_pos_ide', $post['pto_pos_ide'])->get()->getRow()->pex_dias_declarados ?? 0);
+
         foreach ($requisitos as $req) {
             $formacion = $this->db->table('selec_requisito_formacion')->where('rfo_req_ide', $req['req_ide'])->get()->getResultArray();
+
             $experiencia = $this->db->table('selec_requisito_experiencia')->where('rex_req_ide', $req['req_ide'])->get()->getResultArray();
+
             $cumple = true;
             $detalle = '';
+
             foreach ($formacion as $f) {
                 $coincide = false;
                 foreach (array_merge($profesiones, $formaciones) as $r) {
@@ -274,10 +305,21 @@ class InscripcionService
             if ($formacion || $experiencia)
                 $checks[] = ['REQ-' . $req['req_ide'], $req['req_nombre'], $cumple, $detalle ?: 'No cumple el requisito declarado.'];
         }
+
         $model = new ValidacionPostulacionModel();
+
         $this->db->table('selec_validaciones_postulacion')->where('vpo_pto_ide', $post['pto_ide'])->delete();
+
         foreach ($checks as [$codigo, $nombre, $resultado, $observacion])
-            $model->insert(['vpo_pto_ide' => $post['pto_ide'], 'vpo_codigo' => $codigo, 'vpo_nombre' => $nombre, 'vpo_resultado' => $resultado, 'vpo_observacion' => $resultado ? null : $observacion, 'vpo_fecha' => date('Y-m-d H:i:s')]);
+            $model->insert([
+                'vpo_pto_ide' => $post['pto_ide'],
+                'vpo_codigo' => $codigo,
+                'vpo_nombre' => $nombre,
+                'vpo_resultado' => $resultado,
+                'vpo_observacion' => $resultado ? null : $observacion,
+                'vpo_fecha' => date('Y-m-d H:i:s')
+            ]);
+
         return $model->where('vpo_pto_ide', $post['pto_ide'])->findAll();
     }
 
@@ -310,6 +352,7 @@ class InscripcionService
         $p = $this->postulacionActual($userId, $convocatoriaId);
         if (!$p)
             throw new \DomainException('Seleccione una plaza antes de continuar.');
+
         $this->assertEditable($p);
         return $p;
     }

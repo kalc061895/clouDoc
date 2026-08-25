@@ -257,7 +257,7 @@
                 </tr>
             <?php endif; ?>
             <?php if (!empty($formacion)): ?>
-                <?php foreach ($formacion as $item): ?>
+                <?php $i=0; foreach ($formacion as $item): ?>
                     <tr>
                         <td class="text-center"><?= $i++ ?></td>
                         <td><?= esc($item['nfo_codigo']) ?></td>

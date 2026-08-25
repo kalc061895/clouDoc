@@ -80,11 +80,11 @@ class CreateExperienciaEvaluaciones extends Migration
         $this->forge->addForeignKey('exe_eva_ide', 'selec_evaluaciones', 'eva_ide', 'CASCADE', 'RESTRICT');
         $this->forge->addForeignKey('exe_pex_ide', 'selec_postulante_experiencias', 'pex_ide', 'CASCADE', 'RESTRICT');
 
-        $this->forge->createTable('selec_experiencia_evaluaciones');
+        $this->forge->createTable('selec_evaluacion_experiencia');
     }
 
     public function down()
     {
-        $this->forge->dropTable('selec_experiencia_evaluaciones', true);
+        $this->forge->dropTable('selec_evaluacion_experiencia', true);
     }
 }

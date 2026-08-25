@@ -12,6 +12,42 @@
 </div>
 <?php if (empty($postulacion)): ?>
     <div class="alert alert-warning">Primero seleccione una plaza.</div>
+<?php elseif ($postulacion['pto_epo_ide'] === 8): ?>
+
+    <div class="card border-success shadow-sm">
+        <div class="card-body text-center py-5">
+
+            <div class="mb-3">
+                <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
+                    <i class="bi bi-check-lg fs-1"></i>
+                </div>
+            </div>
+
+            <h4 class="text-success fw-bold">
+                ¡Inscripción realizada correctamente!
+            </h4>
+
+            <p class="text-muted mb-4">
+                Su inscripción a la convocatoria ha sido registrada satisfactoriamente.
+            </p>
+
+            <div class="alert alert-info text-start">
+                <i class="bi bi-info-circle me-1"></i>
+                Puede descargar e imprimir su
+                <strong>Constancia de Inscripción</strong>
+                como comprobante de su registro.
+            </div>
+
+            <a href="<?= base_url('seleccion/postulacion/generar-constancia-inscripcion/' . $convocatoriaId) ?>"
+                class="btn btn-success"
+                target="_blank">
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                Descargar Constancia de Inscripción
+            </a>
+
+        </div>
+    </div>
+
 <?php else: ?>
     <div id="lista-validaciones" class="mb-3">
         <?php foreach ($validaciones as $v): ?>
@@ -55,6 +91,40 @@
             class="btn btn-success" id="confirmar-inscripcion" disabled>Confirmar inscripción definitiva</button>
     <?php else: ?>
         <div class="alert alert-success">Expediente presentado. El contenido ha sido bloqueado.</div>
+
+        <div class="card border-success shadow-sm">
+            <div class="card-body text-center py-5">
+
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
+                        <i class="bi bi-check-lg fs-1"></i>
+                    </div>
+                </div>
+
+                <h4 class="text-success fw-bold">
+                    ¡Inscripción realizada correctamente!
+                </h4>
+
+                <p class="text-muted mb-4">
+                    Su inscripción a la convocatoria ha sido registrada satisfactoriamente.
+                </p>
+
+                <div class="alert alert-info text-start">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Puede descargar e imprimir su
+                    <strong>Constancia de Inscripción</strong>
+                    como comprobante de su registro.
+                </div>
+
+                <a href="<?= base_url('seleccion/postulacion/generar-constancia-inscripcion/' . $convocatoriaId) ?>"
+                    class="btn btn-success"
+                    target="_blank">
+                    <i class="bi bi-file-earmark-pdf me-1"></i>
+                    Descargar Constancia de Inscripción
+                </a>
+
+            </div>
+        </div>
     <?php endif ?>
 <?php endif ?>
 <script>

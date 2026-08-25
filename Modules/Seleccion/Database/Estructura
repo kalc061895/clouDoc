@@ -776,7 +776,7 @@ Table selec_evaluacion_detalles {
 // VALIDACION DE EXPERIENCIA
 ////////////////////////////////////////////////////////////
 
-Table selec_experiencia_evaluaciones {
+Table selec_evaluacion_experiencia {
   exe_ide bigint [pk, increment]
 
   exe_eva_ide bigint [not null]
@@ -1280,8 +1280,8 @@ Ref: selec_evaluacion_detalles.evd_eva_ide > selec_evaluaciones.eva_ide
 Ref: selec_evaluacion_detalles.evd_cri_ide > selec_criterios_evaluacion.cri_ide
 
 
-Ref: selec_experiencia_evaluaciones.exe_eva_ide > selec_evaluaciones.eva_ide
-Ref: selec_experiencia_evaluaciones.exe_pex_ide > selec_postulante_experiencias.pex_ide
+Ref: selec_evaluacion_experiencia.exe_eva_ide > selec_evaluaciones.eva_ide
+Ref: selec_evaluacion_experiencia.exe_pex_ide > selec_postulante_experiencias.pex_ide
 
 
 Ref: selec_requisito_evaluaciones.reqe_eva_ide > selec_evaluaciones.eva_ide

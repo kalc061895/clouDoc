@@ -23,7 +23,7 @@ class PostulacionController extends BaseController
     public function index()
     {
         // Obtiene el pos_ide desde la sesión del postulante autenticado
-        $postulanteId = session()->get('pos_ide') ?? session()->get('user_id');
+        $postulanteId = auth()->id() ?? session()->get('user_id');
 
         $data = [
             'titulo'                 => 'Mis Postulaciones',

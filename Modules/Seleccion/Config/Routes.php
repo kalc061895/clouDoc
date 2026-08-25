@@ -128,6 +128,7 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->get('generar-solicitud/(:num)', 'GenerarDocumentoController::generarSolicitud/$1');
         $routes->get('generar-ficha-unica/(:num)', 'GenerarDocumentoController::generarFichaUnica/$1');
         $routes->get('generar-ficha-autoevaluacion/(:num)', 'GenerarDocumentoController::generarFichaAutoevaluacion/$1');
+        $routes->get('generar-constancia-inscripcion/(:num)', 'GenerarDocumentoController::generarConstanciaInscripcion/$1');
     });
 
 
@@ -314,15 +315,19 @@ $routes->group('seleccion', ['namespace' => 'Modules\Seleccion\Controllers'], fu
         $routes->put('tipos-declaracion/(:num)', 'TipoDeclaracionController::update/$1');
         $routes->delete('tipos-declaracion/(:num)', 'TipoDeclaracionController::delete/$1');
     });
+
+
     $routes->group('comision', function ($routes) {
 
-        $routes->get('evaluacion', 'Contratacion\EvaluacionController::index');
-        $routes->get('evaluacion/convocatorias', 'Contratacion\EvaluacionController::convocatorias');
-        $routes->get('evaluacion/postulantes/(:num)', 'Contratacion\EvaluacionController::postulantes/$1');
-        $routes->get('evaluar/ver/(:num)', 'Contratacion\EvaluacionController::postulacion/$1');
-        $routes->post('calificacionprevia/guardar', 'Contratacion\EvaluacionController::guardar');
-        $routes->get('reporte', 'Contratacion\EvaluacionController::resultados');
-        $routes->post('reporte/preevaluacion/(:num)', 'Contratacion\EvaluacionController::resultadosPreEvaluacion/$1');
+        $routes->get('/', 'EvaluacionController::index');
+         
+        $routes->group('evaluacion', ['namespace' => 'Modules\Seleccion\Controllers'], function ($routes) {
+            $routes->get('/', 'EvaluacionController::index');
+            $routes->get('postulantes/(:num)', 'EvaluacionController::getPostulantes/$1');
+            $routes->get('formulario/(:num)', 'EvaluacionController::getFormularioEvaluacion/$1');
+            $routes->post('guardar', 'EvaluacionController::guardarEvaluacion');
+        });
+
     });
     // ==========================================
     // Vistas de Gestión (Módulo Selección)

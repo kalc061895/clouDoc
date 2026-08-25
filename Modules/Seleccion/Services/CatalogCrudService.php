@@ -40,7 +40,8 @@ abstract class CatalogCrudService
             $builder->groupEnd();
         }
         $total = $builder->countAllResults(false);
-        $data = $builder->orderBy($orderBy, $direction)->limit($perPage, ($page - 1) * $perPage)->get()->getResultArray();
+        //$data = $builder->orderBy($orderBy, $direction)->limit($perPage, ($page - 1) * $perPage)->get()->getResultArray();
+        $data = $builder->orderBy($orderBy, $direction)->get()->getResultArray();
 
         return ['ok' => true, 'code' => 200, 'data' => $data, 'meta' => ['page' => $page, 'per_page' => $perPage, 'total' => $total, 'total_pages' => (int) ceil($total / $perPage)]];
     }

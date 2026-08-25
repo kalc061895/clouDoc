@@ -344,7 +344,7 @@
 
                             <i
                                 class="bi bi-circle text-muted me-2"
-                                id="iconDoc">
+                                id="iconDocumento">
                             </i>
 
                             <span>
@@ -430,14 +430,14 @@
         $.get('<?= base_url('seleccion/admin/etapas-convocatoria/listar/' . $convocatoriaId) ?>', r => {
             const count = Array.isArray(r.data || r) ? (r.data || r).length : 0;
             $('#resumenEtapas, #chkEtapasCount').text(count);
-            validarCheckItem('#iconEtapas', count > 0);
+            validarCheckItem('#iconEtapa', count > 0);
             verificarChecklist();
         });
         // Cargar métricas y validar el checklist para publicar
         $.get('<?= base_url('seleccion/admin/documentos-convocatoria/listar/' . $convocatoriaId) ?>', r => {
             const count = Array.isArray(r.data || r) ? (r.data || r).length : 0;
             $('#resumenDocumentos, #chkDocumentosCount').text(count);
-            validarCheckItem('#iconDocumentos', count > 0);
+            validarCheckItem('#iconDocumento', count > 0);
             verificarChecklist();
         });
     }
@@ -453,8 +453,8 @@
 
     function verificarChecklist() {
         const cargosOk = $('#iconCargo').hasClass('text-success');
-        const etapasOk = $('#iconEtapas').hasClass('text-success');
-        const documentosOk = $('#iconDocumentos').hasClass('text-success');
+        const etapasOk = $('#iconEtapa').hasClass('text-success');
+        const documentosOk = $('#iconDocumento').hasClass('text-success');
         // Si cumple los mínimos, se habilita el botón de publicación
         if (cargosOk > 0 && etapasOk > 0 && documentosOk > 0) {
             $('#btnPublicar').prop('disabled', false);
