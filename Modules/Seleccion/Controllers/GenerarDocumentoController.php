@@ -24,7 +24,7 @@ class GenerarDocumentoController extends BaseController
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\solicitud_pdf', $data, 'Solicitud_' . $data['documento'] . '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\solicitud_pdf', $data, 'Solicitud_' . $data['documento'] );
     }
 
     public function generarFichaUnica($convocatoriaId)
@@ -34,7 +34,7 @@ class GenerarDocumentoController extends BaseController
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\ficha_unica_pdf', $data, 'FichaUnica_' . $data['postulante']['documento']. '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\ficha_unica_pdf', $data, 'FichaUnica_' . $data['postulante']['documento']);
     }
 
     public function generarFichaAutoevaluacion($convocatoriaId)
@@ -45,7 +45,7 @@ class GenerarDocumentoController extends BaseController
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\autoevaluacion_pdf', $data, 'Autoevaluacion_' . $data['postulante']['documento'] . '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\autoevaluacion_pdf', $data, 'Autoevaluacion_' . $data['postulante']['documento'] );
 
     }
     public function generarConstanciaInscripcion($convocatoriaId)
@@ -56,7 +56,7 @@ class GenerarDocumentoController extends BaseController
             return redirect()->back()->with('error', 'Postulante no encontrado.');
         }
 
-        return $this->_renderPdf('Modules\Seleccion\Views\documentos\constancia_pdf', $data, 'Autoevaluacion_' . $data['postulante']['pos_documento'] . '.pdf');
+        return $this->_renderPdf('Modules\Seleccion\Views\documentos\constancia_pdf', $data, 'Autoevaluacion_' . $data['postulante']['pos_documento'] );
 
     }
 
@@ -68,7 +68,7 @@ class GenerarDocumentoController extends BaseController
 
         $html = view($viewPath, $data);
         
-        return $html;
+        //return $html;
 
         
         $dompdf->loadHtml($html);

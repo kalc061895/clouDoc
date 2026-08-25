@@ -82,6 +82,7 @@
         }
     </style>
 </head>
+
 <?php
     if($postulante['grupo_ocupacional'] == 1):?>
 <body>
@@ -356,6 +357,7 @@
 
 </body>
     <?php endif;?>
+
 <?php if($postulante['grupo_ocupacional'] == 2 || $postulante['grupo_ocupacional'] == 3):?>
 <body>
 

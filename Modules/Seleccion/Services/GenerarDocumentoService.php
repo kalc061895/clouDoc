@@ -116,12 +116,12 @@ class GenerarDocumentoService
                 'email' => $postulante['pos_email'],
             ],
             'colegiatura' =>
-                [
-                    'colegio' => $profesion['ppr_titulo'] ?? '-',
-                    'numero' => $profesion['ppr_colegitura'] ?? '-',
-                    'estado' => $profesion['ppr_habilitacion'] ?? '-',
-                    'fecha_colegiado' => $profesion['ppr_fecha'] ?? '-',
-                ],
+            [
+                'colegio' => $profesion['ppr_titulo'] ?? '-',
+                'numero' => $profesion['ppr_colegitura'] ?? '-',
+                'estado' => $profesion['ppr_habilitacion'] ?? '-',
+                'fecha_colegiado' => $profesion['ppr_fecha'] ?? '-',
+            ],
 
             'profesion' => $profesiones,
             'formacion' => $formacion,
@@ -155,7 +155,7 @@ class GenerarDocumentoService
         }
         // por ahora lo haremos manual
         // si el postulante pertenece a profesional
-        if (!$postulante['car_gru_ide'] != 1) {
+        if ($postulante['car_gru_ide'] === 1) {
             // Simulación/Consulta de tablas secundarias relacionándolas con $postulanteId
             // $formacionModel = new FormacionModel();
             $postulanteProfesionService = new PostulanteProfesionService();
@@ -219,7 +219,6 @@ class GenerarDocumentoService
                     } else {
                         $horas += $cap['pca_horas'];
                     }
-
                 }
                 $resumen['capa_mayor'] = min($maximo_mayores, 2) * 2;
                 $resumen['capa_menor'] = min($horas, 500) * 0.02;
@@ -232,7 +231,6 @@ class GenerarDocumentoService
 
                 foreach ($experiencia as $cap) {
                     $dias += $cap['pex_dias_declarados'];
-
                 }
                 $meses = $dias / 30;
                 $anios = $meses / 12;
@@ -296,6 +294,7 @@ class GenerarDocumentoService
                 $resumen['ide_encar'] = min($encar, 5) * 0.5;
                 $resumen['ide_felic'] = min($felic, 5) * 0.5;
             }
+            $resumen['total'] = $resumen['total'] + ($resumen['ide_encar'] ?? 0) + ($resumen['ide_felic'] ?? 0);
         }
         // en este caso perteneceria a tecnico o auxiliar
         else {
@@ -329,7 +328,6 @@ class GenerarDocumentoService
                         case 2: //MAESTRIA
                             $resumen['titulo'] = 40;
                             break;
-                        
                     }
                 }
             }
@@ -350,7 +348,6 @@ class GenerarDocumentoService
                     } else {
                         $horas += $cap['pca_horas'];
                     }
-
                 }
                 $resumen['capa_mayor'] = min($maximo_mayores, 4) * 2.5;
                 $resumen['capa_menor'] = min($horas, 500) * 0.02;
@@ -363,7 +360,6 @@ class GenerarDocumentoService
 
                 foreach ($experiencia as $cap) {
                     $dias += $cap['pex_dias_declarados'];
-
                 }
                 $meses = $dias / 30;
                 $ptje = round($meses * 0.5);
@@ -428,8 +424,9 @@ class GenerarDocumentoService
                 $resumen['ide_encar'] = min($encar, 5) * 1;
                 $resumen['ide_felic'] = min($felic, 5) * 1;
             }
+            $resumen['total'] = $resumen['total'] + ($resumen['ide_encar'] ?? 0) + ($resumen['ide_felic'] ?? 0);
         }
-        $resumen['total'] = $resumen['total']+($resumen['ide_encar'] ?? 0)+($resumen['ide_felic'] ?? 0);
+
 
 
 
@@ -543,14 +540,14 @@ class GenerarDocumentoService
                 'telefono' => $postulante['pos_telefono'],
                 'email' => $postulante['pos_email'],
             ],
-            'postulante' =>$postulante,
+            'postulante' => $postulante,
             'colegiatura' =>
-                [
-                    'colegio' => $profesion['ppr_titulo'] ?? '-',
-                    'numero' => $profesion['ppr_colegitura'] ?? '-',
-                    'estado' => $profesion['ppr_habilitacion'] ?? '-',
-                    'fecha_colegiado' => $profesion['ppr_fecha'] ?? '-',
-                ],
+            [
+                'colegio' => $profesion['ppr_titulo'] ?? '-',
+                'numero' => $profesion['ppr_colegitura'] ?? '-',
+                'estado' => $profesion['ppr_habilitacion'] ?? '-',
+                'fecha_colegiado' => $profesion['ppr_fecha'] ?? '-',
+            ],
 
             'profesion' => $profesiones,
             'formacion' => $formacion,
