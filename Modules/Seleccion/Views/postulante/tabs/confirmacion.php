@@ -4,8 +4,7 @@
         <p class="text-muted small">Ejecute las validaciones antes de presentar el expediente.</p>
     </div>
     <?php if (!empty($postulacion)): ?>
-        <span
-            class="badge bg-primary align-self-start">
+        <span class="badge bg-primary align-self-start">
             <?= esc($postulacion['pto_codigo']) ?>
         </span>
     <?php endif ?>
@@ -18,8 +17,9 @@
         <div class="card-body text-center py-5">
 
             <div class="mb-3">
-                <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
-                    <i class="bi bi-check-lg fs-1"></i>
+                <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center"
+                    style="width:80px;height:80px;">
+                    <iconify-icon icon="solar:shield-check-bold" width="4em" height="4em"></iconify-icon>
                 </div>
             </div>
 
@@ -39,9 +39,8 @@
             </div>
 
             <a href="<?= base_url('seleccion/postulacion/generar-constancia-inscripcion/' . $convocatoriaId) ?>"
-                class="btn btn-success"
-                target="_blank">
-                <i class="bi bi-file-earmark-pdf me-1"></i>
+                class="btn btn-success" target="_blank">
+
                 Descargar Constancia de Inscripción
             </a>
 
@@ -52,8 +51,7 @@
     <div id="lista-validaciones" class="mb-3">
         <?php foreach ($validaciones as $v): ?>
             <div class="d-flex gap-2 py-2 border-bottom">
-                <span
-                    class="<?= $v['vpo_resultado'] ? 'text-success' : 'text-danger' ?>">
+                <span class="<?= $v['vpo_resultado'] ? 'text-success' : 'text-danger' ?>">
                     <?= $v['vpo_resultado'] ? '✓' : '✕' ?>
                 </span>
                 <div>
@@ -72,23 +70,18 @@
     <?php if ($editable): ?>
         <div class="form-check mb-2">
             <input class="form-check-input confirm-check" type="checkbox" id="c1">
-            <label
-                class="form-check-label" for="c1">He revisado la información registrada.</label>
+            <label class="form-check-label" for="c1">He revisado la información registrada.</label>
         </div>
         <div class="form-check mb-2">
             <input class="form-check-input confirm-check" type="checkbox" id="c2">
-            <label
-                class="form-check-label" for="c2">Declaro que la información proporcionada es verdadera.</label>
+            <label class="form-check-label" for="c2">Declaro que la información proporcionada es verdadera.</label>
         </div>
         <div class="form-check mb-3">
             <input class="form-check-input confirm-check" type="checkbox" id="c3">
-            <label
-                class="form-check-label" for="c3">Acepto las condiciones de la convocatoria.</label>
+            <label class="form-check-label" for="c3">Acepto las condiciones de la convocatoria.</label>
         </div>
-        <button
-            class="btn btn-outline-primary me-2" id="validar-inscripcion">Actualizar validaciones</button>
-        <button
-            class="btn btn-success" id="confirmar-inscripcion" disabled>Confirmar inscripción definitiva</button>
+        <button class="btn btn-outline-primary me-2" id="validar-inscripcion">Actualizar validaciones</button>
+        <button class="btn btn-success" id="confirmar-inscripcion" disabled>Confirmar inscripción definitiva</button>
     <?php else: ?>
         <div class="alert alert-success">Expediente presentado. El contenido ha sido bloqueado.</div>
 
@@ -96,8 +89,9 @@
             <div class="card-body text-center py-5">
 
                 <div class="mb-3">
-                    <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
-                        <i class="bi bi-check-lg fs-1"></i>
+                    <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center"
+                        style="width:80px;height:80px;">
+                        <iconify-icon icon="solar:shield-check-bold" width="4em" height="4em"></iconify-icon>
                     </div>
                 </div>
 
@@ -117,9 +111,8 @@
                 </div>
 
                 <a href="<?= base_url('seleccion/postulacion/generar-constancia-inscripcion/' . $convocatoriaId) ?>"
-                    class="btn btn-success"
-                    target="_blank">
-                    <i class="bi bi-file-earmark-pdf me-1"></i>
+                    class="btn btn-success" target="_blank">
+                    <iconify-icon icon="solar:file-download-linear" width="1em" height="1em"></iconify-icon>
                     Descargar Constancia de Inscripción
                 </a>
 

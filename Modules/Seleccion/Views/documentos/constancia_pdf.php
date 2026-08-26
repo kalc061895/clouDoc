@@ -119,7 +119,7 @@
 
     <!-- ENCABEZADO INSTITUCIONAL -->
     <header>
-        <div class="header-title">COMISION DE <?=  $postulante['con_nombre'] ?>?></div>
+        <div class="header-title">COMISION DE <?= $postulante['con_nombre'] ?></div>
         <div class="header-sub">CONSTANCIA OFICIAL DE REGISTRO DE POSTULACIÓN DIGITAL</div>
     </header>
 
@@ -153,9 +153,32 @@
             <th>Fecha de Registro:</th>
             <td><?= date('d/m/Y', strtotime($postulante['pto_fecha_presentacion'])) ?></td>
         </tr>
+        <?php
+        $fecha = strtotime($postulante['pto_fecha_presentacion']);
+        $meses = [
+            1 => 'enero',
+            2 => 'febrero',
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre',
+        ];
+        ?>
+
         <tr>
-            <th>Hora de Registro:</th>
-            <td><?= date('H:i:s hrs.', strtotime($postulante['pto_fecha_presentacion'])) ?></td>
+            <th>Fecha y Hora de Registro:</th>
+            <td>
+                <?= date('d', $fecha) ?>
+                de <?= $meses[(int) date('n', $fecha)] ?>
+                de <?= date('Y', $fecha) ?>,
+                <?= date('H:i:s', $fecha) ?> hrs.
+            </td>
         </tr>
         <tr>
             <th>Estado de Inscripción:</th>
@@ -168,7 +191,8 @@
     <table class="data-table">
         <tr>
             <th>Nombres y Apellidos:</th>
-            <td><?= esc($postulante['pos_apellido_paterno'] . ' ' . $postulante['pos_apellido_materno'] . ' ' . $postulante['pos_nombres']) ?></td>
+            <td><?= esc($postulante['pos_apellido_paterno'] . ' ' . $postulante['pos_apellido_materno'] . ' ' . $postulante['pos_nombres']) ?>
+            </td>
         </tr>
         <tr>
             <th>N° de Documento:</th>
@@ -186,7 +210,8 @@
 
     <!-- PIE DE PÁGINA Y NOTAS -->
     <div class="footer-note">
-        <p>Este documento es un comprobante oficial de su inscripción digital generado automáticamente por la plataforma de selección.</p>
+        <p>Este documento es un comprobante oficial de su inscripción digital generado automáticamente por la plataforma
+            de selección.</p>
         <p><strong>Nota:</strong> Guarde o imprima este comprobante para posteriores etapas del concurso público.</p>
         <p style="margin-top: 10px; font-size: 8px;">Fecha de impresión: <?= date('d/m/Y H:i:s') ?></p>
     </div>
