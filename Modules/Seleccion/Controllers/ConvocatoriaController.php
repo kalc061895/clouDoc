@@ -2,37 +2,46 @@
 
 namespace Modules\Seleccion\Controllers;
 
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
-use Modules\Seleccion\Services\ConvocatoriaService;
+use App\Core\Controllers\BaseModuleController;
 use Modules\Seleccion\Models\ConvocatoriaModel;
 use Modules\Seleccion\Models\TipoConvocatoriaModel;
 use Modules\Seleccion\Models\EstadoConvocatoriaModel;
-
+use Modules\Seleccion\Services\ConvocatoriaService;
 use CodeIgniter\API\ResponseTrait;
 
-class ConvocatoriaController extends BaseController
+class ConvocatoriaController extends BaseModuleController
 {
-
     use ResponseTrait;
 
-    protected $convocatoriaModel;
-    protected $tipoModel;
-    protected $estadoModel;
+    protected ConvocatoriaModel $convocatoriaModel;
+    protected TipoConvocatoriaModel $tipoModel;
+    protected EstadoConvocatoriaModel $estadoModel;
 
     public function __construct()
     {
         $this->convocatoriaModel = new ConvocatoriaModel();
-        $this->tipoModel        = new TipoConvocatoriaModel();
-        $this->estadoModel      = new EstadoConvocatoriaModel();
+        $this->tipoModel         = new TipoConvocatoriaModel();
+        $this->estadoModel       = new EstadoConvocatoriaModel();
     }
 
     /**
-     * Carga la Vista HTML principal
+     * Vista principal de convocatorias (Admin)
      */
     public function index()
     {
-        return view('convocatorias/index');
+        return view('Modules\Seleccion\Views\convocatorias\index');
+    }
+
+    /**
+     * Vista de convocatorias vigentes (Postulante)
+     */
+    public function vigentes()
+    {
+        return view('Modules\Seleccion\Views\postulante\index', [
+            'titulo'                => 'Mis Postulaciones y Vacantes',
+            'misPostulaciones'      => [],
+            'convocatoriasAbiertas' => [],
+        ]);
     }
 
     // ==========================================
@@ -40,41 +49,105 @@ class ConvocatoriaController extends BaseController
     // ==========================================
 
     /**
-     * GET: Lista completa con JOINs para DataTable
+     * GET: Lista completa para DataTable (Admin)
+     * Corrección: aliases de tablas con prefijos selec_ correctos
      */
     public function listarApi()
     {
-        $data = $this->convocatoriaModel
-            ->select('
-                convocatoria.con_ide,
-                convocatoria.con_codigo,
-                convocatoria.con_numero,
-                convocatoria.con_nombre,
-                convocatoria.con_anio,
-                convocatoria.con_tco_ide,
-                convocatoria.con_eco_ide,
-                convocatoria.con_fecha_publicacion,
-                convocatoria.con_fecha_inicio,
-                convocatoria.con_fecha_cierre,
-                convocatoria.con_observacion,
-                tipo.tco_nombre AS tipo_nombre,
-                estado.eco_nombre AS estado_nombre
-            ')
-            ->join('tipo_convocatoria tipo', 'tipo.tco_ide = convocatoria.con_tco_ide', 'left')
-            ->join('estado_convocatoria estado', 'estado.eco_ide = convocatoria.con_eco_ide', 'left')
-            ->where('convocatoria.deleted_at', null)
-            ->findAll();
+        $db = \Config\Database::connect();
 
-        return $this->respond([
-            'status' => 'success',
-            'data'   => $data
-        ]);
+        $data = $db->table('selec_convocatorias c')
+            ->select('
+                c.con_ide,
+                c.con_codigo,
+                c.con_numero,
+                c.con_nombre,
+                c.con_anio,
+                c.con_regimen_laboral,
+                c.con_tco_ide,
+                c.con_eco_ide,
+                c.con_fecha_publicacion,
+                c.con_fecha_inicio,
+                c.con_fecha_cierre,
+                c.con_observacion,
+                c.con_bases_pdf,
+                tc.tco_nombre AS tipo_nombre,
+                ec.eco_nombre AS estado_nombre,
+                ec.eco_codigo AS estado_codigo
+            ')
+            ->join('selec_tipos_convocatoria tc', 'tc.tco_ide = c.con_tco_ide', 'left')
+            ->join('selec_estados_convocatoria ec', 'ec.eco_ide = c.con_eco_ide', 'left')
+            ->where('c.deleted_at', null)
+            ->orderBy('c.con_anio', 'DESC')
+            ->orderBy('c.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return $this->jsonResponse('success', 'Convocatorias listadas.', $data);
+    }
+
+    /**
+     * GET: Lista convocatorias vigentes/publicadas (Postulante)
+     */
+    public function listar()
+    {
+        $db = \Config\Database::connect();
+
+        $data = $db->table('selec_convocatorias c')
+            ->select('
+                c.con_ide, c.con_codigo, c.con_numero, c.con_nombre, c.con_anio,
+                c.con_regimen_laboral, c.con_fecha_inicio, c.con_fecha_cierre,
+                c.con_descripcion,
+                tc.tco_nombre AS tipo_nombre,
+                ec.eco_nombre AS estado_nombre, ec.eco_codigo AS estado_codigo,
+                COUNT(DISTINCT cc.cco_ide) AS total_plazas
+            ')
+            ->join('selec_tipos_convocatoria tc', 'tc.tco_ide = c.con_tco_ide', 'left')
+            ->join('selec_estados_convocatoria ec', 'ec.eco_ide = c.con_eco_ide', 'left')
+            ->join('selec_convocatoria_cargos cc', 'cc.cco_con_ide = c.con_ide', 'left')
+            ->where('c.deleted_at', null)
+            ->groupBy('c.con_ide')
+            ->orderBy('c.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return $this->jsonResponse('success', 'Convocatorias listadas.', $data);
+    }
+
+    /**
+     * GET: Lista convocatorias vigentes para el postulante
+     */
+    public function listarVigentes()
+    {
+        $db  = \Config\Database::connect();
+        $uid = auth()->id() ?? session()->get('user_id');
+
+        $data = $db->table('selec_convocatorias c')
+            ->select('
+                c.con_ide, c.con_codigo, c.con_numero, c.con_nombre, c.con_anio,
+                c.con_regimen_laboral, c.con_fecha_inicio, c.con_fecha_cierre, c.con_descripcion,
+                tc.tco_nombre AS tipo_nombre,
+                ec.eco_codigo AS estado_codigo, ec.eco_nombre AS estado_nombre,
+                COUNT(DISTINCT cc.cco_ide) AS total_plazas,
+                MAX(p.pto_ide) AS mi_postulacion_ide
+            ')
+            ->join('selec_tipos_convocatoria tc', 'tc.tco_ide = c.con_tco_ide', 'left')
+            ->join('selec_estados_convocatoria ec', 'ec.eco_ide = c.con_eco_ide', 'left')
+            ->join('selec_convocatoria_cargos cc', 'cc.cco_con_ide = c.con_ide', 'left')
+            ->join('selec_postulaciones p', "p.pto_cco_ide = cc.cco_ide AND p.pto_pos_ide IN (SELECT pos_ide FROM selec_postulantes WHERE pos_user_id = {$uid})", 'left')
+            ->where('c.deleted_at', null)
+            ->groupBy('c.con_ide')
+            ->orderBy('c.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return $this->jsonResponse('success', 'Convocatorias vigentes.', $data);
     }
 
     /**
      * POST: Registrar nueva convocatoria
      */
-    public function crearApi()
+    public function guardar()
     {
         $rules = [
             'con_codigo'  => 'required|max_length[50]',
@@ -83,32 +156,54 @@ class ConvocatoriaController extends BaseController
             'con_nombre'  => 'required|max_length[255]',
             'con_tco_ide' => 'required|numeric',
             'con_eco_ide' => 'required|numeric',
-            'con_responsable_ide' => 'permit_empty|is_not_unique[users.id]',
         ];
 
         if (!$this->validate($rules)) {
-            return $this->fail($this->validator->getErrors(), 400);
+            return $this->jsonResponse('error', 'Datos inválidos.', $this->validator->getErrors(), 422);
         }
 
         $datos = $this->request->getPost();
 
-        if ($this->convocatoriaModel->insert($datos)) {
-            return $this->respondCreated([
-                'status'  => 'success',
-                'message' => 'Convocatoria registrada con éxito.'
-            ]);
+        // Subida del PDF de bases si viene
+        $basePdf = $this->request->getFile('con_bases_pdf');
+        if ($basePdf && $basePdf->isValid() && !$basePdf->hasMoved()) {
+            $ruta = $this->uploadDocument($basePdf, 'seleccion/bases', ['pdf']);
+            if ($ruta) {
+                $datos['con_bases_pdf'] = $ruta;
+            }
         }
 
-        return $this->failServerError('Error al intentar guardar el registro.');
+        unset($datos['con_bases_pdf']); // Eliminar el campo de archivo del post
+        if (isset($ruta)) {
+            $datos['con_bases_pdf'] = $ruta;
+        }
+
+        $datos['created_by'] = $this->getAuditUserId();
+
+        if (!$this->convocatoriaModel->insert($datos)) {
+            return $this->jsonResponse('error', 'Error al guardar la convocatoria.', [], 500);
+        }
+
+        return $this->jsonResponse('success', 'Convocatoria registrada con éxito.', ['id' => $this->convocatoriaModel->getInsertID()], 201);
     }
 
     /**
-     * PUT: Actualizar convocatoria existente
+     * GET: Obtener datos de una convocatoria para edición
      */
-    public function actualizarApi($id = null)
+    public function editar(int $id)
     {
-        $datos = $this->request->getRawInput();
+        $convocatoria = $this->convocatoriaModel->find($id);
+        if (!$convocatoria) {
+            return $this->jsonResponse('error', 'Convocatoria no encontrada.', [], 404);
+        }
+        return $this->jsonResponse('success', 'Convocatoria cargada.', $convocatoria);
+    }
 
+    /**
+     * POST: Actualizar convocatoria existente
+     */
+    public function actualizar(int $id)
+    {
         $rules = [
             'con_codigo'  => 'required|max_length[50]',
             'con_numero'  => 'required|max_length[50]',
@@ -116,69 +211,66 @@ class ConvocatoriaController extends BaseController
             'con_nombre'  => 'required|max_length[255]',
             'con_tco_ide' => 'required|numeric',
             'con_eco_ide' => 'required|numeric',
-            'con_responsable_ide' => 'permit_empty|is_not_unique[users.id]',
         ];
 
-        if (!$this->validateData($datos, $rules)) {
-            return $this->fail($this->validator->getErrors(), 400);
+        if (!$this->validate($rules)) {
+            return $this->jsonResponse('error', 'Datos inválidos.', $this->validator->getErrors(), 422);
         }
 
-        if ($this->convocatoriaModel->update($id, $datos)) {
-            return $this->respond([
-                'status'  => 'success',
-                'message' => 'Convocatoria actualizada correctamente.'
-            ]);
+        $datos = $this->request->getPost();
+        $datos['updated_by'] = $this->getAuditUserId();
+
+        // Subida del PDF de bases si viene
+        $basePdf = $this->request->getFile('con_bases_pdf');
+        if ($basePdf && $basePdf->isValid() && !$basePdf->hasMoved()) {
+            $ruta = $this->uploadDocument($basePdf, 'seleccion/bases', ['pdf']);
+            if ($ruta) {
+                $datos['con_bases_pdf'] = $ruta;
+            }
+        }
+        unset($datos['con_bases_pdf_file']); // Limpiar campo de archivo
+
+        if (!$this->convocatoriaModel->update($id, $datos)) {
+            return $this->jsonResponse('error', 'Error al actualizar.', [], 500);
         }
 
-        return $this->failServerError('Error al intentar actualizar el registro.');
+        return $this->jsonResponse('success', 'Convocatoria actualizada correctamente.');
     }
 
     /**
-     * DELETE: Eliminar convocatoria
+     * POST: Eliminar convocatoria (soft delete)
      */
-    public function eliminarApi($id = null)
+    public function eliminar(int $id)
     {
-        if ($this->convocatoriaModel->delete($id)) {
-            return $this->respond([
-                'status'  => 'success',
-                'message' => 'Convocatoria eliminada correctamente.'
-            ]);
+        if (!$this->convocatoriaModel->delete($id)) {
+            return $this->jsonResponse('error', 'No se pudo eliminar la convocatoria.', [], 500);
         }
-
-        return $this->failServerError('No se pudo eliminar el registro.');
+        return $this->jsonResponse('success', 'Convocatoria eliminada correctamente.');
     }
 
     // ==========================================
-    // CATÁLOGOS / LOOKUPS
+    // LOOKUPS / CATÁLOGOS
     // ==========================================
 
-    /**
-     * GET: Carga selector de Tipos
-     */
     public function tiposLookup()
     {
         $data = $this->tipoModel
             ->select('tco_ide AS id, tco_nombre AS nombre')
             ->findAll();
-
-        return $this->respond([
-            'status' => 'success',
-            'data'   => $data
-        ]);
+        return $this->jsonResponse('success', 'Tipos cargados.', $data);
     }
 
-    /**
-     * GET: Carga selector de Estados
-     */
     public function estadosLookup()
     {
         $data = $this->estadoModel
             ->select('eco_ide AS id, eco_nombre AS nombre')
             ->findAll();
-
-        return $this->respond([
-            'status' => 'success',
-            'data'   => $data
-        ]);
+        return $this->jsonResponse('success', 'Estados cargados.', $data);
     }
+
+    // Mantener API REST para compatibilidad hacia atrás
+    public function listarApi()    { return $this->listar(); }
+    public function crearApi()     { return $this->guardar(); }
+    public function actualizarApi($id = null) { return $this->actualizar((int)$id); }
+    public function eliminarApi($id = null)   { return $this->eliminar((int)$id); }
 }
