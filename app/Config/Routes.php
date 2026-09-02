@@ -188,6 +188,7 @@ $routes->post('api/signature/upload/(:segment)', 'SignatureController::upload/$1
 
 
 
+<<<<<<< HEAD
 ############################## CONTRATACION #############################
 
 /**
@@ -287,3 +288,15 @@ $routes->group('comision', function ($routes) {
 
 
 ############################## CONTRATACION #############################
+=======
+/**
+ * Rutas para las api de notificaciones
+ */
+$routes->group('notificaciones', static function ($routes) {
+    $routes->get('contador', 'NotificacionController::contador');
+    $routes->get('pendientes', 'NotificacionController::pendientes');
+    $routes->get('listado', 'NotificacionController::listado');
+    $routes->post('leer/(:num)', 'NotificacionController::marcarLeida/$1');
+    $routes->post('leer-todas', 'NotificacionController::marcarTodasLeidas');
+});
+>>>>>>> 9c35db9abcb48141c542937da869063e97166430

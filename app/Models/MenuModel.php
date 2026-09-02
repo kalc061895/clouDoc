@@ -11,9 +11,17 @@ class MenuModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-        protected $protectFields    = true;
+    protected $protectFields    = true;
     protected $allowedFields = [
-        'type', 'parent_id', 'name', 'abbr', 'url', 'icon', 'status', 'separator'
+        'type',
+        'parent_id',
+        'name',
+        'abbr',
+        'url',
+        'icon',
+        'order',
+        'status',
+        'separator'
     ];
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -56,7 +64,7 @@ class MenuModel extends Model
         $builder->select('menus.*');
         $builder->join(
             'group_user',
-            "group_user.name = '".$tipoUsuario[0]."'",
+            "group_user.name = '" . $tipoUsuario[0] . "'",
             'join'
         );
         $builder->join(
@@ -85,7 +93,76 @@ class MenuModel extends Model
     public function findAllWithParents()
     {
         return $this->select('menus.*, parent.name as parent_name')
-                    ->join('menus as parent', 'parent.id = menus.parent_id', 'left')
-                    ->findAll();
+            ->join('menus as parent', 'parent.id = menus.parent_id', 'left')
+            ->findAll();
+    }
+    public function getMenuTree()
+    {
+        $menusAsignados = $this->getMenusByRole();
+
+        $todosMenus = $this
+            ->where('status', 'active')
+            ->orderBy('order', 'ASC')
+            ->findAll();
+
+        $mapMenus = [];
+
+        foreach ($todosMenus as $menu) {
+            $mapMenus[$menu['id']] = $menu;
+        }
+
+        $menusFinales = [];
+
+        foreach ($menusAsignados as $menu) {
+
+            $menusFinales[$menu['id']] = $menu;
+
+            $parentId = $menu['parent_id'];
+
+            while ($parentId) {
+
+                if (!isset($mapMenus[$parentId])) {
+                    break;
+                }
+
+                $menusFinales[$parentId] = $mapMenus[$parentId];
+
+                $parentId = $mapMenus[$parentId]['parent_id'];
+            }
+        }
+
+        uasort($menusFinales, function ($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
+
+        return $this->buildTree(array_values($menusFinales));
+    }
+    private function buildTree(array $menus): array
+    {
+        $tree = [];
+        $refs = [];
+
+        foreach ($menus as $menu) {
+
+            $menu['children'] = [];
+
+            $refs[$menu['id']] = $menu;
+        }
+
+        foreach ($refs as $id => &$menu) {
+
+            if (
+                !empty($menu['parent_id'])
+                && isset($refs[$menu['parent_id']])
+            ) {
+
+                $refs[$menu['parent_id']]['children'][] = &$menu;
+            } else {
+
+                $tree[] = &$menu;
+            }
+        }
+
+        return $tree;
     }
 }

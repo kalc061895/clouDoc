@@ -27,10 +27,9 @@ class PersonaModel extends Model
         'per_email',
         'per_estadocivil',
         'per_ingreso',
-        'per_user',
-        'per_pass',
-        // 'per_fecha_registro' no se incluye aquí porque tiene CURRENT_TIMESTAMP en la BD
-        // y se gestiona automáticamente por la base de datos.
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     protected bool $allowEmptyInserts = false;

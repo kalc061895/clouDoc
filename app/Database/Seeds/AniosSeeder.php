@@ -8,15 +8,22 @@ class AniosSeeder extends Seeder
 {
     public function run()
     {
+
+        // Obtiene el año actual de forma dinámica
+        $anioActual = (int) date('Y');
         $data = [];
-        for ($year = 2023; $year <= 2024; $year++) {
+
+        for ($year = 2000; $year <= $anioActual; $year++) {
             $data[] = [
-                'nombre'      => $year,
+                'nombre'      => (string) $year,
                 'abreviatura' => (string) $year,
                 'numero'      => $year,
             ];
         }
-        
-        $this->db->table('anios')->insertBatch($data);
+
+        // Utiliza insertBatch para insertar de golpe todo el array generado
+        if (!empty($data)) {
+            $this->db->table('anios')->insertBatch($data);
+        }
     }
 }
