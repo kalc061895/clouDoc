@@ -70,6 +70,36 @@ class CreateTableProgramacion extends Migration
                 'null'    => true,
                 'default' => null,
             ],
+            'created_at' => [
+                'type'    => 'TIMESTAMP',
+                'null'    => true,
+                'default' => null,
+            ],
+            'updated_at' => [
+                'type'    => 'TIMESTAMP',
+                'null'    => true,
+                'default' => null,
+            ],
+            'deleted_at' => [
+                'type'    => 'TIMESTAMP',
+                'null'    => true,
+                'default' => null,
+            ],
+            'created_by' => [
+                'type'     => 'INT',
+                'unsigned' => true,
+                'null'     => true,
+            ],
+            'updated_by' => [
+                'type'     => 'INT',
+                'unsigned' => true,
+                'null'     => true,
+            ],
+            'deleted_by' => [
+                'type'     => 'INT',
+                'unsigned' => true,
+                'null'     => true,
+            ],
         ]);
 
         $this->forge->addKey('prog_ide', true);

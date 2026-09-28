@@ -229,7 +229,146 @@ class MenuSeeder extends Seeder
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Permisos', 'url' => 'gestordb/permiso', 'icon' => 'id-card', 'order' => 15],
             ['parent' => 'BASE_DE_DATOS', 'name' => 'Usuarios del Sistema', 'url' => 'administrador/periferie', 'icon' => 'network-wired', 'order' => 1],
 
-            
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Tareas', 
+                'url'    => 'gestordb/tarea', 
+                'icon'   => 'tasks', 
+                'order'  => 2
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Tipos de Oficina', 
+                'url'    => 'gestordb/tipo-oficina', 
+                'icon'   => 'building', 
+                'order'  => 3
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Oficinas', 
+                'url'    => 'gestordb/oficina', 
+                'icon'   => 'briefcase', 
+                'order'  => 4
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Licencias', 
+                'url'    => 'gestordb/licencia', 
+                'icon'   => 'calendar-minus', 
+                'order'  => 5
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Turnos', 
+                'url'    => 'gestordb/turno', 
+                'icon'   => 'hourglass-half', 
+                'order'  => 6
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Horario de Turnos', 
+                'url'    => 'gestordb/turno_horario', 
+                'icon'   => 'clock', 
+                'order'  => 7
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Cargo', 
+                'url'    => 'gestordb/cargo', 
+                'icon'   => 'user-tag', 
+                'order'  => 8
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Establecimientos', 
+                'url'    => 'gestordb/establecimiento', 
+                'icon'   => 'hospital', 
+                'order'  => 9
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Modalidad / Contrato', 
+                'url'    => 'gestordb/tipo_contrato', 
+                'icon'   => 'handshake', 
+                'order'  => 10
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Permisos', 
+                'url'    => 'gestordb/permiso', 
+                'icon'   => 'id-card', 
+                'order'  => 11
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Diresas', 
+                'url'    => 'gestordb/diresas', 
+                'icon'   => 'sitemap', 
+                'order'  => 12
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Redes', 
+                'url'    => 'gestordb/redes', 
+                'icon'   => 'project-diagram', 
+                'order'  => 13
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Microredes', 
+                'url'    => 'gestordb/microredes', 
+                'icon'   => 'network-wired', 
+                'order'  => 14
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Profesiones', 
+                'url'    => 'gestordb/profesion', 
+                'icon'   => 'user-md', 
+                'order'  => 15
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Colegiaturas', 
+                'url'    => 'gestordb/colegiatura', 
+                'icon'   => 'file-medical', 
+                'order'  => 16
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Feriados', 
+                'url'    => 'gestordb/feriado', 
+                'icon'   => 'calendar-alt', 
+                'order'  => 17
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'UPSS', 
+                'url'    => 'gestordb/upss', 
+                'icon'   => 'clinic-medical', 
+                'order'  => 18
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Servicios', 
+                'url'    => 'gestordb/servicio', 
+                'icon'   => 'notes-medical', 
+                'order'  => 19
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Periodos', 
+                'url'    => 'gestordb/periodos', 
+                'icon'   => 'calendar-check', 
+                'order'  => 20
+            ],
+            [
+                'parent' => 'BASE_DE_DATOS', 
+                'name'   => 'Usuarios del Sistema', 
+                'url'    => 'administrador/periferie', 
+                'icon'   => 'users', 
+                'order'  => 21
+            ],
 
 
             // ESTABLECIMIENTOS
