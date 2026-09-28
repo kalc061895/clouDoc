@@ -35,7 +35,6 @@ $menuActive = 2;
 
 <?= $this->include('partials/menuVertical',$menu); ?>
 
-<<<<<<< HEAD
     <?php if ($item['type'] == 'primary') : ?>
         <!-- MENU DE TODO---------------------------------- -->
         <li class="nav-small-cap">
@@ -54,8 +53,6 @@ $menuActive = 2;
 
 
 <?php endforeach ?>
-=======
->>>>>>> 9c35db9abcb48141c542937da869063e97166430
 
 <?= $this->endSection(); ?>
 
