@@ -21,11 +21,13 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     // RUTA PRINCIPAL / DASHBOARD
     // ==========================================
+    
     $routes->get('dashboard', 'DashboardController::index');
 
     // ==========================================
     // GRUPO: ADMINISTRADOR (administrador/*)
     // ==========================================
+
     $routes->group('administrador', function ($routes) {
 
         // Personal
@@ -75,6 +77,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     // GRUPO: USUARIO COMÚN (usuario/*)
     // ==========================================
+
     $routes->group('usuario', function ($routes) {
         $routes->get('asistencia', 'UsuarioController::miAsistencia');
         $routes->get('cambio_turno', 'UsuarioController::solicitarCambio');
