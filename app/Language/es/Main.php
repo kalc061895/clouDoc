@@ -156,6 +156,8 @@ return [
     'cancelar'=> 'Cancelar',
     'guardar'=> 'Guardar',
 
+    
+
 ];
 
 

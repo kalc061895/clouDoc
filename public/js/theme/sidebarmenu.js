@@ -17,6 +17,7 @@ if ((at = "vertical")) {
     current_link.setAttribute("href", "index-2.html");
   } else {
     current_link.setAttribute("href", "index.html");
+    console.log('No matching URL found. Defaulting to index.html');
   }
   // end
 

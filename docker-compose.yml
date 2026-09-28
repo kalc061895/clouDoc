@@ -1,0 +1,36 @@
+services:
+
+  app:
+    build: .
+    container_name: cloudoc_app
+
+    ports:
+      - "8080:80"
+
+    volumes:
+      - .:/var/www/html
+
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:11
+
+    container_name: cloudoc_db
+
+    restart: always
+
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: cloudoc2
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
