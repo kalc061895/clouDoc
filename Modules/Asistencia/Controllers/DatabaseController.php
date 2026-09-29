@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\Asistencia\Controllers;
- 
+
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use Modules\Asistencia\Models\EstablecimientoModel;
@@ -22,6 +22,7 @@ use Modules\Asistencia\Services\TipoDocumentoService;
 use Modules\Asistencia\Services\TurnoService;
 use Modules\Asistencia\Services\TurnoHorarioService;
 use Modules\Asistencia\Services\UpssService;
+use Modules\Asistencia\Services\UpssServicioService;
 use Modules\Asistencia\Services\ServicioService;
 use Modules\Asistencia\Services\SegundaEspecialidadService;
 use Modules\Asistencia\Services\ProfesionEspecialidadService;
@@ -1793,103 +1794,92 @@ class DatabaseController extends BaseController
         return $this->fail('No se pudo desactivar la UPSS seleccionada.', 400);
     }
 
-    /**
-     * Vista de Gestión de Servicios
-     * GET /asistencia/gestordb/servicio
-     */
-    public function servicios()
+
+
+
+    public function upssServicios()
     {
-        return view('Modules\Asistencia\Views\database\servicios_view');
+        return view('Modules\Asistencia\Views\database\upss_servicios_view');
     }
 
-    /**
-     * API: Listar Servicios
-     * GET /asistencia/gestordb/api/servicios
-     */
-    public function apiListarServicios()
+    public function apiListarUpssServicios()
     {
-        $service = new ServicioService();
-        $search = $this->request->getVar('search');
+        $search = $this->request->getGet('search');
+        $data = (new UpssServicioService())->listarUpssServicios(is_string($search) ? $search : null);
+        return $this->respond(['status' => 'success', 'data' => $data]);
+    }
 
-        $data = $service->listarServicios($search);
+    public function apiCrearUpssServicio()
+    {
+        $service = new UpssServicioService();
+        $resultado = $service->crearUpssServicio($this->datosUpssServicio($this->request->getPost()));
+        if (is_array($resultado)) {
+            return $this->respond([
+                'status' => 'error',
+                'messages' => $resultado,
+                'csrfHash' => csrf_hash(),
+            ], 422);
+        }
+        return $this->respondCreated([
+            'status' => 'success',
+            'message' => 'Servicio registrado correctamente.',
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
 
+    public function apiActualizarUpssServicio($id = null)
+    {
+        $service = new UpssServicioService();
+        if ((int) $id < 1 || !$service->existe((int) $id)) {
+            return $this->failNotFound('Servicio no encontrado.');
+        }
+        $resultado = $service->actualizarUpssServicio(
+            (int) $id,
+            $this->datosUpssServicio($this->request->getRawInput())
+        );
+        if (is_array($resultado)) {
+            return $this->respond([
+                'status' => 'error',
+                'messages' => $resultado,
+                'csrfHash' => csrf_hash(),
+            ], 422);
+        }
         return $this->respond([
             'status' => 'success',
-            'data'   => $data
+            'message' => 'Servicio actualizado correctamente.',
+            'csrfHash' => csrf_hash(),
         ]);
     }
 
-    /**
-     * API: Crear Servicio
-     * POST /asistencia/gestordb/api/servicios
-     */
-    public function apiCrearServicio()
+    public function apiEliminarUpssServicio($id = null)
     {
-        $service = new ServicioService();
-        $datos = [
-            'ser_abreviatura'  => $this->request->getVar('ser_abreviatura'),
-            'ser_nombre'       => $this->request->getVar('ser_nombre'),
-            'ser_departamento' => $this->request->getVar('ser_departamento'),
-            'ser_descripcion'  => $this->request->getVar('ser_descripcion'),
-            'ser_upss'         => $this->request->getVar('ser_upss'),
+        $service = new UpssServicioService();
+        if ((int) $id < 1 || !$service->existe((int) $id)) {
+            return $this->failNotFound('Servicio no encontrado.');
+        }
+        if (!$service->eliminarUpssServicio((int) $id)) {
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'No se pudo eliminar el servicio. Revise si otros registros lo utilizan.',
+                'csrfHash' => csrf_hash(),
+            ], 409);
+        }
+        return $this->respondDeleted([
+            'status' => 'success',
+            'message' => 'Servicio eliminado correctamente.',
+            'csrfHash' => csrf_hash(),
+        ]);
+    }
+
+    private function datosUpssServicio(array $input): array
+    {
+        return [
+            'uss_ups_ide' => $input['uss_ups_ide'] ?? null,
+            'uss_codigo' => $input['uss_codigo'] ?? null,
+            'uss_nombre' => $input['uss_nombre'] ?? null,
+            'uss_abreviatura' => $input['uss_abreviatura'] ?? null,
+            'uss_estado' => $input['uss_estado'] ?? null,
         ];
-
-        $resultado = $service->crearServicio($datos);
-
-        if (is_array($resultado)) {
-            return $this->fail($resultado, 400);
-        }
-
-        return $this->respondCreated([
-            'status'  => 'success',
-            'message' => 'Servicio registrado correctamente.'
-        ]);
-    }
-
-    /**
-     * API: Actualizar Servicio
-     * PUT /asistencia/gestordb/api/servicios/1
-     */
-    public function apiActualizarServicio($id = null)
-    {
-        $service = new ServicioService();
-        $rawDatos = $this->request->getRawInput();
-
-        $datos = [
-            'ser_abreviatura'  => $rawDatos['ser_abreviatura'] ?? null,
-            'ser_nombre'       => $rawDatos['ser_nombre'] ?? null,
-            'ser_departamento' => $rawDatos['ser_departamento'] ?? null,
-            'ser_descripcion'  => $rawDatos['ser_descripcion'] ?? null,
-            'ser_upss'         => $rawDatos['ser_upss'] ?? null,
-        ];
-
-        $resultado = $service->actualizarServicio((int)$id, $datos);
-
-        if (is_array($resultado)) {
-            return $this->fail($resultado, 400);
-        }
-
-        return $this->respond([
-            'status'  => 'success',
-            'message' => 'Servicio actualizado correctamente.'
-        ]);
-    }
-
-    /**
-     * API: Eliminar Servicio (Físico)
-     * DELETE /asistencia/gestordb/api/servicios/1
-     */
-    public function apiEliminarServicio($id = null)
-    {
-        $service = new ServicioService();
-
-        if ($service->eliminarServicio((int)$id)) {
-            return $this->respondDeleted([
-                'status'  => 'success',
-                'message' => 'El servicio ha sido removido del sistema permanentemente.'
-            ]);
-        }
-        return $this->fail('No se pudo eliminar el servicio seleccionado.', 400);
     }
 
 

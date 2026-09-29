@@ -255,13 +255,13 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->delete('upss/(:num)', 'DatabaseController::apiEliminarUpss/$1');
         });
 
-        $routes->get('servicio', 'DatabaseController::servicios');
+        $routes->get('upss-servicio', 'DatabaseController::upssServicios');
 
         $routes->group('api', function ($routes) {
-            $routes->get('servicios', 'DatabaseController::apiListarServicios');
-            $routes->post('servicios', 'DatabaseController::apiCrearServicio');
-            $routes->put('servicios/(:num)', 'DatabaseController::apiActualizarServicio/$1');
-            $routes->delete('servicios/(:num)', 'DatabaseController::apiEliminarServicio/$1');
+            $routes->get('upsservicios', 'DatabaseController::apiListarUpssServicios');
+            $routes->post('upsservicios', 'DatabaseController::apiCrearUpssServicio');
+            $routes->put('upsservicios/(:num)', 'DatabaseController::apiActualizarUpssServicio/$1');
+            $routes->delete('upsservicios/(:num)', 'DatabaseController::apiEliminarUpssServicio/$1');
         });
 
         $routes->get('persona', 'DatabaseController::personas');
