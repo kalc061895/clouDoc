@@ -3,20 +3,39 @@
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
 
-    $routes->get('horario', 'ProgramacionController::index');
+    // ==========================================
+    // MÓDULO: REGISTROS DE ASISTENCIA (MARCACIONES REALES)
+    // ==========================================
+    $routes->get('marcaciones', 'AsistenciaController::index');
+    $routes->get('asistencia', 'AsistenciaController::index');
+    $routes->group('asistencia/api', function ($routes) {
+        $routes->get('listar', 'AsistenciaController::apiListar');
+        $routes->get('detalle/(:num)', 'AsistenciaController::apiDetalleTrabajador/$1');
+        $routes->post('manual', 'AsistenciaController::apiGuardarManual');
+        $routes->post('corregir/(:num)', 'AsistenciaController::apiCorregir/$1');
+        $routes->post('eliminar/(:num)', 'AsistenciaController::apiEliminar/$1');
+    });
+    $routes->get('asistencia/exportar-excel', 'AsistenciaController::exportarExcel');
 
+    // ==========================================
+    // MÓDULO: PROGRAMACIÓN DE TURNOS
+    // ==========================================
+    $routes->get('programacion', 'ProgramacionController::index');
     $routes->get('programacion/calendario', 'ProgramacionController::index');
-    $routes->get('programacion/eventos', 'ProgramacionController::listar');
-    $routes->post('programacion/eventos', 'ProgramacionController::guardar');
-    $routes->put('programacion/eventos/(:num)', 'ProgramacionController::actualizar/$1');
-    //$routes->post('programacion/eliminar/(:num)', 'ProgramacionController::eliminar/$1');
-    $routes->delete('programacion/eventos/(:num)', 'ProgramacionController::eliminar/$1');
-    $routes->get('programacion/trabajadores', 'ProgramacionController::trabajadores');
-
-
-    $routes->get('programacion/pdf', 'ProgramacionController::pdfMensual');
-
-    $routes->get('programacion/excel', 'ProgramacionController::loadFromExcel');
+    $routes->group('programacion/api', function ($routes) {
+        $routes->get('matriz', 'ProgramacionController::apiMatriz');
+        $routes->get('eventos', 'ProgramacionController::apiEventosCalendar');
+        $routes->get('turnos-catalogo', 'ProgramacionController::apiTurnosCatalogo');
+        $routes->post('guardar', 'ProgramacionController::apiGuardarIndividual');
+        $routes->post('eliminar/(:num)', 'ProgramacionController::apiEliminarIndividual/$1');
+        $routes->post('previsualizar-excel', 'ProgramacionController::apiPrevisualizarExcel');
+        $routes->post('procesar-importacion', 'ProgramacionController::apiProcesarImportacion');
+    });
+    $routes->get('programacion/descargar-plantilla', 'ProgramacionController::descargarPlantilla');
+    $routes->get('programacion/descargar-reporte-errores', 'ProgramacionController::descargarReporteErrores');
+    $routes->get('programacion/exportar-excel-importable', 'ProgramacionController::exportarExcelImportable');
+    $routes->get('programacion/exportar-excel-reporte', 'ProgramacionController::exportarExcelReporte');
+    $routes->get('horario', 'ProgramacionController::index');
 
     // ==========================================
     // RUTA PRINCIPAL / DASHBOARD
@@ -40,16 +59,16 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('planilla_capacitacion', 'PersonalController::planillaCapacitacion');
 
         // Roles Mensuales y Turnos
-        $routes->get('asignar_plan', 'RolesController::asignarPlan');
-        $routes->get('ver_plan', 'RolesController::verPlan');
+        $routes->get('asignar_plan', 'ProgramacionController::index');
+        $routes->get('ver_plan', 'ProgramacionController::index');
         $routes->get('cambio_turno_user', 'RolesController::cambioTurnoAdmin');
-        $routes->get('load_file_turnos', 'RolesController::cargaMasiva');
-        $routes->post('load_file_turnos/procesar', 'RolesController::procesarCargaMasiva');
+        $routes->get('load_file_turnos', 'ProgramacionController::index');
+        $routes->post('load_file_turnos/procesar', 'ProgramacionController::apiProcesarImportacion');
 
-        // Asistencia
-        $routes->get('asistencia', 'AsistenciaController::rectificar');
-        $routes->post('asistencia/rectificar', 'AsistenciaController::guardarRectificacion');
-        $routes->get('reporte_asistencia', 'AsistenciaController::consultar');
+        // Asistencia y Marcaciones
+        $routes->get('asistencia', 'AsistenciaController::index');
+        $routes->post('asistencia/rectificar', 'AsistenciaController::apiCorregir/$1');
+        $routes->get('reporte_asistencia', 'AsistenciaController::index');
 
         // Dispositivos Biométricos
         $routes->get('load_file', 'DispositivoController::loadZtkeco');
@@ -323,10 +342,15 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('datos/(:num)', 'PersonalController::getPaneDatos/$1');
         $routes->get('asistencia/(:num)', 'AsistenciaController::getPaneAsistencia/$1');
         $routes->get('turnos/(:num)', 'TurnoController::getPaneTurnos/$1');
-        $routes->get('cambio-turno/(:num)', 'TurnoController::getPaneCambioTurno/$1');
+        $routes->get('cambio-turno/(:num)', 'CambioTurnoController::pane/$1');
+        $routes->get('cambio-turno/(:num)/turnos', 'CambioTurnoController::turnos/$1');
+        $routes->post('cambio-turno/(:num)/guardar', 'CambioTurnoController::guardar/$1');
+        $routes->post('cambio-turno/(:num)/eliminar/(:num)', 'CambioTurnoController::eliminar/$1/$2');
         $routes->get('incidencias/(:num)', 'RegistroLicenciaController::getPaneIncidencias/$1');
         $routes->get('permisos/(:num)', 'RegistroPermisoController::getPanePermisos/$1');
         $routes->get('vacaciones/(:num)', 'VacacionController::getPaneVacaciones/$1');
+        $routes->post('vacaciones/(:num)/usos', 'VacacionController::registrarUso/$1');
+        $routes->post('vacaciones/(:num)/usos/(:num)/eliminar', 'VacacionController::eliminarUso/$1/$2');
         // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
             $routes->get('listar', 'PersonalController::apiListar');

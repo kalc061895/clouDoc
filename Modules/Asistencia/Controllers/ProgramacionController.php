@@ -1,379 +1,361 @@
 <?php
 
-// 1. CAMBIA EL NAMESPACE PARA QUE COINCIDA CON TU NUEVO MÓDULO
 namespace Modules\Asistencia\Controllers;
 
-// 2. ASEGÚRATE DE IMPORTAR EL BASECONTROLLER DE LA CARPETA APP
-use App\Controllers\BaseController;
+use App\Core\Controllers\BaseModuleController;
+use Modules\Asistencia\Services\ProgramacionTurnoService;
+use Modules\Asistencia\Models\EstablecimientoModel;
+use Modules\Asistencia\Models\UpssModel;
+use Modules\Asistencia\Models\UpssServicioModel;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-// 3. ACTUALIZA LAS RUTAS DE TUS MODELOS SI TAMBIÉN LOS MOVISTE AL MÓDULO
-// Si tus modelos siguen en 'app/Models/Asistencia...', déjalos así:
-use Modules\Asistencia\Models\EventoModel;
-use Modules\Asistencia\Models\PersonalModel;
-use Modules\Asistencia\Models\PersonaModel;
-use Modules\Asistencia\Models\ServicioModel;
-
-// Si en el futuro mudas los modelos a 'Modules/Asistencia/Models', deberás cambiarlos a:
-// use Modules\Asistencia\Models\EventoModel;
-
-// Librerías externas (siguen igual)
-use Dompdf\Dompdf;
-use Ramsey\Uuid\Rfc4122\UuidV4;
-
-class ProgramacionController extends BaseController
+class ProgramacionController extends BaseModuleController
 {
-    public function index()
-    {
+    protected ProgramacionTurnoService $service;
+    protected EstablecimientoModel $establecimientoModel;
+    protected UpssModel $upssModel;
+    protected UpssServicioModel $upssServicioModel;
 
-        //return view('asistencia/programacion/full-calendar');
-        return view('asistencia/programacion/programar-calendario');
+    public function __construct()
+    {
+        $this->service              = new ProgramacionTurnoService();
+        $this->establecimientoModel = new EstablecimientoModel();
+        $this->upssModel            = new UpssModel();
+        $this->upssServicioModel    = new UpssServicioModel();
     }
 
     /**
-     * LISTAR EVENTOS (FULLCALENDAR)
+     * Pantalla mensual de programación de turnos (Vista Matriz y Calendario)
      */
-    public function listar()
+    public function index()
     {
-        $model = new EventoModel();
-        $data = $model->findAll();
+        $establecimientos = $this->establecimientoModel
+            ->select('est_ide, est_nombre, est_codigo')
+            ->where('deleted_at', null)
+            ->orderBy('est_nombre', 'ASC')
+            ->findAll();
 
+        $upssList = $this->upssModel
+            ->select('ups_ide, ups_nombre, ups_codigo')
+            ->where('deleted_at', null)
+            ->where('ups_estado', 1)
+            ->orderBy('ups_nombre', 'ASC')
+            ->findAll();
+
+        $catalogoTurnos = $this->service->obtenerCatalogoTurnos();
+
+        return view('Modules\Asistencia\Views\programacion\index', [
+            'titulo'           => 'Programación Mensual de Turnos',
+            'establecimientos' => $establecimientos,
+            'upssList'         => $upssList,
+            'oficinas' => (new \Modules\Asistencia\Models\OficinaModel())->orderBy('ofi_nombre')->findAll(),
+            'serviciosUpss' => $this->upssServicioModel->where('uss_estado', 1)->orderBy('uss_nombre')->findAll(),
+            'catalogoTurnos'   => $catalogoTurnos,
+            'anioActual'       => (int) date('Y'),
+            'mesActual'        => (int) date('n'),
+        ]);
+    }
+
+    /**
+     * Endpoint API para consultar la matriz mensual completa de programación
+     */
+    public function apiMatriz()
+    {
+        $anio    = (int) ($this->request->getGet('anio') ?? date('Y'));
+        $mes     = (int) ($this->request->getGet('mes') ?? date('n'));
+        $estIde  = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
+        $upsIde  = !empty($this->request->getGet('ups_ide')) ? (int) $this->request->getGet('ups_ide') : null;
+        $ussIde  = !empty($this->request->getGet('uss_ide')) ? (int) $this->request->getGet('uss_ide') : null;
+        $perlIde = !empty($this->request->getGet('perl_ide')) ? (int) $this->request->getGet('perl_ide') : null;
+
+        if ($anio < 2000 || $anio > 2100 || $mes < 1 || $mes > 12) {
+            return $this->jsonResponse('error', 'Año o mes inválido.', [], 422);
+        }
+
+        $datos = $this->service->obtenerMatrizMensual($anio, $mes, $estIde, $upsIde, $ussIde, $perlIde, (int) $this->request->getGet('ofi_ide') ?: null, trim((string) $this->request->getGet('dni')));
+
+        return $this->jsonResponse('success', 'Matriz de programación cargada.', $datos);
+    }
+
+    /**
+     * Endpoint API para FullCalendar de un trabajador o general
+     */
+    public function apiEventosCalendar()
+    {
+        $anio    = (int) ($this->request->getGet('anio') ?? date('Y'));
+        $mes     = (int) ($this->request->getGet('mes') ?? date('n'));
+        $perlIde = !empty($this->request->getGet('perl_ide')) ? (int) $this->request->getGet('perl_ide') : null;
+        $estIde  = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
+
+        $matriz = $this->service->obtenerMatrizMensual($anio, $mes, $estIde, (int) $this->request->getGet('ups_ide') ?: null, (int) $this->request->getGet('uss_ide') ?: null, $perlIde, (int) $this->request->getGet('ofi_ide') ?: null, trim((string) $this->request->getGet('dni')));
         $eventos = [];
 
-        foreach ($data as $row) {
+        foreach ($matriz['matriz'] as $trabajador) {
+            foreach ($trabajador['dias'] as $dia => $turnos) {
+                foreach ($turnos as $t) {
+                    $fecha = $t['prog_fecha'];
+                    $hIngreso = $t['th_hora_ingreso'] . ':00';
+                    $hSalida  = $t['th_hora_salida'] . ':00';
 
-            $eventos[] = [
-                'id'    => $row['id'],
-                'title' => $row['upss'] . ' - ' . $row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'] . ' - ' . $row['turno'],
+                    $inicio = "{$fecha}T{$hIngreso}";
+                    if ($hSalida <= $hIngreso) {
+                        $fechaSig = date('Y-m-d', strtotime("{$fecha} +1 day"));
+                        $fin = "{$fechaSig}T{$hSalida}";
+                    } else {
+                        $fin = "{$fecha}T{$hSalida}";
+                    }
 
-                'start' => $row['fecha_hora_inicio'],
-                'end'   => $row['fecha_hora_fin'],
-
-                'extendedProps' => [
-                    'trabajador_id'            => $row['trabajador_id'],
-                    'trabajador_dni'           => $row['trabajador_dni'],
-                    'trabajador_apellidos'     => $row['trabajador_apellidos'],
-                    'trabajador_nombres'       => $row['trabajador_nombres'],
-                    'trabajador_cargo'         => $row['trabajador_cargo'],
-                    'trabajador_especialidad'  => $row['trabajador_especialidad'],
-
-                    'tipo'      => $row['tipo'],
-                    'turno'     => $row['turno'],
-
-                    'upss'      => $row['upss'],
-                    'ambiente'  => $row['ambiente'],
-                    'actividad' => $row['actividad'],
-
-                    'color_actividad' => $row['color_actividad']
-                ]
-            ];
+                    $eventos[] = [
+                        'id'              => $t['prog_ide'],
+                        'title'           => "{$t['tur_codigo']} - {$trabajador['trabajador']}" . ($t['prog_estado'] === 'CAMBIO TURNO' ? ' ? CAMBIO TURNO' : ''),
+                        'start'           => $inicio,
+                        'end'             => $fin,
+                        'backgroundColor' => !empty($t['tur_color']) ? $t['tur_color'] : '#3B82F6',
+                        'borderColor'     => !empty($t['tur_color']) ? $t['tur_color'] : '#3B82F6',
+                        'extendedProps'   => [
+                            'prog_ide'       => $t['prog_ide'],
+                            'perl_ide'       => $trabajador['perl_ide'],
+                            'trabajador'     => $trabajador['trabajador'],
+                            'dni'            => $trabajador['dni'],
+                            'tur_codigo'     => $t['tur_codigo'],
+                            'tur_nombre'     => $t['tur_nombre'],
+                            'horario'        => "{$t['th_hora_ingreso']} - {$t['th_hora_salida']}",
+                            'duracion_horas' => $t['duracion_horas'],
+                        ],
+                    ];
+                }
+            }
         }
 
         return $this->response->setJSON($eventos);
     }
 
     /**
-     * GUARDAR EVENTO
+     * Asignación / Edición individual de turno con validación de cruces
      */
-
-    public function guardar()
+    public function apiGuardarIndividual()
     {
-        $model = new EventoModel();
-        $data = $this->request->getJSON(true);
-
-        //return $this->response->setJSON($data); // Detener la ejecución después de la prueba
-        $titulo = $data['trabajador_apellidos'] . ' ' . $data['trabajador_nombres'] . ' - ' . $data['turno'];
-
-        $model->insert([
-            'trabajador_id'           => $data['trabajador_id'],
-            'trabajador_dni'          => $data['trabajador_dni'],
-            'trabajador_apellidos'    => $data['trabajador_apellidos'],
-            'trabajador_nombres'      => $data['trabajador_nombres'],
-            'trabajador_cargo'        => $data['trabajador_cargo'],
-            'trabajador_especialidad' => $data['trabajador_especialidad'],
-
-            'tipo'    => $data['tipo'],
-            'turno'   => $data['turno'],
-
-            'upss'      => $data['upss'],
-            'ambiente'  => $data['ambiente'],
-            'actividad' => $data['actividad'],
-
-            'color_actividad' => $data['color_actividad'],
-
-            'fecha_hora_inicio' => $data['start'],
-            'fecha_hora_fin'    => $data['end']
-        ]);
-
-        return $this->response->setJSON(['status' => 'ok']);
-    }
-
-    /**
-     * ACTUALIZAR EVENTO
-     */
-    public function actualizar($id)
-    {
-        $model = new EventoModel();
-        $data = $this->request->getJSON(true);
-
-        $titulo = $data['trabajador_apellidos'] . ' ' . $data['trabajador_nombres'] . ' - ' . $data['turno'];
-
-        $model->update($id, [
-            'trabajador_id'           => $data['trabajador_id'],
-            'trabajador_dni'          => $data['trabajador_dni'],
-            'trabajador_apellidos'    => $data['trabajador_apellidos'],
-            'trabajador_nombres'      => $data['trabajador_nombres'],
-            'trabajador_cargo'        => $data['trabajador_cargo'],
-            'trabajador_especialidad' => $data['trabajador_especialidad'],
-
-            'tipo'    => $data['tipo'],
-            'turno'   => $data['turno'],
-
-            'upss'      => $data['upss'],
-            'ambiente'  => $data['ambiente'],
-            'actividad' => $data['actividad'],
-
-            'color_actividad' => $data['color_actividad'],
-
-            'fecha_hora_inicio' => $data['start'],
-            'fecha_hora_fin'    => $data['end']
-        ]);
-
-        return $this->response->setJSON(['status' => 'ok']);
-    }
-
-    /**
-     * ELIMINAR
-     */
-    public function eliminar($id)
-    {
-        $model = new EventoModel();
-        $model->delete($id);
-
-        return $this->response->setJSON(['status' => 'ok']);
-    }
-
-    /**
-     * TRABAJADORES (SIMULADO / REAL)
-     */
-    public function trabajadores()
-    {
-        $personalModel = new PersonalModel();
-
-        // Seleccionamos los campos necesarios y unimos las tablas
-        $data = $personalModel->select('
-                casis_personal.perl_ide as id, 
-                casis_persona.per_dni as dni, 
-                casis_persona.per_nombre as nombres,
-                CONCAT(casis_persona.per_paterno, " ", casis_persona.per_materno) as apellidos,
-                IFNULL(casis_servicio.ser_nombre, "N/A") as cargo
-            ')
-            ->join('casis_persona', 'casis_persona.per_dni = casis_personal.perl_per_ide', 'left')
-            ->join('casis_servicio', 'casis_servicio.ser_ide = casis_personal.perl_ser_ide', 'left')
-            ->findAll();
-
-        return $this->response->setJSON($data);
-    }
-
-
-
-    public function pdfMensual()
-    {
-        $mes = 'Mayo';
-        $anio = '2026';
-
-        $model = new EventoModel();
-
-        $data = $model->findAll();
-
-        // 🔁 MATRIZ
-        $filas = [];
-
-        foreach ($data as $row) {
-
-            $id = $row['trabajador_id'];
-            $dia = date('j', strtotime($row['fecha_hora_inicio']));
-
-            if (!isset($filas[$id])) {
-                $filas[$id] = [
-                    'dni' => $row['trabajador_dni'],
-                    'nombre' => $row['trabajador_apellidos'] . ' ' . $row['trabajador_nombres'],
-                    'cargo' => $row['trabajador_cargo'],
-                    'dias' => array_fill(1, 31, '')
-                ];
-            }
-
-            $filas[$id]['dias'][$dia] = $row['turno'];
-        }
-
-        $html = $this->generarHTMLPDF($filas, $mes, $anio);
-        
-        $info_rol = [
-            'html' => $html
+        $reglas = [
+            'prog_perl_ide' => 'required|is_natural_no_zero',
+            'prog_fecha'    => 'required|valid_date',
+            'prog_th_ide'   => 'required|is_natural_no_zero',
         ];
 
-        $dompdf = new Dompdf();
-
-        $html = view('asistencia/programacion/pdf-template', $info_rol);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        /*        // =========================
-        // CREAR CARPETA SI NO EXISTE
-        // =========================
-        $rutaCarpeta = WRITEPATH . 'uploads/programaciones/';
-
-        if (!is_dir($rutaCarpeta)) {
-            mkdir($rutaCarpeta, 0777, true);
+        if (!$this->validate($reglas)) {
+            return $this->jsonResponse('error', 'Datos de turno incompletos o inválidos.', $this->validator->getErrors(), 422);
         }
 
-        // =========================
-        // NOMBRE ARCHIVO
-        // =========================
-        
-        $nombre = UuidV4::uuid4()->toString().'programacion_' . date('Ymd_His') . '.pdf';
-        
+        $datos = $this->request->getPost();
+        $usuarioId = $this->getAuditUserId();
 
-        $rutaCompleta = $rutaCarpeta . $nombre;
+        $resp = $this->service->asignarTurnoIndividual($datos, $usuarioId);
 
-        // =========================
-        // GUARDAR PDF
-        // =========================
-        file_put_contents($rutaCompleta, $dompdf->output());
+        if (!$resp['status']) {
+            return $this->jsonResponse('error', $resp['message'], [], 400);
+        }
 
-        return "PDF guardado en: " . $rutaCompleta;
-*/
-
-        return $this->response
-            ->setHeader('Content-Type', 'application/pdf')
-            ->setBody($dompdf->output());
+        return $this->jsonResponse('success', $resp['message'], ['prog_ide' => $resp['prog_ide']]);
     }
 
     /**
-     * HTML DEL PDF
+     * Eliminación de turno asignado
      */
-    private function generarHTMLPDF($filas, $mes, $anio)
+    public function apiEliminarIndividual(int $progIde)
     {
-        $html = '
-            <style>
-            body { font-family: Arial; font-size:8px; }
+        $usuarioId = $this->getAuditUserId();
+        $resp = $this->service->eliminarTurnoIndividual($progIde, $usuarioId);
 
-            .titulo {
-                text-align:center;
-                font-weight:bold;
-                font-size:14px;
-            }
-
-            .sub {
-                text-align:center;
-                font-size:10px;
-            }
-
-            table {
-                width:100%;
-                border-collapse:collapse;
-            }
-
-            th, td {
-                border:1px solid #000;
-                padding:2px;
-                text-align:center;
-            }
-
-            .nombre {
-                text-align:left;
-            }
-
-            .small {
-                font-size:7px;
-            }
-
-            .footer {
-                margin-top:10px;
-                font-size:9px;
-            }
-            </style>
-
-            <div class="titulo">HOSPITAL CARLOS MONGE MEDRANO</div>
-            <div class="sub">PROGRAMACION DE TURNOS DE TRABAJO</div>
-            <div class="sub">MES: ' . $mes . ' - ' . $anio . '</div>
-
-            <br>
-
-            <table>
-            <tr>
-            <th>N°</th>
-            <th>DNI</th>
-            <th>APELLIDOS Y NOMBRES</th>
-            <th>CARGO</th>';
-
-        for ($d = 1; $d <= 31; $d++) {
-            $html .= "<th>$d</th>";
+        if (!$resp['status']) {
+            return $this->jsonResponse('error', $resp['message'], [], 400);
         }
 
-        $html .= '</tr>';
-
-        $i = 1;
-
-        foreach ($filas as $f) {
-
-            $html .= '<tr>';
-            $html .= '<td>' . $i++ . '</td>';
-            $html .= '<td class="nombre">' . $f['nombre'] . '</td>';
-
-            for ($d = 1; $d <= 31; $d++) {
-
-                $turno = $f['dias'][$d];
-
-                $bg = '';
-                if ($turno == 'M') $bg = '#cfe2ff';
-                if ($turno == 'T') $bg = '#d1e7dd';
-                if ($turno == 'N') $bg = '#f8d7da';
-
-                $html .= "<td style='background:$bg'>$turno</td>";
-            }
-
-            $html .= '</tr>';
-        }
-
-        $html .= '
-            <br>
-
-            <table class="small">
-            <tr><td><b>LEYENDA:</b></td></tr>
-            <tr><td>M = Mañana (07:00 - 13:00)</td></tr>
-            <tr><td>T = Tarde (13:00 - 19:00)</td></tr>
-            <tr><td>GD = Guardia Diurna</td></tr>
-            <tr><td>GN = Guardia Nocturna</td></tr>
-            <tr><td>MT = Doble turno</td></tr>
-            </table>
-
-            <br>
-
-            <div class="footer">
-            OBSERVACIONES:<br>
-            - Programación referencial.<br>
-            - Cumple normativa de horas laborales.<br>
-            </div>
-
-            <br><br>
-
-            <table width="100%">
-            <tr>
-            <td align="center">____________________<br>JEFE DE SERVICIO</td>
-            <td align="center">____________________<br>RRHH</td>
-            <td align="center">____________________<br>DIRECCIÓN</td>
-            </tr>
-            </table>
-        ';
-
-        return $html;
+        return $this->jsonResponse('success', $resp['message']);
     }
 
-    public function loadFromExcel()
+    /**
+     * Catálogo de turnos y horarios disponibles
+     */
+    public function apiTurnosCatalogo()
     {
-        // Aquí iría la lógica para cargar datos desde un archivo Excel
-        // Puedes usar una biblioteca como PhpSpreadsheet para esto
+        $catalogo = $this->service->obtenerCatalogoTurnos();
+        return $this->jsonResponse('success', 'Catálogo de turnos cargado.', $catalogo);
+    }
 
-        return view('asistencia/programacion/cargar-excel');
+    /**
+     * Descarga de plantilla Excel predeterminada para importación
+     */
+    public function descargarPlantilla()
+    {
+        $anio   = (int) ($this->request->getGet('anio') ?? date('Y'));
+        $mes    = (int) ($this->request->getGet('mes') ?? date('n'));
+        $estIde = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
+
+        $spreadsheet = $this->service->generarPlantillaExcel($anio, $mes, $estIde);
+
+        $nombreArchivo = sprintf('Plantilla_Programacion_Turnos_%04d_%02d.xlsx', $anio, $mes);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$nombreArchivo}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Previsualización interactiva de archivo Excel antes de aplicar importación
+     */
+    public function apiPrevisualizarExcel()
+    {
+        $archivo = $this->request->getFile('archivo_excel');
+        $anio    = (int) $this->request->getPost('anio');
+        $mes     = (int) $this->request->getPost('mes');
+        $estIde  = !empty($this->request->getPost('est_ide')) ? (int) $this->request->getPost('est_ide') : null;
+
+        if (!$archivo || !$archivo->isValid()) {
+            return $this->jsonResponse('error', 'Debe seleccionar un archivo Excel válido (.xlsx).', [], 400);
+        }
+
+        $extension = strtolower($archivo->getClientExtension());
+        if (!in_array($extension, ['xlsx', 'xls'])) {
+            return $this->jsonResponse('error', 'Formato no admitido. Debe ser un archivo .xlsx de Excel.', [], 400);
+        }
+
+        // Mover a carpeta temporal segura
+        $rutaTemp = WRITEPATH . 'uploads/' . $archivo->getRandomName();
+        $archivo->move(WRITEPATH . 'uploads', basename($rutaTemp));
+
+        $resultado = $this->service->previsualizarImportacionExcel($rutaTemp, $anio, $mes, $estIde);
+
+        // Guardar temporalmente en sesión para procesar o descargar reporte de errores
+        session()->set('temp_import_programacion', [
+            'ruta_archivo'      => $rutaTemp,
+            'anio'              => $anio,
+            'mes'               => $mes,
+            'est_ide'           => $estIde,
+            'registros_validos' => $resultado['registros_validos'] ?? [],
+            'errores'           => $resultado['errores'] ?? [],
+        ]);
+
+        if (!$resultado['status']) {
+            if (file_exists($rutaTemp)) {
+                @unlink($rutaTemp);
+            }
+            return $this->jsonResponse('error', $resultado['message'], [], 400);
+        }
+
+        return $this->jsonResponse('success', 'Archivo analizado correctamente.', $resultado);
+    }
+
+    /**
+     * Confirmación y aplicación de la importación masiva en base de datos
+     */
+    public function apiProcesarImportacion()
+    {
+        $datosSesion = session()->get('temp_import_programacion');
+        if (empty($datosSesion) || empty($datosSesion['registros_validos'])) {
+            return $this->jsonResponse('error', 'No hay datos validados pendientes de importación. Suba el archivo nuevamente.', [], 400);
+        }
+
+        $reemplazar = (bool) $this->request->getPost('reemplazar_existentes');
+        $estIde     = !empty($this->request->getPost('est_ide')) ? (int) $this->request->getPost('est_ide') : $datosSesion['est_ide'];
+        $upsIde     = !empty($this->request->getPost('ups_ide')) ? (int) $this->request->getPost('ups_ide') : null;
+        $ussIde     = !empty($this->request->getPost('uss_ide')) ? (int) $this->request->getPost('uss_ide') : null;
+        $usuarioId  = $this->getAuditUserId();
+
+        $resp = $this->service->procesarImportacionDefinitiva(
+            $datosSesion['registros_validos'],
+            $reemplazar,
+            $estIde,
+            $upsIde,
+            $ussIde,
+            $usuarioId
+        );
+
+        // Limpiar archivo temporal
+        if (!empty($datosSesion['ruta_archivo']) && file_exists($datosSesion['ruta_archivo'])) {
+            @unlink($datosSesion['ruta_archivo']);
+        }
+        session()->remove('temp_import_programacion');
+
+        if (!$resp['status']) {
+            return $this->jsonResponse('error', $resp['message'], [], 500);
+        }
+
+        return $this->jsonResponse('success', $resp['message'], $resp);
+    }
+
+    /**
+     * Descarga de reporte Excel con los errores detectados en la validación
+     */
+    public function descargarReporteErrores()
+    {
+        $datosSesion = session()->get('temp_import_programacion');
+        if (empty($datosSesion) || empty($datosSesion['errores'])) {
+            return redirect()->back()->with('error', 'No hay reporte de errores disponible.');
+        }
+
+        $spreadsheet = $this->service->generarReporteErroresExcel(
+            $datosSesion['errores'],
+            $datosSesion['anio'],
+            $datosSesion['mes']
+        );
+
+        $nombreArchivo = sprintf('Errores_Importacion_Turnos_%04d_%02d.xlsx', $datosSesion['anio'], $datosSesion['mes']);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$nombreArchivo}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Exportación de la programación mensual en formato compatible con importación
+     */
+    public function exportarExcelImportable()
+    {
+        $anio   = (int) ($this->request->getGet('anio') ?? date('Y'));
+        $mes    = (int) ($this->request->getGet('mes') ?? date('n'));
+        $estIde = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
+        $upsIde = !empty($this->request->getGet('ups_ide')) ? (int) $this->request->getGet('ups_ide') : null;
+        $ussIde = !empty($this->request->getGet('uss_ide')) ? (int) $this->request->getGet('uss_ide') : null;
+
+        $spreadsheet = $this->service->exportarExcelImportable($anio, $mes, $estIde, $upsIde, $ussIde, (int) $this->request->getGet('ofi_ide') ?: null, trim((string) $this->request->getGet('dni')));
+        $nombreArchivo = sprintf('Programacion_Turnos_Importable_%04d_%02d.xlsx', $anio, $mes);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$nombreArchivo}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Exportación de la programación mensual en reporte institucional tipo matriz legible
+     */
+    public function exportarExcelReporte()
+    {
+        $anio   = (int) ($this->request->getGet('anio') ?? date('Y'));
+        $mes    = (int) ($this->request->getGet('mes') ?? date('n'));
+        $estIde = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
+        $upsIde = !empty($this->request->getGet('ups_ide')) ? (int) $this->request->getGet('ups_ide') : null;
+        $ussIde = !empty($this->request->getGet('uss_ide')) ? (int) $this->request->getGet('uss_ide') : null;
+
+        $spreadsheet = $this->service->exportarExcelReporteLegible($anio, $mes, $estIde, $upsIde, $ussIde, (int) $this->request->getGet('ofi_ide') ?: null, trim((string) $this->request->getGet('dni')));
+        $nombreArchivo = sprintf('Reporte_Rol_Turnos_Mensual_%04d_%02d.xlsx', $anio, $mes);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$nombreArchivo}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

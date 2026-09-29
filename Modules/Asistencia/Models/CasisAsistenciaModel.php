@@ -19,8 +19,13 @@ class CasisAsistenciaModel extends Model
         'asi_fecha_hora',
         'asi_dispositivo',
         'asi_origen',
+        'asi_tipo',
+        'asi_motivo',
         'asi_ip_log',
         'asi_user_ide',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     protected $useTimestamps = true;

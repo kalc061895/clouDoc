@@ -261,8 +261,14 @@
     });
 
     // Carga centralizada de respuestas JSON
-    function cargarContenidoTab(id, paneId) {
+    function cargarContenidoTab(id, paneId, filtros = null) {
         const $pane = $(`#${paneId}`);
+        const anterior = $pane.data('peticion');
+        if (anterior) anterior.abort();
+        const calendario = $pane.find('.calendario-personal');
+        if (!filtros && Number(calendario.data('personal')) === Number(id)) {
+            filtros = { fecha_inicio: `${calendario.find('.calendario-anio').val()}-${calendario.find('.calendario-mes').val()}-01` };
+        }
 
         // 1. Loader visual mientras descarga la estructura del Pane
         $pane.html(`
@@ -276,15 +282,18 @@
         const endpoint = paneId.replace('pane-', '');
 
         // 2. Carga la vista parcial (HTML + JS interno)
-        $.ajax({
+        const peticion = $.ajax({
             url: `${URL_BASE}/${endpoint}/${id}`,
             type: 'GET',
+            data: filtros || {},
             dataType: 'html', // IMPORTANTE: Recibimos la vista PHP renderizada
             success: function(htmlView) {
+                if (Number(idPersonalSeleccionado) !== Number(id)) return;
                 // Se inyecta el HTML y jQuery ejecuta automáticamente el <script> interno del pane
                 $pane.html(htmlView);
             },
             error: function(xhr, status, error) {
+                if (status === 'abort') return;
                 console.error(`Error al cargar el módulo ${endpoint}:`, error);
                 $pane.html(`
                 <div class="alert alert-danger d-flex align-items-center mb-0 p-3" role="alert">
@@ -296,7 +305,15 @@
             `);
             }
         });
+        $pane.data('peticion', peticion);
     }
+
+    $('#modalGestionPersonal').on('change', '.calendario-mes, .calendario-anio', function() {
+        const calendario = $(this).closest('.calendario-personal');
+        cargarContenidoTab(calendario.data('personal'), `pane-${calendario.data('tipo')}`, {
+            fecha_inicio: `${calendario.find('.calendario-anio').val()}-${calendario.find('.calendario-mes').val()}-01`
+        });
+    });
 
     // Confirmación de Baja con SweetAlert2
     function confirmarBaja(id) {
@@ -329,4 +346,6 @@
         });
     }
 </script>
+<script src="<?= base_url('assets/js/asistencia-cambio-turno.js') ?>"></script>
+<script src="<?= base_url('assets/js/asistencia-vacaciones.js') ?>"></script>
 <?= $this->endSection() ?>

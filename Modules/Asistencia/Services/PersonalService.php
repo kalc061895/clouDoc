@@ -23,6 +23,36 @@ use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class PersonalService
 {
+    public function obtenerDatosGenerales(int $id): ?array
+    {
+        $db = Database::connect();
+        $personal = $db->table('casis_personal pl')
+            ->select('pl.*, p.per_numero_documento, p.per_paterno, p.per_materno, p.per_nombre,
+                p.per_sexo, p.per_fecha_nacimiento, p.per_lugar_nacimiento, p.per_estadocivil,
+                p.per_ruc, p.per_telefono, p.per_email, p.per_residencia,
+                tdi.tdi_nombre, tdi.tdi_abreviatura, est.est_nombre, est.est_codigo, est.est_ipress,
+                ofi.ofi_nombre, car.car_nombre, mco.mco_nombre')
+            ->join('casis_persona p', 'p.per_ide = pl.perl_per_ide')
+            ->join('casis_tipo_documento_identidad tdi', 'tdi.tdi_ide = p.per_tdi_ide', 'left')
+            ->join('casis_establecimiento est', 'est.est_ide = pl.perl_est_ide', 'left')
+            ->join('casis_oficina ofi', 'ofi.ofi_ide = pl.perl_ofi_ide', 'left')
+            ->join('casis_cargo car', 'car.car_ide = pl.perl_car_ide', 'left')
+            ->join('casis_modalidad_contrato mco', 'mco.mco_ide = pl.perl_mco_ide', 'left')
+            ->where('pl.perl_ide', $id)->where('pl.deleted_at', null)->where('p.deleted_at', null)
+            ->get()->getRowArray();
+        if (!$personal) {
+            return null;
+        }
+        $personal['profesiones'] = $db->table('casis_personal_profesion pp')
+            ->select('pp.*, pro.pro_nombre, col.col_nombre, se.se_nombre')
+            ->join('casis_profesion pro', 'pro.pro_ide = pp.pp_pro_ide', 'left')
+            ->join('casis_colegiatura col', 'col.col_ide = pp.pp_col_ide', 'left')
+            ->join('casis_segunda_especialidad se', 'se.se_ide = pp.pp_se_ide', 'left')
+            ->where('pp.pp_perl_ide', $id)->where('pp.deleted_at', null)
+            ->orderBy('pp.pp_principal', 'DESC')->orderBy('pp.pp_ide', 'ASC')->get()->getResultArray();
+        return $personal;
+    }
+
     /**
      * Helper genérico para transformar colecciones al estándar del Wizard
      */

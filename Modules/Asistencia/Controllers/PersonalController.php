@@ -238,7 +238,11 @@ class PersonalController extends BaseController
     }
     public function getPaneDatos($id)
     {
-        return $this->respond($person);
+        $personal = $this->personalService->obtenerDatosGenerales((int) $id);
+        if (!$personal) {
+            return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');
+        }
+        return view('Modules\Asistencia\Views\personal\modals\pane_datos_view', ['personal' => $personal]);
     }
 
 
