@@ -3,6 +3,19 @@
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
 
+    // Documentos de roles: consulta, PDF almacenado e historial. Firma pendiente.
+    $routes->group('roles', function ($routes) {
+        $routes->get('/', 'RolDocumentoController::index');
+        $routes->get('generacion', 'RolDocumentoController::index');
+        $routes->get('historial', 'RolDocumentoController::historial');
+        $routes->get('firmar', 'RolDocumentoController::firmar');
+        $routes->get('consultar', 'RolDocumentoController::consultar');
+        $routes->get('listar', 'RolDocumentoController::listar');
+        $routes->post('generar', 'RolDocumentoController::generar', ['filter' => 'csrf']);
+        $routes->get('(:num)/pdf', 'RolDocumentoController::pdf/$1');
+        $routes->post('(:num)/anular', 'RolDocumentoController::anular/$1', ['filter' => 'csrf']);
+    });
+
     // ==========================================
     // MÓDULO: REGISTROS DE ASISTENCIA (MARCACIONES REALES)
     // ==========================================

@@ -8,14 +8,19 @@ Revisión estática de Routes.php, métodos públicos y vistas de entrada. No ce
 php spark db:seed 'Modules\Asistencia\Database\Seeds\NavigationSeeder'
 ```
 
-Crea el grupo `asistencia` (1000), 2 agrupadores y 28 enlaces, y vincula las 30 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.
+Crea el grupo `asistencia` (1000), 3 agrupadores y 31 enlaces, y vincula las 34 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.
 
 Se puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por otras opciones, falla. Si el grupo asistencia ya tiene otro ID, requiere migrar previamente sus usuarios. No elimina los menús antiguos ni sus relaciones: si ya ejecutó el ejemplo, requieren una migración separada.
 
 ## Pantallas incluidas
 
+Firmar roles muestra un aviso de función pendiente; todavía no firma documentos.
+
 | ID | Menú | Ruta | Destino |
 | --- | --- | --- | --- |
+| 1041 | Generación de roles | asistencia/roles/generacion | RolDocumentoController::index |
+| 1042 | Historial de roles | asistencia/roles/historial | RolDocumentoController::historial |
+| 1043 | Firmar roles | asistencia/roles/firmar | RolDocumentoController::firmar |
 | 1005 | Marcaciones | asistencia/marcaciones | AsistenciaController::index |
 | 1004 | Programación de turnos | asistencia/programacion | ProgramacionController::index |
 | 1011 | Tipos de oficina | asistencia/gestordb/tipo-oficina | DatabaseController::tiposOficina |
@@ -94,6 +99,9 @@ Se puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por o
 
 | Ruta | Destino |
 | --- | --- |
+| asistencia/roles | RolDocumentoController::index |
+| asistencia/roles/consultar | RolDocumentoController::consultar |
+| asistencia/roles/listar | RolDocumentoController::listar |
 | asistencia/asistencia | AsistenciaController::index |
 | asistencia/asistencia/exportar-excel | AsistenciaController::exportarExcel |
 | asistencia/programacion/calendario | ProgramacionController::index |

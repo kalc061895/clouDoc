@@ -73,7 +73,7 @@ namespace {
         throw new \RuntimeException('Hay menús sin ruta GET.');
     }
     $report = "# Navegación de Asistencia\n\nRevisión estática de Routes.php, métodos públicos y vistas de entrada. No certifica el funcionamiento de los flujos ni la base de datos.\n\n";
-    $report .= "## Ejecución\n\n```powershell\nphp spark db:seed 'Modules\\Asistencia\\Database\\Seeds\\NavigationSeeder'\n```\n\nCrea el grupo `asistencia` (1000), 2 agrupadores y 28 enlaces, y vincula las 30 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.\n\nSe puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por otras opciones, falla. Si el grupo asistencia ya tiene otro ID, requiere migrar previamente sus usuarios. No elimina los menús antiguos ni sus relaciones: si ya ejecutó el ejemplo, requieren una migración separada.\n\n";
+    $report .= "## Ejecución\n\n```powershell\nphp spark db:seed 'Modules\\Asistencia\\Database\\Seeds\\NavigationSeeder'\n```\n\nCrea el grupo `asistencia` (1000), 3 agrupadores y 31 enlaces, y vincula las 34 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.\n\nSe puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por otras opciones, falla. Si el grupo asistencia ya tiene otro ID, requiere migrar previamente sus usuarios. No elimina los menús antiguos ni sus relaciones: si ya ejecutó el ejemplo, requieren una migración separada.\n\n";
     $table = static function ($headers, $rows): string {
         $out = '| ' . implode(' | ', $headers) . " |\n| " . implode(' | ', array_fill(0, count($headers), '---')) . " |\n";
         foreach ($rows as $row) {
@@ -81,7 +81,7 @@ namespace {
         }
         return $out . "\n";
     };
-    $report .= "## Pantallas incluidas\n\n" . $table(['ID', 'Menú', 'Ruta', 'Destino'], $implemented);
+    $report .= "## Pantallas incluidas\n\nFirmar roles muestra un aviso de función pendiente; todavía no firma documentos.\n\n" . $table(['ID', 'Menú', 'Ruta', 'Destino'], $implemented);
     $report .= "## Pantallas pendientes (no se insertan menús rotos)\n\n" . $table(['Ruta', 'Destino faltante'], $pending);
     $report .= "## Alias y descargas sin menú adicional\n\n" . $table(['Ruta', 'Destino'], $aliases);
     $report .= "## Todos los endpoints con controlador o método ausente\n\n" . $table(['Verbo', 'Ruta', 'Destino', 'Problema'], $issues);
