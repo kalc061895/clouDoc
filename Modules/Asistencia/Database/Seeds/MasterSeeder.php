@@ -35,6 +35,6 @@ class MasterSeeder extends Seeder
         $this->call('Modules\Asistencia\Database\Seeds\PermisoSeeder');
 
         // 6. Finalmente, menús y permisos de sistema
-        $this->call('Modules\Asistencia\Database\Seeds\MenuSeeder');
+        $this->call(NavigationSeeder::class);
     }
 }

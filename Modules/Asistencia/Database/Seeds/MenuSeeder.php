@@ -6,394 +6,77 @@ use CodeIgniter\Database\Seeder;
 
 class MenuSeeder extends Seeder
 {
+    /** IDs permanentes: no renumerar al agregar opciones. */
+    public static function menus(): array
+    {
+        $definitions = [
+            [1000, null, 'ASISTENCIA', null, 'calendar-mark-line-duotone'],
+            [1001, 1000, 'Personal', 'asistencia/personal', 'users-group-rounded-line-duotone'],
+            [1002, 1000, 'Nuevo personal', 'asistencia/personal/nuevo', 'user-plus-line-duotone'],
+            [1003, 1000, 'Gestor de personal', 'asistencia/personal/gestorpersonal', 'users-group-rounded-line-duotone'],
+            [1004, 1000, 'Programación de turnos', 'asistencia/programacion', 'calendar-line-duotone'],
+            [1005, 1000, 'Marcaciones', 'asistencia/marcaciones', 'clock-circle-line-duotone'],
+            [1010, null, 'CATÁLOGOS DE ASISTENCIA', null, 'database-line-duotone'],
+            [1011, 1010, 'Tipos de oficina', 'asistencia/gestordb/tipo-oficina', 'database-line-duotone'],
+            [1012, 1010, 'Oficinas', 'asistencia/gestordb/oficina', 'database-line-duotone'],
+            [1013, 1010, 'Diresas', 'asistencia/gestordb/diresas', 'database-line-duotone'],
+            [1014, 1010, 'Redes', 'asistencia/gestordb/redes', 'database-line-duotone'],
+            [1015, 1010, 'Microredes', 'asistencia/gestordb/microredes', 'database-line-duotone'],
+            [1016, 1010, 'Establecimientos', 'asistencia/gestordb/establecimiento', 'database-line-duotone'],
+            [1017, 1010, 'Licencias', 'asistencia/gestordb/licencia', 'database-line-duotone'],
+            [1018, 1010, 'Turnos', 'asistencia/gestordb/turno', 'database-line-duotone'],
+            [1019, 1010, 'Horarios de turnos', 'asistencia/gestordb/turnohorario', 'database-line-duotone'],
+            [1020, 1010, 'Modalidades de contrato', 'asistencia/gestordb/modalidad', 'database-line-duotone'],
+            [1021, 1010, 'Permisos', 'asistencia/gestordb/permiso', 'database-line-duotone'],
+            [1022, 1010, 'Cargos', 'asistencia/gestordb/cargo', 'database-line-duotone'],
+            [1023, 1010, 'Profesiones', 'asistencia/gestordb/profesion', 'database-line-duotone'],
+            [1024, 1010, 'Colegiaturas', 'asistencia/gestordb/colegiatura', 'database-line-duotone'],
+            [1025, 1010, 'Feriados', 'asistencia/gestordb/feriado', 'database-line-duotone'],
+            [1026, 1010, 'Tipos de documento', 'asistencia/gestordb/tipodocumento', 'database-line-duotone'],
+            [1027, 1010, 'UPSS', 'asistencia/gestordb/upss', 'database-line-duotone'],
+            [1028, 1010, 'Servicios UPSS', 'asistencia/gestordb/upss-servicio', 'database-line-duotone'],
+            [1029, 1010, 'Personas', 'asistencia/gestordb/persona', 'database-line-duotone'],
+            [1030, 1010, 'Segundas especialidades', 'asistencia/gestordb/segunda-especialidad', 'database-line-duotone'],
+            [1031, 1010, 'Profesión y especialidades', 'asistencia/gestordb/profesion-especialidad', 'database-line-duotone'],
+            [1032, 1010, 'Periodos', 'asistencia/gestordb/periodos', 'database-line-duotone'],
+            [1033, 1010, 'Grupos de corte', 'asistencia/gestordb/grupo-corte', 'database-line-duotone'],
+        ];
+        $menus = [];
+        foreach ($definitions as $order => [$id, $parent, $name, $url, $icon]) {
+            $menus[] = [
+                'id' => $id, 'parent_id' => $parent,
+                'type' => $parent === null ? 'separator' : 'secondary',
+                'name' => $name, 'url' => $url, 'icon' => $icon,
+                'status' => 'active', 'order' => $order + 1000,
+                'separator' => $parent === null ? $name : null,
+            ];
+        }
+        return $menus;
+    }
+
     public function run()
     {
-        $db      = \Config\Database::connect();
-        $builder = $db->table('menus');
-
-        // Desactivar temporalmente las llaves foráneas para evitar problemas al limpiar la tabla
-        $db->query('SET FOREIGN_KEY_CHECKS = 0;');
-        //$builder->truncate();
-        $db->query('SET FOREIGN_KEY_CHECKS = 1;');
-
-        // 1. Definición de los Agrupadores / Separadores Principales (Padres)
-        // Usamos una clave temporal como llave del array para asociar los hijos fácilmente
-        $agrupadores = [
-            'CONFIGURACION' => [
-                'name'      => 'CONFIGURACIÓN',
-                'type'      => 'separator',
-                'icon'      => 'cogs',
-                'order'     => 10,
-                'separator' => 'Gestión del Sistema',
-            ],
-            'PERSONAL' => [
-                'name'      => 'PERSONAL',
-                'type'      => 'separator',
-                'icon'      => 'users',
-                'order'     => 20,
-                'separator' => 'Recursos Humanos',
-            ],
-            'ROL_MENSUAL' => [
-                'name'      => 'ROL MENSUAL',
-                'type'      => 'separator',
-                'icon'      => 'calendar-alt',
-                'order'     => 30,
-                'separator' => 'Planificación',
-            ],
-            'ROL_DE_TURNOS' => [
-                'name'      => 'ROL DE TURNOS',
-                'type'      => 'separator',
-                'icon'      => 'calendar-minus',
-                'order'     => 40,
-                'separator' => 'Turnos del Usuario',
-            ],
-            'ASISTENCIA' => [
-                'name'      => 'ASISTENCIA',
-                'type'      => 'separator',
-                'icon'      => 'calendar-check',
-                'order'     => 50,
-                'separator' => 'Control de Asistencias',
-            ],
-            'DISPOSITIVO' => [
-                'name'      => 'DISPOSITIVO',
-                'type'      => 'separator',
-                'icon'      => 'hdd',
-                'order'     => 60,
-                'separator' => 'Biométricos',
-            ],
-            'REPORTES' => [
-                'name'      => 'REPORTES',
-                'type'      => 'separator',
-                'icon'      => 'chart-bar',
-                'order'     => 70,
-                'separator' => 'Informes y Calificaciones',
-            ],
-            'PERFIL' => [
-                'name'      => 'PERFIL',
-                'type'      => 'separator',
-                'icon'      => 'user-circle',
-                'order'     => 80,
-                'separator' => 'Mi Perfil',
-            ],
-            'CAMBIOS' => [
-                'name'      => 'CAMBIOS',
-                'type'      => 'separator',
-                'icon'      => 'exchange-alt',
-                'order'     => 90,
-                'separator' => 'Trámites',
-            ],
-            'VACACIONES' => [
-                'name'      => 'VACACIONES',
-                'type'      => 'separator',
-                'icon'      => 'umbrella-beach',
-                'order'     => 100,
-                'separator' => 'Descansos',
-            ],
-            'RED_DE_SALUD' => [
-                'name'      => 'RED DE SALUD',
-                'type'      => 'separator',
-                'icon'      => 'hospital-symbol',
-                'order'     => 110,
-                'separator' => 'Red San Román',
-            ],
-            'BASE_DE_DATOS' => [
-                'name'      => 'BASE DE DATOS',
-                'type'      => 'separator',
-                'icon'      => 'database',
-                'order'     => 120,
-                'separator' => 'Mantenimiento DB',
-            ],
-            'MARCAR_ASISTENCIA' => [
-                'name'      => 'MARCAR ASISTENCIA',
-                'type'      => 'separator',
-                'icon'      => 'fingerprint',
-                'order'     => 130,
-                'separator' => 'Registro Remoto',
-            ],
-            'RELOJ' => [
-                'name'      => 'RELOJ',
-                'type'      => 'separator',
-                'icon'      => 'clock',
-                'order'     => 140,
-                'separator' => 'Marcación Local',
-            ],
-            'KARDEX' => [
-                'name'      => 'KARDEX',
-                'type'      => 'separator',
-                'icon'      => 'archive',
-                'order'     => 150,
-                'separator' => 'Historial Laboral',
-            ],
-            'ASISTENCIA_POR_PUESTO' => [
-                'name'      => 'ASISTENCIA POR PUESTO',
-                'type'      => 'separator',
-                'icon'      => 'map-marker-alt',
-                'order'     => 160,
-                'separator' => 'Monitoreo Periférico',
-            ],
-            'ESTABLECIMIENTOS' => [
-                'name'      => 'ESTABLECIMIENTOS',
-                'type'      => 'separator',
-                'icon'      => 'map-marked-alt',
-                'order'     => 170,
-                'separator' => 'Georreferenciación',
-            ],
-            'CALIFICACION' => [
-                'name'      => 'CALIFICACIÓN',
-                'type'      => 'separator',
-                'icon'      => 'medal',
-                'order'     => 180,
-                'separator' => 'Calificaciones',
-                ],
-                ];
-
-        // Insertar los padres y guardar sus IDs asignados en la base de datos
-        $padresIds = [];
-        foreach ($agrupadores as $key => $data) {
-            $builder->insert($data);
-            $padresIds[$key] = $db->insertID();
-        }
-
-        // 2. Definición de los Submenús (Hijos)
-        // Mapeamos el 'tar_menu' original de CI3 al padre correspondiente creado arriba
-        $submenus = [
-           
-            // PERSONAL
-            ['parent' => 'PERSONAL', 'name' => 'Nuevo Personal', 'url' => 'personal/nuevo', 'icon' => 'user-plus', 'order' => 2],
-            ['parent' => 'PERSONAL', 'name' => 'Gestor de Personal', 'url' => 'personal/listado_personal', 'icon' => 'user-cog', 'order' => 6],
-            ['parent' => 'PERSONAL', 'name' => 'Personal MicroRed', 'url' => 'personal/listado_personal_microred', 'icon' => 'users', 'order' => 5],
-            ['parent' => 'PERSONAL', 'name' => 'Interno y Residente', 'url' => 'personal/listado_personal_capacitacion', 'icon' => 'user-graduate', 'order' => 3],
-            ['parent' => 'PERSONAL', 'name' => 'Ver Personal', 'url' => 'personal/listado_personal_observacion', 'icon' => 'eye', 'order' => 4],
-
-            // ROL MENSUAL
-            ['parent' => 'ROL_MENSUAL', 'name' => 'Asignar Prog. Turnos', 'url' => 'administrador/asignar_plan', 'icon' => 'user-clock', 'order' => 1],
-            ['parent' => 'ROL_MENSUAL', 'name' => 'Ver Prog. de Turnos', 'url' => 'administrador/ver_plan', 'icon' => 'calendar-alt', 'order' => 2],
-            ['parent' => 'ROL_MENSUAL', 'name' => 'Cambio de Turno (Admin)', 'url' => 'administrador/cambio_turno_user', 'icon' => 'exchange-alt', 'order' => 3],
-
-            // ROL DE TURNOS
-            // ['parent' => 'ROL_DE_TURNOS', 'name' => 'Roles Por Usuario', 'url' => 'configuracion/cargar_rolusuario', 'icon' => 'users', 'order' => 2],
-            ['parent' => 'ROL_DE_TURNOS', 'name' => 'Carga Masiva', 'url' => 'administrador/load_file_turnos', 'icon' => 'file-excel', 'order' => 3],
-            
-            // ASISTENCIA
-            ['parent' => 'ASISTENCIA', 'name' => 'Consultar Asistencia', 'url' => 'administrador/reporte_asistencia', 'icon' => 'calendar-check', 'order' => 1],
-            ['parent' => 'ASISTENCIA', 'name' => 'Rectificar Asistencia', 'url' => 'administrador/asistencia', 'icon' => 'edit', 'order' => 2],
-            
-            // TRABAJADOR
-            ['parent' => 'TRABAJADOR', 'name' => 'Mi Asistencia', 'url' => 'usuario/asistencia', 'icon' => 'user-check', 'order' => 3],
-            ['parent' => 'TRABAJADOR', 'name' => 'Mi Rol de Turnos', 'url' => 'usuario/rol', 'icon' => 'calendar-check', 'order' => 1],
-            ['parent' => 'TRABAJADOR', 'name' => 'Asistencia Por Establecimiento', 'url' => 'usuario/asistencia_est', 'icon' => 'map-pin', 'order' => 1],
-            ['parent' => 'TRABAJADOR', 'name' => 'Marcar mi Asistencia', 'url' => 'usuario/reloj', 'icon' => 'fingerprint', 'order' => 1],
-            
-            // DISPOSITIVO
-            ['parent' => 'DISPOSITIVO', 'name' => 'Subir Datos', 'url' => 'marcar/prueba2', 'icon' => 'upload', 'order' => 1],
-            ['parent' => 'DISPOSITIVO', 'name' => 'Cargar desde Ztkeco', 'url' => 'administrador/load_file', 'icon' => 'hdd', 'order' => 2],
-            ['parent' => 'DISPOSITIVO', 'name' => 'Archivo HikVision', 'url' => 'administrador/load_file_hv', 'icon' => 'file-excel', 'order' => 3],
-
-            // REPORTES
-            ['parent' => 'REPORTES', 'name' => 'Asistencia Mensual', 'url' => 'administrador/reporte_total', 'icon' => 'calendar-alt', 'order' => 1],
-            ['parent' => 'REPORTES', 'name' => 'Asistencia Hoy', 'url' => 'administrador/asistencia_hoy', 'icon' => 'clock', 'order' => 2],
-            ['parent' => 'REPORTES', 'name' => 'Control de Roles', 'url' => 'administrador/faltas_tardanzas', 'icon' => 'user-slash', 'order' => 3],
-            ['parent' => 'REPORTES', 'name' => 'Rango de Fechas', 'url' => 'administrador/reporte_total_rango', 'icon' => 'calendar-week', 'order' => 4],
-            ['parent' => 'REPORTES', 'name' => 'Inasistencias', 'url' => 'administrador/reporte_total_inasistencia', 'icon' => 'user-times', 'order' => 5],
-            ['parent' => 'REPORTES', 'name' => 'Tardanzas y Faltas', 'url' => 'administrador/faltas_tardanzas', 'icon' => 'exclamation-circle', 'order' => 6],
-            ['parent' => 'REPORTES', 'name' => 'Reporte Específico', 'url' => 'administrador/reporte_total_especifico', 'icon' => 'file-alt', 'order' => 7],
-            ['parent' => 'REPORTES', 'name' => 'Ver Rol de Turnos', 'url' => 'administrador/reporte_rol_turno', 'icon' => 'clipboard-list', 'order' => 8],
-            ['parent' => 'REPORTES', 'name' => 'Reporte Antiguo', 'url' => 'administrador/reporte_nombrados', 'icon' => 'archive', 'order' => 9],
-            ['parent' => 'REPORTES', 'name' => 'CAP Nominal', 'url' => 'administrador/capnominal', 'icon' => 'id-card', 'order' => 10],
-            ['parent' => 'REPORTES', 'name' => 'Calificador Mensual', 'url' => 'administrador/calificador', 'icon' => 'award', 'order' => 11],
-            ['parent' => 'REPORTES', 'name' => 'Ver Reportes', 'url' => 'administrador/listarreportes', 'icon' => 'folder-open', 'order' => 12],
-            ['parent' => 'REPORTES', 'name' => 'Reporte Turnos TUASALUD', 'url' => 'tuasalud/reporte_rol_tuasalud', 'icon' => 'file-csv', 'order' => 13],
-            ['parent' => 'REPORTES', 'name' => 'Reporte 40', 'url' => 'administrador/reporte_40', 'icon' => 'file-medical-alt', 'order' => 14],
-            ['parent' => 'REPORTES', 'name' => 'Kardex Total', 'url' => 'administrador/reporte_total_kardex', 'icon' => 'book', 'order' => 1],
-
-            // PERFIL
-            ['parent' => 'PERFIL', 'name' => 'Mis Datos', 'url' => 'usuario/perfil', 'icon' => 'user-id', 'order' => 1],
-
-            // CAMBIOS
-            ['parent' => 'CAMBIOS', 'name' => 'Cambio de Turno (Solicitud)', 'url' => 'usuario/cambio_turno', 'icon' => 'exchange-alt', 'order' => 1],
-
-            // VACACIONES
-            ['parent' => 'VACACIONES', 'name' => 'Mis Vacaciones', 'url' => 'usuario/vacaciones', 'icon' => 'sun', 'order' => 1],
-
-
-            // BASE DE DATOS (CRUDs)
-            
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Tareas', 'url' => 'gestordb/tarea', 'icon' => 'tasks', 'order' => 2],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Oficinas', 'url' => 'gestordb/oficina', 'icon' => 'briefcase', 'order' => 3],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Licencia', 'url' => 'gestordb/licencia', 'icon' => 'calendar-minus', 'order' => 4],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Turno', 'url' => 'gestordb/turno', 'icon' => 'hourglass-half', 'order' => 5],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Horario de Turnos', 'url' => 'gestordb/turno_horario', 'icon' => 'clock', 'order' => 6],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Cargo', 'url' => 'gestordb/cargo', 'icon' => 'user-tag', 'order' => 7],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Establecimientos', 'url' => 'gestordb/establecimiento', 'icon' => 'hospital', 'order' => 12],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Modalidad', 'url' => 'gestordb/tipo_contrato', 'icon' => 'handshake', 'order' => 14],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Permisos', 'url' => 'gestordb/permiso', 'icon' => 'id-card', 'order' => 15],
-            ['parent' => 'BASE_DE_DATOS', 'name' => 'Usuarios del Sistema', 'url' => 'administrador/periferie', 'icon' => 'network-wired', 'order' => 1],
-
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Tareas', 
-                'url'    => 'gestordb/tarea', 
-                'icon'   => 'tasks', 
-                'order'  => 2
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Tipos de Oficina', 
-                'url'    => 'gestordb/tipo-oficina', 
-                'icon'   => 'building', 
-                'order'  => 3
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Oficinas', 
-                'url'    => 'gestordb/oficina', 
-                'icon'   => 'briefcase', 
-                'order'  => 4
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Licencias', 
-                'url'    => 'gestordb/licencia', 
-                'icon'   => 'calendar-minus', 
-                'order'  => 5
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Turnos', 
-                'url'    => 'gestordb/turno', 
-                'icon'   => 'hourglass-half', 
-                'order'  => 6
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Horario de Turnos', 
-                'url'    => 'gestordb/turno_horario', 
-                'icon'   => 'clock', 
-                'order'  => 7
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Cargo', 
-                'url'    => 'gestordb/cargo', 
-                'icon'   => 'user-tag', 
-                'order'  => 8
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Establecimientos', 
-                'url'    => 'gestordb/establecimiento', 
-                'icon'   => 'hospital', 
-                'order'  => 9
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Modalidad / Contrato', 
-                'url'    => 'gestordb/tipo_contrato', 
-                'icon'   => 'handshake', 
-                'order'  => 10
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Permisos', 
-                'url'    => 'gestordb/permiso', 
-                'icon'   => 'id-card', 
-                'order'  => 11
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Diresas', 
-                'url'    => 'gestordb/diresas', 
-                'icon'   => 'sitemap', 
-                'order'  => 12
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Redes', 
-                'url'    => 'gestordb/redes', 
-                'icon'   => 'project-diagram', 
-                'order'  => 13
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Microredes', 
-                'url'    => 'gestordb/microredes', 
-                'icon'   => 'network-wired', 
-                'order'  => 14
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Profesiones', 
-                'url'    => 'gestordb/profesion', 
-                'icon'   => 'user-md', 
-                'order'  => 15
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Colegiaturas', 
-                'url'    => 'gestordb/colegiatura', 
-                'icon'   => 'file-medical', 
-                'order'  => 16
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Feriados', 
-                'url'    => 'gestordb/feriado', 
-                'icon'   => 'calendar-alt', 
-                'order'  => 17
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'UPSS', 
-                'url'    => 'gestordb/upss', 
-                'icon'   => 'clinic-medical', 
-                'order'  => 18
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Servicios', 
-                'url'    => 'gestordb/servicio', 
-                'icon'   => 'notes-medical', 
-                'order'  => 19
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Periodos', 
-                'url'    => 'gestordb/periodos', 
-                'icon'   => 'calendar-check', 
-                'order'  => 20
-            ],
-            [
-                'parent' => 'BASE_DE_DATOS', 
-                'name'   => 'Usuarios del Sistema', 
-                'url'    => 'administrador/periferie', 
-                'icon'   => 'users', 
-                'order'  => 21
-            ],
-
-
-            // ESTABLECIMIENTOS
-            ['parent' => 'MAPA DE ESTABLECIMIENTOS', 'name' => 'Mapa', 'url' => 'administrador/mapa_establecimiento', 'icon' => 'map-marked-alt', 'order' => 1],
-
-            // CALIFICACION
-            ['parent' => 'CALIFICACION', 'name' => 'Calificador MicroRed', 'url' => 'administrador/calificador_microred', 'icon' => 'award', 'order' => 1],
-            ['parent' => 'CALIFICACION', 'name' => 'Ver Reportes (Microred)', 'url' => 'administrador/listarreportes_microred', 'icon' => 'folder-open', 'order' => 2],
-        ];
-
-        // Insertar submenús vinculándolos a su parent_id correspondiente
-        foreach ($submenus as $sub) {
-            if (isset($padresIds[$sub['parent']])) {
-                $builder->insert([
-                    'type'       => 'secondary',
-                    'parent_id'  => $padresIds[$sub['parent']],
-                    'name'       => $sub['name'],
-                    'abbr'       => null,
-                    'url'        => 'asistencia/'.$sub['url'],
-                    'icon'       => $sub['icon'],
-                    'status'     => 'active',
-                    'order'      => $sub['order'],
-                    'created_at' => date('Y-m-d H:i:s')
-                ]);
+        $menus = self::menus();
+        // Verificar todas las colisiones antes de escribir.
+        foreach ($menus as $menu) {
+            $existing = $this->db->table('menus')->where('id', $menu['id'])->get()->getRowArray();
+            if ($existing && ($existing['url'] !== $menu['url']
+                || ($menu['url'] === null && $existing['name'] !== $menu['name']))) {
+                throw new \RuntimeException('El menú ' . $menu['id'] . ' ya pertenece a otra opción.');
             }
+        }
+        $this->db->transStart();
+        foreach ($menus as $menu) {
+            $builder = $this->db->table('menus');
+            if ($builder->where('id', $menu['id'])->countAllResults()) {
+                $builder->where('id', $menu['id'])->update($menu);
+            } else {
+                $builder->insert($menu);
+            }
+        }
+        $this->db->transComplete();
+        if ($this->db->transStatus() === false) {
+            throw new \RuntimeException('No se pudieron guardar los menús de Asistencia.');
         }
     }
 }

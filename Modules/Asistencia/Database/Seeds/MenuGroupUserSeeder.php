@@ -8,25 +8,27 @@ class MenuGroupUserSeeder extends Seeder
 {
     public function run()
     {
-        // Datos de los grupos de usuarios
-        $data = [];
-
-        // Grupo 1 y 2: Menús 1 al 28
-        for ($menu_id = 600; $menu_id <= 663; $menu_id++) {
-            $data[] = [
-                'group_user_id' => 1,
-                'menu_id' => $menu_id,
-            ];
-            /*
-            $data[] = [
-                'group_user_id' => 100,
-                'menu_id' => $menu_id,
-            ];
-            */
+        $group = $this->db->table('group_user')->where('id', GroupUserSeeder::GROUP_ID)->get()->getRowArray();
+        if (! $group || $group['name'] !== 'asistencia') {
+            throw new \RuntimeException('Ejecute primero GroupUserSeeder de Asistencia.');
         }
-
-
-        // Insertar los datos en la base de datos
-        $this->db->table('menu_group_user')->insertBatch($data);
+        foreach (MenuSeeder::menus() as $menu) {
+            $existing = $this->db->table('menus')->where('id', $menu['id'])->get()->getRowArray();
+            if (! $existing || $existing['url'] !== $menu['url'] || $existing['name'] !== $menu['name']) {
+                throw new \RuntimeException('Ejecute primero MenuSeeder de Asistencia.');
+            }
+        }
+        $this->db->transStart();
+        foreach (MenuSeeder::menus() as $menu) {
+            $relation = ['group_user_id' => GroupUserSeeder::GROUP_ID, 'menu_id' => $menu['id']];
+            $builder = $this->db->table('menu_group_user');
+            if (! $builder->where($relation)->countAllResults()) {
+                $builder->insert($relation);
+            }
+        }
+        $this->db->transComplete();
+        if ($this->db->transStatus() === false) {
+            throw new \RuntimeException('No se pudieron vincular los menús de Asistencia.');
+        }
     }
 }
