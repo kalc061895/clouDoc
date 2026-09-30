@@ -13,7 +13,7 @@ class EstablecimientoSeeder extends Seeder
         $data = [
             // --- MICRORRED: CABANILLAS ---
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003290',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -27,7 +27,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003291',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -41,7 +41,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003292',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -55,7 +55,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003293',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -69,7 +69,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003289',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -83,7 +83,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 1, // CABANILLAS
+                'est_mic_ide' => 57, // CABANILLAS
                 'est_codigo' => '00003294',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -99,7 +99,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- MICRORRED: CONO SUR ---
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00037870',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -113,7 +113,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003315',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -127,7 +127,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003295',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -141,7 +141,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003298',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -155,7 +155,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00027818',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -169,7 +169,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003304',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -183,7 +183,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003300',
                 'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
@@ -197,7 +197,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 2, // CONO SUR
+                'est_mic_ide' => 58, // CONO SUR
                 'est_codigo' => '00003302',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -213,7 +213,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- MICRORRED: JULIACA ---
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003287',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -227,7 +227,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00015422',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -241,7 +241,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003309',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -255,7 +255,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003305',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -269,7 +269,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003286',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -283,7 +283,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00002844', // Normalizado a 8 dígitos
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -297,7 +297,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003288',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -311,7 +311,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003296',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -325,7 +325,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00013506',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -339,7 +339,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00037869',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -353,7 +353,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003274',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -367,7 +367,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003317',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -381,7 +381,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003280',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -395,7 +395,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 3, // JULIACA
+                'est_mic_ide' => 59, // JULIACA
                 'est_codigo' => '00003311',
                 'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
@@ -411,7 +411,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- HOSPITAL DE REFERENCIA BASE ---
             [
-                'est_mic_ide' => 1,
+                'est_mic_ide' => 60,
                 'est_codigo' => '00003299',
                 'est_ipress' => '0000',
                 'est_tipo' => 'HOSPITAL',
@@ -427,7 +427,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- MICRORRED: SAMAN ---
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003275',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -441,7 +441,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003276',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -455,7 +455,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003277',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -469,7 +469,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003312',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -483,7 +483,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00007399',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -497,7 +497,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003279',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -511,7 +511,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00015421',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -525,7 +525,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00006796',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -539,7 +539,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 4, // SAMAN
+                'est_mic_ide' => 61, // SAMAN
                 'est_codigo' => '00003278',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -555,7 +555,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- MICRORRED: SANTA ADRIANA ---
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003307',
                 'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
@@ -569,7 +569,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003314',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -583,7 +583,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003303',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -597,7 +597,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00029841',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -611,7 +611,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003301',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -625,7 +625,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003313',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -639,7 +639,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003308',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -653,7 +653,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003316',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -667,7 +667,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003306',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -681,7 +681,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 5, // SANTA ADRIANA
+                'est_mic_ide' => 62, // SANTA ADRIANA
                 'est_codigo' => '00003310',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -697,7 +697,7 @@ class EstablecimientoSeeder extends Seeder
 
             // --- MICRORRED: TARACO ---
             [
-                'est_mic_ide' => 6, // TARACO
+                'est_mic_ide' => 63, // TARACO
                 'est_codigo' => '00003282',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -711,7 +711,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 6, // TARACO
+                'est_mic_ide' => 63, // TARACO
                 'est_codigo' => '00003284',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -725,7 +725,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 6, // TARACO
+                'est_mic_ide' => 63, // TARACO
                 'est_codigo' => '00003283',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
@@ -739,7 +739,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 6, // TARACO
+                'est_mic_ide' => 63, // TARACO
                 'est_codigo' => '00003281',
                 'est_ipress' => '0000',
                 'est_tipo' => 'CENTRO DE SALUD',
@@ -753,7 +753,7 @@ class EstablecimientoSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'est_mic_ide' => 6, // TARACO
+                'est_mic_ide' => 63, // TARACO
                 'est_codigo' => '00003285',
                 'est_ipress' => '0000',
                 'est_tipo' => 'PUESTO DE SALUD',
