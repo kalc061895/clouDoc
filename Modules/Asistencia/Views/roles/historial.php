@@ -7,7 +7,7 @@
     <div id="roles-mensaje" role="status" aria-live="polite"></div>
     <div class="table-responsive"><table class="table table-bordered bg-white align-middle"><thead><tr><th>Documento / fecha</th><th>Mes / año</th><th>Establecimiento / ámbito</th><th>Personal</th><th>Horas</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="roles-historial"></tbody></table></div>
     <div class="d-flex gap-3 align-items-center"><button id="roles-anterior" class="btn btn-outline-secondary" type="button">Anterior</button><span id="roles-pagina"></span><button id="roles-siguiente" class="btn btn-outline-secondary" type="button">Siguiente</button></div>
-    <p class="text-muted mt-3">Anular conserva el PDF original y registra el motivo. Los documentos generados aún no cuentan con firma digital.</p>
+    <p class="text-muted mt-3">Anular conserva el PDF original y registra el motivo. Use «Firmar» para incorporar un rol propio al módulo Firma y consultar allí sus versiones firmadas.</p>
 </div>
 <script id="roles-config" type="application/json"><?= json_encode(['csrf' => ['name' => csrf_token(), 'hash' => csrf_hash()]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <?= $this->endSection() ?>

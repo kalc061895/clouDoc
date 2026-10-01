@@ -81,7 +81,7 @@ namespace {
         }
         return $out . "\n";
     };
-    $report .= "## Pantallas incluidas\n\nFirmar roles muestra un aviso de función pendiente; todavía no firma documentos.\n\n" . $table(['ID', 'Menú', 'Ruta', 'Destino'], $implemented);
+    $report .= "## Pantallas incluidas\n\nFirmar roles redirige al módulo independiente de Firma de documentos.\n\n" . $table(['ID', 'Menú', 'Ruta', 'Destino'], $implemented);
     $report .= "## Pantallas pendientes (no se insertan menús rotos)\n\n" . $table(['Ruta', 'Destino faltante'], $pending);
     $report .= "## Alias y descargas sin menú adicional\n\n" . $table(['Ruta', 'Destino'], $aliases);
     $report .= "## Todos los endpoints con controlador o método ausente\n\n" . $table(['Verbo', 'Ruta', 'Destino', 'Problema'], $issues);

@@ -147,6 +147,11 @@
                     link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Ver PDF';
                     actions.append(link);
                     if (rol.estado === 'GENERADO') {
+                        const firmar = document.createElement('a');
+                        firmar.className = 'btn btn-sm btn-outline-success me-2';
+                        firmar.href = base.replace(/\/asistencia\/roles\/?$/, '/firma') + '?rol=' + Number(rol.id);
+                        firmar.textContent = 'Firmar';
+                        actions.append(firmar);
                         const button = document.createElement('button');
                         button.type = 'button'; button.className = 'btn btn-sm btn-outline-danger'; button.textContent = 'Anular';
                         button.addEventListener('click', async () => {

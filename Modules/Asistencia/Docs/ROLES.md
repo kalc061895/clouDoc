@@ -15,7 +15,7 @@ Rutas de entrada:
 
 - `asistencia/roles/generacion`
 - `asistencia/roles/historial`
-- `asistencia/roles/firmar` (aviso de función pendiente)
+- `asistencia/roles/firmar` (acceso al módulo independiente `firma`; ver `Modules/Firma/README.md`)
 
 ## Flujo
 

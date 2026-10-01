@@ -3,7 +3,7 @@
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
 
-    // Documentos de roles: consulta, PDF almacenado e historial. Firma pendiente.
+    // Documentos de roles: consulta, PDF almacenado, historial y acceso al módulo Firma.
     $routes->group('roles', function ($routes) {
         $routes->get('/', 'RolDocumentoController::index');
         $routes->get('generacion', 'RolDocumentoController::index');

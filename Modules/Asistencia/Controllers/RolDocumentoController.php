@@ -26,7 +26,7 @@ class RolDocumentoController extends BaseModuleController
 
     public function firmar()
     {
-        return view('Modules\Asistencia\Views\roles\firmar');
+        return redirect()->to(base_url('firma'));
     }
 
     public function consultar()

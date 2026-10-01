@@ -79,6 +79,9 @@ class Filters extends BaseFilters
                     'login*',
                     'register',
                     'auth/a/*',
+                    'firma/cliente/parametros',
+                    'firma/cliente/documento/*',
+                    'firma/cliente/recibir/*',
                     'logut',
                     'nuevoexpediente',// Formulario de Registro de Expediente
                     'cargoexpediente/*',// TUPA - Listado de procedimientos y requisitos

@@ -14,7 +14,7 @@ Se puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por o
 
 ## Pantallas incluidas
 
-Firmar roles muestra un aviso de función pendiente; todavía no firma documentos.
+Firmar roles redirige al módulo independiente de Firma de documentos.
 
 | ID | Menú | Ruta | Destino |
 | --- | --- | --- | --- |

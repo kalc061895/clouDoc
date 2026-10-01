@@ -44,6 +44,7 @@ class Autoload extends AutoloadConfig
         'Modules\Asistencia' => ROOTPATH . 'Modules/Asistencia',
         'Modules\Seleccion'  => ROOTPATH . 'Modules/Seleccion',
         'Modules\Legajos'    => ROOTPATH . 'Modules/Legajos',
+        'Modules\Firma'      => ROOTPATH . 'Modules/Firma',
     ];
 
     /**
