@@ -3,6 +3,12 @@
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
 
+    $routes->get('reportes/mensual', 'ReporteMensualController::index');
+    $routes->get('reportes/mensual/consultar', 'ReporteMensualController::consultar');
+    $routes->get('reportes/mensual/excel', 'ReporteMensualController::exportar/excel');
+    $routes->get('reportes/mensual/pdf', 'ReporteMensualController::exportar/pdf');
+    $routes->get('reportes/mensual/imprimir', 'ReporteMensualController::exportar/imprimir');
+
     // Documentos de roles: consulta, PDF almacenado, historial y acceso al módulo Firma.
     $routes->group('roles', function ($routes) {
         $routes->get('/', 'RolDocumentoController::index');

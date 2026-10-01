@@ -20,6 +20,8 @@ class MenuSeeder extends Seeder
             [1041, 1040, 'Generación de roles', 'asistencia/roles/generacion', 'calendar-line-duotone'],
             [1042, 1040, 'Historial de roles', 'asistencia/roles/historial', 'history-line-duotone'],
             [1043, 1040, 'Firmar roles', 'asistencia/roles/firmar', 'pen-new-square-line-duotone'],
+            [1050, null, 'REPORTES', null, 'chart-square-line-duotone'],
+            [1051, 1050, 'Reporte mensual', 'asistencia/reportes/mensual', 'document-text-line-duotone'],
             [1010, null, 'CATÁLOGOS DE ASISTENCIA', null, 'database-line-duotone'],
             [1011, 1010, 'Tipos de oficina', 'asistencia/gestordb/tipo-oficina', 'database-line-duotone'],
             [1012, 1010, 'Oficinas', 'asistencia/gestordb/oficina', 'database-line-duotone'],
