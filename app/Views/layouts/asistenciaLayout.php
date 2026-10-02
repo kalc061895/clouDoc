@@ -1712,7 +1712,9 @@ try {
     <script src="<?= base_url('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('assets/libs/simplebar/dist/simplebar.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/app.init.js') ?>"></script>
-    <script>userSettings = <?= json_encode($aparienciaAsistencia, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+    <script>
+        userSettings = <?= json_encode($aparienciaAsistencia, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    </script>
     <script src="<?= base_url('assets/js/theme/theme.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/app.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/sidebarmenu.js') ?>"></script>
@@ -1780,22 +1782,22 @@ try {
             }
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             connectionCheckInterval = setInterval(checkInternetConnection, 30000); // Revisar cada minuto
 
             // Ajuste automático de z-index para modales anidados
-            $(document).on('show.bs.modal', '.modal', function () {
+            $(document).on('show.bs.modal', '.modal', function() {
                 const zIndex = 1040 + (10 * $('.modal:visible').length);
                 $(this).css('z-index', zIndex);
-                setTimeout(function () {
+                setTimeout(function() {
                     $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
                 }, 0);
             });
 
             // Restaurar scroll al cerrar el modal superior
-            $(document).on('hidden.bs.modal', '.modal', function () {
+            $(document).on('hidden.bs.modal', '.modal', function() {
                 if ($('.modal:visible').length > 0) {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         $(document.body).addClass('modal-open');
                     }, 0);
                 }
@@ -1804,7 +1806,9 @@ try {
 
         toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');
     </script>
-    <script type="application/json" id="user-appearance-config"><?= json_encode(['settings' => $aparienciaAsistencia, 'available' => $aparienciaDisponible, 'url' => base_url('perfil/preferencias'), 'csrf' => ['header' => csrf_header(), 'name' => csrf_token(), 'hash' => csrf_hash()]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <script type="application/json" id="user-appearance-config">
+        <?= json_encode(['settings' => $aparienciaAsistencia, 'available' => $aparienciaDisponible, 'url' => base_url('perfil/preferencias'), 'csrf' => ['header' => csrf_header(), 'name' => csrf_token(), 'hash' => csrf_hash()]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>
+    </script>
     <script src="<?= base_url('assets/js/asistencia/preferences.js') ?>"></script>
     <script src="<?= base_url('assets/js/asistencia/layout.js') ?>"></script>
     <?= $this->renderSection('pageScripts'); ?>
