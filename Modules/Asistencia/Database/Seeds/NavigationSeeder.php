@@ -11,9 +11,9 @@ class NavigationSeeder extends Seeder
     {
         $this->db->transStart();
         try {
-            $this->call(GroupUserSeeder::class);
-            $this->call(MenuSeeder::class);
-            $this->call(MenuGroupUserSeeder::class);
+            foreach ([GroupUserSeeder::class, MenuSeeder::class, MenuGroupUserSeeder::class] as $class) {
+                (new $class($this->config, $this->db))->setSilent($this->silent)->run();
+            }
             $this->db->transComplete();
         } catch (\Throwable $e) {
             $this->db->transRollback();

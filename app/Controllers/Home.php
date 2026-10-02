@@ -29,7 +29,11 @@ class Home extends BaseController
         ];
         */
         // menu filtardo por grupo de usuario usuario
-        switch (auth()->user()->getGroups()[0]) {
+        $groups = auth()->user()->getGroups();
+        if (!in_array('superadmin', $groups, true) && array_intersect($groups, ['asistencia', 'asi_sua', 'asi_adm', 'asi_apo'])) {
+            return redirect()->to(base_url('asistencia'));
+        }
+        switch ($groups[0] ?? '') {
             case 'superadmin':
             case 'tramite':
             case 'oficina':
@@ -46,7 +50,7 @@ class Home extends BaseController
 
                 break;
             case 'asistencia':
-                break;
+                return redirect()->to(base_url('asistencia'));
             case 'postulante':
                 return redirect()->to(base_url('seleccion/postulacion'));
                 break;

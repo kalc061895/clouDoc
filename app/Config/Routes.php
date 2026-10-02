@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->get('/inicio', 'Home::index');
+$routes->get('perfil/preferencias', 'UserPreferenceController::index');
+$routes->post('perfil/preferencias', 'UserPreferenceController::guardar', ['filter' => 'csrf']);
 
 
 /**

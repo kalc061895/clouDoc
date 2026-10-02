@@ -1,0 +1,38 @@
+#asistencia-dashboard .card { border: 1px solid var(--bs-border-color); border-radius: 18px; box-shadow: 0 4px 20px rgba(30,60,90,.035); }
+#asistencia-dashboard .dash-hero { padding: 28px 32px; border-radius: 22px; background: linear-gradient(115deg,#163c64,#126ba3 75%,#168caa); color: #fff; }
+#asistencia-dashboard .dash-hero h2 { color: #fff; font-weight: 700; }
+#asistencia-dashboard .dash-hero p { color: #dbeefb; }
+#asistencia-dashboard .dash-eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .14em; color: #bce8ff; }
+#asistencia-dashboard .dash-hero-icon { display: grid; place-items: center; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); border-radius: 16px; width: 64px; height: 64px; font-size: 32px; flex-shrink: 0; }
+#asistencia-dashboard .dash-metric .card-body { padding: 20px; }
+#asistencia-dashboard .dash-metric-label { font-size: .84rem; font-weight: 600; padding-top: 8px; }
+#asistencia-dashboard .dash-icon { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; font-size: 22px; flex-shrink: 0; }
+#asistencia-dashboard .dash-number { font-size: 2.15rem; font-weight: 750; letter-spacing: -.05em; color: var(--bs-heading-color,var(--bs-body-color)); line-height: 1.3; margin: 5px 0; }
+#asistencia-dashboard .dash-section-title { margin: 28px 0 16px; }
+#asistencia-dashboard .dash-section-title h4 { font-size: 1.15rem; font-weight: 700; margin-bottom: 5px; }
+#asistencia-dashboard .dash-section-title p { color: var(--bs-secondary-color); margin: 0; font-size: .84rem; }
+#asistencia-dashboard .dash-chart { min-height: 290px; }
+#asistencia-dashboard .dash-chart-fallback { min-height: 290px; display: grid; place-items: center; color: var(--bs-secondary-color); text-align: center; padding: 24px; }
+#asistencia-dashboard .dash-coverage-caption { text-align: center; background: var(--bs-success-bg-subtle); border-radius: 12px; padding: 14px; font-size: .85rem; }
+#asistencia-dashboard .dash-details { border-top: 1px solid var(--bs-border-color); margin-top: 12px; padding-top: 14px; }
+#asistencia-dashboard summary { cursor: pointer; font-weight: 600; }
+#asistencia-dashboard summary:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 5px; }
+#asistencia-dashboard .dash-table-scroll { max-height: 330px; margin-top: 12px; }
+#asistencia-dashboard .dash-table-scroll thead { position: sticky; top: 0; background: var(--bs-body-bg); z-index: 1; }
+#asistencia-dashboard .dash-list { max-height: 285px; overflow: auto; }
+#asistencia-dashboard .dash-person { display: flex; align-items: start; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--bs-border-color); }
+#asistencia-dashboard .dash-person:last-child { border-bottom: 0; }
+#asistencia-dashboard .dash-person strong { font-size: .83rem; }
+#asistencia-dashboard .dash-avatar { display: grid; place-items: center; height: 34px; width: 34px; border-radius: 50%; flex-shrink: 0; font-weight: 700; }
+#asistencia-dashboard .dash-empty { padding: 28px 10px; text-align: center; color: var(--bs-secondary-color); }
+#asistencia-dashboard .dash-empty i { display: block; font-size: 30px; opacity: .5; margin-bottom: 10px; }
+#asistencia-dashboard .dash-method { font-size: .83rem; }
+@media (max-width:575.98px) {
+    #asistencia-dashboard .dash-hero { padding: 22px 18px; }
+    #asistencia-dashboard .dash-hero-icon { display: none; }
+    #asistencia-dashboard .dash-hero h2 { font-size: 1.45rem; }
+    #asistencia-dashboard .dash-metric .card-body { padding: 14px; }
+    #asistencia-dashboard .dash-metric-label { font-size: .76rem; }
+    #asistencia-dashboard .dash-metric .dash-icon { width: 30px; height: 30px; font-size: 18px; }
+    #asistencia-dashboard .dash-number { font-size: 1.85rem; }
+}

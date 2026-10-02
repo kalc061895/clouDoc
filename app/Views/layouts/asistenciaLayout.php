@@ -1,5 +1,20 @@
+<?php
+$usuarioAsistencia = auth()->user();
+$perfilAsistencia = \App\Libraries\AsistenciaLayoutData::perfil($usuarioAsistencia);
+$menuAsistenciaModel = new \App\Models\MenuModel();
+$menuAsistencia = $menuAsistenciaModel->getMenuTree();
+$opcionesAsistencia = \App\Libraries\AsistenciaLayoutData::opciones($menuAsistencia, $menuAsistenciaModel->getMenusByRole());
+$aparienciaAsistencia = \App\Services\UserPreferenceService::DEFAULTS;
+$aparienciaDisponible = true;
+try {
+    $aparienciaAsistencia = (new \App\Services\UserPreferenceService())->obtener((int) $usuarioAsistencia->id);
+} catch (\Throwable $e) {
+    $aparienciaDisponible = false;
+    log_message('error', 'Carga de apariencia: {message}', ['message' => $e->getMessage()]);
+}
+?>
 <!DOCTYPE html>
-<html lang="es" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
+<html lang="es" dir="<?= esc($aparienciaAsistencia['Direction'], 'attr') ?>" data-bs-theme="<?= esc($aparienciaAsistencia['Theme'], 'attr') ?>" data-color-theme="<?= esc($aparienciaAsistencia['ColorTheme'], 'attr') ?>" data-layout="<?= esc($aparienciaAsistencia['Layout'], 'attr') ?>" data-boxed-layout="<?= $aparienciaAsistencia['BoxedLayout'] ? 'boxed' : 'full' ?>" data-card="<?= $aparienciaAsistencia['cardBorder'] ? 'border' : 'shadow' ?>">
 
 <head>
     <!-- Required meta tags -->
@@ -18,10 +33,11 @@
     <link rel="stylesheet" href="<?= base_url('assets/libs/select2/dist/css/select2.min.css') ?>">
 
     <title><?= $this->renderSection('title'); ?></title>
+    <link rel="stylesheet" href="<?= base_url('assets/css/asistencia-layout.css') ?>">
     <?= $this->renderSection('pageStyles'); ?>
 </head>
 
-<body>
+<body class="asis-layout" data-sidebartype="<?= esc($aparienciaAsistencia['SidebarType'], 'attr') ?>">
 
     <!-- Toast -->
 
@@ -54,57 +70,12 @@
                         <!-- User Profile-->
                         <li>
                             <!-- User profile -->
-                            <div class="user-profile text-center position-relative pt-4 mt-1">
-                                <!-- User profile image -->
-                                <div class="profile-img m-auto">
-                                    <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>" alt="user"
-                                        class="w-100 rounded-circle" />
-                                </div>
-
-                                <!-- User profile text-->
-                                <div class="profile-text py-2 dropdown-center hide-menu">
-                                    <a href="javascript:void(0)" class="dropdown-toggle link u-dropdown"
-                                        data-bs-toggle="dropdown" role="button" aria-haspopup="true"
-                                        aria-expanded="true"> <?= $this->renderSection('username'); ?><span
-                                            class="caret"></span>
-                                    </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item d-flex align-items-center gap-2"
-                                            href="javascript:void(0)">
-                                            <iconify-icon icon="solar:user-linear"
-                                                class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.myProfile') ?>
-                                        </a>
-                                        <a class="dropdown-item d-flex align-items-center gap-2"
-                                            href="javascript:void(0)">
-                                            <iconify-icon icon="solar:inbox-linear"
-                                                class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.myImbox') ?>
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item d-flex align-items-center gap-2"
-                                            href="javascript:void(0)">
-                                            <iconify-icon icon="solar:settings-linear"
-                                                class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.profileSettings') ?>
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item d-flex align-items-center gap-2"
-                                            href="javascript:void(0)">
-                                            <iconify-icon icon="solar:login-2-linear"
-                                                class="fs-5 text-primary"></iconify-icon>
-                                            <?= lang('Main.logout') ?>
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <div class="p-2">
-                                            <button type="button" class="btn d-block w-100 btn-info">
-                                                <?= lang('Main.myProfile') ?>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="asis-sidebar-user text-center pt-4 pb-3">
+                                <button type="button" class="border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#asis-user-modal" aria-label="Ver mi información">
+                                    <?= view('partials/asistencia/avatar', ['perfilAsistencia' => $perfilAsistencia, 'avatarClass' => 'asis-avatar-lg']) ?>
+                                </button>
+                                <div class="hide-menu mt-2 px-3"><strong class="d-block"><?= esc($perfilAsistencia['nombre']) ?></strong><span class="text-muted small d-block mt-1"><?= esc($perfilAsistencia['cargo']) ?></span></div>
                             </div>
-                            <!-- End User profile text-->
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="<?= base_url('/inicio') ?>" aria-expanded="false"
@@ -114,22 +85,15 @@
                             </a>
                         </li>
                         <!-- Menu Vertical -->
-                        <?= view_cell('MenuCell', ['tipo' => 'vertical']); ?>
+                        <?= view('partials/menuVerticalLayout', ['menu' => $menuAsistencia]) ?>
 
                     </ul>
                 </nav>
 
                 <div class="sidebar-footer hide-menu">
-                    <!-- item-->
-                    <a href="page-account-settings.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="<?= lang('Main.profileSettings') ?>"><iconify-icon
-                            icon="solar:settings-linear"></iconify-icon></a>
-                    <!-- item-->
-                    <a href="app-email.html" class="link" data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="<?= lang('Main.myImbox') ?>"><iconify-icon icon="solar:inbox-linear"></iconify-icon></a>
-                    <!-- item-->
-                    <a href="<?= base_url('logout') ?>" class="link" data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="<?= lang('Main.logout') ?>"><iconify-icon icon="solar:power-bold"></iconify-icon></a>
+                    <button type="button" class="btn link" data-bs-toggle="modal" data-bs-target="#asis-user-modal" aria-label="Mi información"><i class="ti ti-user-circle" aria-hidden="true"></i></button>
+                    <button type="button" class="btn link" data-bs-toggle="modal" data-bs-target="#exampleModal" aria-label="Buscar funcionalidad"><i class="ti ti-search" aria-hidden="true"></i></button>
+                    <a href="<?= base_url('logout') ?>" class="link" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="ti ti-logout" aria-hidden="true"></i></a>
                 </div>
             </div>
         </aside>
@@ -784,19 +748,7 @@
                                 </ul>
                                 <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-center">
 
-                                    <li class="nav-item search-box d-none d-xl-flex align-items-center">
-                                        <div class="nav-link">
-                                            <form class="app-search position-relative">
-                                                <input type="text"
-                                                    class="form-control rounded-pill border-0 shadow-none"
-                                                    placeholder="Search for..." />
-                                                <a href="javascript:void(0)" class="srh-btn">
-                                                    <iconify-icon icon="solar:magnifer-linear"
-                                                        class="position-absolute top-50 end-0 translate-middle-y me-2 fs-5"></iconify-icon>
-                                                </a>
-                                            </form>
-                                        </div>
-                                    </li>
+                                    <?= view('partials/asistencia/searchTrigger') ?>
                                     <li class="nav-item">
                                         <a class="nav-link moon dark-layout nav-icon-hover-bg dark rounded-circle"
                                             href="javascript:void(0)">
@@ -847,79 +799,7 @@
                                     <!-- ------------------------------- -->
 
                                     <!-- ------------------------------- -->
-                                    <!-- start profile Dropdown -->
-                                    <!-- ------------------------------- -->
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
-                                            <div class="d-flex align-items-center lh-base">
-                                                <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>"
-                                                    class="rounded-circle" width="35" height="35" alt="monster-img" />
-                                            </div>
-                                        </a>
-                                        <div class="dropdown-menu content-dd dropdown-menu-end animated flipInY"
-                                            aria-labelledby="drop1">
-                                            <div class="profile-dropdown position-relative" data-simplebar>
-                                                <div class="py-3 px-7 pb-0">
-                                                    <h5 class="mb-0 fs-5"><?= lang('Main.userProfile');
-                                                    ?></h5>
-                                                </div>
-                                                <div class="d-flex align-items-center py-9 mx-7 border-bottom">
-                                                    <?= $this->renderSection('profile'); ?>
-                                                </div>
-                                                <div class="message-body">
-                                                    <a href="page-user-profile.html"
-                                                        class="py-8 px-7 mt-8 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:user-circle-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myProfile'); ?>
-                                                            </h6>
-                                                            <span
-                                                                class="fs-2 d-block text-body-secondary"><?= lang('Main.profileSettings'); ?></span>
-                                                        </div>
-                                                    </a>
-                                                    <a href="app-email.html"
-                                                        class="py-8 px-7 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:inbox-line-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myImbox') ?>
-                                                            </h6>
-                                                            <span
-                                                                class="fs-2 d-block text-body-secondary"><?= lang('Main.imboxDecription') ?></span>
-                                                        </div>
-                                                    </a>
-                                                    <a href="app-kanban.html"
-                                                        class="py-8 px-7 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:checklist-minimalistic-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base"><?= lang('Main.myTask'); ?>
-                                                            </h6>
-                                                            <span
-                                                                class="fs-2 d-block text-body-secondary"><?= lang('Main.taskList') ?></span>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div class="d-grid py-4 px-7 pt-8">
-                                                    <a href="<?= base_url('logout') ?>"
-                                                        class="btn btn-info"><?= lang('Main.logout') ?></a>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </li>
-                                    <!-- ------------------------------- -->
-                                    <!-- end profile Dropdown -->
+                                    <?= view('partials/asistencia/userDropdown', ['perfilAsistencia' => $perfilAsistencia, 'orientacion' => 'vertical']) ?>
                                     <!-- ------------------------------- -->
                                 </ul>
                             </div>
@@ -1506,19 +1386,7 @@
                                             <iconify-icon icon="solar:sort-line-duotone" class="fs-6"></iconify-icon>
                                         </a>
                                     </li>
-                                    <li class="nav-item search-box d-none d-xl-flex align-items-center">
-                                        <div class="nav-link">
-                                            <form class="app-search position-relative">
-                                                <input type="text"
-                                                    class="form-control rounded-pill border-0 shadow-none"
-                                                    placeholder="Search for..." />
-                                                <a href="javascript:void(0)" class="srh-btn">
-                                                    <iconify-icon icon="solar:magnifer-linear"
-                                                        class="position-absolute top-50 end-0 translate-middle-y me-2 fs-5"></iconify-icon>
-                                                </a>
-                                            </form>
-                                        </div>
-                                    </li>
+                                    <?= view('partials/asistencia/searchTrigger') ?>
                                     <li class="nav-item">
                                         <a class="nav-link nav-icon-hover-bg rounded-circle moon dark-layout"
                                             href="javascript:void(0)">
@@ -1595,82 +1463,7 @@
                                     <!-- ------------------------------- -->
 
                                     <!-- ------------------------------- -->
-                                    <!-- start profile Dropdown -->
-                                    <!-- ------------------------------- -->
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
-                                            <div class="d-flex align-items-center lh-base">
-                                                <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>"
-                                                    class="rounded-circle" width="35" height="35" alt="monster-img" />
-                                            </div>
-                                        </a>
-                                        <div class="dropdown-menu content-dd dropdown-menu-end animated flipInY"
-                                            aria-labelledby="drop1">
-                                            <div class="profile-dropdown position-relative" data-simplebar>
-                                                <div class="py-3 px-7 pb-0">
-                                                    <h5 class="mb-0 fs-5">User Profile</h5>
-                                                </div>
-                                                <div class="d-flex align-items-center py-9 mx-7 border-bottom">
-                                                    <img src="<?= base_url('assets/images/profile/user-1.jpg') ?>"
-                                                        class="rounded-circle" width="80" height="80" alt="" />
-                                                    <div class="ms-3">
-                                                        <h5 class="mb-1 fs-4">Markarn Doe</h5>
-                                                        <span class="mb-1 d-block">Designer</span>
-                                                        <p class="mb-0 d-flex align-items-center gap-2">
-                                                            <i class="ti ti-mail fs-4"></i> info@monster.com
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="message-body">
-                                                    <a href="page-user-profile.html"
-                                                        class="py-8 px-7 mt-8 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:user-circle-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base">My Profile</h6>
-                                                            <span class="fs-2 d-block text-body-secondary">Account
-                                                                Settings</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href="app-email.html"
-                                                        class="py-8 px-7 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:inbox-line-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base">My Inbox</h6>
-                                                            <span class="fs-2 d-block text-body-secondary">Messages &
-                                                                Emails</span>
-                                                        </div>
-                                                    </a>
-                                                    <a href="app-kanban.html"
-                                                        class="py-8 px-7 d-flex align-items-center">
-                                                        <span
-                                                            class="d-flex align-items-center justify-content-center bg-info-subtle rounded p-6 fs-7 text-info">
-                                                            <iconify-icon
-                                                                icon="solar:checklist-minimalistic-line-duotone"></iconify-icon>
-                                                        </span>
-                                                        <div class="w-75 d-inline-block v-middle ps-3">
-                                                            <h6 class="mb-1 fs-3 lh-base">My Task</h6>
-                                                            <span class="fs-2 d-block text-body-secondary">To-do and
-                                                                Daily Tasks</span>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div class="d-grid py-4 px-7 pt-8">
-                                                    <a href="authentication-login.html" class="btn btn-info">Log Out</a>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </li>
-                                    <!-- ------------------------------- -->
-                                    <!-- end profile Dropdown -->
+                                    <?= view('partials/asistencia/userDropdown', ['perfilAsistencia' => $perfilAsistencia, 'orientacion' => 'horizontal']) ?>
                                     <!-- ------------------------------- -->
                                 </ul>
                             </div>
@@ -1694,7 +1487,7 @@
                                 <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                                 <span class="hide-menu">Home</span>
                             </li>
-                            <?= view_cell('MenuCell', ['tipo' => 'horizontal']); ?>
+                            <?= view('partials/menuHorizontalLayout', ['menu' => $menuAsistencia]) ?>
 
 
                         </ul>
@@ -1725,6 +1518,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body" data-simplebar style="height: calc(100vh - 80px)">
+                    <div class="rounded border p-3 mb-4">
+                        <p class="small mb-2">Tu apariencia se guarda automáticamente en tu perfil.</p>
+                        <p id="appearance-save-status" class="small text-muted mb-2" role="status" aria-live="polite"><?= $aparienciaDisponible ? 'Preferencias cargadas.' : 'No se pudo cargar tu apariencia. Intenta guardar nuevamente.' ?></p>
+                        <button type="button" id="appearance-retry" class="btn btn-sm btn-outline-primary" <?= $aparienciaDisponible ? 'hidden' : '' ?>>Reintentar guardado</button>
+                        <button type="button" id="appearance-reset" class="btn btn-sm btn-outline-secondary">Restablecer apariencia</button>
+                    </div>
                     <h6 class="fw-semibold fs-4 mb-2">Tema</h6>
 
                     <div class="d-flex flex-row gap-3 customizer-box" role="group">
@@ -1793,11 +1592,11 @@
                             </div>
                         </label>
 
-                        <input type="radio" class="btn-check" name="color-theme-layout" id="green-theme-layout"
+                        <input type="radio" class="btn-check" name="color-theme-layout" id="Green_Theme"
                             autocomplete="off" />
                         <label
                             class="btn p-9 btn-outline-primary rounded-2 d-flex align-items-center justify-content-center"
-                            onclick="handleColorTheme('Green_Theme')" for="green-theme-layout" data-bs-toggle="tooltip"
+                            onclick="handleColorTheme('Green_Theme')" for="Green_Theme" data-bs-toggle="tooltip"
                             data-bs-placement="top" data-bs-title="GREEN_THEME">
                             <div
                                 class="color-box rounded-circle d-flex align-items-center justify-content-center skin-4">
@@ -1805,11 +1604,11 @@
                             </div>
                         </label>
 
-                        <input type="radio" class="btn-check" name="color-theme-layout" id="cyan-theme-layout"
+                        <input type="radio" class="btn-check" name="color-theme-layout" id="Cyan_Theme"
                             autocomplete="off" />
                         <label
                             class="btn p-9 btn-outline-primary rounded-2 d-flex align-items-center justify-content-center"
-                            onclick="handleColorTheme('Cyan_Theme')" for="cyan-theme-layout" data-bs-toggle="tooltip"
+                            onclick="handleColorTheme('Cyan_Theme')" for="Cyan_Theme" data-bs-toggle="tooltip"
                             data-bs-placement="top" data-bs-title="CYAN_THEME">
                             <div
                                 class="color-box rounded-circle d-flex align-items-center justify-content-center skin-5">
@@ -1817,11 +1616,11 @@
                             </div>
                         </label>
 
-                        <input type="radio" class="btn-check" name="color-theme-layout" id="orange-theme-layout"
+                        <input type="radio" class="btn-check" name="color-theme-layout" id="Orange_Theme"
                             autocomplete="off" />
                         <label
                             class="btn p-9 btn-outline-primary rounded-2 d-flex align-items-center justify-content-center"
-                            onclick="handleColorTheme('Orange_Theme')" for="orange-theme-layout"
+                            onclick="handleColorTheme('Orange_Theme')" for="Orange_Theme"
                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="ORANGE_THEME">
                             <div
                                 class="color-box rounded-circle d-flex align-items-center justify-content-center skin-6">
@@ -1905,114 +1704,15 @@
             </script>
         </div>
 
-        <!--  Search Bar -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header border-bottom">
-                        <input type="search" class="form-control" placeholder="Search here" id="search" />
-                        <a href="javascript:void(0)" data-bs-dismiss="modal" class="lh-1">
-                            <i class="ti ti-x fs-5 ms-3"></i>
-                        </a>
-                    </div>
-                    <div class="modal-body message-body" data-simplebar="">
-                        <h5 class="mb-0 fs-5 p-1">Quick Page Links</h5>
-                        <ul class="list mb-0 py-2">
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Analytics</span>
-                                    <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard1</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">eCommerce</span>
-                                    <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard2</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">CRM</span>
-                                    <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard3</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Contacts</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/contacts</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Posts</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/blog/posts</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Detail</span>
-                                    <span
-                                        class="fs-2 d-block text-body-secondary">/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Shop</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/ecommerce/shop</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Modern</span>
-                                    <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard1</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Dashboard</span>
-                                    <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard2</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Contacts</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/contacts</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Posts</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/blog/posts</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Detail</span>
-                                    <span
-                                        class="fs-2 d-block text-body-secondary">/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow</span>
-                                </a>
-                            </li>
-                            <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                                <a href="javascript:void(0)">
-                                    <span class="text-dark fw-semibold d-block">Shop</span>
-                                    <span class="fs-2 d-block text-body-secondary">/apps/ecommerce/shop</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <?= view('partials/asistencia/sessionModals', ['perfilAsistencia' => $perfilAsistencia, 'opcionesAsistencia' => $opcionesAsistencia]) ?>
     </div>
-
-
 
     <div class="dark-transparent sidebartoggler"></div>
     <!-- Import Js Files -->
     <script src="<?= base_url('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('assets/libs/simplebar/dist/simplebar.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/app.init.js') ?>"></script>
+    <script>userSettings = <?= json_encode($aparienciaAsistencia, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
     <script src="<?= base_url('assets/js/theme/theme.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/app.min.js') ?>"></script>
     <script src="<?= base_url('assets/js/theme/sidebarmenu.js') ?>"></script>
@@ -2104,6 +1804,9 @@
 
         toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');
     </script>
+    <script type="application/json" id="user-appearance-config"><?= json_encode(['settings' => $aparienciaAsistencia, 'available' => $aparienciaDisponible, 'url' => base_url('perfil/preferencias'), 'csrf' => ['header' => csrf_header(), 'name' => csrf_token(), 'hash' => csrf_hash()]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <script src="<?= base_url('assets/js/asistencia/preferences.js') ?>"></script>
+    <script src="<?= base_url('assets/js/asistencia/layout.js') ?>"></script>
     <?= $this->renderSection('pageScripts'); ?>
 </body>
 

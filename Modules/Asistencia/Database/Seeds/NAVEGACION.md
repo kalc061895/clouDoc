@@ -8,9 +8,20 @@ Revisión estática de Routes.php, métodos públicos y vistas de entrada. No ce
 php spark db:seed 'Modules\Asistencia\Database\Seeds\NavigationSeeder'
 ```
 
-Crea el grupo `asistencia` (1000), 3 agrupadores y 31 enlaces, y vincula las 34 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.
+Crea los grupos `asi_sua` (1001), `asi_adm` (1002) y `asi_apo` (1003), y conserva `asistencia` (1000) por compatibilidad. Registra el dashboard y Mi perfil y apariencia, además de las pantallas operativas existentes. No asigna ni migra usuarios entre grupos; se eligen en la administración de usuarios. MasterSeeder también llama a NavigationSeeder.
 
-Se puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por otras opciones, falla. Si el grupo asistencia ya tiene otro ID, requiere migrar previamente sus usuarios. No elimina los menús antiguos ni sus relaciones: si ya ejecutó el ejemplo, requieren una migración separada.
+Se puede repetir sin duplicar IDs o relaciones. Ante IDs o nombres ocupados por otras opciones, falla y revierte la carga. Sincroniza la matriz de menús del catálogo para los grupos nuevos; conserva las relaciones ajenas al catálogo y las membresías. No agrega ESTADÍSTICAS ni enlaces a endpoints JSON. Búsqueda y apariencia también siguen disponibles en la cabecera.
+
+La matriz controla navegación, no autorización de endpoints ni acciones internas. Por ejemplo, el gestor de personal y marcaciones pueden incluir edición. No otorga permisos globales de administración ni cambia las reglas del módulo Firma.
+
+## Matriz de navegación
+
+| Grupo | Enlaces | Opciones |
+| --- | --- | --- |
+| asistencia | 34 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
+| asi_sua | 34 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
+| asi_adm | 16 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Turnos, Horarios de turnos, Feriados, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
+| asi_apo | 7 | Personal, Gestor de personal, Marcaciones, Dashboard de asistencia, Historial de roles, Reporte mensual, Mi perfil y apariencia |
 
 ## Pantallas incluidas
 
@@ -18,6 +29,9 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 
 | ID | Menú | Ruta | Destino |
 | --- | --- | --- | --- |
+| 1006 | Dashboard de asistencia | asistencia | DashboardController::index |
+| 1061 | Mi perfil y apariencia | asistencia/mi-perfil | PerfilController::index |
+| 1051 | Reporte mensual | asistencia/reportes/mensual | ReporteMensualController::index |
 | 1041 | Generación de roles | asistencia/roles/generacion | RolDocumentoController::index |
 | 1042 | Historial de roles | asistencia/roles/historial | RolDocumentoController::historial |
 | 1043 | Firmar roles | asistencia/roles/firmar | RolDocumentoController::firmar |
@@ -54,7 +68,6 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 
 | Ruta | Destino faltante |
 | --- | --- |
-| asistencia/dashboard | DashboardController::index |
 | asistencia/administrador/planilla | PersonalController::planilla |
 | asistencia/administrador/planilla_observacion | PersonalController::planillaObservacion |
 | asistencia/administrador/planilla_microred | PersonalController::planillaMicrored |
@@ -99,6 +112,10 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 
 | Ruta | Destino |
 | --- | --- |
+| asistencia/reportes/mensual/consultar | ReporteMensualController::consultar |
+| asistencia/reportes/mensual/excel | ReporteMensualController::exportar/excel |
+| asistencia/reportes/mensual/pdf | ReporteMensualController::exportar/pdf |
+| asistencia/reportes/mensual/imprimir | ReporteMensualController::exportar/imprimir |
 | asistencia/roles | RolDocumentoController::index |
 | asistencia/roles/consultar | RolDocumentoController::consultar |
 | asistencia/roles/listar | RolDocumentoController::listar |
@@ -110,6 +127,7 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 | asistencia/programacion/exportar-excel-importable | ProgramacionController::exportarExcelImportable |
 | asistencia/programacion/exportar-excel-reporte | ProgramacionController::exportarExcelReporte |
 | asistencia/horario | ProgramacionController::index |
+| asistencia/dashboard | DashboardController::index |
 | asistencia/administrador/personal | PersonalController::index |
 | asistencia/administrador/nuevo_personal | PersonalController::nuevo |
 | asistencia/administrador/asignar_plan | ProgramacionController::index |
@@ -123,7 +141,6 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 
 | Verbo | Ruta | Destino | Problema |
 | --- | --- | --- | --- |
-| GET | asistencia/dashboard | DashboardController::index | Falta controlador |
 | POST | asistencia/administrador/nuevo_personal/guardar | PersonalController::guardar | Falta método |
 | GET | asistencia/administrador/planilla | PersonalController::planilla | Falta método |
 | GET | asistencia/administrador/planilla_observacion | PersonalController::planillaObservacion | Falta método |

@@ -11,6 +11,7 @@ class MenuSeeder extends Seeder
     {
         $definitions = [
             [1000, null, 'ASISTENCIA', null, 'calendar-mark-line-duotone'],
+            [1006, 1000, 'Dashboard de asistencia', 'asistencia', 'chart-square-line-duotone'],
             [1001, 1000, 'Personal', 'asistencia/personal', 'users-group-rounded-line-duotone'],
             [1002, 1000, 'Nuevo personal', 'asistencia/personal/nuevo', 'user-plus-line-duotone'],
             [1003, 1000, 'Gestor de personal', 'asistencia/personal/gestorpersonal', 'users-group-rounded-line-duotone'],
@@ -46,6 +47,8 @@ class MenuSeeder extends Seeder
             [1031, 1010, 'Profesión y especialidades', 'asistencia/gestordb/profesion-especialidad', 'database-line-duotone'],
             [1032, 1010, 'Periodos', 'asistencia/gestordb/periodos', 'database-line-duotone'],
             [1033, 1010, 'Grupos de corte', 'asistencia/gestordb/grupo-corte', 'database-line-duotone'],
+            [1060, null, 'MI CUENTA DE ASISTENCIA', null, 'user-circle-line-duotone'],
+            [1061, 1060, 'Mi perfil y apariencia', 'asistencia/mi-perfil', 'user-circle-line-duotone'],
         ];
         $menus = [];
         foreach ($definitions as $order => [$id, $parent, $name, $url, $icon]) {

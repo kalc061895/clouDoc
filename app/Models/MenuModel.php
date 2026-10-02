@@ -54,31 +54,16 @@ class MenuModel extends Model
     protected $afterDelete    = [];
 
 
-    public function getMenusByRole()
+    public function getMenusByRole(?array $groups = null)
     {
-        $tipoUsuario = auth()->user()->groups;
-
-        $db = \Config\Database::connect();
-
-        $builder = $db->table('menus');
-        $builder->select('menus.*');
-        $builder->join(
-            'group_user',
-            "group_user.name = '" . $tipoUsuario[0] . "'",
-            'join'
-        );
-        $builder->join(
-            'menu_group_user',
-            "menu_group_user.menu_id = menus.id AND menu_group_user.group_user_id = group_user.id",
-            'join'
-        );
-        $builder->orderBy('menus.order ASC');
-
-        $query = $builder->get();
-
-        return $query->getResultArray();
-        // Puedes implementar lógica para filtrar los menús por rol si es necesario
-        //return $builder->where('status', 'active')->findAll();
+        $groups ??= auth()->user()?->getGroups() ?? [];
+        if (!$groups) return [];
+        return $this->db->table('menus')->select('menus.*')->distinct()
+            ->join('menu_group_user mgu', 'mgu.menu_id = menus.id')
+            ->join('group_user gu', 'gu.id = mgu.group_user_id')
+            ->whereIn('gu.name', array_values(array_unique($groups)))
+            ->where('menus.status', 'active')->orderBy('menus.order', 'ASC')
+            ->get()->getResultArray();
     }
 
     public function getSubMenus($parentId)

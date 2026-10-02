@@ -7,6 +7,8 @@ namespace CodeIgniter\Database {
 
 namespace {
     require __DIR__ . '/MenuSeeder.php';
+    require __DIR__ . '/GroupUserSeeder.php';
+    require __DIR__ . '/MenuGroupUserSeeder.php';
     $root = dirname(__DIR__, 4);
     $routes = new class {
         public array $prefix = [];
@@ -53,13 +55,12 @@ namespace {
             }
             // Comprobar la vista literal retornada por el método de entrada.
             preg_match('/public\s+function\s+' . preg_quote($method, '/') . '\s*\([^)]*\)[^{]*\{(.*?)(?=\n    (?:public|private|protected) function|\z)/s', $source, $body);
-            if (! preg_match('/return view\(\x27([^\x27]+)\x27/', $body[1] ?? '', $view)) {
+            if (preg_match('/return view\(\x27([^\x27]+)\x27/', $body[1] ?? '', $view)) {
+                $viewPath = str_replace('\\', '/', $view[1]);
+                $viewPath .= str_ends_with($viewPath, '.php') ? '' : '.php';
+                if (!is_file($root . '/' . $viewPath)) throw new \RuntimeException('Falta vista: ' . $viewPath);
+            } elseif (!preg_match('/return redirect\(\)->to\(base_url\(\x27firma\x27\)\)/', $body[1] ?? '')) {
                 throw new \RuntimeException('Revisar vista de ' . $url);
-            }
-            $viewPath = str_replace('\\', '/', $view[1]);
-            $viewPath .= str_ends_with($viewPath, '.php') ? '' : '.php';
-            if (! is_file($root . '/' . $viewPath)) {
-                throw new \RuntimeException('Falta vista: ' . $viewPath);
             }
             $implemented[$url] = [$urls[$url]['id'], $urls[$url]['name'], $url, $target];
             $targets[$target] = $url;
@@ -73,7 +74,7 @@ namespace {
         throw new \RuntimeException('Hay menús sin ruta GET.');
     }
     $report = "# Navegación de Asistencia\n\nRevisión estática de Routes.php, métodos públicos y vistas de entrada. No certifica el funcionamiento de los flujos ni la base de datos.\n\n";
-    $report .= "## Ejecución\n\n```powershell\nphp spark db:seed 'Modules\\Asistencia\\Database\\Seeds\\NavigationSeeder'\n```\n\nCrea el grupo `asistencia` (1000), 3 agrupadores y 31 enlaces, y vincula las 34 entradas al grupo 1000. MasterSeeder también llama a NavigationSeeder. Las relaciones usan su ID autoincremental; los IDs fijos corresponden al grupo y los menús. No asigna usuarios al grupo. No configura permisos por DIRESA/red/microred ni autorización de endpoints.\n\nSe puede repetir sin duplicar los IDs ni las relaciones. Ante IDs ocupados por otras opciones, falla. Si el grupo asistencia ya tiene otro ID, requiere migrar previamente sus usuarios. No elimina los menús antiguos ni sus relaciones: si ya ejecutó el ejemplo, requieren una migración separada.\n\n";
+    $report .= "## Ejecución\n\n```powershell\nphp spark db:seed 'Modules\\Asistencia\\Database\\Seeds\\NavigationSeeder'\n```\n\nCrea los grupos `asi_sua` (1001), `asi_adm` (1002) y `asi_apo` (1003), y conserva `asistencia` (1000) por compatibilidad. Registra el dashboard y Mi perfil y apariencia, además de las pantallas operativas existentes. No asigna ni migra usuarios entre grupos; se eligen en la administración de usuarios. MasterSeeder también llama a NavigationSeeder.\n\nSe puede repetir sin duplicar IDs o relaciones. Ante IDs o nombres ocupados por otras opciones, falla y revierte la carga. Sincroniza la matriz de menús del catálogo para los grupos nuevos; conserva las relaciones ajenas al catálogo y las membresías. No agrega ESTADÍSTICAS ni enlaces a endpoints JSON. Búsqueda y apariencia también siguen disponibles en la cabecera.\n\nLa matriz controla navegación, no autorización de endpoints ni acciones internas. Por ejemplo, el gestor de personal y marcaciones pueden incluir edición. No otorga permisos globales de administración ni cambia las reglas del módulo Firma.\n\n";
     $table = static function ($headers, $rows): string {
         $out = '| ' . implode(' | ', $headers) . " |\n| " . implode(' | ', array_fill(0, count($headers), '---')) . " |\n";
         foreach ($rows as $row) {
@@ -81,6 +82,13 @@ namespace {
         }
         return $out . "\n";
     };
+    $matrix = [];
+    $byId = array_column($menus, null, 'id');
+    foreach (\Modules\Asistencia\Database\Seeds\MenuGroupUserSeeder::asignaciones() as $name => $ids) {
+        $links = array_filter($ids, static fn($id) => $byId[$id]['url'] !== null);
+        $matrix[] = [$name, count($links), implode(', ', array_map(static fn($id) => $byId[$id]['name'], $links))];
+    }
+    $report .= "## Matriz de navegación\n\n" . $table(['Grupo', 'Enlaces', 'Opciones'], $matrix);
     $report .= "## Pantallas incluidas\n\nFirmar roles redirige al módulo independiente de Firma de documentos.\n\n" . $table(['ID', 'Menú', 'Ruta', 'Destino'], $implemented);
     $report .= "## Pantallas pendientes (no se insertan menús rotos)\n\n" . $table(['Ruta', 'Destino faltante'], $pending);
     $report .= "## Alias y descargas sin menú adicional\n\n" . $table(['Ruta', 'Destino'], $aliases);

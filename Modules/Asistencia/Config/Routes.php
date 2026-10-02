@@ -2,6 +2,8 @@
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+    $routes->get('/', 'DashboardController::index');
+    $routes->get('mi-perfil', 'PerfilController::index');
 
     $routes->get('reportes/mensual', 'ReporteMensualController::index');
     $routes->get('reportes/mensual/consultar', 'ReporteMensualController::consultar');

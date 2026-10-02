@@ -1,0 +1,31 @@
+.asis-layout .asis-user-avatar { position: relative; display: inline-grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--bs-primary-bg-subtle); color: var(--bs-primary); font-weight: 700; border: 2px solid var(--bs-body-bg); box-shadow: 0 0 0 1px var(--bs-border-color); overflow: hidden; vertical-align: middle; }
+.asis-layout .asis-user-avatar.asis-avatar-lg { width: 68px; height: 68px; font-size: 1.4rem; }
+.asis-layout .asis-user-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.asis-layout .asis-sidebar-user { border-bottom: 1px solid var(--bs-border-color); margin-bottom: 12px; overflow-wrap: anywhere; }
+.asis-layout .asis-account-toggle { border-radius: 12px; padding: 6px 10px; color: var(--bs-body-color); }
+.asis-layout .asis-account-toggle:hover { background: var(--bs-primary-bg-subtle) !important; }
+.asis-layout .asis-account-toggle:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
+.asis-layout .asis-account-text { max-width: 185px; line-height: 1.4; }
+.asis-layout .asis-account-text strong,.asis-layout .asis-account-text small { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.asis-layout .asis-account-text strong { font-size: .82rem; }
+.asis-layout .asis-account-text small { font-size: .73rem; color: var(--bs-secondary-color); }
+.asis-layout .asis-account-menu { width: min(350px,calc(100vw - 24px)); border-radius: 16px; border: 1px solid var(--bs-border-color); overflow: hidden; }
+.asis-layout .asis-account-summary { background: var(--bs-primary-bg-subtle); }
+.asis-layout .asis-account-details { min-width: 0; overflow-wrap: anywhere; }
+.asis-layout .asis-account-email { overflow-wrap: anywhere; }
+.asis-layout .asis-account .dropdown-item { white-space: normal; }
+.asis-layout .asis-menu-search-form { background: var(--bs-tertiary-bg,var(--bs-primary-bg-subtle)); border: 1px solid var(--bs-border-color); border-radius: 24px; width: clamp(190px,23vw,340px); margin-right: 12px; }
+.asis-layout .asis-menu-search-form:focus-within { border-color: var(--bs-primary); box-shadow: 0 0 0 3px var(--bs-primary-bg-subtle); }
+.asis-layout .asis-menu-search-form input { min-width: 0; padding: 9px 8px; font-size: .82rem; }
+.asis-layout .asis-search-submit { padding: 6px 12px; border: 0; }
+.asis-layout .asis-user-fields dt { font-size: .75rem; color: var(--bs-secondary-color); margin-bottom: 4px; }
+.asis-layout .asis-user-fields dd { overflow-wrap: anywhere; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--bs-border-color); }
+.asis-layout .asis-user-fields dd:last-child { border: 0; margin-bottom: 0; padding-bottom: 0; }
+.asis-layout .asis-search-result { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; color: var(--bs-body-color); border: 1px solid transparent; text-decoration: none; }
+.asis-layout .asis-search-result:hover,.asis-layout .asis-search-result:focus-visible { outline: none; background: var(--bs-primary-bg-subtle); border-color: var(--bs-primary); }
+.asis-layout .asis-search-result > i:first-child { display: grid; place-items: center; width: 38px; height: 38px; flex-shrink: 0; background: var(--bs-primary-bg-subtle); border-radius: 10px; color: var(--bs-primary); font-size: 20px; }
+.asis-layout .asis-search-result strong { display: block; font-size: .9rem; }
+.asis-layout .asis-search-result small { display: block; color: var(--bs-secondary-color); margin-top: 3px; }
+.asis-layout .asis-search-result span { min-width: 0; overflow-wrap: anywhere; }
+.asis-layout .asis-search-empty { padding: 30px 16px; color: var(--bs-secondary-color); text-align: center; }
+@media (max-width:575.98px) { .asis-layout .asis-account-toggle { padding: 5px; gap: 4px !important; } .asis-layout .asis-account-toggle > .ti { display: none; } }

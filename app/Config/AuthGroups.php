@@ -70,6 +70,18 @@ class AuthGroups extends ShieldAuthGroups
             'title'       => 'Encargado del Area de Control y asistencia y permanencia',
             'description' => 'Gestion de Asistencia y permanencia de los trabajadores',
         ],
+        'asi_sua' => [
+            'title' => 'Asistencia - Superadministrador',
+            'description' => 'Gestión integral y catálogos de Asistencia. No equivale al superadmin global.',
+        ],
+        'asi_adm' => [
+            'title' => 'Asistencia - Administrador',
+            'description' => 'Gestión operativa de personal, turnos, marcaciones, roles y reportes.',
+        ],
+        'asi_apo' => [
+            'title' => 'Asistencia - Apoyo',
+            'description' => 'Apoyo en personal, gestor, marcaciones, historial de roles y reportes.',
+        ],
         'postulante' => [
             'title'       => 'Postulante',
             'description' => 'Usuario que participa en una convocatoria',
@@ -103,6 +115,9 @@ class AuthGroups extends ShieldAuthGroups
      * This defines group-level permissions.
      */
     public array $matrix = [
+        'asi_sua' => [],
+        'asi_adm' => [],
+        'asi_apo' => [],
         'superadmin' => [
             'admin.*',
             'users.*',
