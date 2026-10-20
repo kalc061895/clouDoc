@@ -55,6 +55,9 @@ final class ProgramacionFiltrosTest extends CIUnitTestCase
         $service = $this->getMockBuilder(ProgramacionTurnoService::class)->disableOriginalConstructor()->onlyMethods(['obtenerCatalogoTurnos'])->getMock();
         $service->method('obtenerCatalogoTurnos')->willReturn([]);
         (new ReflectionProperty($service, 'db'))->setValue($service, $db);
+        $gestion = $this->getMockBuilder(\Modules\Asistencia\Services\GestionRolService::class)->disableOriginalConstructor()->onlyMethods(['filtrarPersonal'])->getMock();
+        $gestion->expects(self::once())->method('filtrarPersonal');
+        (new ReflectionProperty($service, 'gestionRoles'))->setValue($service, $gestion);
         $resultado = $service->obtenerMatrizMensual(2026, 9, null, 2, 3, null, 4, '00123456');
         self::assertContains(['p.perl_ofi_ide', 4], $db->consultas['casis_personal p']->condiciones);
         self::assertContains(['pe.per_numero_documento', '00123456'], $db->consultas['casis_personal p']->condiciones);

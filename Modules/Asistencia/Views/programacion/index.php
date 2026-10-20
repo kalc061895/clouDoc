@@ -115,6 +115,7 @@ Programación Mensual de Turnos
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<a class="btn btn-outline-primary m-3" href="<?= site_url('asistencia/gestion-roles') ?>">Periodos y reglas de programaci?n</a>
 <div class="container-fluid px-0">
 
     <!-- CABECERA PRINCIPAL -->

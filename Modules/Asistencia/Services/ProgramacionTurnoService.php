@@ -20,14 +20,84 @@ class ProgramacionTurnoService
     protected TurnoHorarioModel $turnoHorarioModel;
     protected PersonalModel $personalModel;
     protected $db;
+    protected GestionRolService $gestionRoles;
 
-    public function __construct()
+    public function __construct(?GestionRolService $gestionRoles = null)
     {
+        $this->gestionRoles = $gestionRoles ?? new GestionRolService();
         $this->programacionModel = new ProgramacionModel();
         $this->turnoModel        = new TurnoModel();
         $this->turnoHorarioModel = new TurnoHorarioModel();
         $this->personalModel     = new PersonalModel();
         $this->db                = \Config\Database::connect();
+    }
+
+    public function asignarTurnoIndividual(array $datos, ?int $usuarioId = null): array
+    {
+        $g = $this->gestionRoles;
+        try {
+            return $g->transaccion(function() use ($g, $datos) {
+                $id = (int)($datos['prog_perl_ide'] ?? 0);
+                $fecha = (string)($datos['prog_fecha'] ?? '');
+                $anterior = null;
+                if (!empty($datos['prog_ide'])) {
+                    $anterior = $this->programacionModel->find((int)$datos['prog_ide']);
+                    if (!$anterior) throw new \DomainException('Asignaci?n no encontrada.');
+                    $g->editable((int)$anterior['prog_perl_ide'], $anterior['prog_fecha']);
+                }
+                $periodo = $g->editable($id, $fecha);
+                $horario = $this->turnoHorarioModel->find((int)($datos['prog_th_ide'] ?? 0));
+                if (!$horario || !$horario['th_estado']) throw new \DomainException('Horario no disponible.');
+                $datos['prog_estado'] = 'PROGRAMADO';
+                $res = $this->guardarIndividualSinControl($datos, $g->usuario());
+                if (!$res['status']) throw new \DomainException($res['message']);
+                $g->validar($id, $periodo);
+                $g->evento('GUARDAR_TURNO', ['anterior'=>$anterior, 'nuevo'=>$datos]);
+                return $res;
+            });
+        } catch (\DomainException $e) { return ['status'=>false,'message'=>$e->getMessage()]; }
+    }
+
+    public function eliminarTurnoIndividual(int $progIde, ?int $usuarioId = null): array
+    {
+        $g = $this->gestionRoles;
+        try {
+            return $g->transaccion(function() use ($g, $progIde) {
+                $prog = $this->programacionModel->find($progIde);
+                if (!$prog) throw new \DomainException('Asignaci?n no encontrada.');
+                $g->editable((int)$prog['prog_perl_ide'], $prog['prog_fecha']);
+                $res = $this->eliminarIndividualSinControl($progIde, $g->usuario());
+                if (!$res['status']) throw new \DomainException($res['message']);
+                $g->evento('ELIMINAR_TURNO', $prog);
+                return $res;
+            });
+        } catch (\DomainException $e) { return ['status'=>false,'message'=>$e->getMessage()]; }
+    }
+
+    public function procesarImportacionDefinitiva(array $registrosValidos, bool $reemplazarExistentes, ?int $estIde = null, ?int $upsIde = null, ?int $ussIde = null, ?int $usuarioId = null): array
+    {
+        $g = $this->gestionRoles;
+        try {
+            return $g->transaccion(function() use ($g, $registrosValidos, $reemplazarExistentes, $estIde, $upsIde, $ussIde) {
+                $validar=[];
+                foreach ($registrosValidos as &$reg) {
+                    foreach ($reg['turnos'] as &$t) {
+                        $p=$g->editable((int)$reg['perl_ide'],$t['fecha']);
+                        $validar[$reg['perl_ide'].':'.$p['id']]=[(int)$reg['perl_ide'],$p];
+                        $existentes=$this->programacionModel->where('prog_perl_ide',$reg['perl_ide'])->where('prog_fecha',$t['fecha'])->findAll();
+                        if ($reemplazarExistentes && count($existentes)>1) throw new \DomainException('Hay varios turnos en el mismo d?a. Modif?quelos individualmente.');
+                        $t['ya_existe']=!empty($existentes);
+                    }
+                    unset($t);
+                }
+                unset($reg);
+                $res=$this->importarSinControl($registrosValidos,$reemplazarExistentes,$estIde,$upsIde,$ussIde,$g->usuario());
+                if (!$res['status']) throw new \DomainException($res['message']);
+                foreach ($validar as [$id,$periodo]) $g->validar($id,$periodo);
+                $g->evento('IMPORTAR_TURNOS',['resultado'=>$res,'registros'=>$registrosValidos]);
+                return $res;
+            });
+        } catch (\DomainException $e) { return ['status'=>false,'message'=>$e->getMessage()]; }
     }
 
     /**
@@ -199,6 +269,8 @@ class ProgramacionTurnoService
         }
         if ($ofiIde) $builderPersonal->where('p.perl_ofi_ide', $ofiIde);
         if (trim($dni ?? '') !== '') $builderPersonal->where('pe.per_numero_documento', trim($dni));
+
+        $this->gestionRoles->filtrarPersonal($builderPersonal);
 
         $trabajadores = $builderPersonal
             ->orderBy('pe.per_paterno', 'ASC')
@@ -419,7 +491,7 @@ class ProgramacionTurnoService
     /**
      * Asigna un turno individual a un trabajador en una fecha determinada
      */
-    public function asignarTurnoIndividual(array $datos, ?int $usuarioId = null): array
+    private function guardarIndividualSinControl(array $datos, ?int $usuarioId = null): array
     {
         $perlIde = (int) ($datos['prog_perl_ide'] ?? 0);
         $fecha   = trim((string) ($datos['prog_fecha'] ?? ''));
@@ -487,7 +559,7 @@ class ProgramacionTurnoService
     /**
      * Elimina un turno asignado (soft delete)
      */
-    public function eliminarTurnoIndividual(int $progIde, ?int $usuarioId = null): array
+    private function eliminarIndividualSinControl(int $progIde, ?int $usuarioId = null): array
     {
         $prog = $this->programacionModel->find($progIde);
         if (!$prog) {
@@ -611,6 +683,7 @@ class ProgramacionTurnoService
             $builder->where('p.perl_est_ide', $estIde);
         }
 
+        $this->gestionRoles->filtrarPersonal($builder);
         $personal = $builder->orderBy('pe.per_paterno', 'ASC')->get()->getResultArray();
 
         $rowNum = 2;
@@ -765,7 +838,7 @@ class ProgramacionTurnoService
         $diasMes    = $this->obtenerDiasDelMes($anioEsperado, $mesEsperado);
 
         // Pre-cargar trabajadores indexados por DNI
-        $trabajadores = $this->db->table('casis_personal p')
+        $consultaPersonal = $this->db->table('casis_personal p')
             ->select('
                 p.perl_ide,
                 p.perl_est_ide,
@@ -776,9 +849,9 @@ class ProgramacionTurnoService
             ')
             ->join('casis_persona pe', 'pe.per_ide = p.perl_per_ide', 'inner')
             ->where('p.deleted_at', null)
-            ->where('p.perl_estado', 1)
-            ->get()
-            ->getResultArray();
+            ->where('p.perl_estado', 1);
+        $this->gestionRoles->filtrarPersonal($consultaPersonal);
+        $trabajadores = $consultaPersonal->get()->getResultArray();
 
         $trabajadoresPorDni = [];
         foreach ($trabajadores as $t) {
@@ -1014,7 +1087,7 @@ class ProgramacionTurnoService
     /**
      * Aplica la importación masiva definitiva dentro de una transacción de base de datos
      */
-    public function procesarImportacionDefinitiva(array $registrosValidos, bool $reemplazarExistentes, ?int $estIde = null, ?int $upsIde = null, ?int $ussIde = null, ?int $usuarioId = null): array
+    private function importarSinControl(array $registrosValidos, bool $reemplazarExistentes, ?int $estIde = null, ?int $upsIde = null, ?int $ussIde = null, ?int $usuarioId = null): array
     {
         if (empty($registrosValidos)) {
             return ['status' => false, 'message' => 'No hay registros válidos para importar.'];

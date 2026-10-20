@@ -27,6 +27,7 @@ Cargos / Puestos de Trabajo
                     <th>ID</th>
                     <th>Código</th>
                     <th>Nombre del Cargo</th>
+                    <th>Modalidad</th>
                     <th>Descripción</th>
                     <th>Estado</th>
                     <th class="text-end">Acciones</th>
@@ -61,6 +62,15 @@ Cargos / Puestos de Trabajo
                         <div class="col-md-12">
                             <label class="form-label small fw-bold">Descripción o Perfil del Cargo</label>
                             <textarea class="form-control" id="car_descripcion" rows="3" placeholder="Detalles de funciones, requisitos, etc..."></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="car_modalidad" class="form-label small fw-bold">Modalidad del cargo</label>
+                            <select id="car_modalidad" class="form-select" required>
+                                <option value="">Seleccione una modalidad</option>
+                                <option value="ASISTENCIAL">Asistencial</option>
+                                <option value="ADMINISTRATIVO">Administrativo</option>
+                            </select>
+                            <div class="form-text">Se aplica a todo el personal asignado a este cargo.</div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-check form-switch mt-2">
@@ -106,6 +116,12 @@ Cargos / Puestos de Trabajo
                 {
                     "data": "car_nombre",
                     "className": "fw-bold text-dark"
+                },
+                {
+                    "data": "car_modalidad",
+                    "render": function(data) {
+                        return data === 'ADMINISTRATIVO' ? 'Administrativo' : (data === 'ASISTENCIAL' ? 'Asistencial' : 'Sin clasificar');
+                    }
                 },
                 {
                     "data": "car_descripcion",
@@ -163,6 +179,7 @@ Cargos / Puestos de Trabajo
         $('#car_ide').val(data.car_ide);
         $('#car_codigo').val(data.car_codigo);
         $('#car_nombre').val(data.car_nombre);
+        $('#car_modalidad').val(data.car_modalidad || '');
         $('#car_descripcion').val(data.car_descripcion);
         $('#car_estado').prop('checked', data.car_estado == 1);
 
@@ -181,6 +198,7 @@ Cargos / Puestos de Trabajo
         const datos = {
             car_codigo: $('#car_codigo').val(),
             car_nombre: $('#car_nombre').val(),
+            car_modalidad: $('#car_modalidad').val(),
             car_descripcion: $('#car_descripcion').val(),
             car_estado: $('#car_estado').is(':checked') ? 1 : 0
         };

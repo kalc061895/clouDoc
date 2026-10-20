@@ -11,13 +11,15 @@ class CambioTurnoService
     private const ESTADOS_INTERCAMBIABLES = ['PROGRAMADO', 'CONFIRMADO', 'REPROGRAMADO', 'CAMBIO TURNO'];
 
     protected $db;
+    protected GestionRolService $gestionRoles;
     protected PeriodoService $periodos;
     protected ProgramacionTurnoService $programacion;
     protected RegistroCambioTurnoModel $registro;
     protected AdjuntoModel $adjuntos;
 
-    public function __construct($db = null, ?PeriodoService $periodos = null, ?ProgramacionTurnoService $programacion = null, ?RegistroCambioTurnoModel $registro = null, ?AdjuntoModel $adjuntos = null)
+    public function __construct($db = null, ?PeriodoService $periodos = null, ?ProgramacionTurnoService $programacion = null, ?RegistroCambioTurnoModel $registro = null, ?AdjuntoModel $adjuntos = null, ?GestionRolService $gestionRoles = null)
     {
+        $this->gestionRoles = $gestionRoles ?? new GestionRolService();
         $this->db = $db ?? \Config\Database::connect();
         $this->periodos = $periodos ?? new PeriodoService();
         $this->programacion = $programacion ?? new ProgramacionTurnoService();
@@ -163,6 +165,7 @@ class CambioTurnoService
                 foreach ($personas as $persona) {
                     try {
                         $this->periodos->validarPermisoPeriodo($persona, $fecha);
+                        $this->gestionRoles->editable($persona, $fecha);
                     } catch (\Exception $e) {
                         throw new \DomainException($e->getMessage(), 0, $e);
                     }
@@ -182,6 +185,13 @@ class CambioTurnoService
                 $cruce = $this->programacion->validarCruceHorarios((int) $original['prog_perl_ide'], $original['prog_fecha'], (int) $original['prog_th_ide'], (int) $original['prog_ide']);
                 if ($cruce['cruce']) {
                     throw new \DomainException('No se puede restaurar: ' . $cruce['mensaje']);
+                }
+            }
+            foreach ([$sol, $ace] as $original) {
+                foreach ([(int)$sol['prog_perl_ide'], (int)$ace['prog_perl_ide']] as $personalValidar) {
+                    $g = $this->gestionRoles;
+                    $periodo = $g->editable($personalValidar, $original['prog_fecha']);
+                    $g->validar($personalValidar, $periodo);
                 }
             }
             $snapshot['reversion'] = ['motivo' => $motivo, 'usuario_id' => $usuarioId, 'fecha' => $ahora];
@@ -240,6 +250,7 @@ class CambioTurnoService
                 foreach ([$solId, $aceId] as $id) {
                     try {
                         $this->periodos->validarPermisoPeriodo($id, $fecha);
+                        $this->gestionRoles->editable($id, $fecha);
                     } catch (\Exception $e) {
                         throw new \DomainException($e->getMessage(), 0, $e);
                     }
@@ -285,6 +296,13 @@ class CambioTurnoService
                     'adj_orden' => 1, 'created_by' => $usuarioId,
                 ])) {
                     throw new \RuntimeException('No se pudo guardar el sustento.');
+                }
+            }
+            foreach ([$sol, $ace] as $original) {
+                foreach ([(int)$sol['prog_perl_ide'], (int)$ace['prog_perl_ide']] as $personalValidar) {
+                    $g = $this->gestionRoles;
+                    $periodo = $g->editable($personalValidar, $original['prog_fecha']);
+                    $g->validar($personalValidar, $periodo);
                 }
             }
             if (!$this->db->transStatus() || !$this->db->transCommit()) {

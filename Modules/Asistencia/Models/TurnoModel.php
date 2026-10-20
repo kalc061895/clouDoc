@@ -12,6 +12,7 @@ class TurnoModel extends Model
     protected $returnType = 'array';
 
     protected $allowedFields = [
+        'tur_modalidad',
         'tur_codigo',
         'tur_nombre',
         'tur_color',

@@ -16,6 +16,7 @@ class CargoModel extends Model
     protected $allowedFields = [
         'car_codigo',
         'car_nombre',
+        'car_modalidad',
         'car_descripcion',
         'car_estado',
         'created_by',
@@ -32,6 +33,7 @@ class CargoModel extends Model
 
     protected $validationRules = [
         'car_nombre' => 'required|max_length[150]',
+        'car_modalidad' => 'required|in_list[ASISTENCIAL,ADMINISTRATIVO]',
     ];
 
     public function activos()

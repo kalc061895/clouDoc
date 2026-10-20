@@ -41,6 +41,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     // MÓDULO: PROGRAMACIÓN DE TURNOS
     // ==========================================
+    $routes->get('gestion-roles', 'GestionRolController::index');
+    $routes->post('gestion-roles/(:segment)', 'GestionRolController::guardar/$1', ['filter' => 'csrf']);
     $routes->get('programacion', 'ProgramacionController::index');
     $routes->get('programacion/calendario', 'ProgramacionController::index');
     $routes->group('programacion/api', function ($routes) {

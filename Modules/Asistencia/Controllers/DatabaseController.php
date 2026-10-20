@@ -742,6 +742,7 @@ class DatabaseController extends BaseController
         $datos = [
             'car_codigo'      => $this->request->getVar('car_codigo'),
             'car_nombre'      => $this->request->getVar('car_nombre'),
+            'car_modalidad'   => $this->request->getVar('car_modalidad'),
             'car_descripcion' => $this->request->getVar('car_descripcion'),
             'car_estado'      => $this->request->getVar('car_estado') ?? 1,
         ];
@@ -767,6 +768,7 @@ class DatabaseController extends BaseController
         $datos = [
             'car_codigo'      => $rawDatos['car_codigo'] ?? null,
             'car_nombre'      => $rawDatos['car_nombre'] ?? null,
+            'car_modalidad'   => $rawDatos['car_modalidad'] ?? null,
             'car_descripcion' => $rawDatos['car_descripcion'] ?? null,
             'car_estado'      => isset($rawDatos['car_estado']) ? (int)$rawDatos['car_estado'] : 1,
         ];
@@ -806,7 +808,8 @@ class DatabaseController extends BaseController
         $data = array_map(function ($item) {
             return [
                 'id'     => $item['car_ide'],
-                'nombre' => $item['car_nombre']
+                'nombre' => $item['car_nombre'],
+                'modalidad' => $item['car_modalidad']
             ];
         }, $activos);
 

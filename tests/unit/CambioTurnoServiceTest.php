@@ -29,7 +29,9 @@ final class CambioTurnoServiceTest extends CIUnitTestCase
             return $fallarHistorial ? false : 99;
         });
         $adjuntos = $this->getMockBuilder(AdjuntoModel::class)->disableOriginalConstructor()->getMock();
-        $service = new class($db, $periodos, $programacion, $registro, $adjuntos) extends CambioTurnoService {
+        $gestion = $this->getMockBuilder(\Modules\Asistencia\Services\GestionRolService::class)->disableOriginalConstructor()->onlyMethods(['editable','validar'])->getMock();
+        $gestion->method('editable')->willReturn(['mes'=>'2026-09']);
+        $service = new class($db, $periodos, $programacion, $registro, $adjuntos, $gestion) extends CambioTurnoService {
             public array $personas = [
                 1 => ['perl_ide' => 1, 'perl_est_ide' => 7, 'perl_car_ide' => 3],
                 2 => ['perl_ide' => 2, 'perl_est_ide' => 7, 'perl_car_ide' => 3],
