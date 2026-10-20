@@ -14,13 +14,17 @@ Se puede repetir sin duplicar IDs o relaciones. Ante IDs o nombres ocupados por 
 
 La matriz controla navegación, no autorización de endpoints ni acciones internas. Por ejemplo, el gestor de personal y marcaciones pueden incluir edición. No otorga permisos globales de administración ni cambia las reglas del módulo Firma.
 
+## Opciones preparadas
+
+ROLES incluye Periodos y reglas de programación (`asistencia/gestion-roles`). REPORTES conserva Reporte mensual y reserva Auditoría, Gestión de turnos y SUSALUD → Reporte TUASusalud / Reporte SETIPRESS. Estas cinco opciones están inactivas y sin URL hasta implementar sus pantallas; no generan enlaces rotos. Se asignan a asistencia, asi_sua y asi_adm. El perfil asi_apo conserva sus accesos actuales. Tener el menú de gestión de roles no concede permisos para configurar periodos: se mantienen las autorizaciones del servicio. ReportesMenuSeeder carga todo el árbol de reportes; NavigationSeeder sincroniza también las relaciones de perfiles.
+
 ## Matriz de navegación
 
 | Grupo | Enlaces | Opciones |
 | --- | --- | --- |
-| asistencia | 34 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
-| asi_sua | 34 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
-| asi_adm | 16 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Turnos, Horarios de turnos, Feriados, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Reporte mensual, Mi perfil y apariencia |
+| asistencia | 37 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Periodos y reglas de programación, Reporte mensual, Mi perfil y apariencia, Configuración de dispositivos, Asistencia desde archivo |
+| asi_sua | 37 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Tipos de oficina, Oficinas, Diresas, Redes, Microredes, Establecimientos, Licencias, Turnos, Horarios de turnos, Modalidades de contrato, Permisos, Cargos, Profesiones, Colegiaturas, Feriados, Tipos de documento, UPSS, Servicios UPSS, Personas, Segundas especialidades, Profesión y especialidades, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Periodos y reglas de programación, Reporte mensual, Mi perfil y apariencia, Configuración de dispositivos, Asistencia desde archivo |
+| asi_adm | 18 | Personal, Nuevo personal, Gestor de personal, Programación de turnos, Marcaciones, Dashboard de asistencia, Turnos, Horarios de turnos, Feriados, Periodos, Grupos de corte, Generación de roles, Historial de roles, Firmar roles, Periodos y reglas de programación, Reporte mensual, Mi perfil y apariencia, Asistencia desde archivo |
 | asi_apo | 7 | Personal, Gestor de personal, Marcaciones, Dashboard de asistencia, Historial de roles, Reporte mensual, Mi perfil y apariencia |
 
 ## Pantallas incluidas
@@ -31,11 +35,14 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 | --- | --- | --- | --- |
 | 1006 | Dashboard de asistencia | asistencia | DashboardController::index |
 | 1061 | Mi perfil y apariencia | asistencia/mi-perfil | PerfilController::index |
+| 1071 | Configuración de dispositivos | asistencia/dispositivos | DispositivoController::index |
+| 1072 | Asistencia desde archivo | asistencia/dispositivos/archivos | DispositivoController::archivos |
 | 1051 | Reporte mensual | asistencia/reportes/mensual | ReporteMensualController::index |
 | 1041 | Generación de roles | asistencia/roles/generacion | RolDocumentoController::index |
 | 1042 | Historial de roles | asistencia/roles/historial | RolDocumentoController::historial |
 | 1043 | Firmar roles | asistencia/roles/firmar | RolDocumentoController::firmar |
 | 1005 | Marcaciones | asistencia/marcaciones | AsistenciaController::index |
+| 1044 | Periodos y reglas de programación | asistencia/gestion-roles | GestionRolController::index |
 | 1004 | Programación de turnos | asistencia/programacion | ProgramacionController::index |
 | 1011 | Tipos de oficina | asistencia/gestordb/tipo-oficina | DatabaseController::tiposOficina |
 | 1012 | Oficinas | asistencia/gestordb/oficina | DatabaseController::oficinas |
@@ -73,8 +80,6 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 | asistencia/administrador/planilla_microred | PersonalController::planillaMicrored |
 | asistencia/administrador/planilla_capacitacion | PersonalController::planillaCapacitacion |
 | asistencia/administrador/cambio_turno_user | RolesController::cambioTurnoAdmin |
-| asistencia/administrador/load_file | DispositivoController::loadZtkeco |
-| asistencia/administrador/load_file_hv | DispositivoController::loadHikvision |
 | asistencia/administrador/reporte_total | ReportesController::totalMensual |
 | asistencia/administrador/asistencia_hoy | ReportesController::asistenciaHoy |
 | asistencia/administrador/faltas_tardanzas | ReportesController::tardanzasFaltas |
@@ -135,6 +140,8 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 | asistencia/administrador/load_file_turnos | ProgramacionController::index |
 | asistencia/administrador/asistencia | AsistenciaController::index |
 | asistencia/administrador/reporte_asistencia | AsistenciaController::index |
+| asistencia/administrador/load_file | DispositivoController::loadZtkeco |
+| asistencia/administrador/load_file_hv | DispositivoController::loadHikvision |
 | asistencia/gestordb/tipo_contrato | DatabaseController::modalidades |
 
 ## Todos los endpoints con controlador o método ausente
@@ -147,8 +154,6 @@ Firmar roles redirige al módulo independiente de Firma de documentos.
 | GET | asistencia/administrador/planilla_microred | PersonalController::planillaMicrored | Falta método |
 | GET | asistencia/administrador/planilla_capacitacion | PersonalController::planillaCapacitacion | Falta método |
 | GET | asistencia/administrador/cambio_turno_user | RolesController::cambioTurnoAdmin | Falta controlador |
-| GET | asistencia/administrador/load_file | DispositivoController::loadZtkeco | Falta controlador |
-| GET | asistencia/administrador/load_file_hv | DispositivoController::loadHikvision | Falta controlador |
 | GET | asistencia/administrador/reporte_total | ReportesController::totalMensual | Falta controlador |
 | GET | asistencia/administrador/asistencia_hoy | ReportesController::asistenciaHoy | Falta controlador |
 | GET | asistencia/administrador/faltas_tardanzas | ReportesController::tardanzasFaltas | Falta controlador |

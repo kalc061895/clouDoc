@@ -6,6 +6,10 @@ use CodeIgniter\Database\Seeder;
 
 class MenuSeeder extends Seeder
 {
+    /** Opciones reservadas: sin ruta hasta implementar sus pantallas. */
+    public const PENDING_IDS = [1052, 1053, 1054, 1055, 1056];
+    public const REPORT_IDS = [1050, 1051, 1052, 1053, 1054, 1055, 1056];
+
     /** IDs permanentes: no renumerar al agregar opciones. */
     public static function menus(): array
     {
@@ -17,12 +21,21 @@ class MenuSeeder extends Seeder
             [1003, 1000, 'Gestor de personal', 'asistencia/personal/gestorpersonal', 'users-group-rounded-line-duotone'],
             [1004, 1000, 'Programación de turnos', 'asistencia/programacion', 'calendar-line-duotone'],
             [1005, 1000, 'Marcaciones', 'asistencia/marcaciones', 'clock-circle-line-duotone'],
+            [1070, null, 'DISPOSITIVOS', null, 'devices-line-duotone'],
+            [1071, 1070, 'Configuración de dispositivos', 'asistencia/dispositivos', 'settings-line-duotone'],
+            [1072, 1070, 'Asistencia desde archivo', 'asistencia/dispositivos/archivos', 'upload-line-duotone'],
             [1040, null, 'ROLES', null, 'document-text-line-duotone'],
             [1041, 1040, 'Generación de roles', 'asistencia/roles/generacion', 'calendar-line-duotone'],
             [1042, 1040, 'Historial de roles', 'asistencia/roles/historial', 'history-line-duotone'],
             [1043, 1040, 'Firmar roles', 'asistencia/roles/firmar', 'pen-new-square-line-duotone'],
+            [1044, 1040, 'Periodos y reglas de programación', 'asistencia/gestion-roles', 'calendar-mark-line-duotone'],
             [1050, null, 'REPORTES', null, 'chart-square-line-duotone'],
             [1051, 1050, 'Reporte mensual', 'asistencia/reportes/mensual', 'document-text-line-duotone'],
+            [1052, 1050, 'Auditoría', null, 'history-line-duotone'],
+            [1053, 1050, 'Gestión de turnos', null, 'calendar-line-duotone'],
+            [1054, 1050, 'SUSALUD', null, 'document-text-line-duotone'],
+            [1055, 1054, 'Reporte TUASusalud', null, 'document-text-line-duotone'],
+            [1056, 1054, 'Reporte SETIPRESS', null, 'document-text-line-duotone'],
             [1010, null, 'CATÁLOGOS DE ASISTENCIA', null, 'database-line-duotone'],
             [1011, 1010, 'Tipos de oficina', 'asistencia/gestordb/tipo-oficina', 'database-line-duotone'],
             [1012, 1010, 'Oficinas', 'asistencia/gestordb/oficina', 'database-line-duotone'],
@@ -56,7 +69,7 @@ class MenuSeeder extends Seeder
                 'id' => $id, 'parent_id' => $parent,
                 'type' => $parent === null ? 'separator' : 'secondary',
                 'name' => $name, 'url' => $url, 'icon' => $icon,
-                'status' => 'active', 'order' => $order + 1000,
+                'status' => in_array($id, self::PENDING_IDS, true) ? 'inactive' : 'active', 'order' => $order + 1000,
                 'separator' => $parent === null ? $name : null,
             ];
         }

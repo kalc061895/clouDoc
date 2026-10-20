@@ -9,7 +9,7 @@ class ReportesMenuSeeder extends Seeder
 {
     public function run()
     {
-        $menus = array_filter(MenuSeeder::menus(), static fn($m) => in_array($m['id'], [1050, 1051], true));
+        $menus = array_filter(MenuSeeder::menus(), static fn($m) => in_array($m['id'], MenuSeeder::REPORT_IDS, true));
         foreach ($menus as $menu) {
             $existing = $this->db->table('menus')->where('id', $menu['id'])->get()->getRowArray();
             if ($existing && ($existing['url'] !== $menu['url'] || ($menu['url'] === null && $existing['name'] !== $menu['name']))) throw new \RuntimeException('El ID de menú ' . $menu['id'] . ' está ocupado por otra opción.');

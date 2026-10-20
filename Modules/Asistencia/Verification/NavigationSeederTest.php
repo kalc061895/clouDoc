@@ -49,6 +49,27 @@ final class NavigationSeederTest extends CIUnitTestCase
         $db->close();
     }
 
+    public function testReportesPendientesConservanJerarquiaYAsignaciones(): void
+    {
+        $db = $this->database();
+        (new NavigationSeeder(config('Database'), $db))->run();
+        $reportes = new \Modules\Asistencia\Database\Seeds\ReportesMenuSeeder(config('Database'), $db);
+        $reportes->run(); $reportes->run();
+        self::assertSame(count(MenuSeeder::menus()), $db->table('menus')->countAllResults());
+        foreach ([1052 => 1050, 1053 => 1050, 1054 => 1050, 1055 => 1054, 1056 => 1054] as $id => $padre) {
+            $menu = $db->table('menus')->where('id', $id)->get()->getRowArray();
+            self::assertSame($padre, (int) $menu['parent_id']);
+            self::assertNull($menu['url']);
+            self::assertSame('inactive', $menu['status']);
+            foreach (['asistencia', 'asi_sua', 'asi_adm'] as $grupo) {
+                self::assertContains($id, MenuGroupUserSeeder::asignaciones()[$grupo]);
+            }
+        }
+        self::assertContains(1044, MenuGroupUserSeeder::asignaciones()['asi_adm']);
+        self::assertNotContains(1044, MenuGroupUserSeeder::asignaciones()['asi_apo']);
+        $db->close();
+    }
+
     public function testMenuPorGrupoYUnionSinDuplicados(): void
     {
         $db = $this->database();
@@ -58,11 +79,30 @@ final class NavigationSeederTest extends CIUnitTestCase
         self::assertContains(1006, $support); self::assertContains(1061, $support);
         self::assertNotContains(1002, $support); self::assertNotContains(1043, $support); self::assertNotContains(1013, $support);
         $all = $model->getMenusByRole(['asi_apo', 'asi_sua']);
-        self::assertCount(count(MenuSeeder::menus()), $all);
+        self::assertCount(count(array_filter(MenuSeeder::menus(), static fn($m) => $m['status'] === 'active')), $all);
+        self::assertContains(1044, array_map('intval', array_column($all, 'id')));
+        foreach (MenuSeeder::PENDING_IDS as $id) {
+            self::assertNotContains($id, array_map('intval', array_column($all, 'id')));
+        }
         $db->table('menus')->where('id', 1006)->update(['status' => 'inactive']);
         self::assertNotContains(1006, array_map('intval', array_column($model->getMenusByRole(['asi_apo']), 'id')));
         self::assertSame([], $model->getMenusByRole([]));
         self::assertSame([], $model->getMenusByRole(["' OR 1=1 --"]));
+        $db->close();
+    }
+
+    public function testSeederDispositivosPreservaMenuPersonalizado(): void
+    {
+        $db=$this->database();
+        (new NavigationSeeder(config('Database'),$db))->run();
+        $db->table('menus')->where('id',1010)->update(['name'=>'Catálogo personalizado']);
+        $antes=$db->table('menu_group_user')->countAllResults();
+        $seeder=new \Modules\Asistencia\Database\Seeds\DispositivosMenuSeeder(config('Database'),$db);
+        $seeder->run(); $seeder->run();
+        self::assertSame($antes,$db->table('menu_group_user')->countAllResults());
+        self::assertSame('Catálogo personalizado',$db->table('menus')->where('id',1010)->get()->getRowArray()['name']);
+        self::assertContains(1072,MenuGroupUserSeeder::asignaciones()['asi_adm']);
+        self::assertNotContains(1071,MenuGroupUserSeeder::asignaciones()['asi_adm']);
         $db->close();
     }
 }

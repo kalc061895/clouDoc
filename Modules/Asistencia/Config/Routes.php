@@ -5,6 +5,15 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->get('/', 'DashboardController::index');
     $routes->get('mi-perfil', 'PerfilController::index');
 
+    $routes->get('dispositivos', 'DispositivoController::index');
+    $routes->post('dispositivos/guardar', 'DispositivoController::guardar', ['filter'=>'csrf']);
+    $routes->get('dispositivos/archivos', 'DispositivoController::archivos');
+    $routes->post('dispositivos/cargar', 'DispositivoController::cargar', ['filter'=>'csrf']);
+    $routes->get('dispositivos/cargas/(:num)', 'DispositivoController::detalle/$1');
+    $routes->get('dispositivos/cargas/(:num)/archivo', 'DispositivoController::descargar/$1');
+    $routes->post('dispositivos/cargas/(:num)/revisar', 'DispositivoController::revisar/$1', ['filter'=>'csrf']);
+    $routes->post('dispositivos/cargas/(:num)/confirmar', 'DispositivoController::confirmar/$1', ['filter'=>'csrf']);
+
     $routes->get('reportes/mensual', 'ReporteMensualController::index');
     $routes->get('reportes/mensual/consultar', 'ReporteMensualController::consultar');
     $routes->get('reportes/mensual/excel', 'ReporteMensualController::exportar/excel');

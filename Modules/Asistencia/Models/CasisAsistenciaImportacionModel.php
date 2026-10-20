@@ -12,6 +12,8 @@ class CasisAsistenciaImportacionModel extends Model
     protected $returnType = 'array';
 
     protected $allowedFields = [
+        'imp_codigo', 'imp_dispositivo_id', 'imp_estado', 'imp_clave',
+        'imp_confirmado_por', 'imp_errores', 'imp_dispositivo_snapshot', 'imp_est_ide',
 
         'imp_nombre_archivo',
         'imp_ruta_archivo',
