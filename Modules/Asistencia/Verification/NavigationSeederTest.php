@@ -105,4 +105,20 @@ final class NavigationSeederTest extends CIUnitTestCase
         self::assertNotContains(1071,MenuGroupUserSeeder::asignaciones()['asi_adm']);
         $db->close();
     }
+
+    public function testMenuGestionRolesReagrupaSinDuplicarNiCambiarOtrosMenus(): void
+    {
+        $db = $this->database();
+        (new NavigationSeeder(config('Database'), $db))->run();
+        $db->table('menus')->where('id', 1010)->update(['name' => 'Personalizado']);
+        $db->table('menus')->where('id', 1004)->update(['parent_id' => 1000]);
+        $seeder = new \Modules\Asistencia\Database\Seeds\GestionRolesMenuSeeder(config('Database'), $db);
+        $seeder->run(); $seeder->run();
+        self::assertSame(count(MenuSeeder::menus()), $db->table('menus')->countAllResults());
+        foreach ([1004, 1044, 1081, 1082] as $id) self::assertEquals(1080, $db->table('menus')->where('id', $id)->get()->getRowArray()['parent_id']);
+        self::assertSame('Personalizado', $db->table('menus')->where('id', 1010)->get()->getRowArray()['name']);
+        self::assertContains(1082, MenuGroupUserSeeder::asignaciones()['asi_sua']);
+        self::assertNotContains(1082, MenuGroupUserSeeder::asignaciones()['asi_adm']);
+        $db->close();
+    }
 }

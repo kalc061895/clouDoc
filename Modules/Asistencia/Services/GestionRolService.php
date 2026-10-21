@@ -5,7 +5,7 @@ namespace Modules\Asistencia\Services;
 /** Gobierno de programación. Los plazos se interpretan en America/Lima. */
 class GestionRolService
 {
-    private $db;
+    protected $db;
     public function __construct()
     {
         $this->db = \Config\Database::connect();
@@ -44,6 +44,13 @@ class GestionRolService
         if ($aprobar) $q->where('aprobar', 1);
         $ids = array_map('intval', array_column($q->get()->getResultArray(), 'oficina_id'));
         $oficinas = $this->db->table('casis_oficina')->where('deleted_at', null)->where('ofi_estado', 1)->get()->getResultArray();
+        // El jefe asignado en oficinas programa su oficina; aprobar requiere delegación expresa.
+        if (!$aprobar) {
+            foreach ($oficinas as $o) {
+                if ((int)($o['ofi_responsable_id'] ?? 0) === $this->usuario()) $ids[] = (int)$o['ofi_ide'];
+            }
+            $ids = array_values(array_unique($ids));
+        }
         do {
             $antes = count($ids);
             foreach ($oficinas as $o) if (in_array((int)$o['ofi_padre_ide'], $ids, true) && !in_array((int)$o['ofi_ide'], $ids, true)) $ids[] = (int)$o['ofi_ide'];
@@ -178,32 +185,7 @@ class GestionRolService
     }
     public function crearPeriodo(array $d): void
     {
-        $this->exigirAdministrador();
-        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $d['mes'] ?? '')) throw new \DomainException('Mes inválido.');
-        foreach (['apertura', 'aprobacion', 'cierre'] as $k) {
-            $v = str_replace('T', ' ', $d[$k] ?? '');
-            if (strlen($v) === 16) $v .= ':00';
-            $f = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $v);
-            if (!$f || $f->format('Y-m-d H:i:s') !== $v) throw new \DomainException('Fecha inválida: ' . $k);
-            $d[$k] = $v;
-        }
-        if (!($d['apertura'] < $d['aprobacion'] && $d['aprobacion'] < $d['cierre'])) throw new \DomainException('Orden requerido: apertura < aprobación < cierre.');
-        $reglas = json_decode($d['reglas'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
-        if (!is_array($reglas) || !array_is_list($reglas)) throw new \DomainException('Las reglas deben ser una lista.');
-        foreach ($reglas as $r) {
-            if (!is_array($r) || empty($r['nombre']) || !in_array($r['tipo'] ?? '', ['TURNOS_PERMITIDOS', 'MAX_TURNOS', 'MAX_HORAS_MES', 'MAX_CONTINUAS'], true)) throw new \DomainException('Regla inválida.');
-            if (in_array($r['tipo'], ['TURNOS_PERMITIDOS', 'MAX_TURNOS'], true) && (!isset($r['turnos']) || !is_array($r['turnos']) || !$r['turnos'])) throw new \DomainException('Indique los códigos de turno de la regla.');
-            if ($r['tipo'] !== 'TURNOS_PERMITIDOS' && (!is_numeric($r['limite'] ?? null) || $r['limite'] < 0)) throw new \DomainException('Límite de regla inválido.');
-        }
-        if (!$this->db->table('casis_establecimiento')->where('est_ide', (int)($d['est_id'] ?? 0))->where('deleted_at', null)->countAllResults()) throw new \DomainException('Establecimiento inválido.');
-        $this->transaccion(function () use ($d, $reglas) {
-            $data = array_intersect_key($d, array_flip(['est_id', 'mes', 'apertura', 'aprobacion', 'cierre']));
-            $data['reglas'] = json_encode($reglas, JSON_THROW_ON_ERROR);
-            $data['created_by'] = $this->usuario();
-            $data['created_at'] = $this->ahora();
-            $this->db->table('casis_plan_periodo')->insert($data);
-            $this->evento('CREAR_PERIODO', $data);
-        });
+        (new ConfiguracionRolService())->guardarPeriodo($d);
     }
     public function responsable(array $d): void
     {

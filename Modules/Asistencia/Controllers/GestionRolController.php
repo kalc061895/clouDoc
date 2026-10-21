@@ -17,12 +17,13 @@ class GestionRolController extends BaseModuleController
         if ($ids !== null) $oficinas = array_values(array_filter($oficinas, fn($o) => in_array((int)$o['ofi_ide'], $ids, true)));
         $roles = $db->table('casis_plan_rol r')->select('r.*, p.mes, p.apertura, p.aprobacion, p.cierre, o.ofi_nombre')->join('casis_plan_periodo p', 'p.id=r.periodo_id')->join('casis_oficina o', 'o.ofi_ide=r.oficina_id');
         if ($ids !== null) $roles->whereIn('r.oficina_id', $ids ?: [0]);
-        $periodos = $db->table('casis_plan_periodo')->orderBy('mes', 'DESC')->get()->getResultArray();
+        $periodos = $db->table('casis_plan_periodo p')->select('p.*, e.est_nombre')->join('casis_establecimiento e', 'e.est_ide = p.est_id')->orderBy('mes', 'DESC')->get()->getResultArray();
         if ($ids !== null) $periodos = array_values(array_filter($periodos, fn($p) => in_array($p['est_id'], array_column($oficinas, 'ofi_est_ide'))));
         foreach ($periodos as &$p) $p['etapa'] = GestionRolService::etapa($p, $g->ahora());
         unset($p);
         return view('Modules\Asistencia\Views\gestion_roles\index', [
             'admin' => $g->administrador(),
+            'usuarios' => $g->administrador() ? (new \Modules\Asistencia\Services\OficinaService())->listarResponsables() : [],
             'periodos' => $periodos,
             'roles' => $roles->orderBy('p.mes', 'DESC')->get()->getResultArray(),
             'oficinas' => $oficinas,
@@ -35,7 +36,7 @@ class GestionRolController extends BaseModuleController
         $g = new GestionRolService();
         $d = $this->request->getPost();
         try {
-            if ($tipo === 'periodo') $g->crearPeriodo($d);
+            if ($tipo === 'periodo') (new \Modules\Asistencia\Services\ConfiguracionRolService())->guardarPeriodo($d);
             elseif ($tipo === 'responsable') $g->responsable($d);
             elseif ($tipo === 'estado') $g->transicion((int)($d['rol_id'] ?? 0), (string)($d['accion'] ?? ''), (string)($d['motivo'] ?? ''));
             elseif ($tipo === 'modalidad') {
