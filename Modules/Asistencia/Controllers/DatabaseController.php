@@ -595,7 +595,9 @@ class DatabaseController extends BaseController
      */
     public function oficinas()
     {
-        return view('Modules\Asistencia\Views\database\oficinas_view');
+        return view('Modules\Asistencia\Views\database\oficinas_view', [
+            'responsables' => (new OficinaService())->listarResponsables(),
+        ]);
     }
 
     /**
@@ -644,6 +646,7 @@ class DatabaseController extends BaseController
             'ofi_titulo_encargado'  => $this->request->getVar('ofi_titulo_encargado'),
             'ofi_nombres_encargado' => $this->request->getVar('ofi_nombres_encargado'),
             'ofi_cargo_encargado'   => $this->request->getVar('ofi_cargo_encargado'),
+            'ofi_responsable_id'    => $this->request->getVar('ofi_responsable_id'),
             'ofi_descripcion'       => $this->request->getVar('ofi_descripcion'),
             'ofi_rango'             => $this->request->getVar('ofi_rango'),
             'ofi_padre_ide'         => $this->request->getVar('ofi_padre_ide') ?: null,
@@ -682,6 +685,10 @@ class DatabaseController extends BaseController
             'ofi_padre_ide'         => $rawDatos['ofi_padre_ide'] ?: null,
             'ofi_estado'            => isset($rawDatos['ofi_estado']) ? (int)$rawDatos['ofi_estado'] : 1,
         ];
+
+        if (array_key_exists('ofi_responsable_id', $rawDatos)) {
+            $datos['ofi_responsable_id'] = $rawDatos['ofi_responsable_id'];
+        }
 
         $resultado = $service->actualizarOficina((int)$id, $datos);
 

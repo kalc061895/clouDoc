@@ -23,6 +23,7 @@ class OficinaModel extends Model
         'ofi_titulo_encargado',
         'ofi_nombres_encargado',
         'ofi_cargo_encargado',
+        'ofi_responsable_id',
         'ofi_descripcion',
         'ofi_rango',
         'ofi_padre_ide',
@@ -42,6 +43,7 @@ class OficinaModel extends Model
     protected $validationRules = [
         'ofi_nombre'   => 'required|max_length[255]',
         'ofi_tofi_ide' => 'required|integer',
+        'ofi_responsable_id' => 'permit_empty|is_natural_no_zero',
     ];
 
     public function obtenerRaices()

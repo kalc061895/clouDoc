@@ -30,6 +30,7 @@ Oficinas y Áreas
                     <th>Tipo</th>
                     <th>Dependencia Interna (Padre)</th>
                     <th>Encargado</th>
+                    <th>Responsable de roles</th>
                     <th>Estado</th>
                     <th class="text-end">Acciones</th>
                 </tr>
@@ -117,6 +118,22 @@ Oficinas y Áreas
 
                     <h6 class="text-primary fw-bold mb-3 border-bottom pb-2">3. Información del Encargado / Jefe</h6>
                     <div class="row g-3 mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold" for="ofi_responsable_id">Responsable de roles y programación</label>
+                            <select class="form-select" id="ofi_responsable_id">
+                                <option value="">Sin responsable</option>
+                                <?php foreach ($responsables as $responsable): ?>
+                                    <?php
+                                    $nombre = trim(implode(' ', array_filter([$responsable['nombres'], $responsable['paterno'], $responsable['materno']])));
+                                    $dni = trim((string) ($responsable['dni'] ?? ''));
+                                    $etiqueta = ($nombre !== '' ? $nombre : ($responsable['username'] ?: 'Usuario #' . $responsable['id']))
+                                        . ($dni !== '' ? ' — DNI: ' . $dni : '');
+                                    ?>
+                                    <option value="<?= esc($responsable['id'], 'attr') ?>"><?= esc($etiqueta) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="form-text">Usuario del sistema designado para los roles de esta oficina. Es opcional.</div>
+                        </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">Título</label>
                             <input type="text" class="form-control" id="ofi_titulo_encargado" placeholder="Ej. Dr., Mg., Lic.">
@@ -202,6 +219,15 @@ Oficinas y Áreas
                     }
                 },
                 {
+                    "data": null,
+                    "render": function(data, type, row) {
+                        const nombre = [row.responsable_nombres, row.responsable_paterno, row.responsable_materno].filter(Boolean).join(' ');
+                        const usuario = row.responsable_username;
+                        const etiqueta = nombre ? nombre + (usuario ? ` (${usuario})` : '') : (usuario || (row.ofi_responsable_id ? 'Usuario no disponible' : 'Sin responsable'));
+                        return type === 'display' ? $('<span>').text(etiqueta).html() : etiqueta;
+                    }
+                },
+                {
                     "data": "ofi_estado",
                     "render": function(data) {
                         return data == 1 ?
@@ -216,7 +242,7 @@ Oficinas y Áreas
                     "render": function(data, type, row) {
                         return `
                             <button class="btn btn-outline-warning btn-sm me-1 rounded-circle p-1 d-inline-flex align-items-center justify-content-center" 
-                                    onclick='abrirModalEditar(${JSON.stringify(row)})' title="Editar" style="width: 32px; height: 32px;">
+                                    data-editar-oficina title="Editar" style="width: 32px; height: 32px;">
                                 <iconify-icon icon="lucide:edit" style="font-size: 1.1rem;"></iconify-icon>
                             </button>
                             <button class="btn btn-outline-danger btn-sm rounded-circle p-1 d-inline-flex align-items-center justify-content-center" 
@@ -233,6 +259,9 @@ Oficinas y Áreas
         });
 
         // Inicializar Catálogos Base
+        $('#tablaOficinas').on('click', '[data-editar-oficina]', function() {
+            abrirModalEditar(tabla.row($(this).closest('tr')).data());
+        });
         cargarDiresas();
         cargarTiposOficina();
 
@@ -417,6 +446,7 @@ Oficinas y Áreas
     }
 
     function abrirModalCrear() {
+        $('#ofi_responsable_id option[data-no-disponible]').remove();
         $('#formOficina')[0].reset();
         $('#ofi_ide').val('');
         $('#filtro_red').empty().append('<option value="">Seleccione DIRESA...</option>').prop('disabled', true);
@@ -439,6 +469,12 @@ Oficinas y Áreas
         $('#ofi_titulo_encargado').val(data.ofi_titulo_encargado);
         $('#ofi_nombres_encargado').val(data.ofi_nombres_encargado);
         $('#ofi_cargo_encargado').val(data.ofi_cargo_encargado);
+        const responsableSelect = $('#ofi_responsable_id');
+        responsableSelect.find('option[data-no-disponible]').remove();
+        if (data.ofi_responsable_id && !responsableSelect.find('option').toArray().some(option => option.value === String(data.ofi_responsable_id))) {
+            responsableSelect.append($('<option>', {value: data.ofi_responsable_id, text: 'Usuario no disponible: seleccione otro o Sin responsable', disabled: true}).attr('data-no-disponible', '1'));
+        }
+        responsableSelect.val(data.ofi_responsable_id || '');
         $('#ofi_descripcion').val(data.ofi_descripcion);
         $('#ofi_rango').val(data.ofi_rango);
         $('#ofi_estado').prop('checked', data.ofi_estado == 1);
@@ -476,6 +512,7 @@ Oficinas y Áreas
             ofi_titulo_encargado: $('#ofi_titulo_encargado').val(),
             ofi_nombres_encargado: $('#ofi_nombres_encargado').val(),
             ofi_cargo_encargado: $('#ofi_cargo_encargado').val(),
+            ofi_responsable_id: $('#ofi_responsable_id').val() || '',
             ofi_descripcion: $('#ofi_descripcion').val(),
             ofi_rango: $('#ofi_rango').val(),
             ofi_padre_ide: $('#ofi_padre_ide').val(),

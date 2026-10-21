@@ -1,0 +1,10 @@
+Ahora necesitamos crear las reglas basicas para lo que seria la calificacion de horas asistidas por trabajdos, las licencias que tuvo, las faltas, las atardanzas, o incosistencias, para poder completar todo el proceso de asistencias 
+luego apsaremos con reportes
+creemos un menu CALIFICACION o  CALIFICACION MENSUAL o como crees que sea conveniente llaamrlo, aqui tendremos -> una primera opcion para poder generar un reporte de un determinado en este caso puede ser establecimiento microred o red segun el nivel jerarquico o dependencia por ejemplo en la actualidad hospital califica a su personal, y las microred suman al personal de todos sus establecimeinto y los califican en conjunto 
+esta calificacion debera realizar automaticamente con todo el personal que este en ese establecimiento, sus asistencias, sus turnos, sus paleletas, licencias, sus horarios sus tardanzas 
+esto deberia ahcerse de forma autonoma por trabajador o en conjunto de todos los trabajadores, saltando las observaciones que sean necesarias antes de cerrarse, personal que esta sin asistencia, que no registra licencias, que tiene faltas, excesivas tardanzas que tiene asistencia pero no rol de turnos, que tiene turnos pero no asistencia, que tiene ingreso pero no salidas , si tiene guardias, cuantas guardias, si hay guardias en domingos o feriados, 
+para todas estas cosas peinso que deberiamos tener una tabla ggeneral que indiquen los criterios de calificacion para poder usarlos y 
+->segundo, dberiamos tener un historial de esta calificacion 
+esta calificaion deberia tener tambien sus estados
+se inicia despuesdes que de se cierra un periodo para registro de papeletas
+-> historial de los pdf generados de cada calificacion 
