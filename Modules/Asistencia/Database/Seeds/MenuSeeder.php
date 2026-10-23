@@ -52,6 +52,7 @@ class MenuSeeder extends Seeder
             [1020, 1010, 'Modalidades de contrato', 'asistencia/gestordb/modalidad', 'database-line-duotone'],
             [1021, 1010, 'Permisos', 'asistencia/gestordb/permiso', 'database-line-duotone'],
             [1022, 1010, 'Cargos', 'asistencia/gestordb/cargo', 'database-line-duotone'],
+            [1034, 1010, 'Remuneraciones', 'asistencia/gestordb/remuneraciones', 'database-line-duotone'],
             [1023, 1010, 'Profesiones', 'asistencia/gestordb/profesion', 'database-line-duotone'],
             [1024, 1010, 'Colegiaturas', 'asistencia/gestordb/colegiatura', 'database-line-duotone'],
             [1025, 1010, 'Feriados', 'asistencia/gestordb/feriado', 'database-line-duotone'],

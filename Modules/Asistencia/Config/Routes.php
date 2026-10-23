@@ -214,6 +214,11 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         });
 
         $routes->get('cargo', 'DatabaseController::cargos');
+        $routes->get('remuneraciones', 'RemuneracionController::index');
+        $routes->get('api/remuneraciones', 'RemuneracionController::listar');
+        $routes->post('api/remuneraciones', 'RemuneracionController::guardar', ['filter' => 'csrf']);
+        $routes->put('api/remuneraciones/(:num)', 'RemuneracionController::guardar/$1', ['filter' => 'csrf']);
+        $routes->delete('api/remuneraciones/(:num)', 'RemuneracionController::eliminar/$1', ['filter' => 'csrf']);
         $routes->group('api', function ($routes) {
             $routes->get('cargos', 'DatabaseController::apiListarCargos');
             $routes->post('cargos', 'DatabaseController::apiCrearCargo');
