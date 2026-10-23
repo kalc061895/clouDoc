@@ -2,6 +2,12 @@
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+    $routes->get('calificacion', 'CalificacionMensualController::index');
+    $routes->get('calificacion/(:num)', 'CalificacionMensualController::detalle/$1');
+    $routes->get('calificacion/pdf/(:num)', 'CalificacionMensualController::pdf/$1');
+    $routes->post('calificacion/generar', 'CalificacionMensualController::guardar/generar', ['filter'=>'csrf']);
+    $routes->post('calificacion/criterios', 'CalificacionMensualController::guardar/criterios', ['filter'=>'csrf']);
+    $routes->post('calificacion/(:num)/(:segment)', 'CalificacionMensualController::guardar/$2/$1', ['filter'=>'csrf']);
     $routes->get('/', 'DashboardController::index');
     $routes->get('mi-perfil', 'PerfilController::index');
 

@@ -13,7 +13,7 @@ class MenuGroupUserSeeder extends Seeder
         $map = [
             'asistencia' => array_keys($menus), // Compatibilidad con perfiles existentes.
             'asi_sua' => array_keys($menus),
-            'asi_adm' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1051, 1052, 1053, 1055, 1056, 1018, 1019, 1025, 1032, 1033, 1061, 1072],
+            'asi_adm' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1051, 1052, 1053, 1055, 1056, 1018, 1019, 1025, 1032, 1033, 1061, 1072, 1091, 1092, 1093],
             'asi_apo' => [1006, 1001, 1003, 1005, 1042, 1051, 1061],
         ];
         foreach ($map as &$ids) {

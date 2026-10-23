@@ -14,6 +14,10 @@ class MenuSeeder extends Seeder
     public static function menus(): array
     {
         $definitions = [
+            [1090, null, 'CALIFICACIÓN MENSUAL', null, 'calendar-mark-line-duotone'],
+            [1091, 1090, 'Calificar y revisar', 'asistencia/calificacion', 'document-text-line-duotone'],
+            [1092, 1090, 'Historial y PDF', 'asistencia/calificacion#historial', 'history-line-duotone'],
+            [1093, 1090, 'Criterios de calificación', 'asistencia/calificacion#criterios', 'settings-line-duotone'],
             [1000, null, 'ASISTENCIA', null, 'calendar-mark-line-duotone'],
             [1006, 1000, 'Dashboard de asistencia', 'asistencia', 'chart-square-line-duotone'],
             [1001, 1000, 'Personal', 'asistencia/personal', 'users-group-rounded-line-duotone'],
