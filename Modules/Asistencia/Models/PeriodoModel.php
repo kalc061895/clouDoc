@@ -157,15 +157,29 @@ class PeriodoModel extends Model
             return null; // El personal no existe o su establecimiento no está activo
         }
         // 2. Resolver Grupo de Corte
+        // Priorizar siempre el nivel institucional más cercano que tenga período para la fecha.
+        $niveles = [
+            ['establecimiento_id', $personal['perl_est_ide'] ?? null],
+            ['microred_id', $personal['microred_id'] ?? null],
+            ['red_id', $personal['red_id'] ?? null],
+            ['diresa_id', $personal['diresa_id'] ?? null],
+        ];
+        $modalidadId = !empty($personal['perl_mco_ide']) ? (int) $personal['perl_mco_ide'] : null;
         $grupoCorteModel = new GrupoCorteModel();
-        // Resuelve la jerarquía en una sola línea pasando todo el array
-        $grupoCorte = $grupoCorteModel->resolverGrupoCorte($personal);
 
-        if (!$grupoCorte) {
-            return null; // No hay grupo de corte configurado
+        foreach ($niveles as [$campo, $valor]) {
+            if (empty($valor)) {
+                continue;
+            }
+
+            foreach ($grupoCorteModel->gruposActivosPorNivel($campo, (int) $valor, $modalidadId) as $grupoCorte) {
+                $periodo = $this->obtenerPeriodoPorGrupoYFecha((int) $grupoCorte['gco_ide'], $fecha);
+                if ($periodo !== null) {
+                    return $periodo;
+                }
+            }
         }
 
-        // 3. Buscar el Período
-        return $this->obtenerPeriodoPorGrupoYFecha((int) $grupoCorte['gco_ide'], $fecha);
+        return null;
     }
 }

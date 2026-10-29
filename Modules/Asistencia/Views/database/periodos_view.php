@@ -208,7 +208,7 @@ Gestión de Períodos de Asistencia
     });
 
     function cargarGruposCorte() {
-        $.get(urlApiGrupos, function(res) {
+        $.get(urlApiGrupos, { estado: 'ACTIVO' }, function(res) {
             let options = '<option value="">-- Seleccione Grupo --</option>';
             (res.data || res).forEach(g => {
                 options += `<option value="${g.gco_ide}">${g.gco_nombre}</option>`;

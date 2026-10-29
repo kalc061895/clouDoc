@@ -87,8 +87,8 @@ Gestión de Grupos de Corte
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">1. DIRESA *</label>
-                            <select class="form-select" id="diresa_id" required>
+                            <label class="form-label small fw-bold">1. DIRESA (opcional si asigna directamente un establecimiento)</label>
+                            <select class="form-select" id="diresa_id">
                                 <option value="">-- Seleccione DIRESA --</option>
                             </select>
                         </div>
@@ -109,8 +109,8 @@ Gestión de Grupos de Corte
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">4. Establecimiento</label>
-                            <select class="form-select" id="establecimiento_id" disabled>
-                                <option value="">-- Seleccione Microred primero --</option>
+                            <select class="form-select" id="establecimiento_id">
+                                <option value="">-- Todos los establecimientos del nivel elegido --</option>
                             </select>
                         </div>
 
@@ -175,6 +175,7 @@ Gestión de Grupos de Corte
         // Inicializar selectores base
         cargarDiresas();
         cargarModalidadesContrato();
+        cargarTodosEstablecimientos();
 
         // Inicializar DataTable
         tabla = $('#tablaGrupos').DataTable({
@@ -408,6 +409,24 @@ Gestión de Grupos de Corte
         });
     }
 
+    // Permite asignar un grupo directamente a cualquier establecimiento, aunque
+    // no se haya elegido primero la cadena DIRESA > Red > Microred.
+    function cargarTodosEstablecimientos(establecimientoSeleccionado = null) {
+        const $est = $('#establecimiento_id');
+        $est.html('<option value="">Cargando establecimientos...</option>').prop('disabled', true);
+        return $.get(urlApiEstablecimientos, function(res) {
+            const items = res.data || res;
+            let options = '<option value="">-- Todos los establecimientos del nivel elegido --</option>';
+            items.forEach(e => {
+                options += `<option value="${e.est_ide}">${e.est_nombre}</option>`;
+            });
+            $est.html(options).prop('disabled', false);
+            if (establecimientoSeleccionado) $est.val(establecimientoSeleccionado);
+        }).fail(function() {
+            $est.html('<option value="">-- No se pudieron cargar establecimientos --</option>').prop('disabled', true);
+        });
+    }
+
     // Acciones de Modal
     function filtrarTabla() {
         tabla.ajax.reload(null, false);
@@ -416,9 +435,10 @@ Gestión de Grupos de Corte
     function abrirModalCrear() {
         $('#formGrupo')[0].reset();
         $('#gco_ide').val('');
-        $('#red_id, #microred_id, #establecimiento_id')
+        $('#red_id, #microred_id')
             .html('<option value="">-- Seleccione nivel superior --</option>')
             .prop('disabled', true);
+        cargarTodosEstablecimientos();
 
         $('#modalTitulo').text('Nuevo Grupo de Corte');
         modalGrupo.show();
@@ -441,10 +461,14 @@ Gestión de Grupos de Corte
             if (data.red_id) {
                 await cargarMicroredesPorRed(data.red_id, data.microred_id);
 
-                if (data.microred_id) {
-                    await cargarEstablecimientosPorMicrored(data.microred_id, data.establecimiento_id);
-                }
+                if (data.microred_id) await cargarEstablecimientosPorMicrored(data.microred_id, data.establecimiento_id);
+                else await cargarTodosEstablecimientos(data.establecimiento_id);
             }
+        } else {
+            await cargarTodosEstablecimientos(data.establecimiento_id);
+        }
+        if (!data.microred_id && data.diresa_id) {
+            await cargarTodosEstablecimientos(data.establecimiento_id);
         }
 
         $('#modalTitulo').text('Editar Grupo de Corte');

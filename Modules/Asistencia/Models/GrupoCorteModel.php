@@ -125,4 +125,51 @@ class GrupoCorteModel extends Model
 
         return $builder->first();
     }
+
+    /**
+     * Lista grupos aplicables a una entidad exacta, con modalidad específica primero.
+     */
+    public function gruposActivosPorNivel(string $campo, int $entidadId, ?int $modalidadId): array
+    {
+        $camposPermitidos = ['establecimiento_id', 'microred_id', 'red_id', 'diresa_id'];
+        if (!in_array($campo, $camposPermitidos, true)) {
+            return [];
+        }
+
+        $builder = $this->db->table($this->table)
+            ->where($campo, $entidadId)
+            ->where('gco_estado', 'ACTIVO')
+            ->where('deleted_at', null);
+
+        // Los grupos de microred/establecimiento guardan también sus IDs padre.
+        // Excluirlos al consultar niveles superiores para no aplicar, por ejemplo,
+        // un corte de una microred como si fuera un corte de toda la red.
+        switch ($campo) {
+            case 'microred_id':
+                $builder->where('establecimiento_id', null);
+                break;
+            case 'red_id':
+                $builder->where('microred_id', null)
+                    ->where('establecimiento_id', null);
+                break;
+            case 'diresa_id':
+                $builder->where('red_id', null)
+                    ->where('microred_id', null)
+                    ->where('establecimiento_id', null);
+                break;
+        }
+
+        if ($modalidadId !== null) {
+            $builder->groupStart()
+                ->where('gco_mco_ide', (string) $modalidadId)
+                ->orWhere('gco_mco_ide', null)
+                ->groupEnd()
+            ;
+            $builder->orderBy("CASE WHEN gco_mco_ide = " . $this->db->escape((string) $modalidadId) . " THEN 1 ELSE 2 END", '', false);
+        } else {
+            $builder->where('gco_mco_ide', null);
+        }
+
+        return $builder->get()->getResultArray();
+    }
 }
