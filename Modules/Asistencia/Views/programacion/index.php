@@ -12,17 +12,21 @@ Programación Mensual de Turnos
         max-height: 650px;
         overflow: auto;
     }
+
     .table-matriz {
         border-collapse: separate;
         border-spacing: 0;
         font-size: 0.78rem;
     }
-    .table-matriz th, .table-matriz td {
+
+    .table-matriz th,
+    .table-matriz td {
         padding: 4px 6px;
         border: 1px solid #e2e8f0;
         text-align: center;
         vertical-align: middle;
     }
+
     /* Columnas congeladas (Sticky) */
     .sticky-col-1 {
         position: sticky;
@@ -32,6 +36,7 @@ Programación Mensual de Turnos
         width: 45px;
         min-width: 45px;
     }
+
     .sticky-col-2 {
         position: sticky;
         left: 45px;
@@ -40,6 +45,7 @@ Programación Mensual de Turnos
         width: 85px;
         min-width: 85px;
     }
+
     .sticky-col-3 {
         position: sticky;
         left: 130px;
@@ -49,6 +55,7 @@ Programación Mensual de Turnos
         min-width: 200px;
         text-align: left !important;
     }
+
     .table-matriz thead th.sticky-col-1,
     .table-matriz thead th.sticky-col-2,
     .table-matriz thead th.sticky-col-3 {
@@ -56,6 +63,7 @@ Programación Mensual de Turnos
         color: #ffffff;
         z-index: 20;
     }
+
     .table-matriz thead th {
         position: sticky;
         top: 0;
@@ -63,10 +71,12 @@ Programación Mensual de Turnos
         color: #ffffff;
         z-index: 15;
     }
+
     .fin-de-semana {
         background-color: #f8fafc !important;
         color: #ef4444;
     }
+
     .celda-turno {
         min-width: 38px;
         max-width: 46px;
@@ -75,9 +85,11 @@ Programación Mensual de Turnos
         transition: all 0.15s ease-in-out;
         user-select: none;
     }
+
     .celda-turno:hover {
         background-color: #e2e8f0 !important;
     }
+
     .badge-turno-matriz {
         display: inline-block;
         padding: 3px 5px;
@@ -85,16 +97,19 @@ Programación Mensual de Turnos
         color: #ffffff;
         font-weight: 700;
         font-size: 0.72rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
+
     .btn-asignar-vacio {
         opacity: 0;
         color: #94a3b8;
         font-size: 0.7rem;
     }
+
     .celda-turno:hover .btn-asignar-vacio {
         opacity: 1;
     }
+
     .leyenda-item {
         display: inline-flex;
         align-items: center;
@@ -105,6 +120,7 @@ Programación Mensual de Turnos
         border-radius: 8px;
         font-size: 0.75rem;
     }
+
     .leyenda-color {
         width: 14px;
         height: 14px;
@@ -115,7 +131,6 @@ Programación Mensual de Turnos
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<a class="btn btn-outline-primary m-3" href="<?= site_url('asistencia/gestion-roles') ?>">Periodos y reglas de programaci?n</a>
 <div class="container-fluid px-0">
 
     <!-- CABECERA PRINCIPAL -->
@@ -131,6 +146,12 @@ Programación Mensual de Turnos
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                
+
+                <a class="btn btn-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center" href="<?= site_url('asistencia/gestion-roles') ?>">
+                    <iconify-icon icon="solar:gear-bold" class="me-1" style="font-size: 1.1rem;"></iconify-icon>
+                    Periodos y reglas de programación
+                </a>
                 <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center" onclick="abrirModalImportar()">
                     <iconify-icon icon="solar:upload-track-bold" class="me-1" style="font-size: 1.1rem;"></iconify-icon>
                     Importar Excel
@@ -153,7 +174,9 @@ Programación Mensual de Turnos
                                 Formato para Re-Importación (DNI/Días)
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <a class="dropdown-item py-2 small d-flex align-items-center" href="javascript:void(0)" onclick="descargarPlantillaExcel()">
                                 <iconify-icon icon="solar:download-square-bold" class="text-info me-2 fs-5"></iconify-icon>
@@ -188,11 +211,20 @@ Programación Mensual de Turnos
             <div class="col-md-2 col-sm-6">
                 <label class="form-label small fw-bold text-muted mb-1">Mes</label>
                 <select class="form-select form-select-sm rounded-3 fw-bold" id="filtro_mes">
-                    <?php 
+                    <?php
                     $meses = [
-                        1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-                        5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-                        9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                        1 => 'Enero',
+                        2 => 'Febrero',
+                        3 => 'Marzo',
+                        4 => 'Abril',
+                        5 => 'Mayo',
+                        6 => 'Junio',
+                        7 => 'Julio',
+                        8 => 'Agosto',
+                        9 => 'Septiembre',
+                        10 => 'Octubre',
+                        11 => 'Noviembre',
+                        12 => 'Diciembre'
                     ];
                     foreach ($meses as $num => $nombre): ?>
                         <option value="<?= $num ?>" <?= $num === $mesActual ? 'selected' : '' ?>><?= $nombre ?></option>
@@ -260,8 +292,8 @@ Programación Mensual de Turnos
         </div>
         <div class="d-flex flex-wrap gap-2" id="contenedorLeyenda">
             <?php foreach ($catalogoTurnos as $t): ?>
-                <?php 
-                    $hTxt = !empty($t['horarios'][0]) ? ($t['horarios'][0]['th_hora_ingreso'] . '-' . $t['horarios'][0]['th_hora_salida'] . ' [' . $t['horarios'][0]['duracion_horas'] . 'h]') : 'Sin horario';
+                <?php
+                $hTxt = !empty($t['horarios'][0]) ? ($t['horarios'][0]['th_hora_ingreso'] . '-' . $t['horarios'][0]['th_hora_salida'] . ' [' . $t['horarios'][0]['duracion_horas'] . 'h]') : 'Sin horario';
                 ?>
                 <div class="leyenda-item" title="<?= esc($t['tur_nombre']) ?>: <?= esc($hTxt) ?>">
                     <span class="leyenda-color" style="background-color: <?= esc($t['tur_color']) ?>;"></span>
@@ -539,17 +571,17 @@ Programación Mensual de Turnos
     let calendarInstance = null;
     let modoVista = 'matriz';
     let csrfToken = '<?= csrf_token() ?>';
-    let csrfHash  = '<?= csrf_hash() ?>';
+    let csrfHash = '<?= csrf_hash() ?>';
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         cargarMatrizMensual();
 
-        $('#formFiltroProgramacion').on('submit', function (e) {
+        $('#formFiltroProgramacion').on('submit', function(e) {
             e.preventDefault();
             cargarMatrizMensual();
         });
 
-        $('#formTurnoIndividual').on('submit', function (e) {
+        $('#formTurnoIndividual').on('submit', function(e) {
             e.preventDefault();
             guardarTurnoIndividual();
         });
@@ -559,9 +591,9 @@ Programación Mensual de Turnos
 
     function poblarSelectTurnos() {
         let options = '<option value="">Seleccione turno...</option>';
-        catalogoTurnos.forEach(function (t) {
+        catalogoTurnos.forEach(function(t) {
             if (t.horarios && t.horarios.length > 0) {
-                t.horarios.forEach(function (h) {
+                t.horarios.forEach(function(h) {
                     options += `<option value="${h.th_ide}" data-tur="${t.tur_codigo}" data-horas="${h.duracion_horas}" data-color="${t.tur_color}">
                         ${t.tur_codigo} - ${t.tur_nombre} (${h.th_hora_ingreso} a ${h.th_hora_salida} - ${h.duracion_horas}h)
                     </option>`;
@@ -583,32 +615,37 @@ Programación Mensual de Turnos
     }
 
     function cargarServiciosDeUpss(upsIde) {
-        $('#filtro_uss_ide').val('').find('option[data-ups]').each(function () {
+        $('#filtro_uss_ide').val('').find('option[data-ups]').each(function() {
             const visible = !upsIde || String($(this).data('ups')) === String(upsIde);
             $(this).prop('hidden', !visible).prop('disabled', !visible);
         });
     }
 
-    $('#filtro_est_ide').on('change', function () {
+    $('#filtro_est_ide').on('change', function() {
         const est = $(this).val();
-        $('#filtro_ofi_ide').val('').find('option[data-est]').each(function () {
+        $('#filtro_ofi_ide').val('').find('option[data-est]').each(function() {
             const visible = !est || String($(this).data('est')) === String(est);
             $(this).prop('hidden', !visible).prop('disabled', !visible);
         });
     });
 
     function filtrosProgramacion() {
-        return { anio: $('#filtro_anio').val(), mes: $('#filtro_mes').val(),
-            est_ide: $('#filtro_est_ide').val(), ofi_ide: $('#filtro_ofi_ide').val(),
-            ups_ide: $('#filtro_ups_ide').val(), uss_ide: $('#filtro_uss_ide').val(),
-            dni: $('#filtro_dni').val().trim() };
+        return {
+            anio: $('#filtro_anio').val(),
+            mes: $('#filtro_mes').val(),
+            est_ide: $('#filtro_est_ide').val(),
+            ofi_ide: $('#filtro_ofi_ide').val(),
+            ups_ide: $('#filtro_ups_ide').val(),
+            uss_ide: $('#filtro_uss_ide').val(),
+            dni: $('#filtro_dni').val().trim()
+        };
     }
 
     function cargarMatrizMensual() {
-        let anio    = $('#filtro_anio').val();
-        let mes     = $('#filtro_mes').val();
-        let estIde  = $('#filtro_est_ide').val();
-        let upsIde  = $('#filtro_ups_ide').val();
+        let anio = $('#filtro_anio').val();
+        let mes = $('#filtro_mes').val();
+        let estIde = $('#filtro_est_ide').val();
+        let upsIde = $('#filtro_ups_ide').val();
 
         $('#placeholderCarga').removeClass('d-none');
         $('#tablaMatriz').addClass('d-none');
@@ -620,7 +657,7 @@ Programación Mensual de Turnos
             type: 'GET',
             data: filtrosProgramacion(),
             dataType: 'json',
-            success: function (res) {
+            success: function(res) {
                 $('#spnCargarMatriz').addClass('d-none');
                 $('#btnCargarMatriz').prop('disabled', false);
 
@@ -634,7 +671,7 @@ Programación Mensual de Turnos
                     $('#placeholderCarga').html('<div class="text-danger">Error al cargar la programación.</div>');
                 }
             },
-            error: function () {
+            error: function() {
                 $('#spnCargarMatriz').addClass('d-none');
                 $('#btnCargarMatriz').prop('disabled', false);
                 $('#placeholderCarga').html('<div class="text-danger">Error de comunicación con el servidor.</div>');
@@ -658,7 +695,7 @@ Programación Mensual de Turnos
         theadHtml += '<th class="sticky-col-2">DNI</th>';
         theadHtml += '<th class="sticky-col-3">Apellidos y Nombres</th>';
 
-        dias.forEach(function (d) {
+        dias.forEach(function(d) {
             let clsFds = d.es_fin_de_semana ? 'fin-de-semana' : '';
             theadHtml += `<th class="${clsFds}" style="min-width: 38px;">
                 <div style="font-size: 0.65rem; opacity: 0.8;">${d.letra}</div>
@@ -674,7 +711,7 @@ Programación Mensual de Turnos
         let tbodyHtml = '';
         let num = 1;
 
-        filas.forEach(function (f) {
+        filas.forEach(function(f) {
             tbodyHtml += '<tr>';
             tbodyHtml += `<td class="sticky-col-1 text-muted fw-bold">${num}</td>`;
             tbodyHtml += `<td class="sticky-col-2 font-monospace text-center small">${f.dni || '-'}</td>`;
@@ -683,7 +720,7 @@ Programación Mensual de Turnos
                 <div class="text-muted" style="font-size: 0.7rem;">${f.cargo || ''}</div>
             </td>`;
 
-            dias.forEach(function (d) {
+            dias.forEach(function(d) {
                 let diaNum = d.dia;
                 let turnos = f.dias[diaNum] || [];
                 let clsFds = d.es_fin_de_semana ? 'fin-de-semana' : '';
@@ -692,7 +729,7 @@ Programación Mensual de Turnos
                 tbodyHtml += `<td class="celda-turno ${clsFds}" onclick="clickCeldaTurno(${f.perl_ide}, '${fechaIso}', '${escapeHtml(f.trabajador)}', ${JSON.stringify(turnos).replace(/"/g, '&quot;')})">`;
 
                 if (turnos.length > 0) {
-                    turnos.forEach(function (t) {
+                    turnos.forEach(function(t) {
                         let c = t.tur_color || '#3b82f6';
                         tbodyHtml += `<span class="badge-turno-matriz" style="background-color: ${c}" title="${t.tur_codigo}: ${t.tur_nombre} (${t.th_hora_ingreso}-${t.th_hora_salida} - ${t.duracion_horas}h)">${t.tur_codigo}</span>`;
                         if (t.prog_estado === 'CAMBIO TURNO') tbodyHtml += '<small class="d-block text-info fw-bold">CAMBIO TURNO</small>';
@@ -755,15 +792,15 @@ Programación Mensual de Turnos
         spn.removeClass('d-none');
 
         let postData = {
-            prog_ide:      $('#ind_prog_ide').val(),
+            prog_ide: $('#ind_prog_ide').val(),
             prog_perl_ide: $('#ind_perl_ide').val(),
-            prog_fecha:    $('#ind_fecha').val(),
-            prog_th_ide:   $('#ind_th_ide').val(),
-            prog_estado:   $('#ind_estado').val(),
+            prog_fecha: $('#ind_fecha').val(),
+            prog_th_ide: $('#ind_th_ide').val(),
+            prog_estado: $('#ind_estado').val(),
             prog_observacion: $('#ind_observacion').val(),
-            est_ide:       $('#filtro_est_ide').val(),
-            ups_ide:       $('#filtro_ups_ide').val(),
-            [csrfToken]:   csrfHash
+            est_ide: $('#filtro_est_ide').val(),
+            ups_ide: $('#filtro_ups_ide').val(),
+            [csrfToken]: csrfHash
         };
 
         $.ajax({
@@ -771,7 +808,7 @@ Programación Mensual de Turnos
             type: 'POST',
             data: postData,
             dataType: 'json',
-            success: function (res) {
+            success: function(res) {
                 btn.prop('disabled', false);
                 spn.addClass('d-none');
 
@@ -780,14 +817,22 @@ Programación Mensual de Turnos
                     toastr.success(res.message);
                     cargarMatrizMensual();
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Observación de Horario', text: res.message });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Observación de Horario',
+                        text: res.message
+                    });
                 }
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 btn.prop('disabled', false);
                 spn.addClass('d-none');
                 let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al guardar la asignación.';
-                Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: msg
+                });
             }
         });
     }
@@ -809,20 +854,30 @@ Programación Mensual de Turnos
                 $.ajax({
                     url: '<?= base_url('asistencia/programacion/api/eliminar') ?>/' + progIde,
                     type: 'POST',
-                    data: { [csrfToken]: csrfHash },
+                    data: {
+                        [csrfToken]: csrfHash
+                    },
                     dataType: 'json',
-                    success: function (res) {
+                    success: function(res) {
                         if (res.status === 'success') {
                             $('#modalTurnoIndividual').modal('hide');
                             toastr.success(res.message);
                             cargarMatrizMensual();
                         } else {
-                            Swal.fire({ icon: 'error', title: 'Error', text: res.message });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: res.message
+                            });
                         }
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al eliminar el turno.';
-                        Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: msg
+                        });
                     }
                 });
             }
@@ -856,7 +911,7 @@ Programación Mensual de Turnos
         }
 
         let anio = $('#filtro_anio').val();
-        let mes  = String($('#filtro_mes').val()).padStart(2, '0');
+        let mes = String($('#filtro_mes').val()).padStart(2, '0');
 
         calendarInstance = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
@@ -870,31 +925,31 @@ Programación Mensual de Turnos
             buttonText: {
                 today: 'Hoy',
                 month: 'Mes',
-                week:  'Semana',
-                list:  'Lista'
+                week: 'Semana',
+                list: 'Lista'
             },
-            events: function (fetchInfo, successCallback, failureCallback) {
+            events: function(fetchInfo, successCallback, failureCallback) {
                 $.ajax({
                     url: '<?= base_url('asistencia/programacion/api/eventos') ?>',
                     type: 'GET',
                     data: filtrosProgramacion(),
                     dataType: 'json',
-                    success: function (data) {
+                    success: function(data) {
                         successCallback(data);
                     },
-                    error: function () {
+                    error: function() {
                         failureCallback();
                     }
                 });
             },
-            eventClick: function (info) {
+            eventClick: function(info) {
                 let props = info.event.extendedProps;
                 let fecha = info.event.startStr.split('T')[0];
                 let turnos = [{
-                    prog_ide:        props.prog_ide,
-                    tur_codigo:      props.tur_codigo,
-                    tur_nombre:      props.tur_nombre,
-                    duracion_horas:  props.duracion_horas
+                    prog_ide: props.prog_ide,
+                    tur_codigo: props.tur_codigo,
+                    tur_nombre: props.tur_nombre,
+                    duracion_horas: props.duracion_horas
                 }];
                 clickCeldaTurno(props.perl_ide, fecha, props.trabajador, turnos);
             }
@@ -907,23 +962,23 @@ Programación Mensual de Turnos
     // EXPORTACIONES Y PLANTILLA
     // ==========================================
     function descargarPlantillaExcel() {
-        let anio   = $('#filtro_anio').val();
-        let mes    = $('#filtro_mes').val();
+        let anio = $('#filtro_anio').val();
+        let mes = $('#filtro_mes').val();
         let estIde = $('#filtro_est_ide').val();
         window.location.href = `<?= base_url('asistencia/programacion/descargar-plantilla') ?>?anio=${anio}&mes=${mes}&est_ide=${estIde}`;
     }
 
     function exportarExcelReporte() {
-        let anio   = $('#filtro_anio').val();
-        let mes    = $('#filtro_mes').val();
+        let anio = $('#filtro_anio').val();
+        let mes = $('#filtro_mes').val();
         let estIde = $('#filtro_est_ide').val();
         let upsIde = $('#filtro_ups_ide').val();
         window.location.href = `<?= base_url('asistencia/programacion/exportar-excel-reporte') ?>?${new URLSearchParams(filtrosProgramacion()).toString()}`;
     }
 
     function exportarExcelImportable() {
-        let anio   = $('#filtro_anio').val();
-        let mes    = $('#filtro_mes').val();
+        let anio = $('#filtro_anio').val();
+        let mes = $('#filtro_mes').val();
         let estIde = $('#filtro_est_ide').val();
         let upsIde = $('#filtro_ups_ide').val();
         window.location.href = `<?= base_url('asistencia/programacion/exportar-excel-importable') ?>?${new URLSearchParams(filtrosProgramacion()).toString()}`;
@@ -934,6 +989,7 @@ Programación Mensual de Turnos
     // ==========================================
     function abrirModalImportar() {
         $('#archivo_excel').val('');
+        $('#check_reemplazar_existentes').prop('checked', false);
         $('#seccionPrevisualizacion').addClass('d-none');
         $('#btnConfirmarImportacion').addClass('d-none');
         $('#modalImportarExcel').modal('show');
@@ -942,15 +998,20 @@ Programación Mensual de Turnos
     function analizarArchivoExcel() {
         let fileInput = document.getElementById('archivo_excel');
         if (!fileInput.files.length) {
-            Swal.fire({ icon: 'warning', title: 'Atención', text: 'Debe seleccionar un archivo Excel (.xlsx) para continuar.' });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Debe seleccionar un archivo Excel (.xlsx) para continuar.'
+            });
             return;
         }
 
         let formData = new FormData();
         formData.append('archivo_excel', fileInput.files[0]);
         formData.append('anio', $('#filtro_anio').val());
-        formData.append('mes',  $('#filtro_mes').val());
+        formData.append('mes', $('#filtro_mes').val());
         formData.append('est_ide', $('#filtro_est_ide').val());
+        formData.append('reemplazar_existentes', $('#check_reemplazar_existentes').is(':checked') ? 1 : 0);
         formData.append(csrfToken, csrfHash);
 
         let btn = $('#btnAnalizarExcel');
@@ -965,21 +1026,30 @@ Programación Mensual de Turnos
             processData: false,
             contentType: false,
             dataType: 'json',
-            success: function (res) {
+            success: function(res) {
                 btn.prop('disabled', false);
                 spn.addClass('d-none');
 
                 if (res.status === 'success' && res.data) {
+                    $('#seccionPrevisualizacion').data('reemplazar', $('#check_reemplazar_existentes').is(':checked'));
                     mostrarPrevisualizacion(res.data);
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Error en el Archivo', text: res.message });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en el Archivo',
+                        text: res.message
+                    });
                 }
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 btn.prop('disabled', false);
                 spn.addClass('d-none');
                 let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al procesar el archivo Excel.';
-                Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: msg
+                });
             }
         });
     }
@@ -994,7 +1064,7 @@ Programación Mensual de Turnos
         // Render Válidos
         let tbodyValidos = '';
         if (data.registros_validos && data.registros_validos.length > 0) {
-            data.registros_validos.forEach(function (v) {
+            data.registros_validos.forEach(function(v) {
                 let turnosBadge = '';
                 for (const dia in v.turnos) {
                     let t = v.turnos[dia];
@@ -1020,15 +1090,15 @@ Programación Mensual de Turnos
         // Render Errores
         let tbodyErrores = '';
         if (data.errores && data.errores.length > 0) {
-            data.errores.forEach(function (err) {
+            data.errores.forEach(function(err) {
                 tbodyErrores += `
                     <tr>
-                        <td class="text-center text-danger fw-bold">${err.fila}</td>
-                        <td class="font-monospace text-center">${err.dni}</td>
-                        <td>${err.trabajador}</td>
-                        <td class="text-center fw-bold">${err.dia}</td>
-                        <td class="text-center font-monospace">${err.codigo}</td>
-                        <td class="text-danger small">${err.error}</td>
+                        <td class="text-center text-danger fw-bold">${escapeHtml(String(err.fila ?? ''))}</td>
+                        <td class="font-monospace text-center">${escapeHtml(String(err.dni ?? ''))}</td>
+                        <td>${escapeHtml(String(err.trabajador ?? ''))}</td>
+                        <td class="text-center fw-bold">${escapeHtml(String(err.dia ?? ''))}</td>
+                        <td class="text-center font-monospace">${escapeHtml(String(err.codigo ?? ''))}</td>
+                        <td class="text-danger small">${escapeHtml(String(err.error ?? ''))}</td>
                     </tr>
                 `;
             });
@@ -1054,9 +1124,9 @@ Programación Mensual de Turnos
 
     function aplicarImportacionDefinitiva() {
         let reemplazar = $('#check_reemplazar_existentes').is(':checked') ? 1 : 0;
-        let advertencia = reemplazar
-            ? 'Se sobreescribirán los turnos existentes en las fechas especificadas en el archivo.'
-            : 'Se conservarán los turnos existentes y solo se insertarán turnos en días libres.';
+        let advertencia = reemplazar ?
+            'Se sobreescribirán los turnos existentes en las fechas especificadas en el archivo.' :
+            'Se conservarán los turnos existentes y solo se insertarán turnos en días libres.';
 
         Swal.fire({
             title: '¿Confirmar Importación?',
@@ -1083,7 +1153,7 @@ Programación Mensual de Turnos
                         [csrfToken]: csrfHash
                     },
                     dataType: 'json',
-                    success: function (res) {
+                    success: function(res) {
                         btn.prop('disabled', false);
                         spn.addClass('d-none');
 
@@ -1096,19 +1166,34 @@ Programación Mensual de Turnos
                             });
                             cargarMatrizMensual();
                         } else {
-                            Swal.fire({ icon: 'error', title: 'Error', text: res.message });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: res.message
+                            });
                         }
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         btn.prop('disabled', false);
                         spn.addClass('d-none');
                         let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error en el servidor al importar.';
-                        Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: msg
+                        });
                     }
                 });
             }
         });
     }
+
+    $('#check_reemplazar_existentes').on('change', function() {
+        if (!$('#seccionPrevisualizacion').hasClass('d-none') &&
+            $('#seccionPrevisualizacion').data('reemplazar') !== $(this).is(':checked')) {
+            analizarArchivoExcel();
+        }
+    });
 
     function escapeHtml(text) {
         if (!text) return '';

@@ -40,18 +40,25 @@ class ProgramacionTurnoService
                 $id = (int)($datos['prog_perl_ide'] ?? 0);
                 $fecha = (string)($datos['prog_fecha'] ?? '');
                 $anterior = null;
+                $periodosValidar = [];
                 if (!empty($datos['prog_ide'])) {
                     $anterior = $this->programacionModel->find((int)$datos['prog_ide']);
-                    if (!$anterior) throw new \DomainException('Asignaci?n no encontrada.');
-                    $g->editable((int)$anterior['prog_perl_ide'], $anterior['prog_fecha']);
+                    if (!$anterior) throw new \DomainException('Asignación no encontrada.');
+                    $periodoAnterior = $g->editable((int)$anterior['prog_perl_ide'], $anterior['prog_fecha']);
+                    $claveAnterior = $anterior['prog_perl_ide'] . ':' . $periodoAnterior['id'];
+                    $periodosValidar[$claveAnterior] = [(int) $anterior['prog_perl_ide'], $periodoAnterior];
                 }
                 $periodo = $g->editable($id, $fecha);
+                $claveNuevo = $id . ':' . $periodo['id'];
+                $periodosValidar[$claveNuevo] = [$id, $periodo];
                 $horario = $this->turnoHorarioModel->find((int)($datos['prog_th_ide'] ?? 0));
                 if (!$horario || !$horario['th_estado']) throw new \DomainException('Horario no disponible.');
                 $datos['prog_estado'] = 'PROGRAMADO';
                 $res = $this->guardarIndividualSinControl($datos, $g->usuario());
                 if (!$res['status']) throw new \DomainException($res['message']);
-                $g->validar($id, $periodo);
+                foreach ($periodosValidar as [$personalValidar, $periodoValidar]) {
+                    $g->validar($personalValidar, $periodoValidar);
+                }
                 $g->evento('GUARDAR_TURNO', ['anterior'=>$anterior, 'nuevo'=>$datos]);
                 return $res;
             });
@@ -83,7 +90,14 @@ class ProgramacionTurnoService
                 foreach ($registrosValidos as &$reg) {
                     foreach ($reg['turnos'] as &$t) {
                         $p=$g->editable((int)$reg['perl_ide'],$t['fecha']);
-                        $validar[$reg['perl_ide'].':'.$p['id']]=[(int)$reg['perl_ide'],$p];
+                        $clave = $reg['perl_ide'].':'.$p['id'];
+                        $validar[$clave] = [
+                            'personal_id' => (int) $reg['perl_ide'],
+                            'periodo' => $p,
+                            'fila' => $reg['fila'] ?? '?',
+                            'dni' => $reg['dni'] ?? '-',
+                            'trabajador' => $reg['trabajador'] ?? 'Trabajador',
+                        ];
                         $existentes=$this->programacionModel->where('prog_perl_ide',$reg['perl_ide'])->where('prog_fecha',$t['fecha'])->findAll();
                         if ($reemplazarExistentes && count($existentes)>1) throw new \DomainException('Hay varios turnos en el mismo d?a. Modif?quelos individualmente.');
                         $t['ya_existe']=!empty($existentes);
@@ -93,7 +107,19 @@ class ProgramacionTurnoService
                 unset($reg);
                 $res=$this->importarSinControl($registrosValidos,$reemplazarExistentes,$estIde,$upsIde,$ussIde,$g->usuario());
                 if (!$res['status']) throw new \DomainException($res['message']);
-                foreach ($validar as [$id,$periodo]) $g->validar($id,$periodo);
+                foreach ($validar as $contexto) {
+                    try {
+                        $g->validar($contexto['personal_id'], $contexto['periodo']);
+                    } catch (\DomainException $e) {
+                        throw new \DomainException(sprintf(
+                            'Fila %s, DNI %s (%s): %s',
+                            $contexto['fila'],
+                            $contexto['dni'],
+                            $contexto['trabajador'],
+                            $e->getMessage()
+                        ));
+                    }
+                }
                 $g->evento('IMPORTAR_TURNOS',['resultado'=>$res,'registros'=>$registrosValidos]);
                 return $res;
             });
@@ -799,7 +825,7 @@ class ProgramacionTurnoService
     /**
      * Valida el archivo Excel subido y genera una previsualización interactiva completa
      */
-    public function previsualizarImportacionExcel(string $rutaArchivo, int $anioEsperado, int $mesEsperado, ?int $estIde = null): array
+    public function previsualizarImportacionExcel(string $rutaArchivo, int $anioEsperado, int $mesEsperado, ?int $estIde = null, bool $reemplazarExistentes = false): array
     {
         try {
             $spreadsheet = IOFactory::load($rutaArchivo);
@@ -1070,6 +1096,12 @@ class ProgramacionTurnoService
             }
         }
 
+        $this->validarReglasImportacion($registrosValidos, $errores, $anioEsperado, $mesEsperado, $reemplazarExistentes);
+        $totalCeldasTurnos = array_sum(array_map(
+            static fn(array $registro): int => count($registro['turnos']),
+            $registrosValidos
+        ));
+
         return [
             'status'            => true,
             'anio'              => $anioEsperado,
@@ -1082,6 +1114,113 @@ class ProgramacionTurnoService
             'registros_validos' => $registrosValidos,
             'errores'           => $errores,
         ];
+    }
+
+    /** Aplica en la previsualización las mismas reglas que se verifican al guardar. */
+    private function validarReglasImportacion(array &$registros, array &$errores, int $anio, int $mes, bool $reemplazarExistentes): void
+    {
+        if (!$registros) {
+            return;
+        }
+
+        $idsHorarios = [];
+        foreach ($registros as $registro) {
+            foreach ($registro['turnos'] as $turno) {
+                $idsHorarios[] = (int) $turno['th_ide'];
+            }
+        }
+        $idsHorarios = array_values(array_unique($idsHorarios));
+        if (!$idsHorarios) {
+            return;
+        }
+
+        $horarios = $this->db->table('casis_turno_horario h')
+            ->select('h.th_ide, h.th_hora_ingreso, h.th_hora_salida, t.tur_modalidad')
+            ->join('casis_turno t', 't.tur_ide = h.th_tur_ide')
+            ->whereIn('h.th_ide', $idsHorarios)
+            ->where('h.deleted_at', null)
+            ->where('t.deleted_at', null)
+            ->get()->getResultArray();
+        $horarioPorId = array_column($horarios, null, 'th_ide');
+
+        $registrosValidos = [];
+        foreach ($registros as $registro) {
+            $fila = (int) ($registro['fila'] ?? 0);
+            $perlIde = (int) $registro['perl_ide'];
+
+            try {
+                $personal = $this->gestionRoles->personal($perlIde);
+                $periodo = $this->db->table('casis_plan_periodo')
+                    ->where('est_id', (int) $personal['perl_est_ide'])
+                    ->where('mes', sprintf('%04d-%02d', $anio, $mes))
+                    ->get()->getRowArray();
+                if (!$periodo) {
+                    throw new \DomainException('No existe un periodo de programación para este establecimiento y mes.');
+                }
+                if (GestionRolService::etapa($periodo, $this->gestionRoles->ahora()) !== 'PROGRAMACION') {
+                    throw new \DomainException('El periodo no está abierto para modificaciones.');
+                }
+
+                $reglas = json_decode($periodo['reglas'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
+                $turnosActuales = $this->gestionRoles->turnos($perlIde);
+                $fechasArchivo = array_fill_keys(array_column($registro['turnos'], 'fecha'), true);
+                if ($reemplazarExistentes) {
+                    $turnosActuales = array_values(array_filter(
+                        $turnosActuales,
+                        static fn(array $t): bool => !isset($fechasArchivo[$t['prog_fecha']])
+                    ));
+                }
+
+                $fechasExistentes = [];
+                foreach ($turnosActuales as $actual) {
+                    $fechasExistentes[$actual['prog_fecha']] = true;
+                }
+                foreach ($registro['turnos'] as $turno) {
+                    if (!$reemplazarExistentes && isset($fechasExistentes[$turno['fecha']])) {
+                        continue;
+                    }
+                    $horario = $horarioPorId[(int) $turno['th_ide']] ?? null;
+                    if (!$horario) {
+                        throw new \DomainException('No se pudo encontrar el horario de uno de los turnos del archivo.');
+                    }
+                    $turnosActuales[] = [
+                        'prog_fecha' => $turno['fecha'],
+                        'th_hora_ingreso' => $horario['th_hora_ingreso'],
+                        'th_hora_salida' => $horario['th_hora_salida'],
+                        'tur_codigo' => $turno['tur_codigo'],
+                        'tur_modalidad' => $horario['tur_modalidad'],
+                    ];
+                }
+
+                $fallos = GestionRolService::evaluar($personal, $turnosActuales, $reglas, $periodo['mes']);
+                if ($fallos) {
+                    foreach (array_unique($fallos) as $fallo) {
+                        $errores[] = [
+                            'fila' => $fila,
+                            'dni' => $registro['dni'],
+                            'trabajador' => $registro['trabajador'],
+                            'dia' => 'Mes completo',
+                            'codigo' => 'REGLA',
+                            'error' => $fallo,
+                        ];
+                    }
+                    continue;
+                }
+
+                $registrosValidos[] = $registro;
+            } catch (\Throwable $e) {
+                $errores[] = [
+                    'fila' => $fila,
+                    'dni' => $registro['dni'],
+                    'trabajador' => $registro['trabajador'],
+                    'dia' => 'Mes completo',
+                    'codigo' => 'REGLA',
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
+        $registros = $registrosValidos;
     }
 
     /**

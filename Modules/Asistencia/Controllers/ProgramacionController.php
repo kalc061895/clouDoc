@@ -212,6 +212,7 @@ class ProgramacionController extends BaseModuleController
         $anio    = (int) $this->request->getPost('anio');
         $mes     = (int) $this->request->getPost('mes');
         $estIde  = !empty($this->request->getPost('est_ide')) ? (int) $this->request->getPost('est_ide') : null;
+        $reemplazar = (bool) $this->request->getPost('reemplazar_existentes');
 
         if (!$archivo || !$archivo->isValid()) {
             return $this->jsonResponse('error', 'Debe seleccionar un archivo Excel válido (.xlsx).', [], 400);
@@ -226,7 +227,7 @@ class ProgramacionController extends BaseModuleController
         $rutaTemp = WRITEPATH . 'uploads/' . $archivo->getRandomName();
         $archivo->move(WRITEPATH . 'uploads', basename($rutaTemp));
 
-        $resultado = $this->service->previsualizarImportacionExcel($rutaTemp, $anio, $mes, $estIde);
+        $resultado = $this->service->previsualizarImportacionExcel($rutaTemp, $anio, $mes, $estIde, $reemplazar);
 
         // Guardar temporalmente en sesión para procesar o descargar reporte de errores
         session()->set('temp_import_programacion', [
@@ -234,6 +235,7 @@ class ProgramacionController extends BaseModuleController
             'anio'              => $anio,
             'mes'               => $mes,
             'est_ide'           => $estIde,
+            'reemplazar_existentes' => $reemplazar,
             'registros_validos' => $resultado['registros_validos'] ?? [],
             'errores'           => $resultado['errores'] ?? [],
         ]);
