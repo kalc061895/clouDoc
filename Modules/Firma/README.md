@@ -27,7 +27,7 @@ Máximo predeterminado: 20 MiB por PDF (`firma.maxBytes`). Ajustar también `upl
 ## Uso e integración
 
 - Cargar un PDF externo en `/firma`.
-- En Asistencia → Historial de roles → Firmar, incorporar el rol y pulsar Firmar. Solo se pueden incorporar roles propios y no anulados.
+- En Asistencia, los roles sin flujo se incorporan por su propietario. Los PDF vinculados a un envío aprobado se firman en secuencia por el elaborador, RR. HH. y Dirección; cada actor solo puede iniciar su etapa cuando la anterior quedó recibida. El envío conserva las fechas de las tres firmas.
 - Elegir motivo, cargo y estampa. La ubicación se confirma en el cliente Firma Perú.
 - El servidor conserva original, versiones, SHA-256, usuario, fechas y operación. El navegador confirma éxito únicamente cuando el servidor recibió el archivo.
 - Cada usuario consulta sus propios documentos. El módulo no implementa todavía bandejas compartidas ni circuitos de aprobación.

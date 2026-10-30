@@ -3,6 +3,7 @@
 namespace Modules\Firma\Services;
 
 use Modules\Firma\Config\Firma;
+use Modules\Asistencia\Services\RolEnvioService;
 
 class FirmaService
 {
@@ -77,14 +78,25 @@ class FirmaService
 
     public function documento(int $id, int $usuario): array
     {
-        $doc = $this->db->table('firma_documentos')->where('id', $id)->where('created_by', $usuario)->get()->getRowArray();
-        if (! $doc) throw new \OutOfBoundsException('Documento no disponible.');
+        $doc = $this->db->table('firma_documentos')->where('id', $id)->get()->getRowArray();
+        if (! $doc || ((int) $doc['created_by'] !== $usuario && ! (new RolEnvioService())->puedeVerDocumentoFirma($id, $usuario))) {
+            throw new \OutOfBoundsException('Documento no disponible.');
+        }
         return $doc;
     }
 
     public function listar(int $usuario, int $pagina = 1): array
     {
-        $q = $this->db->table('firma_documentos')->where('created_by', $usuario);
+        $ids = array_map('intval', array_column($this->db->table('firma_documentos')->select('id')->where('created_by', $usuario)->get()->getResultArray(), 'id'));
+        $compartidos = [];
+        if ($this->db->tableExists('casis_rol_envio') && $this->db->fieldExists('envio_id', 'casis_rol_documento')) {
+            $compartidos = $this->db->query(
+                'SELECT DISTINCT fd.id FROM firma_documentos fd JOIN casis_rol_documento rd ON rd.id = fd.referencia JOIN casis_rol_envio e ON e.id = rd.envio_id WHERE fd.origen = ? AND e.estado = ? AND (e.usuario_envio_id = ? OR e.usuario_rrhh_id = ? OR e.usuario_direccion_id = ?)',
+                ['asistencia.roles', 'APROBADO_DIRECCION', $usuario, $usuario, $usuario]
+            )->getResultArray();
+        }
+        $ids = array_values(array_unique(array_merge($ids, array_map('intval', array_column($compartidos, 'id')))));
+        $q = $this->db->table('firma_documentos')->whereIn('id', $ids ?: [0]);
         $total = $q->countAllResults(false);
         return [
             'filas' => $q->orderBy('id', 'DESC')->limit(20, (max(1, $pagina) - 1) * 20)->get()->getResultArray(),
@@ -122,6 +134,15 @@ class FirmaService
     {
         $doc = $this->documento($id, $usuario);
         $this->validarOrigen($doc);
+        if ($doc['origen'] === 'asistencia.roles') {
+            $rolDocumento = $this->db->table('casis_rol_documento')->where('id', $doc['referencia'])->get()->getRowArray();
+            if ($rolDocumento && !empty($rolDocumento['envio_id'])) {
+                if (! (new RolEnvioService())->puedeFirmarDocumento((int) $rolDocumento['id'], $usuario)) throw new \DomainException('La firma está asignada a otro actor de la secuencia o esta etapa ya se completó.');
+            }
+        }
+        if ($this->db->table('firma_operaciones')->where('documento_id', $id)->where('estado', 'PENDIENTE')->countAllResults()) {
+            throw new \DomainException('Ya hay una operación de firma pendiente para este documento.');
+        }
         $this->archivo($id, (int) $doc['version_actual']);
         $asunto = $input['asunto'] ?? '';
         $motivo = $input['motivo'] ?? '';
@@ -220,6 +241,13 @@ class FirmaService
                 'created_by' => $op['created_by'],
                 'created_at' => date('Y-m-d H:i:s')
             ]);
+            $documento = $this->db->table('firma_documentos')->where('id', (int) $op['documento_id'])->get()->getRowArray();
+            if ($documento && $documento['origen'] === 'asistencia.roles') {
+                $rolDocumento = $this->db->table('casis_rol_documento')->where('id', $documento['referencia'])->get()->getRowArray();
+                if ($rolDocumento && !empty($rolDocumento['envio_id'])) {
+                    (new RolEnvioService())->registrarFirmaDocumento((int) $rolDocumento['id'], (int) $op['created_by']);
+                }
+            }
             $this->commit();
         } catch (\Throwable $e) {
             $this->db->transRollback();

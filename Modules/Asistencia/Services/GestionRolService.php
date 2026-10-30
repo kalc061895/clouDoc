@@ -36,12 +36,15 @@ class GestionRolService
         return 'CERRADO';
     }
     /** null representa alcance global; [] representa ningún acceso. */
-    public function oficinas(bool $aprobar = false): ?array
+    public function oficinas(bool $aprobar = false, ?string $etapa = null): ?array
     {
         if ($this->administrador()) return null;
         $hoy = substr($this->ahora(), 0, 10);
         $q = $this->db->table('casis_plan_responsable')->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy);
-        if ($aprobar) $q->where('aprobar', 1);
+        if ($aprobar) {
+            $q->where('aprobar', 1);
+            if ($etapa !== null) $q->where('etapa', $etapa);
+        } else $q->where('programar', 1);
         $ids = array_map('intval', array_column($q->get()->getResultArray(), 'oficina_id'));
         $oficinas = $this->db->table('casis_oficina')->where('deleted_at', null)->where('ofi_estado', 1)->get()->getResultArray();
         // El jefe asignado en oficinas programa su oficina; aprobar requiere delegación expresa.
@@ -57,9 +60,9 @@ class GestionRolService
         } while (count($ids) !== $antes);
         return $ids;
     }
-    public function exigirOficina(int $id, bool $aprobar = false): void
+    public function exigirOficina(int $id, bool $aprobar = false, ?string $etapa = null): void
     {
-        $ids = $this->oficinas($aprobar);
+        $ids = $this->oficinas($aprobar, $etapa);
         if (!$id || ($ids !== null && !in_array($id, $ids, true))) throw new \DomainException('No tiene permiso sobre esta oficina o sus trabajadores.');
     }
     public function filtrarPersonal($builder, string $alias = 'p'): void
@@ -69,7 +72,7 @@ class GestionRolService
     }
     public function personal(int $id): array
     {
-        $p = $this->db->table('casis_personal p')->select('p.*, c.car_modalidad')->join('casis_cargo c', 'c.car_ide = p.perl_car_ide AND c.deleted_at IS NULL', 'left')->where('p.perl_ide', $id)->where('p.deleted_at', null)->get()->getRowArray();
+        $p = $this->db->table('casis_personal p')->select('p.*, c.car_modalidad, c.car_nombre')->join('casis_cargo c', 'c.car_ide = p.perl_car_ide AND c.deleted_at IS NULL', 'left')->where('p.perl_ide', $id)->where('p.deleted_at', null)->get()->getRowArray();
         if (!$p) throw new \DomainException('Trabajador no encontrado.');
         $this->exigirOficina((int)$p['perl_ofi_ide']);
         return $p;
@@ -80,15 +83,17 @@ class GestionRolService
         $p = $this->personal($id);
         $periodo = $this->db->query('SELECT * FROM casis_plan_periodo WHERE est_id = ? AND mes = ? FOR UPDATE', [$p['perl_est_ide'], substr($fecha, 0, 7)])->getRowArray();
         if (!$periodo) throw new \DomainException('No existe un periodo de programación para este establecimiento y mes.');
-        if (self::etapa($periodo, $this->ahora()) !== 'PROGRAMACION') throw new \DomainException('El periodo no está abierto para modificaciones.');
+        $etapaPeriodo = self::etapa($periodo, $this->ahora());
+        $rol = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->where('oficina_id', $p['perl_ofi_ide'])->get()->getRowArray();
+        $correccionObservada = $rol && $rol['estado'] === 'OBSERVADO' && $etapaPeriodo !== 'CERRADO';
+        if ($etapaPeriodo !== 'PROGRAMACION' && ! $correccionObservada) throw new \DomainException('El periodo no está abierto para modificaciones.');
         // Una transferencia de oficina no debe desbloquear a quien ya integra un rol presentado/aprobado.
-        $congelados = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->whereIn('estado', ['PRESENTADO', 'APROBADO'])->get()->getResultArray();
+        $congelados = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->whereIn('estado', ['PRESENTADO', 'APROBADO', 'PENDIENTE_RRHH', 'VISTO_BUENO_RRHH', 'APROBADO_DIRECCION', 'RECHAZADO'])->get()->getResultArray();
         foreach ($congelados as $congelado) {
             foreach (json_decode($congelado['snapshot'] ?? '[]', true) ?: [] as $miembro) {
                 if ((int)($miembro['personal']['perl_ide'] ?? 0) === $id) throw new \DomainException('El trabajador pertenece a un rol presentado o aprobado.');
             }
         }
-        $rol = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->where('oficina_id', $p['perl_ofi_ide'])->get()->getRowArray();
         if ($rol && !in_array($rol['estado'], ['BORRADOR', 'OBSERVADO'], true)) throw new \DomainException('El rol está presentado o aprobado y no admite modificaciones.');
         if (!$rol) {
             $this->db->table('casis_plan_rol')->insert(['periodo_id' => $periodo['id'], 'oficina_id' => $p['perl_ofi_ide'], 'estado' => 'BORRADOR', 'created_by' => $this->usuario(), 'created_at' => $this->ahora()]);
@@ -97,7 +102,7 @@ class GestionRolService
     }
     public function turnos(int $personal): array
     {
-        return $this->db->table('casis_programacion pr')->select('pr.*, h.th_hora_ingreso, h.th_hora_salida, t.tur_codigo, t.tur_modalidad')
+        return $this->db->table('casis_programacion pr')->select('pr.*, h.th_hora_ingreso, h.th_hora_salida, t.tur_codigo, t.tur_modalidad, t.tur_nombre, t.tur_color')
             ->join('casis_turno_horario h', 'h.th_ide = pr.prog_th_ide')->join('casis_turno t', 't.tur_ide = h.th_tur_ide')
             ->where('pr.prog_perl_ide', $personal)->where('pr.deleted_at', null)->orderBy('pr.prog_fecha')->get()->getResultArray();
     }
@@ -190,6 +195,8 @@ class GestionRolService
     public function responsable(array $d): void
     {
         $this->exigirAdministrador();
+        $etapa = strtoupper(trim((string)($d['etapa'] ?? 'DIRECCION')));
+        if (!in_array($etapa, ['PROGRAMACION', 'RRHH', 'DIRECCION'], true)) throw new \DomainException('Etapa de aprobación inválida.');
         foreach (['desde', 'hasta'] as $k) {
             $f = \DateTimeImmutable::createFromFormat('!Y-m-d', $d[$k] ?? '');
             if (!$f || $f->format('Y-m-d') !== $d[$k]) throw new \DomainException('Vigencia inválida.');
@@ -197,9 +204,11 @@ class GestionRolService
         if ($d['desde'] > $d['hasta']) throw new \DomainException('Vigencia inválida.');
         if (!$this->db->table('users')->where('id', (int)$d['usuario_id'])->where('active', 1)->countAllResults()) throw new \DomainException('Usuario activo no encontrado.');
         if (!$this->db->table('casis_oficina')->where('ofi_ide', (int)$d['oficina_id'])->where('deleted_at', null)->countAllResults()) throw new \DomainException('Oficina no encontrada.');
-        $this->transaccion(function () use ($d) {
+        $this->transaccion(function () use ($d, $etapa) {
             $data = array_intersect_key($d, array_flip(['usuario_id', 'oficina_id', 'desde', 'hasta']));
-            $data['aprobar'] = empty($d['aprobar']) ? 0 : 1;
+            $data['aprobar'] = $etapa === 'PROGRAMACION' ? 0 : 1;
+            $data['programar'] = $etapa === 'PROGRAMACION' ? 1 : 0;
+            $data['etapa'] = $etapa;
             $data['created_by'] = $this->usuario();
             $data['created_at'] = $this->ahora();
             $this->db->table('casis_plan_responsable')->insert($data);

@@ -9,7 +9,7 @@ class GestionRolesMenuSeeder extends Seeder
 {
     public function run()
     {
-        $menus = array_filter(MenuSeeder::menus(), fn($m) => in_array($m['id'], [1080, 1081, 1082, 1044, 1004], true));
+        $menus = array_filter(MenuSeeder::menus(), fn($m) => in_array($m['id'], [1080, 1081, 1082, 1083, 1084, 1085, 1044, 1004], true));
         foreach ($menus as $menu) {
             $actual = $this->db->table('menus')->where('id', $menu['id'])->get()->getRowArray();
             if ($actual && ($actual['url'] !== $menu['url'] || ($menu['url'] === null && $actual['name'] !== $menu['name']))) throw new \RuntimeException('El menú ' . $menu['id'] . ' pertenece a otra opción.');

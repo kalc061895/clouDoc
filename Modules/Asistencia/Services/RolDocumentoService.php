@@ -99,8 +99,16 @@ class RolDocumentoService
         throw new \InvalidArgumentException('La UPSS o el servicio no corresponde al establecimiento y filtros elegidos.');
     }
 
-    public function generar(array $input, int $usuario): array
+    public function generar(array $input, int $usuario, ?int $envioId = null): array
     {
+        if ($envioId !== null) {
+            $existente = $this->db->table('casis_rol_documento')->where('envio_id', $envioId)->get()->getRowArray();
+            if ($existente) {
+                if ($existente['estado'] !== 'GENERADO') throw new \DomainException('El PDF oficial vinculado está anulado y no se puede reemplazar.');
+                $this->archivo((int) $existente['id']);
+                return ['id' => (int) $existente['id'], 'codigo' => $existente['codigo'], 'estado' => $existente['estado']];
+            }
+        }
         $documento = $this->consultar($input);
         if (! $documento['personal']) {
             throw new \InvalidArgumentException('No hay turnos programados para los filtros seleccionados.');
@@ -109,7 +117,81 @@ class RolDocumentoService
         if (! is_string($huella) || ! hash_equals(RolDocumentoData::huella($documento), $huella)) {
             throw new \DomainException('La programación o los filtros cambiaron. Consulte nuevamente antes de generar.');
         }
-        $f = $documento['filtros'];
+        return $this->guardarDocumento($documento, $documento['filtros'], $usuario, $envioId);
+    }
+
+    public function generarDesdeSnapshot(array $envio, int $usuario): array
+    {
+        $envioId = (int) ($envio['id'] ?? 0);
+        if ($envioId < 1 || ($envio['estado'] ?? '') !== 'APROBADO_DIRECCION') throw new \DomainException('Solo se genera el PDF de un envío aprobado.');
+        if (! hash_equals((string) $envio['hash_sha256'], hash('sha256', (string) $envio['datos_json']))) throw new \DomainException('El snapshot del envío no superó la verificación de integridad.');
+        if (! hash_equals((string) $envio['cabecera_sha256'], hash('sha256', (string) $envio['cabecera_json']))) throw new \DomainException('La cabecera del snapshot no superó la verificación de integridad.');
+        $existente = $this->db->table('casis_rol_documento')->where('envio_id', $envioId)->get()->getRowArray();
+        if ($existente) {
+            if ($existente['estado'] !== 'GENERADO') throw new \DomainException('El PDF oficial vinculado está anulado y no se puede reemplazar.');
+            $this->archivo((int) $existente['id']);
+            return ['id' => (int) $existente['id'], 'codigo' => $existente['codigo'], 'estado' => $existente['estado']];
+        }
+
+        $cabecera = json_decode((string) $envio['cabecera_json'], true, 512, JSON_THROW_ON_ERROR);
+        $miembros = json_decode((string) $envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
+        $anio = (int) $envio['anio'];
+        $mes = (int) $envio['mes'];
+        $diasMes = cal_days_in_month(CAL_GREGORIAN, $mes, $anio);
+        $dias = [];
+        $tz = new \DateTimeZone('America/Lima');
+        for ($dia = 1; $dia <= $diasMes; $dia++) {
+            $weekday = (int) (new \DateTimeImmutable(sprintf('%04d-%02d-%02d', $anio, $mes, $dia), $tz))->format('N');
+            $dias[] = ['dia' => $dia, 'dia_semana' => $weekday, 'es_fin_de_semana' => $weekday >= 6];
+        }
+
+        $matriz = [];
+        foreach ($miembros as $miembro) {
+            $persona = $miembro['personal'] ?? [];
+            $turnos = $miembro['turnos'] ?? [];
+            if (! $turnos) continue;
+            $diasPersona = array_fill(1, $diasMes, []);
+            foreach ($turnos as $turno) {
+                $fechaTurno = $turno['prog_fecha'] ?? '';
+                if (substr($fechaTurno, 0, 7) !== sprintf('%04d-%02d', $anio, $mes)) continue;
+                $numeroDia = (int) substr($fechaTurno, 8, 2);
+                if ($numeroDia < 1 || $numeroDia > $diasMes) continue;
+                $inicio = new \DateTimeImmutable($fechaTurno . ' ' . $turno['th_hora_ingreso'], $tz);
+                $fin = new \DateTimeImmutable($fechaTurno . ' ' . $turno['th_hora_salida'], $tz);
+                if ($fin <= $inicio) $fin = $fin->modify('+1 day');
+                $diasPersona[$numeroDia][] = [
+                    'tur_codigo' => $turno['tur_codigo'] ?? '',
+                    'tur_color' => $turno['tur_color'] ?? '#FFFFFF',
+                    'tur_nombre' => $turno['tur_nombre'] ?? '',
+                    'th_hora_ingreso' => substr((string) $turno['th_hora_ingreso'], 0, 5),
+                    'th_hora_salida' => substr((string) $turno['th_hora_salida'], 0, 5),
+                    'duracion_horas' => round(($fin->getTimestamp() - $inicio->getTimestamp()) / 3600, 2),
+                ];
+            }
+            $matriz[] = [
+                'perl_ide' => (int) ($persona['perl_ide'] ?? 0),
+                'dni' => (string) ($persona['documento_snapshot'] ?? ''),
+                'trabajador' => (string) ($persona['nombre_snapshot'] ?? ''),
+                'cargo' => (string) ($persona['cargo_snapshot'] ?? 'Sin Cargo'),
+                'establecimiento' => (string) ($cabecera['est_nombre'] ?? ''),
+                'dias' => $diasPersona,
+                'total_horas' => 0,
+                'total_turnos' => count($turnos),
+            ];
+        }
+        if (! $matriz) throw new \DomainException('El snapshot aprobado no contiene turnos para imprimir.');
+        $filtros = [
+            'anio' => $anio, 'mes' => $mes, 'est_ide' => (int) $envio['id_establecimiento'],
+            'tofi_ide' => (int) ($cabecera['tofi_ide'] ?? 0), 'ofi_ide' => (int) $envio['id_oficina'],
+            'ups_ide' => null, 'uss_ide' => null, 'incluir_hijos' => false,
+        ];
+        $documento = RolDocumentoData::preparar(['dias' => $dias, 'dias_mes' => $diasMes, 'matriz' => $matriz], $cabecera, $filtros);
+        return $this->guardarDocumento($documento, $filtros, $usuario, $envioId);
+    }
+
+    private function guardarDocumento(array $documento, array $filtros, int $usuario, ?int $envioId): array
+    {
+        $f = $filtros;
         $codigo = sprintf('ROL-%04d%02d-%s', $f['anio'], $f['mes'], strtoupper(bin2hex(random_bytes(8))));
         $fecha = date('Y-m-d H:i:s');
         $documento['codigo'] = $codigo;
@@ -144,6 +226,7 @@ class RolDocumentoService
                 'created_by' => $usuario,
                 'created_at' => $fecha,
             ];
+            if ($envioId !== null) $row['envio_id'] = $envioId;
             if (! $this->db->table('casis_rol_documento')->insert($row)) {
                 throw new \RuntimeException('No se pudo registrar el documento.');
             }
@@ -196,7 +279,9 @@ class RolDocumentoService
         if (mb_strlen($motivo) < 5 || mb_strlen($motivo) > 500) {
             throw new \InvalidArgumentException('El motivo debe tener entre 5 y 500 caracteres.');
         }
-        $ok = $this->db->table('casis_rol_documento')->where('id', $id)->where('estado', 'GENERADO')->update([
+        $query = $this->db->table('casis_rol_documento')->where('id', $id)->where('estado', 'GENERADO');
+        if ($this->db->fieldExists('envio_id', 'casis_rol_documento')) $query->where('envio_id', null);
+        $ok = $query->update([
             'estado' => 'ANULADO',
             'motivo_anulacion' => $motivo,
             'anulado_por' => $usuario,

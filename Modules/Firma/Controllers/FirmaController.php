@@ -17,7 +17,7 @@ class FirmaController extends BaseModuleController
 
     public function index()
     {
-        return view('Modules\Firma\Views\index', ['config' => config(Firma::class)]);
+        return view('Modules\Firma\Views\index', ['config' => config(Firma::class), 'rolId' => max(0, (int) $this->request->getGet('rol_id'))]);
     }
 
     private function ejecutar(callable $action)
@@ -50,10 +50,19 @@ class FirmaController extends BaseModuleController
     {
         return $this->ejecutar(function ($s, $u) use ($id) {
             $db = db_connect();
-            $rol = $db->table('casis_rol_documento')->where('id', $id)->where('created_by', $u)->get()->getRowArray();
-            if (! $rol) throw new \OutOfBoundsException('Solo puede incorporar roles generados por usted.');
+            $rol = $db->table('casis_rol_documento')->where('id', $id)->get()->getRowArray();
+            if (! $rol) throw new \OutOfBoundsException('El documento de rol no existe.');
             if ($rol['estado'] !== 'GENERADO') throw new \DomainException('No se puede firmar un rol anulado.');
-            $existing = $db->table('firma_documentos')->where('origen', 'asistencia.roles')->where('referencia', (string) $id)->where('created_by', $u)->get()->getRowArray();
+            $envioOficial = $db->fieldExists('envio_id', 'casis_rol_documento') && !empty($rol['envio_id']);
+            if ($envioOficial && ! (new \Modules\Asistencia\Services\RolEnvioService())->puedeFirmarDocumento($id, $u)) {
+                throw new \OutOfBoundsException('La firma solo está disponible para el siguiente actor de la secuencia.');
+            }
+            if (!$envioOficial && (int) $rol['created_by'] !== $u) {
+                throw new \OutOfBoundsException('Solo puede incorporar roles generados por usted.');
+            }
+            $existingQuery = $db->table('firma_documentos')->where('origen', 'asistencia.roles')->where('referencia', (string) $id);
+            if (!$envioOficial) $existingQuery->where('created_by', $u);
+            $existing = $existingQuery->get()->getRowArray();
             if ($existing) return ['id' => (int) $existing['id']];
             $archivo = (new \Modules\Asistencia\Services\RolDocumentoService())->archivo($id);
             return ['id' => $s->registrar($archivo['ruta'], $archivo['nombre'], $u, 'asistencia.roles', (string) $id)];

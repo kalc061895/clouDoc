@@ -15,8 +15,8 @@
         </div>
         <div class="col-lg-6">
             <form id="firma-rol" class="card card-body">
-                <label for="firma-rol-id">ID de un rol generado por usted</label>
-                <input class="form-control my-2" id="firma-rol-id" name="rol" type="number" min="1" required>
+                <label for="firma-rol-id">ID del rol que le corresponde firmar</label>
+                <input class="form-control my-2" id="firma-rol-id" name="rol" type="number" min="1" value="<?= (int) ($rolId ?? 0) ?: '' ?>" required>
                 <button class="btn btn-outline-primary" type="submit">Incorporar rol de Asistencia</button>
                 <a class="mt-2" href="<?= base_url('asistencia/roles/historial') ?>">Consultar historial de roles</a>
             </form>

@@ -57,6 +57,16 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // MÓDULO: PROGRAMACIÓN DE TURNOS
     // ==========================================
     $routes->get('gestion-roles', 'GestionRolController::index');
+    $routes->get('gestion-roles/delegaciones', 'DelegacionRolController::index');
+    $routes->get('gestion-roles/turnos', 'GestionRolController::turnos');
+    $routes->post('gestion-roles/delegaciones/guardar', 'DelegacionRolController::guardar', ['filter' => 'csrf']);
+    $routes->post('gestion-roles/delegaciones/(:num)/eliminar', 'DelegacionRolController::eliminar/$1', ['filter' => 'csrf']);
+    $routes->get('gestion-roles/envios', 'RolEnvioController::index');
+    $routes->get('gestion-roles/envios/(:num)', 'RolEnvioController::detalle/$1');
+    $routes->post('gestion-roles/envios/(:num)/rrhh', 'RolEnvioController::rrhh/$1', ['filter' => 'csrf']);
+    $routes->post('gestion-roles/envios/(:num)/direccion', 'RolEnvioController::direccion/$1', ['filter' => 'csrf']);
+    $routes->post('gestion-roles/envios/(:num)/pdf', 'RolEnvioController::pdf/$1', ['filter' => 'csrf']);
+    $routes->post('gestion-roles/(:num)/enviar', 'RolEnvioController::enviar/$1', ['filter' => 'csrf']);
     $routes->get('gestion-roles/periodos', 'ConfiguracionRolController::index/periodos');
     $routes->get('gestion-roles/plantillas', 'ConfiguracionRolController::index/plantillas');
     $routes->post('gestion-roles/periodos/(:segment)', 'ConfiguracionRolController::guardar/periodos/$1', ['filter' => 'csrf']);

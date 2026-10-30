@@ -9,9 +9,10 @@
     let csrf = config.csrf;
     let busy = false;
     const params = () => new URLSearchParams(new FormData(form));
-    const notify = (text, error = false) => {
-        message.className = 'alert ' + (error ? 'alert-danger' : 'alert-info');
+    const notify = (text, type = 'info') => {
+        message.className = 'visually-hidden';
         message.textContent = text;
+        if (text && window.toastr?.[type]) window.toastr[type](text);
     };
     async function request(path, data = null) {
         const options = {headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}, credentials: 'same-origin'};
@@ -36,6 +37,7 @@
         const gen = document.getElementById('rol-generar');
         const pdf = document.getElementById('rol-pdf');
         const preview = document.getElementById('roles-preview');
+        const previewCard = document.getElementById('roles-preview-card');
         const summary = document.getElementById('roles-resumen');
         let reviewed = null;
         const field = name => form.elements.namedItem(name);
@@ -68,6 +70,8 @@
             gen.disabled = true;
             pdf.hidden = true;
             preview.replaceChildren();
+            previewCard.hidden = true;
+            summary.hidden = false;
             summary.textContent = 'Filtros modificados. Consulte nuevamente.';
         });
         form.addEventListener('submit', async event => {
@@ -82,13 +86,16 @@
                 const {data} = await request('/consultar?' + filters);
                 // HTML escapado y construido por la vista del servidor, nunca por datos del navegador.
                 preview.innerHTML = data.html;
+                previewCard.hidden = false;
+                summary.hidden = false;
                 summary.textContent = data.cabecera.est_nombre + ' · ' + data.cabecera.ambito + ' · ' + data.personal + ' trabajadores · ' + data.horas + ' horas';
                 if (data.personal > 0) reviewed = {filters: filters.toString(), huella: data.huella};
                 notify(data.personal > 0 ? 'Revise los turnos y pulse Generar y guardar PDF.' : 'No hay turnos programados para estos filtros.');
             } catch (e) {
                 preview.replaceChildren();
+                previewCard.hidden = true;
                 summary.textContent = '';
-                notify(e.message, true);
+                notify(e.message, 'error');
             } finally {
                 lock(false);
                 gen.disabled = !reviewed;
@@ -96,7 +103,9 @@
         });
         gen.addEventListener('click', async () => {
             if (busy || !reviewed) return;
-            if (params().toString() !== reviewed.filters) { gen.disabled = true; notify('Consulte nuevamente los filtros seleccionados.', true); return; }
+            if (params().toString() !== reviewed.filters) { gen.disabled = true; notify('Consulte nuevamente los filtros seleccionados.', 'warning'); return; }
+            const confirmacion = await Swal.fire({title:'¿Generar el rol?',text:'Se guardará un PDF con la programación consultada.',icon:'question',showCancelButton:true,confirmButtonText:'Generar PDF',cancelButtonText:'Cancelar'});
+            if (!confirmacion.isConfirmed) return;
             const data = new URLSearchParams(reviewed.filters);
             data.set('huella', reviewed.huella);
             lock(true);
@@ -106,10 +115,10 @@
                 pdf.href = result.data.url;
                 pdf.hidden = false;
                 reviewed = null;
-                notify(result.message + ' Documento: ' + result.data.codigo);
+                notify(result.message + ' Documento: ' + result.data.codigo, 'success');
             } catch (e) {
                 reviewed = null;
-                notify(e.message, true);
+                notify(e.message, 'error');
             } finally {
                 lock(false);
                 gen.disabled = !reviewed;
@@ -144,27 +153,28 @@
                     const link = document.createElement('a');
                     link.className = 'btn btn-sm btn-outline-primary me-2';
                     link.href = base + '/' + Number(rol.id) + '/pdf';
-                    link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Ver PDF';
+                    link.target = '_blank'; link.rel = 'noopener'; link.innerHTML = '<iconify-icon icon="lucide:file-text" class="me-1"></iconify-icon>Ver PDF';
                     actions.append(link);
                     if (rol.estado === 'GENERADO') {
                         const firmar = document.createElement('a');
                         firmar.className = 'btn btn-sm btn-outline-success me-2';
                         firmar.href = base.replace(/\/asistencia\/roles\/?$/, '/firma') + '?rol=' + Number(rol.id);
-                        firmar.textContent = 'Firmar';
+                        firmar.innerHTML = '<iconify-icon icon="lucide:pen-line" class="me-1"></iconify-icon>Firmar';
                         actions.append(firmar);
                         const button = document.createElement('button');
-                        button.type = 'button'; button.className = 'btn btn-sm btn-outline-danger'; button.textContent = 'Anular';
+                        button.type = 'button'; button.className = 'btn btn-sm btn-outline-danger'; button.innerHTML = '<iconify-icon icon="lucide:ban" class="me-1"></iconify-icon>Anular';
                         button.addEventListener('click', async () => {
                             if (busy) return;
-                            const reason = window.prompt('Motivo para anular ' + rol.codigo + ' (5 a 500 caracteres). El PDF original se conservará.');
-                            if (reason === null) return;
-                            if (reason.trim().length < 5 || reason.trim().length > 500) { notify('El motivo debe tener entre 5 y 500 caracteres.', true); return; }
+                            const result = await Swal.fire({title:'¿Anular documento?',text:rol.codigo + '. El PDF original se conservará.',icon:'warning',input:'textarea',inputLabel:'Motivo (5 a 500 caracteres)',inputAttributes:{maxlength:500},showCancelButton:true,confirmButtonText:'Anular documento',cancelButtonText:'Cancelar',confirmButtonColor:'#d33',inputValidator:value=>!value || value.trim().length < 5 ? 'Ingrese un motivo de al menos 5 caracteres.' : value.trim().length > 500 ? 'El motivo no puede superar 500 caracteres.' : undefined});
+                            if (!result.isConfirmed) return;
+                            const reason = result.value;
                             lock(true); button.disabled = true;
                             try {
                                 await request('/' + Number(rol.id) + '/anular', new URLSearchParams({motivo: reason}));
+                                notify('El documento fue anulado y su archivo original se conservó.', 'success');
                                 lock(false);
                                 await load();
-                            } catch (e) { notify(e.message, true); } finally { lock(false); button.disabled = false; }
+                            } catch (e) { notify(e.message, 'error'); } finally { lock(false); button.disabled = false; }
                         });
                         actions.append(button);
                     }
@@ -173,8 +183,8 @@
                 document.getElementById('roles-pagina').textContent = 'Página ' + data.pagina + ' de ' + data.paginas + ' · ' + data.total + ' documentos';
                 prev.disabled = page <= 1;
                 next.disabled = page >= data.paginas;
-                message.className = ''; message.textContent = '';
-            } catch (e) { notify(e.message, true); } finally { lock(false); }
+                message.className = 'visually-hidden'; message.textContent = '';
+            } catch (e) { notify(e.message, 'error'); } finally { lock(false); }
         }
         form.addEventListener('submit', event => { event.preventDefault(); if (!busy) { page = 1; load(); } });
         prev.addEventListener('click', () => { if (!busy && page > 1) { page--; load(); } });
