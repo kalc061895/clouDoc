@@ -15,6 +15,12 @@ class ConfiguracionRolController extends BaseModuleController
         $db = db_connect();
         $periodos = $db->table('casis_plan_periodo p')->select('p.*, e.est_nombre')->join('casis_establecimiento e', 'e.est_ide = p.est_id')->orderBy('mes', 'DESC')->get()->getResultArray();
         foreach ($periodos as &$p) $p['etapa'] = $g::etapa($p, $g->ahora());
+        foreach ($periodos as &$p) {
+            $inicio = $p['mes'] . '-01';
+            $fin = (new \DateTimeImmutable($inicio))->modify('last day of this month')->format('Y-m-d');
+            $p['tiene_datos'] = $db->table('casis_plan_rol')->where('periodo_id', (int)$p['id'])->countAllResults() > 0
+                || $db->table('casis_programacion pr')->join('casis_personal pe', 'pe.perl_ide=pr.prog_perl_ide')->where('pe.perl_est_ide', (int)$p['est_id'])->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->where('pr.deleted_at', null)->countAllResults() > 0;
+        }
         unset($p);
         $plantillas = $db->table('casis_plan_plantilla')->where('deleted_at', null)->orderBy('nombre')->get()->getResultArray();
         $editar = null;

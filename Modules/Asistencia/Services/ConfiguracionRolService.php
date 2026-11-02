@@ -92,7 +92,9 @@ class ConfiguracionRolService extends GestionRolService
         $data = self::datosPeriodo($datos);
         if (!$this->db->table('casis_establecimiento')->where('est_ide', $data['est_id'])->where('deleted_at', null)->countAllResults()) throw new \DomainException('Establecimiento no encontrado.');
         $this->transaccion(function () use ($id, $data) {
-            $anterior = $id ? $this->periodoModificable($id) : null;
+            $anterior = $id ? $this->periodoExistente($id) : null;
+            if ($anterior && ((int)$anterior['est_id'] !== (int)$data['est_id'] || $anterior['mes'] !== $data['mes'])
+                && $this->periodoTieneDatos($anterior)) throw new \DomainException('No puede cambiar el establecimiento o mes de un período que ya tiene roles o turnos asociados.');
             $q = $this->db->table('casis_plan_periodo')->where('est_id', $data['est_id'])->where('mes', $data['mes']);
             if ($id) $q->where('id !=', $id);
             if ($q->countAllResults()) throw new \DomainException('Ya existe un período para ese establecimiento y mes.');
@@ -120,24 +122,29 @@ class ConfiguracionRolService extends GestionRolService
         return $data;
     }
 
-    private function periodoModificable(int $id): array
+    private function periodoExistente(int $id): array
     {
         $sql = 'SELECT * FROM casis_plan_periodo WHERE id = ?' . ($this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE');
         $p = $this->db->query($sql, [$id])->getRowArray();
         if (!$p) throw new \DomainException('Período no encontrado.');
-        if (self::etapa($p, $this->ahora()) !== 'PROGRAMADO') throw new \DomainException('Solo se puede editar o eliminar un período antes de su apertura.');
-        if ($this->db->table('casis_plan_rol')->where('periodo_id', $id)->countAllResults()) throw new \DomainException('El período ya tiene roles asociados.');
+        return $p;
+    }
+
+    private function periodoTieneDatos(array $p): bool
+    {
+        if ($this->db->table('casis_plan_rol')->where('periodo_id', (int)$p['id'])->countAllResults()) return true;
         $inicio = $p['mes'] . '-01';
         $fin = (new \DateTimeImmutable($inicio))->modify('last day of this month')->format('Y-m-d');
-        if ($this->db->table('casis_programacion pr')->join('casis_personal pe', 'pe.perl_ide = pr.prog_perl_ide')->where('pe.perl_est_ide', $p['est_id'])->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->where('pr.deleted_at', null)->countAllResults()) throw new \DomainException('El período ya tiene turnos programados.');
-        return $p;
+        return (bool)$this->db->table('casis_programacion pr')->join('casis_personal pe', 'pe.perl_ide = pr.prog_perl_ide')->where('pe.perl_est_ide', $p['est_id'])->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->where('pr.deleted_at', null)->countAllResults();
     }
 
     public function eliminarPeriodo(int $id): void
     {
         $this->exigirAdministrador();
         $this->transaccion(function () use ($id) {
-            $anterior = $this->periodoModificable($id);
+            $anterior = $this->periodoExistente($id);
+            if (self::etapa($anterior, $this->ahora()) !== 'PROGRAMADO') throw new \DomainException('No se puede eliminar un período que ya abrió.');
+            if ($this->periodoTieneDatos($anterior)) throw new \DomainException('El período ya tiene roles o turnos asociados y no se puede eliminar.');
             $this->db->table('casis_plan_periodo')->where('id', $id)->delete();
             $this->evento('ELIMINAR_PERIODO', $anterior);
         });

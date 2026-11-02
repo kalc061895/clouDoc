@@ -11,6 +11,13 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->get('/', 'DashboardController::index');
     $routes->get('mi-perfil', 'PerfilController::index');
 
+    $routes->get('accesos', 'AccesosController::index');
+    $routes->get('accesos/datos', 'AccesosController::datos');
+    $routes->post('accesos/perfil/guardar', 'AccesosController::guardarPerfil', ['filter'=>'csrf']);
+    $routes->post('accesos/menu', 'AccesosController::menu', ['filter'=>'csrf']);
+    $routes->post('accesos/usuario', 'AccesosController::usuario', ['filter'=>'csrf']);
+    $routes->post('accesos/guardar-cambios', 'AccesosController::guardarCambios', ['filter'=>'csrf']);
+
     $routes->get('dispositivos', 'DispositivoController::index');
     $routes->post('dispositivos/guardar', 'DispositivoController::guardar', ['filter'=>'csrf']);
     $routes->get('dispositivos/archivos', 'DispositivoController::archivos');
@@ -92,7 +99,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     // RUTA PRINCIPAL / DASHBOARD
     // ==========================================
-    
+
     $routes->get('dashboard', 'DashboardController::index');
 
     // ==========================================
@@ -193,7 +200,6 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('diresas', 'DatabaseController::apiCrearDiresa');
             $routes->put('diresas/(:num)', 'DatabaseController::apiActualizarDiresa/$1');
             $routes->delete('diresas/(:num)', 'DatabaseController::apiEliminarDiresa/$1');
-
 
             $routes->get('redes', 'DatabaseController::apiListarRedes');
             $routes->post('redes', 'DatabaseController::apiCrearRed');
@@ -442,8 +448,6 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->get('oficinas', 'PersonalController::apiSelectOficinas');
         });
 
-
-
     });
 
     $routes->group('licencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
@@ -465,9 +469,6 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             $routes->post('eliminar/(:num)', 'PermisoController::eliminar/$1');
         });
     });
-
-
-
 
     // Otros controladores específicos
     $routes->get('tuasalud/reporte_rol_tuasalud', 'TuasaludController::reporte');

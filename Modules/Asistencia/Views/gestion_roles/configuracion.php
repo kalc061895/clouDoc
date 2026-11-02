@@ -37,8 +37,8 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
                     </details><?php else: ?><span class="badge text-bg-warning">Sin reglas configuradas</span><?php endif ?></td>
                     <td class="text-nowrap">
                         <button type="button" class="btn btn-sm btn-outline-secondary copiar-reglas" data-fuente="<?= ($esPeriodo ? 'periodo-' : 'plantilla-') . (int)$fila['id'] ?>"><iconify-icon icon="lucide:copy" class="me-1"></iconify-icon>Copiar reglas</button>
-                        <?php if (!$esPeriodo || $fila['etapa'] === 'PROGRAMADO'): ?>
-                            <a class="btn btn-sm btn-outline-primary" href="<?= $base ?>?editar=<?= (int)$fila['id'] ?>"><iconify-icon icon="lucide:pencil"></iconify-icon></a>
+                            <a class="btn btn-sm btn-outline-primary" href="<?= $base ?>?editar=<?= (int)$fila['id'] ?>" title="Editar"><iconify-icon icon="lucide:pencil"></iconify-icon></a>
+                        <?php if (!$esPeriodo || ($fila['etapa'] === 'PROGRAMADO' && empty($fila['tiene_datos']))): ?>
                             <form method="post" action="<?= $base ?>/eliminar" class="d-inline eliminar-configuracion" data-nombre="<?= esc($esPeriodo ? $fila['mes'] . ' · ' . $fila['est_nombre'] : $fila['nombre'], 'attr') ?>">
                                 <?= csrf_field() ?><input type="hidden" name="id" value="<?= (int)$fila['id'] ?>"><button class="btn btn-sm btn-outline-danger" aria-label="Eliminar"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
                             </form>
@@ -49,8 +49,8 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
             </tbody>
         </table>
     </div>
-    <?php if ($esPeriodo): ?><p class="small text-muted">Solo se editan o eliminan períodos antes de su apertura, sin roles ni turnos asociados. Los grupos de corte de asistencia mantienen su calendario independiente.</p><?php endif ?>
-    <div class="modal fade" id="modalConfiguracion" tabindex="-1" aria-labelledby="tituloModalConfiguracion" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+    <?php if ($esPeriodo): ?><p class="small text-muted">Los plazos y reglas pueden editarse en cualquier etapa, y los cambios afectan validaciones posteriores. Solo se elimina un periodo programado sin roles ni turnos asociados. El calendario de asistencia es independiente.</p><?php endif ?>
+    <div class="modal fade" id="modalConfiguracion" tabindex="-1" aria-labelledby="tituloModalConfiguracion" aria-hidden="true"><div class="modal-dialog modal-xl "><div class="modal-content">
     <form method="post" action="<?= $base ?>/guardar" id="formulario">
         <?= csrf_field() ?><input type="hidden" name="id" value="<?= (int)old('id', $editar['id'] ?? 0) ?>">
         <div class="modal-header"><h2 class="modal-title fs-5" id="tituloModalConfiguracion"><?= $editar ? 'Editar' : 'Crear' ?> <?= $esPeriodo ? 'período' : 'plantilla' ?></h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body">

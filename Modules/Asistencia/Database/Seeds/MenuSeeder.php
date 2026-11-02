@@ -39,6 +39,7 @@ class MenuSeeder extends Seeder
             [1083, 1080, 'Envíos y aprobaciones', 'asistencia/gestion-roles/envios', 'document-text-line-duotone'],
             [1084, 1080, 'Delegaciones temporales', 'asistencia/gestion-roles/delegaciones', 'users-group-rounded-line-duotone'],
             [1085, 1080, 'Modalidad de turnos', 'asistencia/gestion-roles/turnos', 'clock-circle-line-duotone'],
+            [1086, 1000, 'Perfiles y accesos', 'asistencia/accesos', 'users-group-rounded-line-duotone'],
             [1050, null, 'REPORTES', null, 'chart-square-line-duotone'],
             [1051, 1050, 'Reporte mensual', 'asistencia/reportes/mensual', 'document-text-line-duotone'],
             [1052, 1050, 'Auditoría', null, 'history-line-duotone'],
