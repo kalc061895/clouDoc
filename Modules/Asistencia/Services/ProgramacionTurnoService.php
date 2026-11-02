@@ -1150,12 +1150,11 @@ class ProgramacionTurnoService
 
             try {
                 $personal = $this->gestionRoles->personal($perlIde);
-                $periodo = $this->db->table('casis_plan_periodo')
-                    ->where('est_id', (int) $personal['perl_est_ide'])
-                    ->where('mes', sprintf('%04d-%02d', $anio, $mes))
-                    ->get()->getRowArray();
+                $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo(
+                    (int) $personal['perl_est_ide'], sprintf('%04d-%02d', $anio, $mes)
+                );
                 if (!$periodo) {
-                    throw new \DomainException('No existe un periodo de programación para este establecimiento y mes.');
+                    throw new \DomainException('No existe un periodo de programación aplicable al establecimiento ni a sus niveles superiores.');
                 }
                 if (GestionRolService::etapa($periodo, $this->gestionRoles->ahora()) !== 'PROGRAMACION') {
                     throw new \DomainException('El periodo no está abierto para modificaciones.');

@@ -38,14 +38,14 @@ class ConfiguracionRolService extends GestionRolService
         return $resultado;
     }
 
-    private function reglas(string $json, ?int $establecimiento = null): string
+    private function reglas(string $json, ?array $establecimientos = null): string
     {
         $reglas = self::normalizarReglas($json);
         foreach ($reglas as $r) {
             if (isset($r['oficina_id'])) {
                 $q = $this->db->table('casis_oficina')->where('ofi_ide', $r['oficina_id'])->where('deleted_at', null);
-                if ($establecimiento !== null) $q->where('ofi_est_ide', $establecimiento);
-                if (!$q->countAllResults()) throw new \DomainException('La oficina de una regla no pertenece al establecimiento o ya no existe.');
+                if ($establecimientos !== null) $q->whereIn('ofi_est_ide', $establecimientos ?: [0]);
+                if (!$q->countAllResults()) throw new \DomainException('La oficina de una regla no pertenece al alcance del grupo o ya no existe.');
             }
             if (isset($r['regimen_id']) && !$this->db->table('casis_modalidad_contrato')->where('mco_ide', $r['regimen_id'])->where('deleted_at', null)->countAllResults()) throw new \DomainException('Régimen contractual no encontrado.');
             foreach ($r['turnos'] ?? [] as $codigo) {
@@ -88,16 +88,19 @@ class ConfiguracionRolService extends GestionRolService
     public function guardarPeriodo(array $datos, int $id = 0): void
     {
         $this->exigirAdministrador();
-        $datos['reglas'] = $this->reglas($datos['reglas'] ?? '[]', (int)($datos['est_id'] ?? 0));
+        $grupoId = (int)($datos['grupo_id'] ?? 0);
+        $grupo = $this->db->table('casis_plan_grupo')->where('id',$grupoId)->where('estado','ACTIVO')->get()->getRowArray();
+        if (!$grupo) throw new \DomainException('Seleccione un grupo de programación activo.');
+        $gestorGrupos = new GrupoProgramacionRolService($this->db);
+        $datos['reglas'] = $this->reglas($datos['reglas'] ?? '[]', $gestorGrupos->establecimientosDeGrupo($grupo));
         $data = self::datosPeriodo($datos);
-        if (!$this->db->table('casis_establecimiento')->where('est_ide', $data['est_id'])->where('deleted_at', null)->countAllResults()) throw new \DomainException('Establecimiento no encontrado.');
-        $this->transaccion(function () use ($id, $data) {
+        $this->transaccion(function () use ($id, $data, $gestorGrupos) {
             $anterior = $id ? $this->periodoExistente($id) : null;
-            if ($anterior && ((int)$anterior['est_id'] !== (int)$data['est_id'] || $anterior['mes'] !== $data['mes'])
+            if ($anterior && ((int)($anterior['grupo_id'] ?? 0) !== (int)$data['grupo_id'] || $anterior['mes'] !== $data['mes'])
                 && $this->periodoTieneDatos($anterior)) throw new \DomainException('No puede cambiar el establecimiento o mes de un período que ya tiene roles o turnos asociados.');
-            $q = $this->db->table('casis_plan_periodo')->where('est_id', $data['est_id'])->where('mes', $data['mes']);
+            $q = $this->db->table('casis_plan_periodo')->where('grupo_id', $data['grupo_id'])->where('mes', $data['mes']);
             if ($id) $q->where('id !=', $id);
-            if ($q->countAllResults()) throw new \DomainException('Ya existe un período para ese establecimiento y mes.');
+            if ($q->countAllResults()) throw new \DomainException('Ya existe un período para ese grupo y mes.');
             if ($id) $this->db->table('casis_plan_periodo')->where('id', $id)->update($data);
             else {
                 $this->db->table('casis_plan_periodo')->insert($data + ['created_at' => $this->ahora(), 'created_by' => $this->usuario()]);
@@ -110,7 +113,8 @@ class ConfiguracionRolService extends GestionRolService
     public static function datosPeriodo(array $d): array
     {
         if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $d['mes'] ?? '')) throw new \DomainException('Mes inválido.');
-        $data = ['est_id' => (int)($d['est_id'] ?? 0), 'mes' => $d['mes'], 'reglas' => $d['reglas'] ?? '[]'];
+        $data = ['grupo_id' => (int)($d['grupo_id'] ?? 0), 'est_id' => null, 'mes' => $d['mes'], 'reglas' => $d['reglas'] ?? '[]'];
+        if ($data['grupo_id'] < 1) throw new \DomainException('Seleccione el grupo de programación.');
         foreach (['apertura', 'aprobacion', 'cierre'] as $campo) {
             $valor = str_replace('T', ' ', $d[$campo] ?? '');
             if (strlen($valor) === 16) $valor .= ':00';
@@ -135,7 +139,8 @@ class ConfiguracionRolService extends GestionRolService
         if ($this->db->table('casis_plan_rol')->where('periodo_id', (int)$p['id'])->countAllResults()) return true;
         $inicio = $p['mes'] . '-01';
         $fin = (new \DateTimeImmutable($inicio))->modify('last day of this month')->format('Y-m-d');
-        return (bool)$this->db->table('casis_programacion pr')->join('casis_personal pe', 'pe.perl_ide = pr.prog_perl_ide')->where('pe.perl_est_ide', $p['est_id'])->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->where('pr.deleted_at', null)->countAllResults();
+        $establecimientos = (new GrupoProgramacionRolService($this->db))->establecimientosDePeriodo($p);
+        return $establecimientos && (bool)$this->db->table('casis_programacion pr')->join('casis_personal pe', 'pe.perl_ide = pr.prog_perl_ide')->whereIn('pe.perl_est_ide', $establecimientos)->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->where('pr.deleted_at', null)->countAllResults();
     }
 
     public function eliminarPeriodo(int $id): void

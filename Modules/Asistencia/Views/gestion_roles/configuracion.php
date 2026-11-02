@@ -8,7 +8,7 @@ $base = site_url('asistencia/gestion-roles/' . $tipo);
 $valor = static fn($campo, $default = '') => old($campo, $editar[$campo] ?? $default, false);
 $fuentes = [];
 foreach ($plantillas as $p) $fuentes['plantilla-' . $p['id']] = ['nombre' => 'Plantilla: ' . $p['nombre'], 'reglas' => json_decode($p['reglas'], true)];
-foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes'] . ' — ' . $p['est_nombre'], 'reglas' => json_decode($p['reglas'], true)];
+foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes'] . ' — ' . $p['grupo_nombre'], 'reglas' => json_decode($p['reglas'], true)];
 ?>
 <div class="container-fluid py-3">
     <div class="card border-0 shadow-sm"><div class="card-body">
@@ -21,14 +21,14 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
     <div class="table-responsive">
         <table id="tablaConfiguracionRol" class="table table-striped table-hover align-middle mb-0">
             <thead class="table-light"><tr>
-                <?php if ($esPeriodo): ?><th>Mes / establecimiento</th><th>Apertura</th><th>Aprobación</th><th>Cierre</th><th>Etapa</th>
+                <?php if ($esPeriodo): ?><th>Mes / grupo de programación</th><th>Apertura</th><th>Aprobación</th><th>Cierre</th><th>Etapa</th>
                 <?php else: ?><th>Plantilla</th><th>Descripción</th><?php endif ?>
                 <th>Reglas</th><th>Acciones</th>
             </tr></thead><tbody>
             <?php $filas = $esPeriodo ? $periodos : $plantillas; foreach ($filas as $fila): ?>
                 <tr>
                     <?php if ($esPeriodo): ?>
-                        <td><strong><?= esc($fila['mes']) ?></strong><br><?= esc($fila['est_nombre']) ?></td>
+                        <td><strong><?= esc($fila['mes']) ?></strong><br><?= esc($fila['grupo_nombre'] ?? 'Sin grupo') ?> <span class="text-muted">(<?= esc($fila['nivel'] ?? '') ?>: <?= esc($fila['alcance_nombre'] ?? '') ?>)</span></td>
                         <td><?= esc($fila['apertura']) ?></td><td><?= esc($fila['aprobacion']) ?></td><td><?= esc($fila['cierre']) ?></td><td><?= esc($fila['etapa']) ?></td>
                     <?php else: ?><td><?= esc($fila['nombre']) ?></td><td><?= esc($fila['descripcion']) ?></td><?php endif ?>
                     <?php $reglasFila = json_decode($fila['reglas'], true) ?: []; ?>
@@ -39,7 +39,7 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
                         <button type="button" class="btn btn-sm btn-outline-secondary copiar-reglas" data-fuente="<?= ($esPeriodo ? 'periodo-' : 'plantilla-') . (int)$fila['id'] ?>"><iconify-icon icon="lucide:copy" class="me-1"></iconify-icon>Copiar reglas</button>
                             <a class="btn btn-sm btn-outline-primary" href="<?= $base ?>?editar=<?= (int)$fila['id'] ?>" title="Editar"><iconify-icon icon="lucide:pencil"></iconify-icon></a>
                         <?php if (!$esPeriodo || ($fila['etapa'] === 'PROGRAMADO' && empty($fila['tiene_datos']))): ?>
-                            <form method="post" action="<?= $base ?>/eliminar" class="d-inline eliminar-configuracion" data-nombre="<?= esc($esPeriodo ? $fila['mes'] . ' · ' . $fila['est_nombre'] : $fila['nombre'], 'attr') ?>">
+                            <form method="post" action="<?= $base ?>/eliminar" class="d-inline eliminar-configuracion" data-nombre="<?= esc($esPeriodo ? $fila['mes'] . ' · ' . ($fila['grupo_nombre'] ?? 'Sin grupo') : $fila['nombre'], 'attr') ?>">
                                 <?= csrf_field() ?><input type="hidden" name="id" value="<?= (int)$fila['id'] ?>"><button class="btn btn-sm btn-outline-danger" aria-label="Eliminar"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
                             </form>
                         <?php endif ?>
@@ -56,7 +56,7 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
         <div class="modal-header"><h2 class="modal-title fs-5" id="tituloModalConfiguracion"><?= $editar ? 'Editar' : 'Crear' ?> <?= $esPeriodo ? 'período' : 'plantilla' ?></h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button></div><div class="modal-body">
         <div class="row g-3 mb-3">
             <?php if ($esPeriodo): ?>
-                <label class="col-md-6">Establecimiento<select name="est_id" class="form-select" required><option value="">Seleccione...</option><?php foreach ($establecimientos as $e): ?><option value="<?= (int)$e['est_ide'] ?>" <?= (string)$valor('est_id') === (string)$e['est_ide'] ? 'selected' : '' ?>><?= esc($e['est_nombre']) ?></option><?php endforeach ?></select></label>
+                <label class="col-md-6">Grupo de programación<select name="grupo_id" class="form-select" required><option value="">Seleccione...</option><?php foreach ($grupos as $grupo): if ($grupo['estado'] !== 'ACTIVO') continue; $entidadNombre = $grupo['est_nombre'] ?: ($grupo['mic_nombre'] ?: ($grupo['red_nombre'] ?: $grupo['dir_nombre'])); ?><option value="<?= (int)$grupo['id'] ?>" <?= (string)$valor('grupo_id', $editar['grupo_id'] ?? '') === (string)$grupo['id'] ? 'selected' : '' ?>><?= esc($grupo['nombre'] . ' — ' . $grupo['nivel'] . ': ' . $entidadNombre) ?></option><?php endforeach ?></select><small><a href="<?= site_url('asistencia/gestion-roles/grupos') ?>">Crear o administrar grupos de programación</a></small></label>
                 <label class="col-md-6">Mes trabajado<input type="month" name="mes" value="<?= esc($valor('mes'), 'attr') ?>" required class="form-control"></label>
                 <?php foreach (['apertura' => 'Apertura de programación', 'aprobacion' => 'Inicio de aprobación', 'cierre' => 'Cierre'] as $campo => $label): ?>
                     <label class="col-md-4"><?= $label ?><input type="datetime-local" name="<?= $campo ?>" value="<?= esc(str_replace(' ', 'T', $valor($campo)), 'attr') ?>" required class="form-control"></label>
@@ -173,7 +173,7 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
     }));
     if ($.fn.DataTable) $('#tablaConfiguracionRol').DataTable({language:{emptyTable:'No hay registros',info:'Mostrando _START_ a _END_ de _TOTAL_ registros',infoEmpty:'Mostrando 0 registros',lengthMenu:'Mostrar _MENU_ registros',search:'Buscar:',zeroRecords:'No se encontraron resultados',paginate:{first:'Primero',last:'Último',next:'Siguiente',previous:'Anterior'}},pageLength:25,order:[],columnDefs:[{targets:-1,orderable:false,searchable:false}]});
     actualizarVacio();
-    <?php if ($editar || old('est_id') !== null || old('nombre') !== null): ?>modal.show();<?php endif ?>
+    <?php if ($editar || old('grupo_id') !== null || old('nombre') !== null): ?>modal.show();<?php endif ?>
 })();
 </script>
 <?= $this->endSection() ?>

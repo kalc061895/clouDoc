@@ -30,11 +30,15 @@ class RolEnvioService
                 throw new \DomainException('El período no está habilitado para enviar este rol.');
             }
 
+            $establecimientos = (new GrupoProgramacionRolService($this->db))->establecimientosDePeriodo($periodo);
+            $oficina = $this->db->table('casis_oficina')->select('ofi_est_ide')->where('ofi_ide',(int)$rol['oficina_id'])->where('deleted_at',null)->get()->getRowArray();
+            $establecimientoId = (int)($oficina['ofi_est_ide'] ?? 0);
+            if (!$establecimientoId || !in_array($establecimientoId,$establecimientos,true)) throw new \DomainException('La oficina no pertenece al alcance del periodo.');
             $personal = $this->db->table('casis_personal')
-                ->where('perl_est_ide', (int) $periodo['est_id'])
+                ->whereIn('perl_est_ide', $establecimientos ?: [0])
                 ->where('perl_ofi_ide', (int) $rol['oficina_id'])
                 ->where('deleted_at', null)->orderBy('perl_ide')->get()->getResultArray();
-            $cabecera = $this->cabeceraSnapshot((int) $periodo['est_id'], (int) $rol['oficina_id']);
+            $cabecera = $this->cabeceraSnapshot($establecimientoId, (int) $rol['oficina_id']);
             $snapshot = [];
             foreach ($personal as $trabajador) {
                 $id = (int) $trabajador['perl_ide'];
@@ -70,7 +74,7 @@ class RolEnvioService
                 'anio' => (int) substr($periodo['mes'], 0, 4),
                 'mes' => (int) substr($periodo['mes'], 5, 2),
                 'id_oficina' => (int) $rol['oficina_id'],
-                'id_establecimiento' => (int) $periodo['est_id'],
+                'id_establecimiento' => $establecimientoId,
                 'datos_json' => $json,
                 'cabecera_json' => $cabeceraJson,
                 'cabecera_sha256' => hash('sha256', $cabeceraJson),

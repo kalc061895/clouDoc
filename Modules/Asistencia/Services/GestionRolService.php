@@ -81,8 +81,8 @@ class GestionRolService
     public function editable(int $id, string $fecha): array
     {
         $p = $this->personal($id);
-        $periodo = $this->db->query('SELECT * FROM casis_plan_periodo WHERE est_id = ? AND mes = ? FOR UPDATE', [$p['perl_est_ide'], substr($fecha, 0, 7)])->getRowArray();
-        if (!$periodo) throw new \DomainException('No existe un periodo de programación para este establecimiento y mes.');
+        $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo((int)$p['perl_est_ide'], substr($fecha, 0, 7), true);
+        if (!$periodo) throw new \DomainException('No existe un periodo de programación aplicable al establecimiento ni a sus niveles superiores.');
         $etapaPeriodo = self::etapa($periodo, $this->ahora());
         $rol = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->where('oficina_id', $p['perl_ofi_ide'])->get()->getRowArray();
         $correccionObservada = $rol && $rol['estado'] === 'OBSERVADO' && $etapaPeriodo !== 'CERRADO';
@@ -230,7 +230,8 @@ class GestionRolService
             if ($accion === 'APROBAR' && $etapa === 'APROBACION' && $rol['estado'] === 'PRESENTADO') $destino = 'APROBADO';
             if (!$destino) throw new \DomainException('Transición no permitida para el estado o plazo actual. Las observaciones requieren un motivo y plazo de programación vigente.');
             $snapshot = [];
-            $personal = $this->db->table('casis_personal')->where('perl_ofi_ide', $rol['oficina_id'])->where('perl_est_ide', $p['est_id'])->where('deleted_at', null)->get()->getResultArray();
+            $establecimientos = (new GrupoProgramacionRolService($this->db))->establecimientosDePeriodo($p);
+            $personal = $this->db->table('casis_personal')->where('perl_ofi_ide', $rol['oficina_id'])->whereIn('perl_est_ide', $establecimientos ?: [0])->where('deleted_at', null)->get()->getResultArray();
             foreach ($personal as $trabajador) {
                 $this->validar((int)$trabajador['perl_ide'], $p);
                 $snapshot[] = ['personal' => $this->personal((int)$trabajador['perl_ide']), 'turnos' => array_values(array_filter($this->turnos((int)$trabajador['perl_ide']), fn($t) => substr($t['prog_fecha'], 0, 7) === $p['mes']))];

@@ -7,5 +7,6 @@
     <?php if ($admin): ?>
     <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/periodos') ?>"><iconify-icon icon="lucide:calendar-range" class="me-1"></iconify-icon>Períodos</a>
     <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/plantillas') ?>"><iconify-icon icon="lucide:settings-2" class="me-1"></iconify-icon>Plantillas de reglas</a>
+    <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/grupos') ?>"><iconify-icon icon="lucide:network" class="me-1"></iconify-icon>Grupos de programación</a>
     <?php endif ?>
 </nav>

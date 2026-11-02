@@ -76,6 +76,9 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->post('gestion-roles/(:num)/enviar', 'RolEnvioController::enviar/$1', ['filter' => 'csrf']);
     $routes->get('gestion-roles/periodos', 'ConfiguracionRolController::index/periodos');
     $routes->get('gestion-roles/plantillas', 'ConfiguracionRolController::index/plantillas');
+    $routes->get('gestion-roles/grupos', 'GrupoProgramacionRolController::index');
+    $routes->post('gestion-roles/grupos/guardar', 'GrupoProgramacionRolController::guardar', ['filter'=>'csrf']);
+    $routes->post('gestion-roles/grupos/eliminar/(:num)', 'GrupoProgramacionRolController::eliminar/$1', ['filter'=>'csrf']);
     $routes->post('gestion-roles/periodos/(:segment)', 'ConfiguracionRolController::guardar/periodos/$1', ['filter' => 'csrf']);
     $routes->post('gestion-roles/plantillas/(:segment)', 'ConfiguracionRolController::guardar/plantillas/$1', ['filter' => 'csrf']);
     $routes->post('gestion-roles/(:segment)', 'GestionRolController::guardar/$1', ['filter' => 'csrf']);
