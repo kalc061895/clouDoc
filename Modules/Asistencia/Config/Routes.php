@@ -10,6 +10,10 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->post('calificacion/(:num)/(:segment)', 'CalificacionMensualController::guardar/$2/$1', ['filter'=>'csrf']);
     $routes->get('/', 'DashboardController::index');
     $routes->get('mi-perfil', 'PerfilController::index');
+    $routes->get('personal/importar', 'ImportarPersonalController::index');
+    $routes->get('personal/importar/plantilla', 'ImportarPersonalController::plantilla');
+    $routes->post('personal/importar/previsualizar', 'ImportarPersonalController::previsualizar', ['filter' => 'csrf']);
+    $routes->post('personal/importar/confirmar', 'ImportarPersonalController::confirmar', ['filter' => 'csrf']);
 
     $routes->get('accesos', 'AccesosController::index');
     $routes->get('accesos/datos', 'AccesosController::datos');

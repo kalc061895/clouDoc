@@ -23,6 +23,7 @@ class MenuSeeder extends Seeder
             [1001, 1000, 'Personal', 'asistencia/personal', 'users-group-rounded-line-duotone'],
             [1002, 1000, 'Nuevo personal', 'asistencia/personal/nuevo', 'user-plus-line-duotone'],
             [1003, 1000, 'Gestor de personal', 'asistencia/personal/gestorpersonal', 'users-group-rounded-line-duotone'],
+            [1088, 1000, 'Importar Personal', 'asistencia/personal/importar', 'upload-line-duotone'],
             [1005, 1000, 'Marcaciones', 'asistencia/marcaciones', 'clock-circle-line-duotone'],
             [1070, null, 'DISPOSITIVOS', null, 'devices-line-duotone'],
             [1071, 1070, 'Configuración de dispositivos', 'asistencia/dispositivos', 'settings-line-duotone'],
