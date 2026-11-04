@@ -6,6 +6,7 @@ use App\Core\Controllers\BaseModuleController;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class ImportarPersonalController extends BaseModuleController
 {
@@ -20,11 +21,13 @@ class ImportarPersonalController extends BaseModuleController
 
     public function index()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return redirect()->to(site_url('asistencia'))->with('error', 'No tiene acceso a la gestión de personal.');
         return view('Modules\\Asistencia\\Views\\personal\\importar', ['resultado' => session()->getFlashdata('import_resultado')]);
     }
 
     public function plantilla()
     {
+        if (!(new AccesoAsistenciaService())->permitir('crear_personal')) return $this->response->setStatusCode(403)->setBody('No tiene permiso para registrar personal.');
         $book = new Spreadsheet();
         $sheet = $book->getActiveSheet();
         $sheet->setTitle('Personal');
@@ -56,6 +59,8 @@ class ImportarPersonalController extends BaseModuleController
 
     public function previsualizar()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('crear_personal')) return redirect()->to(site_url('asistencia'))->with('error', 'No tiene permiso para importar personal.');
         $file = $this->request->getFile('archivo_excel');
         if (!$file || !$file->isValid() || !in_array(strtolower($file->getClientExtension()), ['xlsx', 'xls'], true)) {
             return redirect()->to(site_url('asistencia/personal/importar'))->with('error', 'Seleccione un archivo Excel .xlsx o .xls válido.');
@@ -87,6 +92,7 @@ class ImportarPersonalController extends BaseModuleController
             $line = $index + 1; $e = [];
             foreach ([0,1,2,4,14,17,18,19] as $required) if ($row[$required] === '') $e[] = self::HEADERS[$required] . ' es obligatorio';
             foreach ($catalogs as $i => $_) if ($row[$i] !== '' && !isset($lookup[$i][mb_strtolower($row[$i])])) $e[] = self::HEADERS[$i] . ' no existe en el catálogo';
+            if ($row[14] !== '' && isset($lookup[14][mb_strtolower($row[14])]) && !$acceso->establecimientoDentroAmbito($lookup[14][mb_strtolower($row[14])])) $e[] = 'Establecimiento fuera de su ámbito';
             foreach ([7,13,19,20,21,32,33] as $i) if ($row[$i] !== '' && !$this->fechaValida($row[$i])) $e[] = self::HEADERS[$i] . ' debe usar AAAA-MM-DD';
             if (!in_array(mb_strtolower($row[5]), ['', 'masculino','femenino','m','f'], true)) $e[] = 'Sexo inválido';
             if ($row[1] !== '') {
@@ -105,6 +111,8 @@ class ImportarPersonalController extends BaseModuleController
 
     public function confirmar()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('crear_personal')) return redirect()->to(site_url('asistencia'))->with('error', 'No tiene permiso para importar personal.');
         $rows = session()->get('importar_personal_validos');
         if (!$rows) return redirect()->to(site_url('asistencia/personal/importar'))->with('error', 'No hay filas validadas pendientes.');
         if (session()->get('importar_personal_tiene_errores')) return redirect()->to(site_url('asistencia/personal/importar'))->with('error', 'Corrija los errores del archivo y vuelva a validarlo; no se importaron filas.');
@@ -114,6 +122,7 @@ class ImportarPersonalController extends BaseModuleController
         try {
             foreach ($rows as $r) {
                 $ids=[]; foreach ($maps as $i=>[$table,$label,$id]) { if ($r[$i] === '') { $ids[$i]=null; continue; } $item=$db->table($table)->where($label,$r[$i])->where('deleted_at',null)->get()->getRowArray(); if (!$item) throw new \RuntimeException('El catálogo cambió después de la validación: '.$label.' '.$r[$i]); $ids[$i]=(int)$item[$id]; }
+                if (!$ids[14] || !$acceso->establecimientoDentroAmbito((int) $ids[14])) throw new \RuntimeException('El establecimiento del archivo está fuera de su ámbito. No se importó ningún registro.');
                 $audit=['created_at'=>$now,'updated_at'=>$now,'created_by'=>$user,'updated_by'=>$user];
                 $db->table('casis_persona')->insert(['per_tdi_ide'=>$ids[0],'per_numero_documento'=>$r[1],'per_paterno'=>$r[2]?:null,'per_materno'=>$r[3]?:null,'per_nombre'=>$r[4]?:null,'per_sexo'=>$r[5]?:null,'per_lugar_nacimiento'=>$r[6]?:null,'per_fecha_nacimiento'=>$this->fecha($r[7]),'per_residencia'=>$r[8]?:null,'per_ruc'=>$r[9]?:null,'per_telefono'=>$r[10]?:null,'per_email'=>$r[11]?:null,'per_estadocivil'=>$r[12]?:null,'per_ingreso'=>$this->fecha($r[13])]+$audit);
                 $persona=(int)$db->insertID();

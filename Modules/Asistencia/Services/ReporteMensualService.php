@@ -26,6 +26,24 @@ class ReporteMensualService
         }
         $result['eup'] = $this->db->table('casis_establecimiento_upss')->select('eup_ide, eup_est_ide, eup_ups_ide')->where('deleted_at', null)->get()->getResultArray();
         $result['eus'] = $this->db->table('casis_establecimiento_upss_servicio')->select('eus_eup_ide, eus_uss_ide')->where('deleted_at', null)->get()->getResultArray();
+        $acceso = new AccesoAsistenciaService();
+        $perfil = $acceso->perfilTerritorial();
+        if (!$perfil) throw new \DomainException('No tiene acceso a reportes de Asistencia.');
+        if (!($perfil['global'] ?? false)) {
+            $estIds = $acceso->establecimientosDelAmbito();
+            $result['est_ide'] = array_values(array_filter($result['est_ide'], static fn($r) => in_array((int)$r['est_ide'], $estIds, true)));
+            $micIds = array_values(array_unique(array_map('intval', array_column($result['est_ide'], 'est_mic_ide'))));
+            $result['mic_ide'] = array_values(array_filter($result['mic_ide'], static fn($r) => in_array((int)$r['mic_ide'], $micIds, true)));
+            $redIds = array_values(array_unique(array_map('intval', array_column($result['mic_ide'], 'mic_red_ide'))));
+            $result['red_ide'] = array_values(array_filter($result['red_ide'], static fn($r) => in_array((int)$r['red_ide'], $redIds, true)));
+            $dirIds = array_values(array_unique(array_map('intval', array_column($result['red_ide'], 'red_dir_ide'))));
+            $result['dir_ide'] = array_values(array_filter($result['dir_ide'], static fn($r) => in_array((int)$r['dir_ide'], $dirIds, true)));
+            $result['ofi_ide'] = array_values(array_filter($result['ofi_ide'], static fn($r) => in_array((int)$r['ofi_est_ide'], $estIds, true)));
+            $eupScoped = array_filter($result['eup'], static fn($r) => in_array((int)$r['eup_est_ide'], $estIds, true));
+            $eupIds = array_values(array_unique(array_map('intval', array_column($eupScoped, 'eup_ide'))));
+            $result['eup'] = array_values(array_filter($result['eup'], static fn($r) => in_array((int)$r['eup_est_ide'], $estIds, true)));
+            $result['eus'] = array_values(array_filter($result['eus'], static fn($r) => in_array((int)$r['eus_eup_ide'], $eupIds, true)));
+        }
         return $result;
     }
 

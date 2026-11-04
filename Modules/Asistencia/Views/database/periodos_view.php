@@ -5,6 +5,7 @@ Gestión de Períodos de Asistencia
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<script>const puedeGestionarPeriodos = <?= json_encode((bool) ($puedeGestionar ?? false)) ?>;</script>
 <div class="card bg-white p-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
@@ -24,10 +25,10 @@ Gestión de Períodos de Asistencia
                 <option value="REABIERTO">REABIERTO</option>
             </select>
 
-            <button class="btn btn-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center" onclick="abrirModalCrear()">
+            <?php if ($puedeGestionar ?? false): ?><button class="btn btn-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center" onclick="abrirModalCrear()">
                 <iconify-icon icon="lucide:plus" class="me-1" style="font-size: 1.1rem;"></iconify-icon>
                 Nuevo Período
-            </button>
+            </button><?php endif; ?>
         </div>
     </div>
 
@@ -183,6 +184,7 @@ Gestión de Períodos de Asistencia
                     "orderable": false,
                     "className": "text-end",
                     "render": function(data, type, row) {
+                        if (!puedeGestionarPeriodos) return '';
                         return `
                             <div class="d-inline-flex align-items-center justify-content-end gap-1">
                                 <button class="btn btn-outline-warning btn-sm rounded-circle p-1 d-inline-flex align-items-center justify-content-center" 

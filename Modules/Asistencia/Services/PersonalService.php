@@ -18,6 +18,7 @@ use Config\Database;
 use Modules\Asistencia\Models\PersonaModel;
 use Modules\Asistencia\Models\PersonalModel;
 use Modules\Asistencia\Models\PersonalProfesionalModel;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 use CodeIgniter\Database\Exceptions\DatabaseException;
 
@@ -77,8 +78,10 @@ class PersonalService
 
     public function getSelectEstablecimientos(): array
     {
-        $model = new EstablecimientoModel();
-        return $this->mapearSelect($model->orderBy('est_nombre', 'ASC')->findAll(), 'est_ide', 'est_nombre');
+        $db = Database::connect();
+        $builder = $db->table('casis_establecimiento')->where('deleted_at', null)->orderBy('est_nombre', 'ASC');
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($builder, 'casis_establecimiento', 'est_ide');
+        return $this->mapearSelect($builder->get()->getResultArray(), 'est_ide', 'est_nombre');
     }
 
     public function getSelectModalidadesContrato(): array
@@ -284,6 +287,7 @@ class PersonalService
         $builder->join('casis_establecimiento est', 'est.est_ide = pl.perl_est_ide');
         $builder->join('casis_cargo car', 'car.car_ide = pl.perl_car_ide', 'left');
         $builder->orderBy('p.per_paterno', 'ASC');
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($builder, 'pl');
 
         return $builder->get()->getResultArray();
     }
@@ -314,6 +318,7 @@ class PersonalService
         $builder->join('casis_oficina ofi', 'ofi.ofi_ide = pl.perl_ofi_ide', 'left');
         $builder->join('casis_modalidad_contrato mco', 'mco.mco_ide = pl.perl_mco_ide', 'left');
         $builder->where('pl.perl_estado = 1');
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($builder, 'pl');
 
         // Total de registros antes de filtrar
         $totalRecords = $builder->countAllResults(false);

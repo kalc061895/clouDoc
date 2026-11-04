@@ -5,16 +5,19 @@ namespace Modules\Asistencia\Controllers;
 use App\Core\Controllers\BaseModuleController;
 use Modules\Asistencia\Services\ReporteMensualService;
 use Modules\Asistencia\Services\ReporteMensualExporter;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class ReporteMensualController extends BaseModuleController
 {
     public function index()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_reportes')) return $this->response->setStatusCode(403)->setBody('No tiene acceso a reportes de Asistencia.');
         return view('Modules\Asistencia\Views\reportes\mensual', ['catalogos' => (new ReporteMensualService())->catalogos()]);
     }
 
     public function consultar()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_reportes')) return $this->jsonResponse('error', 'No tiene acceso a reportes de Asistencia.', [], 403);
         try {
             $reporte = (new ReporteMensualService())->consultar($this->request->getGet());
             return $this->jsonResponse('success', 'Reporte consultado.', ['html' => view('Modules\Asistencia\Views\reportes\resultado', ['reporte' => $reporte]), 'total' => count($reporte['filas'])]);
@@ -23,6 +26,7 @@ class ReporteMensualController extends BaseModuleController
 
     public function exportar(string $formato)
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_reportes')) return $this->response->setStatusCode(403)->setBody('No tiene acceso a reportes de Asistencia.');
         try {
             if (! in_array($formato, ['excel', 'pdf', 'imprimir'], true)) throw new \InvalidArgumentException('Formato inválido.');
             $reporte = (new ReporteMensualService())->consultar($this->request->getGet());

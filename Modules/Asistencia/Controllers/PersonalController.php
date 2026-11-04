@@ -5,32 +5,39 @@ namespace Modules\Asistencia\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
 use Modules\Asistencia\Services\PersonalService;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class PersonalController extends BaseController
 {
     use ResponseTrait;
 
     protected $personalService;
+    protected AccesoAsistenciaService $acceso;
 
     public function __construct()
     {
         // Instanciamos el servicio del módulo
         $this->personalService = new PersonalService();
+        $this->acceso = new AccesoAsistenciaService();
     }
 
     public function index()
     {
+        if (!$this->acceso->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso al padrón de personal.');
         return view('Modules\Asistencia\Views\personal\listar_personal_view.php');
     }
 
     public function apiListar()
     {
+        if (!$this->acceso->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso al padrón de personal.');
         $data = $this->personalService->getListadoPersonal();
         return $this->respond(['status' => 'success', 'data' => $data], 200);
     }
 
     public function apiDarDeBaja($id)
     {
+        if (!$this->acceso->permitir('eliminar_personal')) return $this->failForbidden('No tiene permiso para dar de baja personal.');
+        if (!$this->acceso->personalDentroAmbito((int) $id)) return $this->failNotFound('Personal no encontrado en su ámbito.');
         $exito = $this->personalService->darDeBajaPersonal((int) $id);
 
         if ($exito) {
@@ -42,11 +49,14 @@ class PersonalController extends BaseController
     // --- VISTAS ---
     public function nuevo()
     {
+        if (!$this->acceso->permitir('crear_personal')) return $this->failForbidden('No tiene permiso para registrar personal.');
         return view('Modules\Asistencia\Views\personal\registrar_wizard');
     }
 
     public function editar($id)
     {
+        if (!$this->acceso->permitir('editar_personal')) return $this->failForbidden('No tiene permiso para editar personal.');
+        if (!$this->acceso->personalDentroAmbito((int) $id)) return $this->failNotFound('Personal no encontrado en su ámbito.');
         $personal = $this->personalService->getPersonalParaEditar((int) $id);
 
         if (!$personal) {
@@ -62,6 +72,10 @@ class PersonalController extends BaseController
      */
     public function apiActualizarPersonal($id)
     {
+        if (!$this->acceso->permitir('editar_personal')) return $this->failForbidden('No tiene permiso para editar personal.');
+        if (!$this->acceso->personalDentroAmbito((int) $id)) return $this->failNotFound('Personal no encontrado en su ámbito.');
+        $establecimientoDestino = (int) $this->request->getPost('perl_est_ide');
+        if ($establecimientoDestino && !$this->acceso->establecimientoDentroAmbito($establecimientoDestino)) return $this->failForbidden('El establecimiento destino está fuera de su ámbito.');
         // 1. Reglas de Validación rigurosas (Similares al guardado)
         $rules = [
             'per_tdi_ide' => 'required',
@@ -172,12 +186,14 @@ class PersonalController extends BaseController
 
     public function apiGuardarWizard()
     {
+        if (!$this->acceso->permitir('crear_personal')) return $this->failForbidden('No tiene permiso para registrar personal.');
         // Capturamos el Payload JSON del request asíncrono
         $json = $this->request->getJSON(true);
 
         if (empty($json)) {
             return $this->respond(['status' => 'error', 'messages' => ['payload' => 'No se recibieron datos válidos.']], 400);
         }
+        if (empty($json['perl_est_ide']) || !$this->acceso->establecimientoDentroAmbito((int) $json['perl_est_ide'])) return $this->failForbidden('El establecimiento está fuera de su ámbito.');
 
         // Opcional: Aquí puedes meter las reglas del Validation Service de CodeIgniter 4
         // antes de pasárselo al servicio.
@@ -212,12 +228,18 @@ class PersonalController extends BaseController
     // Carga la vista principal del Layout
     public function gestorPersonal()
     {
-        return view('Modules\Asistencia\Views\personal\gestor_personal_view');
+        if (!$this->acceso->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso al gestor de personal.');
+        return view('Modules\Asistencia\Views\personal\gestor_personal_view', [
+            'puedeCrear' => $this->acceso->permitir('crear_personal'),
+            'puedeEditar' => $this->acceso->permitir('editar_personal'),
+            'puedeEliminar' => $this->acceso->permitir('eliminar_personal'),
+        ]);
     }
 
     // Endpoint API para DataTables
     public function fetch()
     {
+        if (!$this->acceso->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso al gestor de personal.');
         $requestData = $this->request->getGet(); // o $this->request->getPost();
         $response = $this->personalService->getListadoPersonalDatatable($requestData);
 
@@ -227,6 +249,7 @@ class PersonalController extends BaseController
     // Endpoint API para obtener los datos completos de un usuario para el Modal
     public function show($id)
     {
+        if (!$this->acceso->permitir('lectura_personal') || !$this->acceso->personaDentroAmbito((int) $id)) return $this->failNotFound('Personal no encontrado en su ámbito.');
         $db = \Config\Database::connect();
         $person = $db->table('vw_personal_activo')->where('per_id', $id)->get()->getRowArray();
 
@@ -238,6 +261,7 @@ class PersonalController extends BaseController
     }
     public function getPaneDatos($id)
     {
+        if (!$this->acceso->permitir('lectura_personal') || !$this->acceso->personalDentroAmbito((int) $id)) return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');
         $personal = $this->personalService->obtenerDatosGenerales((int) $id);
         if (!$personal) {
             return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');

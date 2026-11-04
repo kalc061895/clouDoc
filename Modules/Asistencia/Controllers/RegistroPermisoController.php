@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\AnioModel;
 use App\Models\MesesModel;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class RegistroPermisoController extends BaseController
 {
@@ -16,6 +17,8 @@ class RegistroPermisoController extends BaseController
 
     public function getPanePermisos($id)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito((int) $id)) return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');
         $anioModel = new AnioModel();
         $mesModel = new MesesModel();
 

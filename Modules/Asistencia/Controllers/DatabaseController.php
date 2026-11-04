@@ -28,6 +28,7 @@ use Modules\Asistencia\Services\SegundaEspecialidadService;
 use Modules\Asistencia\Services\ProfesionEspecialidadService;
 
 use Modules\Asistencia\Services\PersonaService;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class DatabaseController extends BaseController
 {
@@ -47,6 +48,33 @@ class DatabaseController extends BaseController
         $this->diresaService = new DiresaService();
         $this->redService = new RedService();
         $this->microredService = new MicroredService();
+    }
+
+    private function filtrarCatalogoTerritorial(array $rows, string $campo, string $nivel): array
+    {
+        $acceso = new AccesoAsistenciaService();
+        $perfil = $acceso->perfilTerritorial();
+        if (!$perfil || ($perfil['global'] ?? false)) return $rows;
+        $establecimientos = $acceso->establecimientosDelAmbito();
+        if (!$establecimientos) return [];
+        $cols = ['establecimiento'=>'e.est_ide', 'microred'=>'m.mic_ide', 'red'=>'m.mic_red_ide', 'diresa'=>'r.red_dir_ide'];
+        $entidades = \Config\Database::connect()->table('casis_establecimiento e')
+            ->select($cols[$nivel] . ' AS entidad_id')->join('casis_microred m', 'm.mic_ide=e.est_mic_ide', 'left')
+            ->join('casis_red r', 'r.red_ide=m.mic_red_ide', 'left')->whereIn('e.est_ide', $establecimientos)->get()->getResultArray();
+        $ids = array_values(array_unique(array_map('intval', array_column($entidades, 'entidad_id'))));
+        return array_values(array_filter($rows, static fn($row) => in_array((int)($row[$campo] ?? 0), $ids, true)));
+    }
+
+    private function filtrarPersonasTerritorial(array $rows): array
+    {
+        $acceso = new AccesoAsistenciaService();
+        $perfil = $acceso->perfilTerritorial();
+        if (!$perfil || ($perfil['global'] ?? false)) return $rows;
+        $estIds = $acceso->establecimientosDelAmbito();
+        if (!$estIds) return [];
+        $personas = array_flip(array_map('intval', array_column(\Config\Database::connect()->table('casis_personal')
+            ->select('perl_per_ide')->where('deleted_at', null)->whereIn('perl_est_ide', $estIds)->distinct()->get()->getResultArray(), 'perl_per_ide')));
+        return array_values(array_filter($rows, static fn($row) => isset($personas[(int)($row['per_ide'] ?? 0)])));
     }
 
     /**
@@ -71,6 +99,7 @@ class DatabaseController extends BaseController
     {
         $search = $this->request->getVar('search');
         $data = $this->diresaService->listarDiresas($search);
+        $data = $this->filtrarCatalogoTerritorial($data, 'dir_ide', 'diresa');
 
         return $this->respond([
             'status' => 'success',
@@ -166,6 +195,7 @@ class DatabaseController extends BaseController
     {
         $search = $this->request->getVar('search');
         $data = $this->redService->listarRedes($search);
+        $data = $this->filtrarCatalogoTerritorial($data, 'red_ide', 'red');
 
         return $this->respond([
             'status' => 'success',
@@ -253,6 +283,7 @@ class DatabaseController extends BaseController
     public function apiRedesLookup()
     {
         $redes = $this->redService->listarRedes();
+        $redes = $this->filtrarCatalogoTerritorial($redes, 'red_ide', 'red');
         $data = array_map(function ($red) {
             return [
                 'id' => $red['red_ide'],
@@ -283,6 +314,7 @@ class DatabaseController extends BaseController
     {
         $search = $this->request->getVar('search');
         $data = $this->microredService->listarMicroredes($search);
+        $data = $this->filtrarCatalogoTerritorial($data, 'mic_ide', 'microred');
 
         return $this->respond([
             'status' => 'success',
@@ -360,6 +392,7 @@ class DatabaseController extends BaseController
     public function apiMicroredesLookup()
     {
         $microredes = $this->microredService->listarMicroredes();
+        $microredes = $this->filtrarCatalogoTerritorial($microredes, 'mic_ide', 'microred');
         $data = array_map(function ($mic) {
             return [
                 'id' => $mic['mic_ide'],
@@ -392,6 +425,7 @@ class DatabaseController extends BaseController
         $busqueda = $this->request->getVar('search');
 
         $data = $establecimientoService->listarEstablecimientos($busqueda);
+        $data = $this->filtrarCatalogoTerritorial($data, 'est_ide', 'establecimiento');
 
         return $this->respond([
             'status' => 'success',
@@ -419,6 +453,7 @@ class DatabaseController extends BaseController
             'est_longitud'     => $this->request->getVar('est_longitud') ?: null,
             'est_radio'        => $this->request->getVar('est_radio') ?: 50,
         ];
+        if (!(new AccesoAsistenciaService())->puedeCrearEstablecimientoEnMicrored((int) $datos['est_mic_ide'])) return $this->failForbidden('La microred está fuera de su ámbito o su perfil no puede crear establecimientos.');
 
         $resultado = $establecimientoService->crearEstablecimiento($datos);
 
@@ -439,6 +474,9 @@ class DatabaseController extends BaseController
     public function apiActualizarEstablecimiento($id = null)
     {
         $establecimientoService = new EstablecimientoService();
+        $acceso = new AccesoAsistenciaService();
+        $actual = $establecimientoService->obtenerPorId((int) $id);
+        if (!$actual || !$acceso->establecimientoDentroAmbito((int) $id)) return $this->failNotFound('Establecimiento no encontrado en su ámbito.');
         $rawDatos = $this->request->getRawInput();
         $datos = [
             'est_mic_ide'      => $rawDatos['est_mic_ide'] ?? null,
@@ -452,6 +490,7 @@ class DatabaseController extends BaseController
             'est_longitud'     => $rawDatos['est_longitud'] ?? null,
             'est_radio'        => $rawDatos['est_radio'] ?? 50,
         ];
+        if ((int) $datos['est_mic_ide'] !== (int) $actual['est_mic_ide'] && !$acceso->microredDentroAmbito((int) $datos['est_mic_ide'])) return $this->failForbidden('La microred destino está fuera de su ámbito.');
 
         $resultado = $establecimientoService->actualizarEstablecimiento((int)$id, $datos);
 
@@ -471,6 +510,7 @@ class DatabaseController extends BaseController
      */
     public function apiEliminarEstablecimiento($id = null)
     {
+        if (!(new AccesoAsistenciaService())->establecimientoDentroAmbito((int) $id)) return $this->failNotFound('Establecimiento no encontrado en su ámbito.');
         $establecimientoService = new EstablecimientoService();
 
         if ($establecimientoService->eliminarEstablecimiento((int)$id)) {
@@ -2077,6 +2117,7 @@ class DatabaseController extends BaseController
         $search = $this->request->getVar('search');
 
         $data = $service->listarPersonas($search);
+        $data = $this->filtrarPersonasTerritorial($data);
 
         return $this->respond([
             'status' => 'success',

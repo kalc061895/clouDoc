@@ -18,7 +18,7 @@ class GestionRolService
     public function administrador(): bool
     {
         $this->usuario();
-        return auth()->user()->inGroup('superadmin', 'asi_sua');
+        return auth()->user()->inGroup('superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm');
     }
     public function exigirAdministrador(): void
     {
@@ -39,6 +39,15 @@ class GestionRolService
     public function oficinas(bool $aprobar = false, ?string $etapa = null): ?array
     {
         if ($this->administrador()) return null;
+        $accesoTerritorial = new AccesoAsistenciaService();
+        $perfil = $accesoTerritorial->perfilTerritorial();
+        if (($perfil['modo'] ?? null) === 'auditoria') return [];
+        if ($perfil && !($perfil['global'] ?? false)) {
+            if (!$accesoTerritorial->permitir('editar_personal')) return [];
+            $estIds = $accesoTerritorial->establecimientosDelAmbito();
+            if (!$estIds) return [];
+            return array_map('intval', array_column($this->db->table('casis_oficina')->select('ofi_ide')->whereIn('ofi_est_ide', $estIds)->where('deleted_at', null)->get()->getResultArray(), 'ofi_ide'));
+        }
         $hoy = substr($this->ahora(), 0, 10);
         $q = $this->db->table('casis_plan_responsable')->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy);
         if ($aprobar) {

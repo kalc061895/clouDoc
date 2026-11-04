@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Modules\Asistencia\Services\RegistroPermisoService;
 use Modules\Asistencia\Models\PermisoModel;
 use CodeIgniter\API\ResponseTrait;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class PermisoController extends BaseController
 {
@@ -27,6 +28,7 @@ class PermisoController extends BaseController
      */
     public function tiposActivos()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso a esta información.');
         $tipos = $this->permisoModel->activos();
         return $this->respond([
             'status' => 200,
@@ -39,6 +41,8 @@ class PermisoController extends BaseController
      */
     public function obtenerPorPersonal($perlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito((int) $perlIde)) return $this->failNotFound('Trabajador no encontrado en su ámbito.');
         $mes  = $this->request->getGet('mes');
         $anio = $this->request->getGet('anio');
 
@@ -55,6 +59,10 @@ class PermisoController extends BaseController
      */
     public function guardar()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('crear_operacion')) return $this->failForbidden('No tiene permiso para registrar permisos.');
+        $personalId = (int) $this->request->getPost('rp_perl_ide');
+        if (!$personalId || !$acceso->personalDentroAmbito($personalId)) return $this->failForbidden('El trabajador está fuera de su ámbito.');
         $usuarioId = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
         $ip        = $this->request->getIPAddress();
 
@@ -113,6 +121,9 @@ class PermisoController extends BaseController
      */
     public function eliminar($rpIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        $registro = \Config\Database::connect()->table('casis_registro_permiso')->select('rp_perl_ide')->where('rp_ide', (int) $rpIde)->where('deleted_at', null)->get()->getRowArray();
+        if (!$acceso->permitir('eliminar_operacion') || !$registro || !$acceso->personalDentroAmbito((int) $registro['rp_perl_ide'])) return $this->failForbidden('No tiene permiso para eliminar este permiso.');
         try {
             $usuarioId    = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
             $ip           = $this->request->getIPAddress();

@@ -2,6 +2,7 @@
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+    $routes->get('auditoria', 'AuditoriaController::index');
     $routes->get('calificacion', 'CalificacionMensualController::index');
     $routes->get('calificacion/(:num)', 'CalificacionMensualController::detalle/$1');
     $routes->get('calificacion/pdf/(:num)', 'CalificacionMensualController::pdf/$1');
@@ -177,7 +178,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // GRUPO: MANTENIMIENTO BASE DE DATOS (gestordb/*)
     // ==========================================
 
-    $routes->group('gestordb', function ($routes) {
+    $routes->group('gestordb', ['filter' => 'asistencia-catalogos'], function ($routes) {
         $routes->get('listar_tablas', 'DatabaseController::index');
         $routes->get('tarea', 'DatabaseController::tareas');
         $routes->get('tipo-oficina', 'DatabaseController::tiposOficina');

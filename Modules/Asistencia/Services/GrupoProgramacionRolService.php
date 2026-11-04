@@ -97,6 +97,6 @@ class GrupoProgramacionRolService
             ->join('casis_microred m','m.mic_ide=e.est_mic_ide AND m.deleted_at IS NULL','left')->join('casis_red r','r.red_ide=m.mic_red_ide AND r.deleted_at IS NULL','left')
             ->where('e.est_ide',$establecimientoId)->where('e.deleted_at',null)->get()->getRowArray();
     }
-    private function exigirAdmin(): void { if (!function_exists('auth') || !auth()->loggedIn() || !auth()->user()->inGroup('superadmin','asi_sua')) throw new \DomainException('Solo el administrador de Asistencia puede configurar grupos de programación.'); }
+    private function exigirAdmin(): void { if (!function_exists('auth') || !auth()->loggedIn() || !auth()->user()->inGroup('superadmin','asistencia','asi_sua','asi_adm','asi_dm')) throw new \DomainException('Solo el administrador de Asistencia puede configurar grupos de programación.'); }
     private function usuario(): ?int { return function_exists('auth') && auth()->loggedIn() ? (int)auth()->id() : null; }
 }

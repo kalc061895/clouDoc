@@ -14,7 +14,7 @@ class RemuneracionController extends BaseController
     private function acceso()
     {
         if (!auth()->loggedIn()) return $this->failUnauthorized('Debe iniciar sesión.');
-        if (!auth()->user()->inGroup('superadmin', 'asistencia', 'asi_sua')) return $this->failForbidden('No tiene permiso para administrar remuneraciones.');
+        if (!auth()->user()->inGroup('superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm')) return $this->failForbidden('No tiene permiso para administrar remuneraciones.');
         return null;
     }
 

@@ -3,6 +3,7 @@
 namespace Modules\Asistencia\Services;
 
 use Modules\Asistencia\Models\CasisAsistenciaModel;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 use Modules\Asistencia\Models\PersonalModel;
 use Modules\Asistencia\Models\ProgramacionModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -40,6 +41,7 @@ class MarcacionService
 
         $this->aplicarJoins($builder);
         $builder->where('a.deleted_at', null);
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($builder, 'p');
 
         // Total sin filtros aplicados
         $totalRecords = (clone $builder)->countAllResults(false);
@@ -209,7 +211,7 @@ class MarcacionService
      */
     public function obtenerDetalleTrabajador(int $perlIde, string $fechaInicio, string $fechaFin): ?array
     {
-        $trabajador = $this->db->table('casis_personal p')
+        $trabajadorBuilder = $this->db->table('casis_personal p')
             ->select('
                 p.perl_ide,
                 p.perl_codigo,
@@ -228,9 +230,9 @@ class MarcacionService
             ->join('casis_cargo car', 'car.car_ide = p.perl_car_ide', 'left')
             ->join('casis_modalidad_contrato mco', 'mco.mco_ide = p.perl_mco_ide', 'left')
             ->where('p.perl_ide', $perlIde)
-            ->where('p.deleted_at', null)
-            ->get()
-            ->getRowArray();
+            ->where('p.deleted_at', null);
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($trabajadorBuilder, 'p');
+        $trabajador = $trabajadorBuilder->get()->getRowArray();
 
         if (!$trabajador) {
             return null;
@@ -465,6 +467,7 @@ class MarcacionService
         $builder = $this->db->table('casis_asistencia a');
         $this->aplicarJoins($builder);
         $builder->where('a.deleted_at', null);
+        (new AccesoAsistenciaService())->aplicarAmbitoPersonal($builder, 'p');
         $this->aplicarFiltros($builder, $filtros);
         $builder->orderBy('a.asi_fecha_hora', 'ASC');
 

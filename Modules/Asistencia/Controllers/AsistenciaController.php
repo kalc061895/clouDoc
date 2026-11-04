@@ -6,6 +6,7 @@ use App\Core\Controllers\BaseModuleController;
 use Modules\Asistencia\Services\MarcacionService;
 use Modules\Asistencia\Models\EstablecimientoModel;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class AsistenciaController extends BaseModuleController
 {
@@ -23,11 +24,16 @@ class AsistenciaController extends BaseModuleController
      */
     public function index()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal')) return $this->response->setStatusCode(403)->setBody('No tiene acceso a las marcaciones.');
         $establecimientos = $this->establecimientoModel
             ->select('est_ide, est_nombre, est_codigo')
             ->where('deleted_at', null)
             ->orderBy('est_nombre', 'ASC')
             ->findAll();
+        $ids = $acceso->establecimientosDelAmbito();
+        if (!empty($ids)) $establecimientos = array_values(array_filter($establecimientos, static fn($e) => in_array((int)$e['est_ide'], $ids, true)));
+        elseif (!$acceso->esSuperadministrador() && !auth()->user()->inGroup('asi_apo', 'asi_apoyo')) $establecimientos = [];
 
         return view('Modules\Asistencia\Views\asistencia\index', [
             'titulo'           => 'Registros de Asistencia y Marcaciones',
@@ -42,6 +48,7 @@ class AsistenciaController extends BaseModuleController
      */
     public function apiListar()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a las marcaciones.', [], 403);
         $request = $this->request;
 
         $draw   = (int) ($request->getGet('draw') ?? 1);
@@ -98,6 +105,8 @@ class AsistenciaController extends BaseModuleController
      */
     public function apiDetalleTrabajador(int $perlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito($perlIde)) return $this->jsonResponse('error', 'Trabajador no encontrado en su ámbito.', [], 404);
         $fechaInicio = $this->request->getGet('fecha_inicio') ?? date('Y-m-01');
         $fechaFin    = $this->request->getGet('fecha_fin') ?? date('Y-m-t');
 
@@ -115,6 +124,8 @@ class AsistenciaController extends BaseModuleController
      */
     public function apiGuardarManual()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('editar_personal')) return $this->jsonResponse('error', 'No tiene permiso para registrar marcaciones.', [], 403);
         $reglas = [
             'asi_perl_ide'   => 'required|is_natural_no_zero',
             'asi_fecha_hora' => 'required|valid_date[Y-m-d H:i:s,Y-m-d H:i]',
@@ -127,6 +138,7 @@ class AsistenciaController extends BaseModuleController
         }
 
         $datos = $this->request->getPost();
+        if (!$acceso->personalDentroAmbito((int) $datos['asi_perl_ide'])) return $this->jsonResponse('error', 'Trabajador fuera de su ámbito.', [], 403);
         $usuarioId = $this->getAuditUserId();
 
         $resp = $this->marcacionService->registrarMarcacionManual($datos, $usuarioId);
@@ -143,6 +155,7 @@ class AsistenciaController extends BaseModuleController
      */
     public function apiCorregir(int $asiIde)
     {
+        if (!(new AccesoAsistenciaService())->permitir('editar_personal') || !$this->marcacionDentroAmbito($asiIde)) return $this->jsonResponse('error', 'No tiene permiso sobre esta marcación.', [], 403);
         $reglas = [
             'asi_fecha_hora' => 'required|valid_date[Y-m-d H:i:s,Y-m-d H:i]',
             'asi_tipo'       => 'required|in_list[ENTRADA,SALIDA,REFRIGERIO_SALIDA,REFRIGERIO_RETORNO,OTRO]',
@@ -170,6 +183,7 @@ class AsistenciaController extends BaseModuleController
      */
     public function apiEliminar(int $asiIde)
     {
+        if (!(new AccesoAsistenciaService())->permitir('eliminar_personal') || !$this->marcacionDentroAmbito($asiIde)) return $this->jsonResponse('error', 'No tiene permiso sobre esta marcación.', [], 403);
         $motivo = trim((string) $this->request->getPost('asi_motivo'));
 
         if (empty($motivo) || strlen($motivo) < 5) {
@@ -191,6 +205,7 @@ class AsistenciaController extends BaseModuleController
      */
     public function exportarExcel()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_reportes')) return $this->response->setStatusCode(403)->setBody('No tiene acceso a este reporte.');
         $filtros = [
             'fecha_inicio' => $this->request->getGet('fecha_inicio'),
             'fecha_fin'    => $this->request->getGet('fecha_fin'),
@@ -220,6 +235,8 @@ class AsistenciaController extends BaseModuleController
      */
     public function getPaneAsistencia(int $perlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito($perlIde)) return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');
         $calendario = new \Modules\Asistencia\Services\CalendarioPersonalService();
         try {
             [$fechaInicio, $fechaFin] = $calendario->periodo($this->request->getGet('fecha_inicio'));
@@ -238,10 +255,19 @@ class AsistenciaController extends BaseModuleController
 
     public function getByPersonal(int $perlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito($perlIde)) return $this->jsonResponse('error', 'Trabajador no encontrado en su ámbito.', [], 404);
         $fechaInicio = $this->request->getGet('fecha_inicio') ?? date('Y-m-01');
         $fechaFin    = $this->request->getGet('fecha_fin') ?? date('Y-m-t');
 
         $detalle = $this->marcacionService->obtenerDetalleTrabajador($perlIde, $fechaInicio, $fechaFin);
         return $this->jsonResponse('success', 'Asistencia cargada.', $detalle);
+    }
+
+    private function marcacionDentroAmbito(int $id): bool
+    {
+        $row = \Config\Database::connect()->table('casis_asistencia')->select('asi_perl_ide')
+            ->where('asi_ide', $id)->where('deleted_at', null)->get()->getRowArray();
+        return $row && (new AccesoAsistenciaService())->personalDentroAmbito((int) $row['asi_perl_ide']);
     }
 }

@@ -10,7 +10,7 @@ class GrupoProgramacionRolController extends BaseModuleController
     public function index()
     {
         $service = new GrupoProgramacionRolService();
-        if (!auth()->loggedIn() || !auth()->user()->inGroup('superadmin','asi_sua')) return $this->response->setStatusCode(403)->setBody('Sin permiso.');
+        if (!auth()->loggedIn() || !auth()->user()->inGroup('superadmin','asistencia','asi_sua','asi_adm','asi_dm')) return $this->response->setStatusCode(403)->setBody('Sin permiso.');
         $db = db_connect();
         $grupos = $service->listar();
         foreach ($grupos as &$g) {

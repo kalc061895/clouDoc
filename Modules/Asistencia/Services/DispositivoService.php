@@ -16,7 +16,7 @@ class DispositivoService
     public function usuario(bool $configurar = false): int
     {
         if (!auth()->loggedIn()) throw new \DomainException('Debe iniciar sesión.');
-        $grupos = $configurar ? ['superadmin', 'asi_sua', 'asistencia'] : ['superadmin', 'asi_sua', 'asi_adm', 'asistencia'];
+        $grupos = $configurar ? ['superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm'] : ['superadmin', 'asi_sua', 'asi_adm', 'asi_dm', 'asistencia'];
         if (!auth()->user()->inGroup(...$grupos)) throw new \DomainException('No tiene permiso para esta operación de dispositivos.');
         return (int)auth()->id();
     }

@@ -10,11 +10,31 @@ class MenuGroupUserSeeder extends Seeder
     public static function asignaciones(): array
     {
         $menus = array_column(MenuSeeder::menus(), null, 'id');
+        $menusTerritoriales = array_values(array_diff(array_keys($menus), [1086, 1094]));
         $map = [
             'asistencia' => array_keys($menus), // Compatibilidad con perfiles existentes.
             'asi_sua' => array_keys($menus),
-            'asi_adm' => [1006, 1001, 1002, 1003, 1088, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1052, 1053, 1055, 1056, 1018, 1019, 1025, 1032, 1033, 1061, 1072, 1091, 1092, 1093],
+            'asi_adm' => [1006, 1001, 1002, 1003, 1088, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1052, 1053, 1055, 1056, 1018, 1019, 1025, 1032, 1033, 1061, 1072, 1091, 1092, 1093, 1094],
             'asi_apo' => [1006, 1001, 1003, 1005, 1042, 1051, 1061],
+            'asi_dm' => array_keys($menus),
+            'asi_apoyo' => [1006, 1001, 1003, 1005, 1042, 1051, 1061],
+            'asi_diresa' => $menusTerritoriales,
+            'asi_red' => $menusTerritoriales,
+            'asi_mred' => $menusTerritoriales,
+            'asi_est' => $menusTerritoriales,
+            'asi_diresa_apoyo' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1053, 1061, 1091, 1092],
+            'asi_red_apoyo' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1053, 1061, 1091, 1092],
+            'asi_mred_apoyo' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1053, 1061, 1091, 1092],
+            'asi_est_apoyo' => [1006, 1001, 1002, 1003, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1053, 1061, 1091, 1092],
+            'asi_diresa_registro' => [1006, 1001, 1002, 1003, 1051, 1061],
+            'asi_red_registro' => [1006, 1001, 1002, 1003, 1051, 1061],
+            'asi_mred_registro' => [1006, 1001, 1002, 1003, 1051, 1061],
+            'asi_est_registro' => [1006, 1001, 1002, 1003, 1051, 1061],
+            'asi_diresa_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
+            'asi_red_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
+            'asi_mred_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
+            'asi_est_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
+            'asi_auditoria' => [1051, 1094],
         ];
         $map['asistencia'] = array_values(array_diff(array_keys($menus), [1086, 1087])); // Perfil institucional de compatibilidad.
         foreach ($map as &$ids) {

@@ -20,7 +20,7 @@ class PeriodoService
     public function listarPeriodos($search = null, $grupoIde = null, $estado = null)
     {
         $builder = $this->periodoModel
-            ->select('casis_periodos.*, gc.gco_nombre')
+            ->select('casis_periodos.*, gc.gco_nombre, gc.diresa_id, gc.red_id, gc.microred_id, gc.establecimiento_id')
             ->join('casis_grupos_corte gc', 'gc.gco_ide = casis_periodos.gco_ide', 'left');
 
         if ($grupoIde) {
@@ -38,13 +38,17 @@ class PeriodoService
                 ->groupEnd();
         }
 
-        return $builder->orderBy('per_anio', 'DESC')
+        $periodos = $builder->orderBy('per_anio', 'DESC')
             ->orderBy('per_mes', 'DESC')
             ->findAll();
+        $grupos = (new AccesoAsistenciaService())->gruposCorteDentroAmbito(array_map(static fn($p) => ['gco_ide' => $p['gco_ide'], 'diresa_id' => $p['diresa_id'] ?? null, 'red_id' => $p['red_id'] ?? null, 'microred_id' => $p['microred_id'] ?? null, 'establecimiento_id' => $p['establecimiento_id'] ?? null], $periodos));
+        $allowed = array_flip(array_map('intval', array_column($grupos, 'gco_ide')));
+        return array_values(array_filter($periodos, static fn($p) => isset($allowed[(int)$p['gco_ide']])));
     }
 
     public function listarPorGrupoCorte(int $grupoIde)
     {
+        if (!(new AccesoAsistenciaService())->grupoCorteDentroAmbito($grupoIde)) return [];
         return $this->periodoModel
             ->select('casis_periodos.*, gc.gco_nombre')
             ->join('casis_grupos_corte gc', 'gc.gco_ide = casis_periodos.gco_ide', 'left')
@@ -144,7 +148,8 @@ class PeriodoService
                 ->groupEnd();
         }
 
-        return $builder->orderBy('gco_ide', 'DESC')->findAll();
+        $grupos = $builder->orderBy('gco_ide', 'DESC')->findAll();
+        return (new AccesoAsistenciaService())->gruposCorteDentroAmbito($grupos);
     }
 
     public function crearGrupoCorte(array $datos)

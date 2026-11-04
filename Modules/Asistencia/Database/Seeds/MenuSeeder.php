@@ -76,6 +76,7 @@ class MenuSeeder extends Seeder
             [1033, 1010, 'Grupos de corte', 'asistencia/gestordb/grupo-corte', 'database-line-duotone'],
             [1060, null, 'MI CUENTA DE ASISTENCIA', null, 'user-circle-line-duotone'],
             [1061, 1060, 'Mi perfil y apariencia', 'asistencia/mi-perfil', 'user-circle-line-duotone'],
+            [1094, 1050, 'Auditoría institucional', 'asistencia/auditoria', 'history-line-duotone'],
         ];
         $menus = [];
         foreach ($definitions as $order => [$id, $parent, $name, $url, $icon]) {

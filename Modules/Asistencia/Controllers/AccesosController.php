@@ -9,8 +9,8 @@ class AccesosController extends BaseModuleController
 {
     private function autorizar(): void
     {
-        if (!auth()->loggedIn() || !auth()->user()->inGroup('superadmin', 'asi_sua')) {
-            throw new \DomainException('Solo superadmin o asi_sua puede administrar los accesos de Asistencia.');
+        if (!auth()->loggedIn() || !auth()->user()->inGroup('superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm')) {
+            throw new \DomainException('Solo los superadministradores de Asistencia pueden administrar los accesos.');
         }
     }
 
@@ -23,6 +23,16 @@ class AccesosController extends BaseModuleController
             return $this->response->setStatusCode($e instanceof \DomainException ? 403 : 400)
                 ->setJSON(['ok' => false, 'message' => $e->getMessage(), 'csrfHash' => csrf_hash()]);
         }
+    }
+
+    private function registrarAuditoria($db, string $accion, string $tipo, ?int $id, array $detalle): void
+    {
+        if (!$db->tableExists('casis_acceso_auditoria')) return;
+        $db->table('casis_acceso_auditoria')->insert([
+            'actor_id' => auth()->id(), 'accion' => $accion, 'entidad_tipo' => $tipo, 'entidad_id' => $id,
+            'detalle' => json_encode($detalle, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+            'ip_address' => $this->request->getIPAddress(), 'created_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     public function index()
@@ -65,9 +75,11 @@ class AccesosController extends BaseModuleController
             if ($db->table('group_user')->where('name', $nombre)->countAllResults()) throw new \DomainException('Ese perfil ya existe.');
             $db->transException(true)->transStart();
             $db->table('group_user')->insert(['name'=>$nombre]);
+            $perfilId = (int) $db->insertID();
             $grupos = setting('AuthGroups.groups');
             $grupos[$nombre] = ['title'=>$nombre, 'description'=>trim((string)$this->request->getPost('descripcion')) ?: $nombre];
             setting('AuthGroups.groups', $grupos);
+            $this->registrarAuditoria($db, 'CREAR_PERFIL', 'perfil', $perfilId, ['nombre' => $nombre]);
             $db->transComplete();
             $perfil=$db->table('group_user')->where('name',$nombre)->get()->getRowArray();
             return ['id'=>(int)$perfil['id'], 'name'=>$nombre];
@@ -83,8 +95,15 @@ class AccesosController extends BaseModuleController
             $menu=$db->table('menus')->where('id',$menuId)->like('url','asistencia/','after')->get()->getRowArray();
             if (!$grupo || !$menu) throw new \DomainException('Perfil o menú no válido.');
             $rel=['group_user_id'=>$groupId,'menu_id'=>$menuId];
-            if ($activo && !$db->table('menu_group_user')->where($rel)->countAllResults()) $db->table('menu_group_user')->insert($rel);
-            if (!$activo) $db->table('menu_group_user')->where($rel)->delete();
+            $existe = $db->table('menu_group_user')->where($rel)->countAllResults() > 0;
+            if ($activo && !$existe) {
+                $db->table('menu_group_user')->insert($rel);
+                $this->registrarAuditoria($db, 'ASIGNAR_MENU', 'menu', $menuId, ['perfil' => $grupo['name'], 'menu' => $menu['name']]);
+            }
+            if (!$activo && $existe) {
+                $db->table('menu_group_user')->where($rel)->delete();
+                $this->registrarAuditoria($db, 'RETIRAR_MENU', 'menu', $menuId, ['perfil' => $grupo['name'], 'menu' => $menu['name']]);
+            }
             return $rel + ['activo'=>$activo];
         });
     }
@@ -109,8 +128,14 @@ class AccesosController extends BaseModuleController
                     if (!$menu) throw new \DomainException('Se indicó un menú de Asistencia inválido.');
                     $rel = ['group_user_id' => $perfilId, 'menu_id' => $menuId];
                     $existe = $db->table('menu_group_user')->where($rel)->countAllResults() > 0;
-                    if ($activo && !$existe) $db->table('menu_group_user')->insert($rel);
-                    if (!$activo && $existe) $db->table('menu_group_user')->where($rel)->delete();
+                    if ($activo && !$existe) {
+                        $db->table('menu_group_user')->insert($rel);
+                        $this->registrarAuditoria($db, 'ASIGNAR_MENU', 'menu', $menuId, ['perfil' => $perfil['name'], 'menu' => $menu['name']]);
+                    }
+                    if (!$activo && $existe) {
+                        $db->table('menu_group_user')->where($rel)->delete();
+                        $this->registrarAuditoria($db, 'RETIRAR_MENU', 'menu', $menuId, ['perfil' => $perfil['name'], 'menu' => $menu['name']]);
+                    }
                 }
                 foreach ($cambios['usuarios'] as $cambio) {
                     $userId = (int) ($cambio['id'] ?? 0); $activo = !empty($cambio['activo']);
@@ -118,8 +143,14 @@ class AccesosController extends BaseModuleController
                     if (!$tienePerfilAsistencia) throw new \DomainException('El usuario ya no pertenece a un perfil de Asistencia.');
                     $rel = ['user_id' => $userId, 'group' => $perfil['name']];
                     $existe = $db->table('auth_groups_users')->where($rel)->countAllResults() > 0;
-                    if ($activo && !$existe) $db->table('auth_groups_users')->insert($rel + ['created_at' => date('Y-m-d H:i:s')]);
-                    if (!$activo && $existe) $db->table('auth_groups_users')->where($rel)->delete();
+                    if ($activo && !$existe) {
+                        $db->table('auth_groups_users')->insert($rel + ['created_at' => date('Y-m-d H:i:s')]);
+                        $this->registrarAuditoria($db, 'ASIGNAR_PERFIL', 'usuario', $userId, ['perfil' => $perfil['name']]);
+                    }
+                    if (!$activo && $existe) {
+                        $db->table('auth_groups_users')->where($rel)->delete();
+                        $this->registrarAuditoria($db, 'RETIRAR_PERFIL', 'usuario', $userId, ['perfil' => $perfil['name']]);
+                    }
                 }
                 $db->transCommit();
             } catch (\Throwable $e) {
@@ -137,8 +168,15 @@ class AccesosController extends BaseModuleController
             $perfil=$db->table('group_user')->where('id',$perfilId)->like('name','asi','after')->get()->getRowArray();
             if (!$perfil || !$db->table('users')->where('id',$id)->countAllResults()) throw new \DomainException('Usuario o perfil no válido.');
             $rel=['user_id'=>$id,'group'=>$perfil['name']];
-            if ($activo && !$db->table('auth_groups_users')->where($rel)->countAllResults()) $db->table('auth_groups_users')->insert($rel + ['created_at'=>date('Y-m-d H:i:s')]);
-            if (!$activo) $db->table('auth_groups_users')->where($rel)->delete();
+            $existe = $db->table('auth_groups_users')->where($rel)->countAllResults() > 0;
+            if ($activo && !$existe) {
+                $db->table('auth_groups_users')->insert($rel + ['created_at'=>date('Y-m-d H:i:s')]);
+                $this->registrarAuditoria($db, 'ASIGNAR_PERFIL', 'usuario', $id, ['perfil' => $perfil['name']]);
+            }
+            if (!$activo && $existe) {
+                $db->table('auth_groups_users')->where($rel)->delete();
+                $this->registrarAuditoria($db, 'RETIRAR_PERFIL', 'usuario', $id, ['perfil' => $perfil['name']]);
+            }
             return $rel + ['activo'=>$activo];
         });
     }

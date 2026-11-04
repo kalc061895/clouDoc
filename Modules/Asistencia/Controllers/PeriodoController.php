@@ -8,6 +8,7 @@ use Modules\Asistencia\Services\PeriodoService;
 use CodeIgniter\RESTful\ResourceController;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class PeriodoController extends ResourceController
 {
@@ -17,8 +18,9 @@ class PeriodoController extends ResourceController
      */
     public function periodos()
     {
-        
-        return view('Modules\Asistencia\Views\database\periodos_view');
+        if (!(new AccesoAsistenciaService())->permitir('lectura_periodos')) return $this->failForbidden('No tiene acceso a la gestión de periodos.');
+        $acceso = new AccesoAsistenciaService();
+        return view('Modules\Asistencia\Views\database\periodos_view', ['puedeGestionar' => $acceso->permitir('gestionar_periodos')]);
     }
 
     /**
@@ -27,6 +29,7 @@ class PeriodoController extends ResourceController
      */
     public function apiListarPeriodos()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_periodos')) return $this->failForbidden('No tiene acceso a la gestión de periodos.');
         $service = new PeriodoService();
         $search = $this->request->getVar('search');
         $grupoIde = $this->request->getVar('gco_ide');
@@ -46,6 +49,8 @@ class PeriodoController extends ResourceController
      */
     public function apiPeriodosPorGrupo($grupoIde = null)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_periodos') || !$acceso->grupoCorteDentroAmbito((int) $grupoIde)) return $this->failNotFound('Grupo de corte no encontrado en su ámbito.');
         $service = new PeriodoService();
         $data = $service->listarPorGrupoCorte((int) $grupoIde);
         return $this->respond([
@@ -60,6 +65,8 @@ class PeriodoController extends ResourceController
      */
     public function apiCalcularFechas()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_periodos')) return $this->failForbidden('No tiene acceso a la gestión de periodos.');
         $grupoIde = $this->request->getVar('gco_ide');
         $anio = $this->request->getVar('anio');
         $mes = $this->request->getVar('mes');
@@ -67,6 +74,7 @@ class PeriodoController extends ResourceController
         if (!$grupoIde || !$anio || !$mes) {
             return $this->fail('Faltan parámetros obligatorios.', 400);
         }
+        if (!$acceso->grupoCorteDentroAmbito((int) $grupoIde)) return $this->failNotFound('Grupo de corte no encontrado en su ámbito.');
 
         try {
             $service = new PeriodoService();
@@ -83,6 +91,10 @@ class PeriodoController extends ResourceController
      */
     public function apiCrearPeriodo()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_periodos')) return $this->failForbidden('No tiene permiso para crear o aperturar periodos.');
+        $grupoId = (int) $this->request->getVar('gco_ide');
+        if (!$grupoId || !$acceso->grupoCorteDentroAmbito($grupoId)) return $this->failForbidden('El grupo de corte está fuera de su ámbito.');
         $service = new PeriodoService();
         $datos = [
             'gco_ide' => $this->request->getVar('gco_ide') ?: null,
@@ -110,8 +122,11 @@ class PeriodoController extends ResourceController
      */
     public function apiActualizarPeriodo($id = null)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_periodos')) return $this->failForbidden('No tiene permiso para modificar o aperturar periodos.');
         $service = new PeriodoService();
         $rawDatos = $this->request->getRawInput();
+        if (!$this->periodoDentroAmbito((int) $id, $acceso) || empty($rawDatos['gco_ide']) || !$acceso->grupoCorteDentroAmbito((int) $rawDatos['gco_ide'])) return $this->failForbidden('El periodo o grupo de corte está fuera de su ámbito.');
 
         $datos = [
             'gco_ide' => !empty($rawDatos['gco_ide']) ? $rawDatos['gco_ide'] : null,
@@ -139,6 +154,9 @@ class PeriodoController extends ResourceController
      */
     public function apiEliminarPeriodo($id = null)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_periodos')) return $this->failForbidden('No tiene permiso para eliminar periodos.');
+        if (!$this->periodoDentroAmbito((int) $id, $acceso)) return $this->failNotFound('Periodo no encontrado en su ámbito.');
         $service = new PeriodoService();
 
         if ($service->eliminarPeriodo((int) $id)) {
@@ -154,13 +172,16 @@ class PeriodoController extends ResourceController
     // =========================================================================
     public function gruposCorte()
     {
-        return view('Modules\Asistencia\Views\database\grupo_corte_view');
+        if (!(new AccesoAsistenciaService())->permitir('lectura_periodos')) return $this->failForbidden('No tiene acceso a grupos de corte.');
+        $acceso = new AccesoAsistenciaService();
+        return view('Modules\Asistencia\Views\database\grupo_corte_view', ['puedeGestionar' => $acceso->permitir('gestionar_grupos_corte')]);
     }
     /**
      * GET /asistencia/gestordb/api/grupos-corte
      */
     public function apiListarGruposCorte()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_periodos')) return $this->failForbidden('No tiene acceso a grupos de corte.');
         $periodoService = new PeriodoService();
         $search = $this->request->getVar('search');
         $estado = $this->request->getVar('estado');
@@ -178,6 +199,8 @@ class PeriodoController extends ResourceController
      */
     public function apiCrearGrupoCorte()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_grupos_corte')) return $this->failForbidden('No tiene permiso para crear grupos de corte.');
         $periodoService = new PeriodoService();
 
         $datos = [
@@ -192,6 +215,7 @@ class PeriodoController extends ResourceController
             'gco_mes_desfasado' => $this->request->getVar('gco_mes_desfasado') ?? 0,
             'gco_estado' => $this->request->getVar('gco_estado') ?? 'ACTIVO',
         ];
+        if (!$acceso->validarUbicacion($datos)) return $this->failForbidden('La ubicación del grupo de corte está fuera de su ámbito.');
 
         $resultado = $periodoService->crearGrupoCorte($datos);
 
@@ -207,8 +231,11 @@ class PeriodoController extends ResourceController
      */
     public function apiActualizarGrupoCorte($id = null)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_grupos_corte')) return $this->failForbidden('No tiene permiso para modificar grupos de corte.');
         $periodoService = new PeriodoService();
         $rawDatos = $this->request->getRawInput();
+        if (!$acceso->grupoCorteDentroAmbito((int) $id)) return $this->failNotFound('Grupo de corte no encontrado en su ámbito.');
 
         $datos = [
             'diresa_id' => !empty($rawDatos['diresa_id']) ? $rawDatos['diresa_id'] : null,
@@ -222,6 +249,7 @@ class PeriodoController extends ResourceController
             'gco_mes_desfasado' => isset($rawDatos['gco_mes_desfasado']) ? (int) $rawDatos['gco_mes_desfasado'] : 0,
             'gco_estado' => $rawDatos['gco_estado'] ?? 'ACTIVO',
         ];
+        if (!$acceso->validarUbicacion($datos)) return $this->failForbidden('La ubicación del grupo de corte está fuera de su ámbito.');
 
         $resultado = $periodoService->actualizarGrupoCorte((int) $id, $datos);
 
@@ -237,10 +265,20 @@ class PeriodoController extends ResourceController
      */
     public function apiEliminarGrupoCorte($id = null)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('gestionar_grupos_corte')) return $this->failForbidden('No tiene permiso para eliminar grupos de corte.');
+        if (!$acceso->grupoCorteDentroAmbito((int) $id)) return $this->failNotFound('Grupo de corte no encontrado en su ámbito.');
         $periodoService = new PeriodoService();
         if ($periodoService->eliminarGrupoCorte((int) $id)) {
             return $this->respondDeleted(['status' => 'success', 'message' => 'Grupo de corte eliminado con éxito.']);
         }
         return $this->fail('No se pudo eliminar el registro.', 400);
+    }
+
+    private function periodoDentroAmbito(int $id, AccesoAsistenciaService $acceso): bool
+    {
+        $row = \Config\Database::connect()->table('casis_periodos p')->select('p.gco_ide')
+            ->where('p.per_ide', $id)->where('p.deleted_at', null)->get()->getRowArray();
+        return $row && $acceso->grupoCorteDentroAmbito((int) $row['gco_ide']);
     }
 }

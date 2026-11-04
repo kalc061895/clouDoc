@@ -5,6 +5,7 @@ namespace Modules\Asistencia\Controllers;
 use App\Core\Controllers\BaseModuleController;
 use Modules\Asistencia\Services\TurnoService;
 use Modules\Asistencia\Services\TurnoHorarioService;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class TurnoController extends BaseModuleController
 {
@@ -21,6 +22,8 @@ class TurnoController extends BaseModuleController
      */
     public function getPaneTurnos($personalId)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito((int) $personalId)) return $this->response->setStatusCode(404)->setBody('Trabajador no encontrado.');
         $calendario = new \Modules\Asistencia\Services\CalendarioPersonalService();
         try {
             [$fechaInicio, $fechaFin] = $calendario->periodo($this->request->getGet('fecha_inicio'));
@@ -47,6 +50,8 @@ class TurnoController extends BaseModuleController
      */
     public function getByPersonal($personalId)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito((int) $personalId)) return $this->jsonResponse('error', 'Trabajador no encontrado en su ámbito.', [], 404);
         $fechaInicio = $this->request->getGet('fecha_inicio');
         $fechaFin    = $this->request->getGet('fecha_fin');
 

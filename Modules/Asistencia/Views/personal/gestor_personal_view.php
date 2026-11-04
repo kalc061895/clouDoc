@@ -10,10 +10,10 @@
                 <h4 class="card-title mb-0">Padrón General de Personal</h4>
                 <h6 class="card-subtitle text-muted small">Gestión de datos personales, laborales y asistenciales.</h6>
             </div>
-            <a href="<?= base_url('asistencia/personal/nuevo') ?>" class="btn btn-primary d-flex align-items-center">
+            <?php if (!empty($puedeCrear)): ?><a href="<?= base_url('asistencia/personal/nuevo') ?>" class="btn btn-primary d-flex align-items-center">
                 <iconify-icon icon="solar:user-plus-bold" class="me-2" style="font-size: 1.2rem;"></iconify-icon>
                 Registrar Nuevo
-            </a>
+            </a><?php endif ?>
         </div>
 
         <div class="table-responsive mb-2" style="height: 680px;">
@@ -117,6 +117,8 @@
 <?= $this->section('pageScripts') ?>
 <script>
     const URL_BASE = '<?= base_url('asistencia/personal') ?>';
+    const PUEDE_EDITAR_PERSONAL = <?= json_encode((bool)($puedeEditar ?? false)) ?>;
+    const PUEDE_ELIMINAR_PERSONAL = <?= json_encode((bool)($puedeEliminar ?? false)) ?>;
     let idPersonalSeleccionado = null;
 
     $(document).ready(function() {
@@ -161,7 +163,7 @@
                     orderable: false,
                     render: function(data, type, row) {
                         let btnBaja = '';
-                        if (row.estado == 1) {
+                        if (PUEDE_ELIMINAR_PERSONAL && row.estado == 1) {
                             btnBaja = `
                                 <li>
                                     <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmarBaja(${data})">
@@ -171,6 +173,9 @@
                             `;
                         }
 
+                        const accionesEdicion = PUEDE_EDITAR_PERSONAL ? `
+                            <li><a class="dropdown-item" href="${URL_BASE}/editar/${data}"><iconify-icon icon="solar:pen-bold" class="me-1 text-info"></iconify-icon> Editar Formulario</a></li>
+                        ` : '';
                         return `
                             <div class="btn-group">
                                 <button type="button" class="btn btn-sm btn-light-primary text-primary px-2" onclick="abrirModalGestion(${data}, 'pane-datos', '${row.nombre_completo}', '${row.documento}')" title="Ver Datos">
@@ -211,11 +216,7 @@
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="${URL_BASE}/editar/${data}">
-                                            <iconify-icon icon="solar:pen-bold" class="me-1 text-info"></iconify-icon> Editar Formulario
-                                        </a>
-                                    </li>
+                                    ${accionesEdicion}
                                     ${btnBaja}
                                 </ul>
                             </div>

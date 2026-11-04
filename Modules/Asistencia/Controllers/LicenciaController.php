@@ -9,6 +9,7 @@ use Modules\Asistencia\Models\RegistroLicenciaModel;
 use Modules\Asistencia\Services\LicenciaService;
 use Modules\Asistencia\Services\RegistroLicenciaService;
 use Modules\Asistencia\Models\RegistroLicenciaHistorialModel;
+use Modules\Asistencia\Services\AccesoAsistenciaService;
 
 class LicenciaController extends BaseController
 {
@@ -35,6 +36,7 @@ class LicenciaController extends BaseController
      */
     public function tiposActivos()
     {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->failForbidden('No tiene acceso a esta información.');
         $tipos = $this->licenciaModel->activos();
         return $this->respond([
             'status' => 200,
@@ -48,6 +50,8 @@ class LicenciaController extends BaseController
      */
     public function obtenerPorPersonal($perlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('lectura_personal') || !$acceso->personalDentroAmbito((int) $perlIde)) return $this->failNotFound('Trabajador no encontrado en su ámbito.');
         $licenciaService = new RegistroLicenciaService();
         $mes  = $this->request->getGet('mes');
         $anio = $this->request->getGet('anio');
@@ -67,6 +71,10 @@ class LicenciaController extends BaseController
      */
     public function guardar()
     {
+        $acceso = new AccesoAsistenciaService();
+        if (!$acceso->permitir('crear_operacion')) return $this->failForbidden('No tiene permiso para registrar licencias.');
+        $personalId = (int) $this->request->getPost('rl_perl_ide');
+        if (!$personalId || !$acceso->personalDentroAmbito($personalId)) return $this->failForbidden('El trabajador está fuera de su ámbito.');
         $registroLicenciaService = new RegistroLicenciaService();
         $usuarioId = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
         $ip = $this->request->getIPAddress();
@@ -119,6 +127,9 @@ class LicenciaController extends BaseController
      */
     public function eliminar($rlIde)
     {
+        $acceso = new AccesoAsistenciaService();
+        $registro = $this->db->table('casis_registro_licencia')->select('rl_perl_ide')->where('rl_ide', (int) $rlIde)->where('deleted_at', null)->get()->getRowArray();
+        if (!$acceso->permitir('eliminar_operacion') || !$registro || !$acceso->personalDentroAmbito((int) $registro['rl_perl_ide'])) return $this->failForbidden('No tiene permiso para eliminar esta licencia.');
         $licenciaService = new RegistroLicenciaService();
         try {
             $usuarioId    = session()->get('user_id') ?? session()->get('usu_ide') ?? 1;
