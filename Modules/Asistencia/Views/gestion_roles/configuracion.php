@@ -106,7 +106,7 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
                                     <small>Puede ajustar la copia antes de guardar. Cargar una fuente reemplaza las reglas del formulario.</small>
                                 </div>
                                 <h3 class="h6">Reglas de programación</h3>
-                                <p class="small text-muted">Los ámbitos vacíos aplican a todos. Si selecciona oficina, régimen y modalidad, deben coincidir todos. Siempre se controlan superposiciones y la compatibilidad de modalidad.</p>
+                                <p class="small text-muted">Los ámbitos vacíos aplican a todos. Si selecciona oficina, régimen y modalidad, deben coincidir todos. Se controlan superposiciones y las reglas del cargo.</p>
                                 <div id="reglas-vacio" class="alert alert-light border small"><?= $esPeriodo ? 'Este período no tiene reglas todavía. Agregue una regla o cárguela desde una plantilla.' : 'Esta plantilla no tiene reglas todavía. Agregue una regla para guardarla.' ?></div>
                                 <div id="reglas"></div>
                                 <input type="hidden" name="reglas" id="reglas-json">

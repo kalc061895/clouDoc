@@ -253,7 +253,7 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
                 <?php endforeach ?>
             </div>
             <div class="nota">Los conteos GD, GN, M, T, N y demás códigos representan turnos asignados. Total horas suma las duraciones de los horarios, incluidos los nocturnos. Una casilla vacía indica que no hay turno programado.</div>
-            <br><br><br><br>
+            
             <table class="firmas">
                 <tr>
                     <td>

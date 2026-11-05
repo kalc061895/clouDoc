@@ -1,8 +1,10 @@
 <?php
+
 use Modules\Asistencia\Services\RolDocumentoData;
+
 $filas = $filas ?? $documento['personal'];
 $offset = $offset ?? 0;
-$numero = static fn ($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
+$numero = static fn($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
 $letras = [1 => 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
 $anchoDia = 55 / $documento['dias_mes'];
 $anchoConteo = 12 / count($documento['codigos']);
@@ -26,22 +28,24 @@ $anchoConteo = 12 / count($documento['codigos']);
     </thead>
     <tbody>
         <?php foreach ($filas as $i => $persona): ?>
-        <tr>
-            <td><?= $offset + $i + 1 ?></td>
-            <td class="nombre"><?= esc($persona['trabajador']) ?></td>
-            <td><?= esc($persona['dni']) ?></td>
-            <td class="nombre cargo"><?= esc($persona['cargo']) ?></td>
-            <?php foreach ($documento['dias'] as $dia): ?>
-            <td class="dia <?= $dia['es_fin_de_semana'] ? 'fin-semana' : '' ?>">
-                <?php foreach ($persona['dias'][$dia['dia']] ?? [] as $turno): ?>
-                <div class="turno" style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></div>
+            <tr>
+                <td><?= $offset + $i + 1 ?></td>
+                <td class="nombre"><?= esc($persona['trabajador']) ?></td>
+                <td><?= esc($persona['dni']) ?></td>
+                <td class="nombre cargo"><?= esc($persona['cargo']) ?></td>
+                <?php foreach ($documento['dias'] as $dia): ?>
+                    <td class="dia <?= $dia['es_fin_de_semana'] ? 'fin-semana' : '' ?>">
+                        <?php foreach ($persona['dias'][$dia['dia']] ?? [] as $turno): ?>
+                            <div class="turno" style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></div>
+                        <?php endforeach ?>
+                    </td>
                 <?php endforeach ?>
-            </td>
-            <?php endforeach ?>
-            <?php foreach ($documento['codigos'] as $codigo): ?><td><?= (int) ($persona['conteos'][$codigo] ?? 0) ?></td><?php endforeach ?>
-            <td class="horas"><?= $numero($persona['total_horas']) ?></td>
-        </tr>
+                <?php foreach ($documento['codigos'] as $codigo): ?><td><?= (int) ($persona['conteos'][$codigo] ?? 0) ?></td><?php endforeach ?>
+                <td class="horas"><?= $numero($persona['total_horas']) ?></td>
+            </tr>
         <?php endforeach ?>
-        <?php if (! $filas): ?><tr><td colspan="<?= 5 + $documento['dias_mes'] + count($documento['codigos']) ?>">No hay turnos programados para los filtros seleccionados.</td></tr><?php endif ?>
+        <?php if (! $filas): ?><tr>
+                <td colspan="<?= 5 + $documento['dias_mes'] + count($documento['codigos']) ?>">No hay turnos programados para los filtros seleccionados.</td>
+            </tr><?php endif ?>
     </tbody>
 </table>

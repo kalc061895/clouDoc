@@ -200,6 +200,20 @@ class ProgramacionController extends BaseModuleController
     /**
      * Descarga de plantilla Excel predeterminada para importación
      */
+    public function apiTurnosPermitidos()
+    {
+        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a programacion de turnos.', [], 403);
+        $personalId = (int) $this->request->getGet('perl_ide');
+        $fecha = (string) $this->request->getGet('fecha');
+        if (!$personalId || !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $fecha)) return $this->jsonResponse('error', 'Trabajador o fecha invalidos.', [], 422);
+        try {
+            $permitidos = $this->service->obtenerTurnosPermitidos($personalId, $fecha);
+            return $this->jsonResponse('success', 'Reglas cargadas.', ['codigos' => $permitidos]);
+        } catch (\DomainException $e) {
+            return $this->jsonResponse('error', $e->getMessage(), [], 400);
+        }
+    }
+
     public function descargarPlantilla()
     {
         $anio   = (int) ($this->request->getGet('anio') ?? date('Y'));

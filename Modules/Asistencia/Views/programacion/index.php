@@ -586,12 +586,12 @@ Programación Mensual de Turnos
             guardarTurnoIndividual();
         });
 
-        poblarSelectTurnos();
     });
 
-    function poblarSelectTurnos() {
+    function poblarSelectTurnos(codigosPermitidos = null, turnoActual = null) {
         let options = '<option value="">Seleccione turno...</option>';
         catalogoTurnos.forEach(function(t) {
+            if (Array.isArray(codigosPermitidos) && !codigosPermitidos.includes(t.tur_codigo) && t.tur_codigo !== (turnoActual && turnoActual.tur_codigo)) return;
             if (t.horarios && t.horarios.length > 0) {
                 t.horarios.forEach(function(h) {
                     options += `<option value="${h.th_ide}" data-tur="${t.tur_codigo}" data-horas="${h.duracion_horas}" data-color="${t.tur_color}">
@@ -761,8 +761,10 @@ Programación Mensual de Turnos
         $('#ind_trabajador_nombre').text(trabajador);
         $('#ind_fecha_texto').text(fecha);
 
+        let turnoActual = null;
         if (turnos && turnos.length > 0) {
             let t = turnos[0]; // Editar turno existente
+            turnoActual = t;
             $('#modalIndividualTitulo').text('Editar Turno Asignado');
             $('#ind_prog_ide').val(t.prog_ide);
             $('#ind_th_ide').val(t.th_ide);
@@ -781,7 +783,19 @@ Programación Mensual de Turnos
             $('#ind_info_turno').html('');
         }
 
-        $('#modalTurnoIndividual').modal('show');
+        $('#ind_th_ide').html('<option value="">Cargando turnos permitidos...</option>');
+        $.get('<?= base_url('asistencia/programacion/api/turnos-permitidos') ?>', {perl_ide: perlIde, fecha: fecha})
+            .done(function(res) {
+                const data = res.data || res;
+                const codigos = data.codigos === undefined ? null : data.codigos;
+                poblarSelectTurnos(codigos, turnoActual);
+                if (turnoActual) $('#ind_th_ide').val(turnoActual.th_ide);
+                $('#modalTurnoIndividual').modal('show');
+            })
+            .fail(function(xhr) {
+                const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'No se pudieron cargar los turnos permitidos.';
+                toastr.error(msg);
+            });
     }
 
     function guardarTurnoIndividual() {

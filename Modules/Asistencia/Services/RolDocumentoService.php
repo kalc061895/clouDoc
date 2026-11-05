@@ -137,7 +137,7 @@ class RolDocumentoService
         $miembros = json_decode((string) $envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
         $anio = (int) $envio['anio'];
         $mes = (int) $envio['mes'];
-        $diasMes = cal_days_in_month(CAL_GREGORIAN, $mes, $anio);
+        $diasMes = (int) (new \DateTimeImmutable(sprintf('%04d-%02d-01', $anio, $mes)))->format('t');
         $dias = [];
         $tz = new \DateTimeZone('America/Lima');
         for ($dia = 1; $dia <= $diasMes; $dia++) {

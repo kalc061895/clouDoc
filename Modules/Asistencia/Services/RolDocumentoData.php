@@ -68,7 +68,7 @@ class RolDocumentoData
 
     public static function preparar(array $matriz, array $cabecera, array $filtros): array
     {
-        $codigos = ['GD', 'GN', 'M', 'T', 'N'];
+        $codigos = [];
         $leyenda = [];
         $total = 0.0;
         foreach ($matriz['matriz'] as &$persona) {

@@ -111,7 +111,7 @@ class GestionRolService
     }
     public function turnos(int $personal): array
     {
-        return $this->db->table('casis_programacion pr')->select('pr.*, h.th_hora_ingreso, h.th_hora_salida, t.tur_codigo, t.tur_modalidad, t.tur_nombre, t.tur_color')
+        return $this->db->table('casis_programacion pr')->select('pr.*, h.th_hora_ingreso, h.th_hora_salida, t.tur_codigo, t.tur_nombre, t.tur_color')
             ->join('casis_turno_horario h', 'h.th_ide = pr.prog_th_ide')->join('casis_turno t', 't.tur_ide = h.th_tur_ide')
             ->where('pr.prog_perl_ide', $personal)->where('pr.deleted_at', null)->orderBy('pr.prog_fecha')->get()->getResultArray();
     }
@@ -138,7 +138,6 @@ class GestionRolService
             $intervalos[] = $t;
             if (substr($t['prog_fecha'], 0, 7) !== $mes) continue;
             $mensuales[] = $t;
-            if (($p['car_modalidad']) !== $t['tur_modalidad']) $errores[] = 'El turno no corresponde a la modalidad del trabajador.';
             if (($p['car_modalidad']) === 'ADMINISTRATIVO' && ((int)$inicio->format('N') > 5 || $t['fin'] - $t['inicio'] !== 28800)) $errores[] = 'La jornada administrativa requiere ocho horas de lunes a viernes.';
         }
         usort($intervalos, fn($a, $b) => $a['inicio'] <=> $b['inicio']);

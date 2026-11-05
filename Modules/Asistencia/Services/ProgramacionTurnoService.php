@@ -212,6 +212,28 @@ class ProgramacionTurnoService
         return array_values($catalogo);
     }
 
+    /** Códigos autorizados por las reglas aplicables al trabajador en el período. */
+    public function obtenerTurnosPermitidos(int $personalId, string $fecha): ?array
+    {
+        $personal = $this->gestionRoles->personal($personalId);
+        $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo(
+            (int) $personal['perl_est_ide'], substr($fecha, 0, 7)
+        );
+        if (!$periodo) return null;
+
+        $reglas = json_decode($periodo['reglas'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
+        $permitidos = null;
+        foreach ($reglas as $regla) {
+            if (($regla['tipo'] ?? '') !== 'TURNOS_PERMITIDOS') continue;
+            if (!empty($regla['oficina_id']) && (int)$regla['oficina_id'] !== (int)$personal['perl_ofi_ide']) continue;
+            if (!empty($regla['regimen_id']) && (int)$regla['regimen_id'] !== (int)$personal['perl_mco_ide']) continue;
+            if (!empty($regla['modalidad']) && $regla['modalidad'] !== ($personal['car_modalidad'] ?? null)) continue;
+            $codigos = array_values(array_unique($regla['turnos'] ?? []));
+            $permitidos = $permitidos === null ? $codigos : array_values(array_intersect($permitidos, $codigos));
+        }
+        return $permitidos;
+    }
+
     /**
      * Obtiene el mapa rápido de código de turno a th_ide y duración
      */
@@ -1135,7 +1157,7 @@ class ProgramacionTurnoService
         }
 
         $horarios = $this->db->table('casis_turno_horario h')
-            ->select('h.th_ide, h.th_hora_ingreso, h.th_hora_salida, t.tur_modalidad')
+            ->select('h.th_ide, h.th_hora_ingreso, h.th_hora_salida')
             ->join('casis_turno t', 't.tur_ide = h.th_tur_ide')
             ->whereIn('h.th_ide', $idsHorarios)
             ->where('h.deleted_at', null)
@@ -1187,7 +1209,6 @@ class ProgramacionTurnoService
                         'th_hora_ingreso' => $horario['th_hora_ingreso'],
                         'th_hora_salida' => $horario['th_hora_salida'],
                         'tur_codigo' => $turno['tur_codigo'],
-                        'tur_modalidad' => $horario['tur_modalidad'],
                     ];
                 }
 

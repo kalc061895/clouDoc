@@ -70,7 +70,6 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     // ==========================================
     $routes->get('gestion-roles', 'GestionRolController::index');
     $routes->get('gestion-roles/delegaciones', 'DelegacionRolController::index');
-    $routes->get('gestion-roles/turnos', 'GestionRolController::turnos');
     $routes->post('gestion-roles/delegaciones/guardar', 'DelegacionRolController::guardar', ['filter' => 'csrf']);
     $routes->post('gestion-roles/delegaciones/(:num)/eliminar', 'DelegacionRolController::eliminar/$1', ['filter' => 'csrf']);
     $routes->get('gestion-roles/envios', 'RolEnvioController::index');
@@ -93,6 +92,7 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('matriz', 'ProgramacionController::apiMatriz');
         $routes->get('eventos', 'ProgramacionController::apiEventosCalendar');
         $routes->get('turnos-catalogo', 'ProgramacionController::apiTurnosCatalogo');
+        $routes->get('turnos-permitidos', 'ProgramacionController::apiTurnosPermitidos');
         $routes->post('guardar', 'ProgramacionController::apiGuardarIndividual');
         $routes->post('eliminar/(:num)', 'ProgramacionController::apiEliminarIndividual/$1');
         $routes->post('previsualizar-excel', 'ProgramacionController::apiPrevisualizarExcel');

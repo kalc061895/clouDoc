@@ -1804,7 +1804,7 @@ try {
             });
         });
 
-        toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');
+        //toastr.info('<?= lang('Main.welcomeMessage'); ?>', '<?= lang('Main.welcomeDecription'); ?>');
     </script>
     <script type="application/json" id="user-appearance-config">
         <?= json_encode(['settings' => $aparienciaAsistencia, 'available' => $aparienciaDisponible, 'url' => base_url('perfil/preferencias'), 'csrf' => ['header' => csrf_header(), 'name' => csrf_token(), 'hash' => csrf_hash()]], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>

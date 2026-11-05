@@ -31,9 +31,9 @@ class RolEnvioService
             }
 
             $establecimientos = (new GrupoProgramacionRolService($this->db))->establecimientosDePeriodo($periodo);
-            $oficina = $this->db->table('casis_oficina')->select('ofi_est_ide')->where('ofi_ide',(int)$rol['oficina_id'])->where('deleted_at',null)->get()->getRowArray();
+            $oficina = $this->db->table('casis_oficina')->select('ofi_est_ide')->where('ofi_ide', (int)$rol['oficina_id'])->where('deleted_at', null)->get()->getRowArray();
             $establecimientoId = (int)($oficina['ofi_est_ide'] ?? 0);
-            if (!$establecimientoId || !in_array($establecimientoId,$establecimientos,true)) throw new \DomainException('La oficina no pertenece al alcance del periodo.');
+            if (!$establecimientoId || !in_array($establecimientoId, $establecimientos, true)) throw new \DomainException('La oficina no pertenece al alcance del periodo.');
             $personal = $this->db->table('casis_personal')
                 ->whereIn('perl_est_ide', $establecimientos ?: [0])
                 ->where('perl_ofi_ide', (int) $rol['oficina_id'])
@@ -45,22 +45,31 @@ class RolEnvioService
                 $this->gestion->validar($id, $periodo);
                 $turnos = array_values(array_filter(
                     $this->gestion->turnos($id),
-                    static fn (array $turno): bool => substr($turno['prog_fecha'], 0, 7) === $periodo['mes']
+                    static fn(array $turno): bool => substr($turno['prog_fecha'], 0, 7) === $periodo['mes']
                 ));
                 $perfilCompleto = $this->gestion->personal($id);
                 $persona = $this->db->table('casis_persona')->where('per_ide', (int) $perfilCompleto['perl_per_ide'])->get()->getRowArray();
                 $perfil = array_intersect_key($perfilCompleto, array_flip([
-                    'perl_ide', 'perl_per_ide', 'perl_est_ide', 'perl_ofi_ide', 'perl_car_ide',
-                    'perl_mco_ide', 'perl_codigo', 'car_modalidad', 'car_nombre',
+                    'perl_ide',
+                    'perl_per_ide',
+                    'perl_est_ide',
+                    'perl_ofi_ide',
+                    'perl_car_ide',
+                    'perl_mco_ide',
+                    'perl_codigo',
+                    'car_modalidad',
+                    'car_nombre',
                 ]));
                 $perfil['nombre_snapshot'] = trim(implode(' ', array_filter([
-                    $persona['per_paterno'] ?? '', $persona['per_materno'] ?? '', $persona['per_nombre'] ?? '',
+                    $persona['per_paterno'] ?? '',
+                    $persona['per_materno'] ?? '',
+                    $persona['per_nombre'] ?? '',
                 ])));
                 $perfil['documento_snapshot'] = $persona['per_numero_documento'] ?? '';
                 $perfil['cargo_snapshot'] = $perfil['car_nombre'] ?? 'Sin Cargo';
                 $snapshot[] = ['personal' => $perfil, 'turnos' => $turnos];
             }
-            if (! array_filter($snapshot, static fn (array $miembro): bool => count($miembro['turnos']) > 0)) {
+            if (! array_filter($snapshot, static fn(array $miembro): bool => count($miembro['turnos']) > 0)) {
                 throw new \DomainException('No hay turnos programados en esta oficina para el período.');
             }
 
@@ -105,8 +114,10 @@ class RolEnvioService
             if ((int) $envio['usuario_envio_id'] === $uid) throw new \DomainException('Quien envió el rol no puede revisarlo en RR. HH.');
             $estado = ['OBSERVAR' => 'OBSERVADO', 'VISTO_BUENO' => 'VISTO_BUENO_RRHH'][$accion];
             $this->db->table('casis_rol_envio')->where('id', $envioId)->update([
-                'estado' => $estado, 'usuario_rrhh_id' => $uid,
-                'rrhh_at' => $this->gestion->ahora(), 'comentario_rrhh' => $comentario ?: null,
+                'estado' => $estado,
+                'usuario_rrhh_id' => $uid,
+                'rrhh_at' => $this->gestion->ahora(),
+                'comentario_rrhh' => $comentario ?: null,
             ]);
             $this->db->table('casis_plan_rol')->where('id', (int) $envio['rol_id'])->update(['estado' => $estado]);
             $this->gestion->evento('RRHH_' . $accion, ['envio_id' => $envioId, 'estado' => $estado, 'comentario' => $comentario], (int) $envio['rol_id']);
@@ -130,8 +141,10 @@ class RolEnvioService
             if ($accion === 'APROBAR') $this->verificarSnapshotOperativo($envio);
             $estado = ['APROBAR' => 'APROBADO_DIRECCION', 'DEVOLVER' => 'OBSERVADO', 'RECHAZAR' => 'RECHAZADO'][$accion];
             $this->db->table('casis_rol_envio')->where('id', $envioId)->update([
-                'estado' => $estado, 'usuario_direccion_id' => $uid,
-                'direccion_at' => $this->gestion->ahora(), 'comentario_direccion' => $comentario ?: null,
+                'estado' => $estado,
+                'usuario_direccion_id' => $uid,
+                'direccion_at' => $this->gestion->ahora(),
+                'comentario_direccion' => $comentario ?: null,
             ]);
             $this->db->table('casis_plan_rol')->where('id', (int) $envio['rol_id'])->update(['estado' => $estado]);
             $this->gestion->evento('DIRECCION_' . $accion, ['envio_id' => $envioId, 'estado' => $estado, 'comentario' => $comentario], (int) $envio['rol_id']);
@@ -144,7 +157,10 @@ class RolEnvioService
         $global = false;
         foreach ([null, 'RRHH', 'DIRECCION'] as $etapa) {
             $ids = $etapa === null ? $this->gestion->oficinas() : $this->gestion->oficinas(true, $etapa);
-            if ($ids === null) { $global = true; break; }
+            if ($ids === null) {
+                $global = true;
+                break;
+            }
             $oficinas = array_merge($oficinas, $ids);
         }
         $q = $this->db->table('casis_rol_envio e')
@@ -172,9 +188,11 @@ class RolEnvioService
         $usuario = $this->gestion->usuario();
         $actorAprobado = $envio['estado'] === 'APROBADO_DIRECCION'
             && in_array($usuario, [(int) $envio['usuario_envio_id'], (int) $envio['usuario_rrhh_id'], (int) $envio['usuario_direccion_id']], true);
-        if (! $actorAprobado && ($local !== null && ! in_array((int) $envio['id_oficina'], $local, true))
+        if (
+            ! $actorAprobado && ($local !== null && ! in_array((int) $envio['id_oficina'], $local, true))
             && ($rrhh !== null && ! in_array((int) $envio['id_oficina'], $rrhh, true))
-            && ($direccion !== null && ! in_array((int) $envio['id_oficina'], $direccion, true))) {
+            && ($direccion !== null && ! in_array((int) $envio['id_oficina'], $direccion, true))
+        ) {
             throw new \DomainException('No tiene acceso a este envío.');
         }
         if (! hash_equals($envio['hash_sha256'], hash('sha256', $envio['datos_json']))) throw new \RuntimeException('La huella del snapshot no coincide; no se mostrará como íntegro.');
@@ -304,7 +322,7 @@ class RolEnvioService
         $snapshot = json_decode($envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
         $inicio = sprintf('%04d-%02d-01', $envio['anio'], $envio['mes']);
         $fin = date('Y-m-t', strtotime($inicio));
-        $idsSnapshot = array_map(static fn (array $miembro): int => (int) ($miembro['personal']['perl_ide'] ?? 0), $snapshot);
+        $idsSnapshot = array_map(static fn(array $miembro): int => (int) ($miembro['personal']['perl_ide'] ?? 0), $snapshot);
         sort($idsSnapshot);
         $idsActuales = array_map('intval', array_column($this->db->table('casis_personal')->select('perl_ide')
             ->where('perl_est_ide', (int) $envio['id_establecimiento'])->where('perl_ofi_ide', (int) $envio['id_oficina'])
@@ -328,7 +346,7 @@ class RolEnvioService
                     }
                     return $r;
                 }, $filas);
-                usort($filas, static fn (array $a, array $b): int => strcmp(json_encode($a), json_encode($b)));
+                usort($filas, static fn(array $a, array $b): int => strcmp(json_encode($a), json_encode($b)));
                 return $filas;
             };
             $esperados = $normalizar($miembro['turnos'] ?? []);

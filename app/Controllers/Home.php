@@ -50,6 +50,13 @@ class Home extends BaseController
 
                 break;
             case 'asistencia':
+                case 'asi_sua':
+                case 'asi_apo': case'asi_dm': case'asi_apoyo':                
+                case 'asi_diresa': case'asi_diresa_apoyo': case'asi_diresa_registro': case'asi_diresa_consulta': 
+                case 'asi_red': case'asi_red_apoyo': case'asi_red_registro': case'asi_red_consulta': 
+                case 'asi_mred': case'asi_mred_apoyo': case'asi_mred_registro': case'asi_mred_consulta':
+                case 'asi_est': case'asi_est_apoyo': case'asi_est_registro': case'asi_est_consulta': 
+                case 'asi_auditoria':
                 return redirect()->to(base_url('asistencia'));
             case 'postulante':
                 return redirect()->to(base_url('seleccion/postulacion'));
