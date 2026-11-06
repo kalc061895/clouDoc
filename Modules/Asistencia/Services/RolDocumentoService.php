@@ -22,7 +22,7 @@ class RolDocumentoService
         return [
             'establecimientos' => $this->db->table('casis_establecimiento')->select('est_ide, est_nombre')->where('deleted_at', null)->orderBy('est_nombre')->get()->getResultArray(),
             'tipos' => $this->db->table('casis_tipo_oficina')->select('tofi_ide, tofi_nombre')->where('deleted_at', null)->where('tofi_estado', 1)->orderBy('tofi_nombre')->get()->getResultArray(),
-            'oficinas' => $this->db->table('casis_oficina')->select('ofi_ide, ofi_nombre, ofi_est_ide, ofi_tofi_ide, ofi_padre_ide')->where('deleted_at', null)->where('ofi_estado', 1)->orderBy('ofi_nombre')->get()->getResultArray(),
+            'oficinas' => $this->db->table('casis_oficina')->select('ofi_ide, ofi_nombre, ofi_codigo_referencia, ofi_est_ide, ofi_tofi_ide, ofi_padre_ide')->where('deleted_at', null)->where('ofi_estado', 1)->orderBy('ofi_nombre')->get()->getResultArray(),
             'upss' => $this->db->table('casis_establecimiento_upss e')->select('e.eup_est_ide AS est_ide, u.ups_ide, u.ups_nombre')->join('casis_upss u', 'u.ups_ide = e.eup_ups_ide')->where('e.deleted_at', null)->where('u.deleted_at', null)->where('e.eup_estado', 1)->where('u.ups_estado', 1)->orderBy('u.ups_nombre')->get()->getResultArray(),
             'servicios' => $this->db->table('casis_establecimiento_upss_servicio s')->select('e.eup_est_ide AS est_ide, e.eup_ups_ide AS ups_ide, u.uss_ide, u.uss_nombre')->join('casis_establecimiento_upss e', 'e.eup_ide = s.eus_eup_ide')->join('casis_upss_servicio u', 'u.uss_ide = s.eus_uss_ide')->where('s.deleted_at', null)->where('e.deleted_at', null)->where('u.deleted_at', null)->where('s.eus_estado', 1)->where('e.eup_estado', 1)->where('u.uss_estado', 1)->orderBy('u.uss_nombre')->get()->getResultArray(),
         ];
@@ -52,15 +52,20 @@ class RolDocumentoService
         $index = array_column($oficinas, null, 'ofi_ide');
         $oficina = $index[$f['ofi_ide']] ?? null;
         $departamento = 'Todos';
+        $servicioAreaArbol = '';
         $actual = $oficina;
         $visitados = [];
+        $rutaOficina = [];
         while ($actual && ! isset($visitados[$actual['ofi_ide']])) {
             $visitados[$actual['ofi_ide']] = true;
+            $rutaOficina[] = $actual['ofi_nombre'];
             if (mb_strtoupper($tipos[$actual['ofi_tofi_ide']] ?? '') === 'DEPARTAMENTO') {
                 $departamento = $actual['ofi_nombre'];
-                break;
             }
             $actual = $index[$actual['ofi_padre_ide']] ?? null;
+        }
+        if ($rutaOficina) {
+            $servicioAreaArbol = implode('->', array_reverse($rutaOficina));
         }
         $ambito = $oficina ? ($tipos[$oficina['ofi_tofi_ide']] ?? 'Oficina') . ': ' . $oficina['ofi_nombre'] : ($f['tofi_ide'] ? 'Tipo: ' . $tipos[$f['tofi_ide']] : 'Todo el establecimiento');
         if ($f['incluir_hijos'] && ($f['ofi_ide'] || $f['tofi_ide'])) {
@@ -79,7 +84,9 @@ class RolDocumentoService
         $matriz['matriz'] = array_values(array_filter($matriz['matriz'], static fn($p) => ! empty($p['total_turnos'])));
         $cabecera = $est + [
             'departamento' => $departamento,
+            'codigo_referencial' => $oficina['ofi_codigo_referencia'] ?? '',
             'servicio_area' => $servicio ?: ($upss ? $upss . ' (UPSS)' : ($oficina['ofi_nombre'] ?? 'Todos')),
+            'servicio_area_arbol' => $servicioAreaArbol ?: ($servicio ?: ($upss ? $upss . ' (UPSS)' : ($oficina['ofi_nombre'] ?? 'Todos'))),
             'ambito' => $ambito,
         ];
         return RolDocumentoData::preparar($matriz, $cabecera, $f);
@@ -134,6 +141,32 @@ class RolDocumentoService
         }
 
         $cabecera = json_decode((string) $envio['cabecera_json'], true, 512, JSON_THROW_ON_ERROR);
+        // Los envíos creados antes de guardar la ruta en la cabecera no tienen
+        // servicio_area_arbol. Reconstruirla para que el primer PDF oficial
+        // generado desde esos snapshots también muestre toda la jerarquía.
+        if (empty($cabecera['servicio_area_arbol'])) {
+            $oficinasSnapshot = $this->db->table('casis_oficina')
+                ->select('ofi_ide, ofi_nombre, ofi_codigo_referencia, ofi_padre_ide')
+                ->where('ofi_est_ide', (int) $envio['id_establecimiento'])
+                ->where('deleted_at', null)
+                ->get()->getResultArray();
+            $oficinasPorId = array_column($oficinasSnapshot, null, 'ofi_ide');
+            $actual = $oficinasPorId[(int) $envio['id_oficina']] ?? null;
+            $ruta = [];
+            $visitadas = [];
+            while ($actual && ! isset($visitadas[(int) $actual['ofi_ide']])) {
+                $idActual = (int) $actual['ofi_ide'];
+                $visitadas[$idActual] = true;
+                $ruta[] = $actual['ofi_nombre'];
+                $actual = $oficinasPorId[(int) ($actual['ofi_padre_ide'] ?? 0)] ?? null;
+            }
+            if ($ruta) {
+                $cabecera['servicio_area_arbol'] = implode('->', array_reverse($ruta));
+            }
+            $cabecera['codigo_referencial'] = $cabecera['codigo_referencial']
+                ?? $cabecera['codigo_referencia']
+                ?? ($oficinasPorId[(int) $envio['id_oficina']]['ofi_codigo_referencia'] ?? '');
+        }
         $miembros = json_decode((string) $envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
         $anio = (int) $envio['anio'];
         $mes = (int) $envio['mes'];
@@ -181,11 +214,23 @@ class RolDocumentoService
         }
         if (! $matriz) throw new \DomainException('El snapshot aprobado no contiene turnos para imprimir.');
         $filtros = [
-            'anio' => $anio, 'mes' => $mes, 'est_ide' => (int) $envio['id_establecimiento'],
-            'tofi_ide' => (int) ($cabecera['tofi_ide'] ?? 0), 'ofi_ide' => (int) $envio['id_oficina'],
-            'ups_ide' => null, 'uss_ide' => null, 'incluir_hijos' => false,
+            'anio' => $anio, 
+            'mes' => $mes, 
+            'est_ide' => (int) $envio['id_establecimiento'],
+            'tofi_ide' => (int) ($cabecera['tofi_ide'] ?? 0), 
+            'ofi_ide' => (int) $envio['id_oficina'],
+            'ups_ide' => null,
+            'uss_ide' => null, 
+            'incluir_hijos' => false,
         ];
-        $documento = RolDocumentoData::preparar(['dias' => $dias, 'dias_mes' => $diasMes, 'matriz' => $matriz], $cabecera, $filtros);
+        $documento = RolDocumentoData::preparar(
+            [
+                'dias' => $dias, 
+                'dias_mes' => $diasMes, 
+                'matriz' => $matriz
+            ], 
+            $cabecera,
+            $filtros);
         return $this->guardarDocumento($documento, $filtros, $usuario, $envioId);
     }
 

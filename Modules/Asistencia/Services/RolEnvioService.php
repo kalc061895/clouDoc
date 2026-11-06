@@ -264,8 +264,12 @@ class RolEnvioService
             ->join('casis_diresa d', 'd.dir_ide = r.red_dir_ide', 'left')
             ->where('e.est_ide', $establecimientoId)->where('e.deleted_at', null)->get()->getRowArray();
         if (! $establecimiento) throw new \DomainException('El establecimiento del período ya no está disponible.');
+
         $oficinas = $this->db->table('casis_oficina')
-            ->where('ofi_est_ide', $establecimientoId)->where('deleted_at', null)->get()->getResultArray();
+            ->where('ofi_est_ide', $establecimientoId)
+            ->where('deleted_at', null)
+            ->get()
+            ->getResultArray();
         $tipos = $this->db->table('casis_tipo_oficina')->where('deleted_at', null)->get()->getResultArray();
         $tipos = array_column($tipos, 'tofi_nombre', 'tofi_ide');
         $index = array_column($oficinas, null, 'ofi_ide');
@@ -274,19 +278,25 @@ class RolEnvioService
         $departamento = 'Todos';
         $actual = $oficina;
         $visitados = [];
+        $rutaOficina = [];
         while ($actual && ! isset($visitados[$actual['ofi_ide']])) {
             $visitados[$actual['ofi_ide']] = true;
+            $rutaOficina[] = $actual['ofi_nombre'];
             if (mb_strtoupper($tipos[$actual['ofi_tofi_ide']] ?? '') === 'DEPARTAMENTO') {
                 $departamento = $actual['ofi_nombre'];
-                break;
             }
             $actual = $index[$actual['ofi_padre_ide']] ?? null;
         }
         $tipo = $tipos[$oficina['ofi_tofi_ide']] ?? 'Oficina';
+        $codigoReferencia = $oficina['ofi_codigo_referencia'] ?? '';
+        $arbolOficinas = implode('->', array_reverse($rutaOficina));
         return $establecimiento + [
             'departamento' => $departamento,
             'servicio_area' => $oficina['ofi_nombre'],
+            'servicio_area_arbol' => $arbolOficinas,
             'ambito' => $tipo . ': ' . $oficina['ofi_nombre'],
+            'codigo_referencia' => $codigoReferencia,
+            'codigo_referencial' => $codigoReferencia,
             'tofi_ide' => (int) $oficina['ofi_tofi_ide'],
         ];
     }

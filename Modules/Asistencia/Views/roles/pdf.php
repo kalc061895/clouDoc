@@ -219,6 +219,8 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
                     </td>
                     <td style="width: 70%;" class="institucion-texto">
                         MINISTERIO DE SALUD | <?= esc($cab['dir_nombre'] ?: 'DIRESA no registrada') ?> | <?= esc($cab['red_nombre'] ?: 'Red no registrada') ?>
+                        <br>
+                        PROGRAMACIÓN DE TURNOS DE TRABAJO DE PERSONAL PROFESIONAL, TÉCNICO Y AUXILIAR DE LA SALUD Y ADMINISTRATIVO
                     </td>
                     <td style="width: 15%; text-align: right;">
                         <img src="<?= $logoDerecha ?>" class="logo-img" alt="Logo Derecha">
@@ -226,12 +228,13 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
                 </tr>
             </table>
 
-            <h1>PROGRAMACIÓN DE TURNOS DE TRABAJO DE PERSONAL PROFESIONAL, TÉCNICO Y AUXILIAR DE LA SALUD</h1>
+            
             <table class="datos">
                 <tr>
-                    <td colspan="2"><b>ESTABLECIMIENTO:</b> <?= esc($cab['est_nombre']) ?></td>
+                    <td ><b>ESTABLECIMIENTO:</b> <?= esc($cab['est_nombre']) ?></td>
                     <td><b>IPRESS:</b> <?= esc($cab['est_ipress'] ?: 'No registrado') ?></td>
                     <td><b>NIVEL:</b> <?= esc($cab['est_categoria'] ?: 'No registrado') ?></td>
+                    <td><b>MES/AÑO:</b> <?= esc($documento['mes_nombre']) ?>-<?= (int) $documento['filtros']['anio'] ?></td>
                 </tr>
                 <tr>
                     <td><b>DIRESA:</b> <?= esc($cab['dir_nombre'] ?: 'No registrada') ?></td>
@@ -239,12 +242,16 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
                     <td colspan="2"><b>MICRORED:</b> <?= esc($cab['mic_nombre'] ?: 'No registrada') ?></td>
                 </tr>
                 <tr>
-                    <td><b>DEPARTAMENTO:</b> <?= esc($cab['departamento']) ?></td>
-                    <td colspan="2"><b>SERVICIO O ÁREA:</b> <?= esc($cab['servicio_area']) ?></td>
-                    <td><b>MES/AÑO:</b> <?= esc($documento['mes_nombre']) ?>-<?= (int) $documento['filtros']['anio'] ?></td>
+                    
+                    <td colspan="4">
+                        <b>Dep/Ser/Are/Ofi:</b>
+                        <b><?= esc($cab['codigo_referencial'] ?? $cab['codigo_referencia'] ?? '') ?> : </b> 
+                         <?= esc($cab['servicio_area_arbol'] ?? $cab['servicio_area']) ?>
+                    </td>
+                    
                 </tr>
             </table>
-            <div class="ambito"><b>Ámbito:</b> <?= esc($cab['ambito']) ?></div>
+            <!--div class="ambito"><b>Ámbito:</b> <?= esc($cab['ambito']) ?></div-->
             <?= view('Modules\Asistencia\Views\roles\tabla', ['documento' => $documento, 'filas' => $filas, 'offset' => $pagina['offset']]) ?>
             <div class="resumen">Personal en esta hoja: <?= count($filas) ?> · Total personal del rol: <?= count($documento['personal']) ?> · Total horas del rol: <?= $numero($documento['total_horas']) ?></div>
             <div class="leyenda"><b>LEYENDA DE TURNOS:</b>

@@ -37,7 +37,7 @@ class RolDocumentoData
         if (! $oficina && ! $tipo) {
             return null;
         }
-        $ids = $oficina ? [$oficina] : array_map('intval', array_column(array_filter($oficinas, static fn ($o) => (int) $o['ofi_tofi_ide'] === $tipo), 'ofi_ide'));
+        $ids = $oficina ? [$oficina] : array_map('intval', array_column(array_filter($oficinas, static fn($o) => (int) $o['ofi_tofi_ide'] === $tipo), 'ofi_ide'));
         if ($hijos) {
             do {
                 $before = count($ids);
@@ -97,11 +97,15 @@ class RolDocumentoData
         unset($persona);
         ksort($leyenda);
         return [
-            'cabecera' => $cabecera, 'filtros' => $filtros,
+            'cabecera' => $cabecera,
+            'filtros' => $filtros,
             'mes_nombre' => self::MESES[$filtros['mes']],
-            'dias' => $matriz['dias'], 'dias_mes' => $matriz['dias_mes'],
-            'personal' => $matriz['matriz'], 'codigos' => $codigos,
-            'leyenda' => array_values($leyenda), 'total_horas' => round($total, 2),
+            'dias' => $matriz['dias'],
+            'dias_mes' => $matriz['dias_mes'],
+            'personal' => $matriz['matriz'],
+            'codigos' => $codigos,
+            'leyenda' => array_values($leyenda),
+            'total_horas' => round($total, 2),
         ];
     }
 

@@ -209,12 +209,6 @@
     }));
     document.querySelectorAll('.js-confirmar-pdf').forEach(form => form.addEventListener('submit', async event => {
         event.preventDefault();
-        const target = 'rol-pdf-' + Date.now();
-        const popup = window.open('about:blank', target);
-        if (!popup) {
-            toastr.warning('Permita las ventanas emergentes para abrir el PDF oficial.');
-            return;
-        }
         const result = await Swal.fire({
             title: '¿Abrir PDF oficial?',
             text: 'El documento se generará desde el snapshot aprobado.',
@@ -224,9 +218,17 @@
             cancelButtonText: 'Cancelar'
         });
         if (result.isConfirmed) {
+            // Abrir la pestaña solo después de confirmar. Abrirla antes deja
+            // una pestaña about:blank visible mientras el usuario decide.
+            const target = 'rol-pdf-' + Date.now();
+            const popup = window.open('about:blank', target);
+            if (!popup) {
+                toastr.warning('Permita las ventanas emergentes para abrir el PDF oficial.');
+                return;
+            }
             form.target = target;
             form.submit();
-        } else popup.close();
+        }
     }));
 </script><?= $this->endSection() ?>
 <?= $this->endSection() ?>
