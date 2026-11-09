@@ -136,7 +136,7 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
 
         .leyenda {
             margin-top: 10px;
-            font-size: 8px;
+            font-size: 7px;
             line-height: 1.7;
         }
 
@@ -149,11 +149,6 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
             padding: 2px 5px;
         }
 
-        .nota {
-            color: #53606c;
-            font-size: 8px;
-            margin-top: 7px;
-        }
 
         .firmas {
             width: 100%;
@@ -254,12 +249,13 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
             <!--div class="ambito"><b>Ámbito:</b> <?= esc($cab['ambito']) ?></div-->
             <?= view('Modules\Asistencia\Views\roles\tabla', ['documento' => $documento, 'filas' => $filas, 'offset' => $pagina['offset']]) ?>
             <div class="resumen">Personal en esta hoja: <?= count($filas) ?> · Total personal del rol: <?= count($documento['personal']) ?> · Total horas del rol: <?= $numero($documento['total_horas']) ?></div>
+
             <div class="leyenda"><b>LEYENDA DE TURNOS:</b>
                 <?php foreach ($documento['leyenda'] as $turno): ?>
                     <span><b style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></b> <?= esc($turno['tur_nombre']) ?> (<?= esc($turno['th_hora_ingreso']) ?>–<?= esc($turno['th_hora_salida']) ?>; <?= $numero($turno['duracion_horas']) ?> h)</span>
-                <?php endforeach ?>
+                <?php endforeach ?> Una casilla vacía indica que no hay turno programado.
             </div>
-            <div class="nota">Los conteos GD, GN, M, T, N y demás códigos representan turnos asignados. Total horas suma las duraciones de los horarios, incluidos los nocturnos. Una casilla vacía indica que no hay turno programado.</div>
+            
             
             <table class="firmas">
                 <tr>

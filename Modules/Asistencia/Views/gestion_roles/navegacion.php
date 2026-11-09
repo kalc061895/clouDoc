@@ -9,4 +9,4 @@
         <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/grupos') ?>"><iconify-icon icon="lucide:network" class="me-1"></iconify-icon>Grupos de programación</a>
     <?php endif ?>
 </nav-->
-<div>   </div>
+<div></div>
