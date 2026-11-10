@@ -7,7 +7,7 @@ use CodeIgniter\Database\Seeder;
 class MenuSeeder extends Seeder
 {
     /** Opciones reservadas: sin ruta hasta implementar sus pantallas. */
-    public const PENDING_IDS = [1052, 1053, 1054, 1055, 1056];
+    public const PENDING_IDS = [1052, 1053, 1056];
     public const REPORT_IDS = [1050, 1051, 1052, 1053, 1054, 1055, 1056];
 
     /** IDs permanentes: no renumerar al agregar opciones. */
@@ -46,9 +46,10 @@ class MenuSeeder extends Seeder
             [1051, 1050, 'Reporte mensual', 'asistencia/reportes/mensual', 'document-text-line-duotone'],
             [1052, 1050, 'Auditoría', null, 'history-line-duotone'],
             [1053, 1050, 'Gestión de turnos', null, 'calendar-line-duotone'],
-            [1054, 1050, 'SUSALUD', null, 'document-text-line-duotone'],
-            [1055, 1054, 'Reporte TUASusalud', null, 'document-text-line-duotone'],
+            [1054, 1050, 'TUA SUSALUD', null, 'document-text-line-duotone'],
+            [1055, 1054, 'Reporte TUA SUSALUD', 'asistencia/reportes/tua-susalud', 'document-text-line-duotone'],
             [1056, 1054, 'Reporte SETIPRESS', null, 'document-text-line-duotone'],
+            [1095, 1054, 'Asignación de servicios por oficina', 'asistencia/reportes/tua-susalud/asignaciones', 'settings-line-duotone'],
             [1010, null, 'CATÁLOGOS DE ASISTENCIA', null, 'database-line-duotone'],
             [1011, 1010, 'Tipos de oficina', 'asistencia/gestordb/tipo-oficina', 'database-line-duotone'],
             [1012, 1010, 'Oficinas', 'asistencia/gestordb/oficina', 'database-line-duotone'],
@@ -69,6 +70,8 @@ class MenuSeeder extends Seeder
             [1026, 1010, 'Tipos de documento', 'asistencia/gestordb/tipodocumento', 'database-line-duotone'],
             [1027, 1010, 'UPSS', 'asistencia/gestordb/upss', 'database-line-duotone'],
             [1028, 1010, 'Servicios UPSS', 'asistencia/gestordb/upss-servicio', 'database-line-duotone'],
+            [1096, 1010, 'UPSS por establecimiento', 'asistencia/gestordb/establecimiento-upss', 'hospital-line-duotone'],
+            [1097, 1010, 'Servicios por establecimiento', 'asistencia/gestordb/establecimiento-upss-servicios', 'link-line-duotone'],
             [1029, 1010, 'Personas', 'asistencia/gestordb/persona', 'database-line-duotone'],
             [1030, 1010, 'Segundas especialidades', 'asistencia/gestordb/segunda-especialidad', 'database-line-duotone'],
             [1031, 1010, 'Profesión y especialidades', 'asistencia/gestordb/profesion-especialidad', 'database-line-duotone'],

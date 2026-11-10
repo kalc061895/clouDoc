@@ -23,7 +23,7 @@ class AsistenciaCatalogoFilter implements FilterInterface
         } else {
             $perfil = $acceso->perfilTerritorial();
             $territorial = $perfil && !($perfil['global'] ?? false);
-            $esEstablecimientos = str_contains($uri, '/establecimientos') || str_ends_with($uri, '/establecimiento');
+            $esEstablecimientos = str_contains($uri, '/establecimientos') || str_ends_with($uri, '/establecimiento') || str_contains($uri, '/establecimiento-upss');
             if ($territorial && $metodo !== 'GET') {
                 $permitido = $esEstablecimientos && $acceso->permitir('gestionar_catalogos');
             } elseif ($territorial) {

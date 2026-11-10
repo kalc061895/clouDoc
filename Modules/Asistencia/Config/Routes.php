@@ -37,6 +37,16 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->get('reportes/mensual/excel', 'ReporteMensualController::exportar/excel');
     $routes->get('reportes/mensual/pdf', 'ReporteMensualController::exportar/pdf');
     $routes->get('reportes/mensual/imprimir', 'ReporteMensualController::exportar/imprimir');
+    $routes->get('reportes/tua-susalud', 'TuaSusaludController::index');
+    $routes->get('reportes/tua-susalud/excel', 'TuaSusaludController::excel');
+    $routes->get('reportes/tua-susalud/catalogo', 'TuaSusaludController::catalogo');
+    $routes->get('reportes/tua-susalud/periodos', 'TuaSusaludController::periodos');
+    $routes->get('reportes/tua-susalud/consultar', 'TuaSusaludController::consultar');
+    $routes->get('reportes/tua-susalud/asignaciones', 'TuaSusaludController::asignaciones');
+    $routes->post('reportes/tua-susalud/asignaciones', 'TuaSusaludController::asignaciones', ['filter' => 'csrf']);
+    $routes->get('reportes/tua-susalud/asignaciones/catalogo', 'TuaSusaludController::catalogoAsignacion');
+    $routes->get('reportes/tua-susalud/asignaciones/listar', 'TuaSusaludController::listarAsignaciones');
+    $routes->delete('reportes/tua-susalud/asignaciones/(:num)', 'TuaSusaludController::eliminarAsignacion/$1');
 
     // Documentos de roles: consulta, PDF almacenado, historial y acceso al módulo Firma.
     $routes->group('roles', function ($routes) {
@@ -189,6 +199,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('redes', 'DatabaseController::redes');
         $routes->get('microredes', 'DatabaseController::microredes');
         $routes->get('establecimiento', 'DatabaseController::establecimientos');
+        $routes->get('establecimiento-upss', 'EstablecimientoUpssController::index');
+        $routes->get('establecimiento-upss-servicios', 'EstablecimientoUpssServicioController::index');
         $routes->get('licencia', 'DatabaseController::licencias');
         $routes->get('turno', 'DatabaseController::turnos');
         $routes->get('turno_horario', 'DatabaseController::horarios');
@@ -205,6 +217,16 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
             // Endpoints de apoyo para selects desplegables (Lookups)
             $routes->get('establecimientos-lookup', 'DatabaseController::apiEstablecimientosLookup');
             $routes->get('oficinas-lookup', 'DatabaseController::apiOficinasLookup');
+            $routes->get('establecimiento-upss/catalogos', 'EstablecimientoUpssController::catalogos');
+            $routes->get('establecimiento-upss', 'EstablecimientoUpssController::listar');
+            $routes->post('establecimiento-upss', 'EstablecimientoUpssController::crear', ['filter'=>'csrf']);
+            $routes->put('establecimiento-upss/(:num)', 'EstablecimientoUpssController::actualizar/$1', ['filter'=>'csrf']);
+            $routes->delete('establecimiento-upss/(:num)', 'EstablecimientoUpssController::eliminar/$1', ['filter'=>'csrf']);
+            $routes->get('establecimiento-upss-servicios/catalogos', 'EstablecimientoUpssServicioController::catalogos');
+            $routes->get('establecimiento-upss-servicios', 'EstablecimientoUpssServicioController::listar');
+            $routes->post('establecimiento-upss-servicios', 'EstablecimientoUpssServicioController::crear', ['filter'=>'csrf']);
+            $routes->put('establecimiento-upss-servicios/(:num)', 'EstablecimientoUpssServicioController::actualizar/$1', ['filter'=>'csrf']);
+            $routes->delete('establecimiento-upss-servicios/(:num)', 'EstablecimientoUpssServicioController::eliminar/$1', ['filter'=>'csrf']);
 
             $routes->get('diresas', 'DatabaseController::apiListarDiresas');
             $routes->post('diresas', 'DatabaseController::apiCrearDiresa');

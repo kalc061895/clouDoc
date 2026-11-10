@@ -178,8 +178,8 @@
                     searchable: false,
                     className: 'text-end',
                     render: (_d, type) => type === 'display' ?
-                        '<button type="button" class="btn btn-outline-primary btn-sm js-editar me-1">Editar</button>' +
-                        '<button type="button" class="btn btn-outline-danger btn-sm js-eliminar">Eliminar</button>' :
+                        '<button type="button" class="btn btn-outline-primary btn-sm js-editar me-1" title="Editar" aria-label="Editar"><iconify-icon icon="lucide:edit-2"></iconify-icon></button>' +
+                        '<button type="button" class="btn btn-outline-danger btn-sm js-eliminar" title="Eliminar" aria-label="Eliminar"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>' :
                         ''
                 }
             ],
