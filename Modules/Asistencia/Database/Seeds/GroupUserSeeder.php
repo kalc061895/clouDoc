@@ -38,6 +38,9 @@ class GroupUserSeeder extends Seeder
         1403 => 'asi_est_consulta',
         // Auditoria Asistencia
         1500 => 'asi_auditoria',
+        1501 => 'asi_rol',
+        1502 => 'asi_dire',
+        1503 => 'asi_rrhh',
     ];
 
     public function run()

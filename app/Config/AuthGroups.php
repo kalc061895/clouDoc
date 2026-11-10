@@ -100,6 +100,9 @@ class AuthGroups extends ShieldAuthGroups
         'asi_est_apoyo' => ['title' => 'Asistencia - Apoyo Establecimiento', 'description' => 'Operación de Asistencia con restricciones en su establecimiento.'],
         'asi_est_registro' => ['title' => 'Asistencia - Registro Establecimiento', 'description' => 'Consulta y registro de personal de su establecimiento.'],
         'asi_est_consulta' => ['title' => 'Asistencia - Consulta Establecimiento', 'description' => 'Consulta de información de su establecimiento.'],
+        'asi_rol' => ['title' => 'Asistencia - Programador de roles', 'description' => 'Programa roles de su oficina asignada.'],
+        'asi_dire' => ['title' => 'Asistencia - Aprobador de roles', 'description' => 'Aprueba roles dentro de su ?mbito asignado.'],
+        'asi_rrhh' => ['title' => 'Asistencia - Validador RR. HH.', 'description' => 'Valida roles dentro de su ?mbito asignado.'],
         'asi_auditoria' => ['title' => 'Asistencia - Auditoría', 'description' => 'Consulta global de reportes, eventos, accesos y registros de auditoría.'],
         'postulante' => [
             'title'       => 'Postulante',
@@ -155,6 +158,9 @@ class AuthGroups extends ShieldAuthGroups
         'asi_est_apoyo' => [],
         'asi_est_registro' => [],
         'asi_est_consulta' => [],
+        'asi_rol' => [],
+        'asi_dire' => [],
+        'asi_rrhh' => [],
         'asi_auditoria' => [],
         'superadmin' => [
             'admin.*',

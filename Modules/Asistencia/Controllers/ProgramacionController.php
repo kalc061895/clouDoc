@@ -43,6 +43,14 @@ class ProgramacionController extends BaseModuleController
             $ids = $acceso->establecimientosDelAmbito();
             $establecimientos = array_values(array_filter($establecimientos, static fn($e) => in_array((int)$e['est_ide'], $ids, true)));
         }
+        if (auth()->user()->inGroup('asi_rol')) {
+            $oficinaIds = (new GestionRolService())->oficinas() ?? [];
+            $establecimientoIds = array_map('intval', array_unique(array_column(
+                db_connect()->table('casis_oficina')->select('ofi_est_ide')->whereIn('ofi_ide', $oficinaIds ?: [0])->where('deleted_at', null)->get()->getResultArray(),
+                'ofi_est_ide'
+            )));
+            $establecimientos = array_values(array_filter($establecimientos, static fn($e) => in_array((int) $e['est_ide'], $establecimientoIds, true)));
+        }
 
         $upssList = $this->upssModel
             ->select('ups_ide, ups_nombre, ups_codigo')
@@ -73,7 +81,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiMatriz()
     {
-        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
+        if (!$this->permitirProgramacion(false)) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
         $anio    = (int) ($this->request->getGet('anio') ?? date('Y'));
         $mes     = (int) ($this->request->getGet('mes') ?? date('n'));
         $estIde  = !empty($this->request->getGet('est_ide')) ? (int) $this->request->getGet('est_ide') : null;
@@ -95,7 +103,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiEventosCalendar()
     {
-        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
+        if (!$this->permitirProgramacion(false)) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
         $anio    = (int) ($this->request->getGet('anio') ?? date('Y'));
         $mes     = (int) ($this->request->getGet('mes') ?? date('n'));
         $perlIde = !empty($this->request->getGet('perl_ide')) ? (int) $this->request->getGet('perl_ide') : null;
@@ -149,7 +157,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiGuardarIndividual()
     {
-        if (!(new AccesoAsistenciaService())->permitir('editar_personal')) return $this->jsonResponse('error', 'No tiene permiso para modificar la programación.', [], 403);
+        if (!$this->permitirProgramacion(true)) return $this->jsonResponse('error', 'No tiene permiso para modificar la programación.', [], 403);
         $reglas = [
             'prog_perl_ide' => 'required|is_natural_no_zero',
             'prog_fecha'    => 'required|valid_date',
@@ -202,7 +210,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiTurnosPermitidos()
     {
-        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a programacion de turnos.', [], 403);
+        if (!$this->permitirProgramacion(false)) return $this->jsonResponse('error', 'No tiene acceso a programacion de turnos.', [], 403);
         $personalId = (int) $this->request->getGet('perl_ide');
         $fecha = (string) $this->request->getGet('fecha');
         if (!$personalId || !preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $fecha)) return $this->jsonResponse('error', 'Trabajador o fecha invalidos.', [], 422);
@@ -238,7 +246,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiPrevisualizarExcel()
     {
-        if (!(new AccesoAsistenciaService())->permitir('lectura_personal')) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
+        if (!$this->permitirProgramacion(false)) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
         $archivo = $this->request->getFile('archivo_excel');
         $anio    = (int) $this->request->getPost('anio');
         $mes     = (int) $this->request->getPost('mes');
@@ -286,7 +294,7 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiProcesarImportacion()
     {
-        if (!(new AccesoAsistenciaService())->permitir('editar_personal')) return $this->jsonResponse('error', 'No tiene permiso para importar turnos.', [], 403);
+        if (!$this->permitirProgramacion(true)) return $this->jsonResponse('error', 'No tiene permiso para importar turnos.', [], 403);
         $datosSesion = session()->get('temp_import_programacion');
         if (empty($datosSesion) || empty($datosSesion['registros_validos'])) {
             return $this->jsonResponse('error', 'No hay datos validados pendientes de importación. Suba el archivo nuevamente.', [], 400);
@@ -392,4 +400,12 @@ class ProgramacionController extends BaseModuleController
         $writer->save('php://output');
         exit;
     }
+
+    private function permitirProgramacion(bool $editar): bool
+    {
+        $user = auth()->user();
+        if ($user && $user->inGroup('asi_rol')) return true;
+        return (new AccesoAsistenciaService())->permitir($editar ? 'editar_personal' : 'lectura_personal');
+    }
+
 }

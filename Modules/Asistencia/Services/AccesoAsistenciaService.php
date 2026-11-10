@@ -157,6 +157,20 @@ class AccesoAsistenciaService
         return array_map('intval', array_column($q->get()->getResultArray(), 'est_ide'));
     }
 
+    public function oficinaActualDeUsuario(): ?int
+    {
+        if (!function_exists('auth') || !auth()->loggedIn()) return null;
+        $dni = trim((string)(auth()->user()->dni ?? ''));
+        if ($dni === '') return null;
+        $rows = Database::connect()->table('casis_personal p')->select('p.perl_ofi_ide')
+            ->join('casis_persona pe', 'pe.per_ide = p.perl_per_ide AND pe.deleted_at IS NULL')
+            ->join('casis_oficina o', 'o.ofi_ide = p.perl_ofi_ide AND o.deleted_at IS NULL')
+            ->where('pe.per_numero_documento', $dni)->where('p.perl_estado', 1)->where('p.deleted_at', null)
+            ->get()->getResultArray();
+        $ids = array_values(array_unique(array_map('intval', array_column($rows, 'perl_ofi_ide'))));
+        return count($ids) === 1 ? $ids[0] : null;
+    }
+
     public function grupoCorteDentroAmbito(int $grupoId): bool
     {
         $perfil = $this->perfilTerritorial();

@@ -11,6 +11,7 @@ class GestionRolController extends BaseModuleController
     {
         $g = new GestionRolService();
         $g->usuario();
+        $g->exigirProgramador();
         $db = \Config\Database::connect();
         $ids = $g->oficinas();
         $roles = $db->table('casis_plan_rol r')->select('r.*, p.mes, p.apertura, p.aprobacion, p.cierre, o.ofi_nombre')->join('casis_plan_periodo p', 'p.id=r.periodo_id')->join('casis_oficina o', 'o.ofi_ide=r.oficina_id');
@@ -23,6 +24,11 @@ class GestionRolController extends BaseModuleController
     public function guardar(string $tipo)
     {
         $g = new GestionRolService();
+        try {
+            $g->exigirProgramador();
+        } catch (\DomainException $e) {
+            return redirect()->to(site_url('asistencia/gestion-roles/envios'))->with('error', $e->getMessage());
+        }
         $d = $this->request->getPost();
         try {
             if ($tipo === 'periodo') (new \Modules\Asistencia\Services\ConfiguracionRolService())->guardarPeriodo($d);

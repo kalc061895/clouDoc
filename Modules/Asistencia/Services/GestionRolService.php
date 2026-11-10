@@ -39,6 +39,25 @@ class GestionRolService
     public function oficinas(bool $aprobar = false, ?string $etapa = null): ?array
     {
         if ($this->administrador()) return null;
+        if ($this->usuarioTieneGrupo('asi_rol')) {
+            if ($aprobar) return [];
+            $oficina = (new AccesoAsistenciaService())->oficinaActualDeUsuario();
+            return $oficina ? [$oficina] : [];
+        }
+        foreach (['asi_dire' => 'DIRECCION', 'asi_rrhh' => 'RRHH'] as $grupo => $etapaGrupo) {
+            if (!$this->usuarioTieneGrupo($grupo)) continue;
+            if ($aprobar && $etapa !== $etapaGrupo) return [];
+            if (!$aprobar && $etapa !== null) return [];
+            $hoy = substr($this->ahora(), 0, 10);
+            $q = $this->db->table('casis_plan_responsable')->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy)->where('aprobar', 1)->where('etapa', $etapaGrupo);
+            $ids = array_map('intval', array_column($q->get()->getResultArray(), 'oficina_id'));
+            $oficinas = $this->db->table('casis_oficina')->where('deleted_at', null)->where('ofi_estado', 1)->get()->getResultArray();
+            do {
+                $antes = count($ids);
+                foreach ($oficinas as $o) if (in_array((int)$o['ofi_padre_ide'], $ids, true) && !in_array((int)$o['ofi_ide'], $ids, true)) $ids[] = (int)$o['ofi_ide'];
+            } while (count($ids) !== $antes);
+            return array_values(array_unique($ids));
+        }
         $accesoTerritorial = new AccesoAsistenciaService();
         $perfil = $accesoTerritorial->perfilTerritorial();
         if (($perfil['modo'] ?? null) === 'auditoria') return [];
@@ -69,6 +88,15 @@ class GestionRolService
         } while (count($ids) !== $antes);
         return $ids;
     }
+    private function usuarioTieneGrupo(string $grupo): bool
+    {
+        return function_exists('auth') && auth()->loggedIn() && auth()->user()->inGroup($grupo);
+    }
+    public function exigirProgramador(): void
+    {
+        if ($this->usuarioTieneGrupo('asi_dire') || $this->usuarioTieneGrupo('asi_rrhh')) throw new \DomainException('Este perfil solo puede revisar roles en su etapa asignada.');
+        if ($this->usuarioTieneGrupo('asi_rol') && !(new AccesoAsistenciaService())->oficinaActualDeUsuario()) throw new \DomainException('El usuario no tiene una oficina activa asignada.');
+    }
     public function exigirOficina(int $id, bool $aprobar = false, ?string $etapa = null): void
     {
         $ids = $this->oficinas($aprobar, $etapa);
@@ -89,6 +117,7 @@ class GestionRolService
     /** Debe ejecutarse dentro de la misma transacción que la escritura. */
     public function editable(int $id, string $fecha): array
     {
+        $this->exigirProgramador();
         $p = $this->personal($id);
         $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo((int)$p['perl_est_ide'], substr($fecha, 0, 7), true);
         if (!$periodo) throw new \DomainException('No existe un periodo de programación aplicable al establecimiento ni a sus niveles superiores.');

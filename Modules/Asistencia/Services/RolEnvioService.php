@@ -16,6 +16,7 @@ class RolEnvioService
 
     public function enviar(int $rolId): int
     {
+        $this->gestion->exigirProgramador();
         return $this->gestion->transaccion(function () use ($rolId): int {
             $rol = $this->db->query('SELECT * FROM casis_plan_rol WHERE id = ? FOR UPDATE', [$rolId])->getRowArray();
             if (! $rol) throw new \OutOfBoundsException('No se encontró el rol de la oficina.');
