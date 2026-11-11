@@ -30,8 +30,9 @@ class TuaSusaludService
 
     public function establecimientosAccesibles(): array
     {
-        $rows=$this->establecimientos();$ids=$this->ambitoEstablecimientos();
-        return $ids===null ? $rows : array_values(array_filter($rows,static fn($e)=>in_array((int)$e['est_ide'],$ids,true)));
+        $rows = $this->establecimientos();
+        $ids = $this->ambitoEstablecimientos();
+        return $ids === null ? $rows : array_values(array_filter($rows, static fn($e) => in_array((int)$e['est_ide'], $ids, true)));
     }
 
     public function puedeAcceder(): bool
@@ -44,8 +45,8 @@ class TuaSusaludService
         $user = function_exists('auth') ? auth()->user() : null;
         if (!$user) return false;
         if ($user->inGroup('superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm')) return true;
-        $perfil=(new AccesoAsistenciaService())->perfilTerritorial();
-        return $perfil && !($perfil['global']??false) && ($perfil['modo']??'')==='completo' && !empty($this->ambitoEstablecimientos());
+        $perfil = (new AccesoAsistenciaService())->perfilTerritorial();
+        return $perfil && !($perfil['global'] ?? false) && ($perfil['modo'] ?? '') === 'completo' && !empty($this->ambitoEstablecimientos());
     }
 
     private function ambitoEstablecimientos(): ?array
@@ -53,7 +54,7 @@ class TuaSusaludService
         if ($this->ambitoCache !== null) return $this->ambitoCache;
         $user = function_exists('auth') ? auth()->user() : null;
         if (!$user) return $this->ambitoCache = [];
-        if ($user->inGroup('superadmin','asistencia','asi_sua','asi_adm','asi_dm')) return $this->ambitoCache = null;
+        if ($user->inGroup('superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm')) return $this->ambitoCache = null;
         $acceso = new AccesoAsistenciaService();
         $perfil = $acceso->perfilTerritorial();
         if ($perfil) {
@@ -67,14 +68,15 @@ class TuaSusaludService
         elseif ($user->inGroup('asi_rrhh')) $oficinas = $gestion->oficinas(true, 'RRHH') ?? [];
         if (!$oficinas) return $this->ambitoCache = [];
         return $this->ambitoCache = array_values(array_unique(array_map('intval', array_column(
-            $this->db->table('casis_oficina')->select('ofi_est_ide')->whereIn('ofi_ide', $oficinas)->where('deleted_at', null)->get()->getResultArray(), 'ofi_est_ide'
+            $this->db->table('casis_oficina')->select('ofi_est_ide')->whereIn('ofi_ide', $oficinas)->where('deleted_at', null)->get()->getResultArray(),
+            'ofi_est_ide'
         ))));
     }
 
     public function validarEstablecimiento(int $establecimientoId): void
     {
-        $ids=$this->ambitoEstablecimientos();
-        if ($establecimientoId<1 || ($ids!==null && !in_array($establecimientoId,$ids,true))) throw new \DomainException('El establecimiento está fuera del ámbito de acceso.');
+        $ids = $this->ambitoEstablecimientos();
+        if ($establecimientoId < 1 || ($ids !== null && !in_array($establecimientoId, $ids, true))) throw new \DomainException('El establecimiento está fuera del ámbito de acceso.');
     }
 
     public function periodos(int $establecimientoId): array
@@ -92,7 +94,7 @@ class TuaSusaludService
             $hayProgramacion = $this->db->table('casis_programacion pr')->join('casis_personal p', 'p.perl_ide=pr.prog_perl_ide')
                 ->join('casis_cargo c', "c.car_ide=p.perl_car_ide AND c.deleted_at IS NULL AND c.car_modalidad='ASISTENCIAL'")
                 ->where('p.perl_est_ide', $establecimientoId)->where('p.deleted_at', null)->where('pr.deleted_at', null)
-                ->where('pr.prog_fecha >=', $desde)->where('pr.prog_fecha <', $hasta)->whereNotIn('pr.prog_estado',['ANULADO','CANCELADO'])->countAllResults() > 0;
+                ->where('pr.prog_fecha >=', $desde)->where('pr.prog_fecha <', $hasta)->whereNotIn('pr.prog_estado', ['ANULADO', 'CANCELADO'])->countAllResults() > 0;
             if ($hayProgramacion) $result[] = ['mes' => $mes, 'id' => (int) $periodo['id'], 'nivel' => $periodo['nivel'], 'grupo' => $periodo['grupo_nombre'] ?? ''];
         }
         return $result;
@@ -106,13 +108,14 @@ class TuaSusaludService
         if (!$periodo || !in_array($mes, $mesValido, true)) throw new \DomainException('Seleccione un período con programación registrada para el establecimiento.');
         $inicio = $mes . '-01';
         $fin = (new \DateTimeImmutable($inicio))->modify('+1 month')->format('Y-m-d');
-        $personal = $this->db->table('casis_personal p')->select("p.perl_ide, e.est_ipress, e.est_nombre, r.red_nombre, td.tdi_abreviatura, pe.per_numero_documento, col.col_abreviatura, pp.pp_numero_colegiatura, pe.per_paterno, pe.per_materno, pe.per_nombre, se.se_nombre, s.uss_nombre")
+        $personal = $this->db->table('casis_personal p')->select("p.perl_ide, e.est_ipress, e.est_nombre, r.red_nombre, td.tdi_abreviatura, pe.per_numero_documento,pro.pro_abreviatura, col.col_abreviatura, pp.pp_numero_colegiatura, pe.per_paterno, pe.per_materno, pe.per_nombre, se.se_nombre, s.uss_nombre")
             ->join('casis_persona pe', 'pe.per_ide=p.perl_per_ide AND pe.deleted_at IS NULL', 'inner')
             ->join('casis_establecimiento e', 'e.est_ide=p.perl_est_ide AND e.deleted_at IS NULL', 'inner')
             ->join('casis_microred m', 'm.mic_ide=e.est_mic_ide AND m.deleted_at IS NULL', 'left')
             ->join('casis_red r', 'r.red_ide=m.mic_red_ide AND r.deleted_at IS NULL', 'left')
             ->join('casis_tipo_documento_identidad td', 'td.tdi_ide=pe.per_tdi_ide', 'left')
             ->join('casis_personal_profesion pp', 'pp.pp_perl_ide=p.perl_ide AND pp.pp_principal=1 AND pp.deleted_at IS NULL', 'inner')
+            ->join('casis_profesion pro', 'pro.pro_ide=pp.pp_pro_ide AND pro.deleted_at IS NULL', 'inner')
             ->join('casis_cargo c', "c.car_ide=p.perl_car_ide AND c.deleted_at IS NULL AND c.car_modalidad='ASISTENCIAL'", 'inner')
             ->join('casis_colegiatura col', 'col.col_ide=pp.pp_col_ide AND col.deleted_at IS NULL', 'left')
             ->join('casis_segunda_especialidad se', 'se.se_ide=pp.pp_se_ide AND se.deleted_at IS NULL', 'left')
@@ -125,7 +128,7 @@ class TuaSusaludService
         if ($ids) {
             $resultados = $this->db->table('casis_programacion p')->select('p.prog_perl_ide, DAY(p.prog_fecha) AS dia, h.th_hora_ingreso, h.th_hora_salida')
                 ->join('casis_turno_horario h', 'h.th_ide=p.prog_th_ide')->whereIn('p.prog_perl_ide', $ids)
-                ->where('p.prog_fecha >=', $inicio)->where('p.prog_fecha <', $fin)->where('p.deleted_at', null)->whereNotIn('p.prog_estado',['ANULADO','CANCELADO'])
+                ->where('p.prog_fecha >=', $inicio)->where('p.prog_fecha <', $fin)->where('p.deleted_at', null)->whereNotIn('p.prog_estado', ['ANULADO', 'CANCELADO'])
                 ->orderBy('p.prog_fecha')->orderBy('h.th_hora_ingreso')->get()->getResultArray();
             foreach ($resultados as $t) {
                 $key = (int) $t['prog_perl_ide'];
@@ -136,7 +139,7 @@ class TuaSusaludService
         }
         foreach ($personal as &$fila) {
             $fila['especialidad'] = $fila['se_nombre'] ?: 'SIN ESPECIALIDAD';
-            $fila['profesion'] = $fila['col_abreviatura'] ?: '';
+            $fila['profesion'] = $fila['col_abreviatura'] ?: $fila['pro_abreviatura'] ?: 'SIN PROFESIÓN';
             $fila['colegiatura'] = trim((string) $fila['pp_numero_colegiatura']) !== '' ? $fila['pp_numero_colegiatura'] : '000000';
             $fila['apellidos'] = trim(($fila['per_paterno'] ?? '') . ' ' . ($fila['per_materno'] ?? ''));
             $fila['servicio'] = $fila['uss_nombre'] ?: 'SIN ASIGNACION';
@@ -202,7 +205,7 @@ class TuaSusaludService
         $asignados = [];
         if ($establecimientoId) {
             $this->validarEstablecimiento($establecimientoId);
-            $oficinas = $this->db->table('casis_oficina')->where('ofi_est_ide', $establecimientoId)->where('ofi_estado',1)->where('deleted_at', null)->orderBy('ofi_nombre')->get()->getResultArray();
+            $oficinas = $this->db->table('casis_oficina')->where('ofi_est_ide', $establecimientoId)->where('ofi_estado', 1)->where('deleted_at', null)->orderBy('ofi_nombre')->get()->getResultArray();
             $servicios = $this->db->table('casis_establecimiento_upss e')->select('DISTINCT s.uss_ide, s.uss_nombre', false)->join('casis_establecimiento_upss_servicio es', 'es.eus_eup_ide=e.eup_ide AND es.deleted_at IS NULL AND es.eus_estado=1')->join('casis_upss_servicio s', 's.uss_ide=es.eus_uss_ide AND s.deleted_at IS NULL AND s.uss_estado=1')->where('e.eup_est_ide', $establecimientoId)->where('e.deleted_at', null)->where('e.eup_estado', 1)->orderBy('s.uss_nombre')->get()->getResultArray();
             $asignados = array_column($this->db->table('casis_tua_servicio_oficina')->whereIn('oficina_id', array_map('intval', array_column($oficinas, 'ofi_ide')) ?: [0])->get()->getResultArray(), 'servicio_id', 'oficina_id');
         }
@@ -212,47 +215,58 @@ class TuaSusaludService
     public function listarAsignaciones(int $establecimientoId = 0): array
     {
         if ($establecimientoId) $this->validarEstablecimiento($establecimientoId);
-        $q=$this->db->table('casis_tua_servicio_oficina x')->select('x.id, x.oficina_id, x.servicio_id, x.created_at, x.updated_at, o.ofi_nombre, e.est_ide, e.est_nombre, e.est_ipress, r.red_nombre, s.uss_nombre')
-            ->join('casis_oficina o','o.ofi_ide=x.oficina_id AND o.deleted_at IS NULL','inner')
-            ->join('casis_establecimiento e','e.est_ide=o.ofi_est_ide AND e.deleted_at IS NULL','inner')
-            ->join('casis_microred m','m.mic_ide=e.est_mic_ide AND m.deleted_at IS NULL','left')
-            ->join('casis_red r','r.red_ide=m.mic_red_ide AND r.deleted_at IS NULL','left')
-            ->join('casis_upss_servicio s','s.uss_ide=x.servicio_id AND s.deleted_at IS NULL','inner');
-        $ids=$this->ambitoEstablecimientos();if($ids!==null)$q->whereIn('e.est_ide',$ids?:[0]);
-        if($establecimientoId)$q->where('e.est_ide',$establecimientoId);
+        $q = $this->db->table('casis_tua_servicio_oficina x')->select('x.id, x.oficina_id, x.servicio_id, x.created_at, x.updated_at, o.ofi_nombre, e.est_ide, e.est_nombre, e.est_ipress, r.red_nombre, s.uss_nombre')
+            ->join('casis_oficina o', 'o.ofi_ide=x.oficina_id AND o.deleted_at IS NULL', 'inner')
+            ->join('casis_establecimiento e', 'e.est_ide=o.ofi_est_ide AND e.deleted_at IS NULL', 'inner')
+            ->join('casis_microred m', 'm.mic_ide=e.est_mic_ide AND m.deleted_at IS NULL', 'left')
+            ->join('casis_red r', 'r.red_ide=m.mic_red_ide AND r.deleted_at IS NULL', 'left')
+            ->join('casis_upss_servicio s', 's.uss_ide=x.servicio_id AND s.deleted_at IS NULL', 'inner');
+        $ids = $this->ambitoEstablecimientos();
+        if ($ids !== null) $q->whereIn('e.est_ide', $ids ?: [0]);
+        if ($establecimientoId) $q->where('e.est_ide', $establecimientoId);
         return $q->orderBy('e.est_nombre')->orderBy('o.ofi_nombre')->get()->getResultArray();
     }
 
     public function guardarRelacionServicioOficina(array $datos): int
     {
-        $id=(int)($datos['id']??0);$establecimiento=(int)($datos['establecimiento_id']??0);$oficina=(int)($datos['oficina_id']??0);$servicio=(int)($datos['servicio_id']??0);
+        $id = (int)($datos['id'] ?? 0);
+        $establecimiento = (int)($datos['establecimiento_id'] ?? 0);
+        $oficina = (int)($datos['oficina_id'] ?? 0);
+        $servicio = (int)($datos['servicio_id'] ?? 0);
         $this->validarEstablecimiento($establecimiento);
-        if(!$this->db->table('casis_oficina')->where('ofi_ide',$oficina)->where('ofi_est_ide',$establecimiento)->where('ofi_estado',1)->where('deleted_at',null)->countAllResults()) throw new \DomainException('Seleccione una oficina activa del establecimiento.');
-        $valido=$this->db->table('casis_establecimiento_upss e')->join('casis_establecimiento_upss_servicio es','es.eus_eup_ide=e.eup_ide')->join('casis_upss_servicio s','s.uss_ide=es.eus_uss_ide AND s.deleted_at IS NULL AND s.uss_estado=1')
-            ->where('e.eup_est_ide',$establecimiento)->where('es.eus_uss_ide',$servicio)->where('e.deleted_at',null)->where('e.eup_estado',1)
-            ->where('es.deleted_at',null)->where('es.eus_estado',1)->countAllResults()>0;
-        if(!$valido) throw new \DomainException('Seleccione un servicio UPSS activo del establecimiento.');
-        $duplicado=$this->db->table('casis_tua_servicio_oficina')->where('oficina_id',$oficina);
-        if($id)$duplicado->where('id !=',$id);
-        if($duplicado->countAllResults())throw new \DomainException('La oficina ya tiene un servicio asignado. Edite la relación existente.');
-        $now=date('Y-m-d H:i:s');$uid=function_exists('auth')&&auth()->loggedIn()?(int)auth()->id():null;
-        if($id){$actual=$this->db->table('casis_tua_servicio_oficina')->where('id',$id)->get()->getRowArray();if(!$actual)throw new \DomainException('La relación no existe.');$this->validarOficinaAsignada((int)$actual['oficina_id']);$this->db->table('casis_tua_servicio_oficina')->where('id',$id)->update(['oficina_id'=>$oficina,'servicio_id'=>$servicio,'updated_at'=>$now,'updated_by'=>$uid]);return $id;}
-        $this->db->table('casis_tua_servicio_oficina')->insert(['oficina_id'=>$oficina,'servicio_id'=>$servicio,'created_at'=>$now,'updated_at'=>$now,'created_by'=>$uid,'updated_by'=>$uid]);
+        if (!$this->db->table('casis_oficina')->where('ofi_ide', $oficina)->where('ofi_est_ide', $establecimiento)->where('ofi_estado', 1)->where('deleted_at', null)->countAllResults()) throw new \DomainException('Seleccione una oficina activa del establecimiento.');
+        $valido = $this->db->table('casis_establecimiento_upss e')->join('casis_establecimiento_upss_servicio es', 'es.eus_eup_ide=e.eup_ide')->join('casis_upss_servicio s', 's.uss_ide=es.eus_uss_ide AND s.deleted_at IS NULL AND s.uss_estado=1')
+            ->where('e.eup_est_ide', $establecimiento)->where('es.eus_uss_ide', $servicio)->where('e.deleted_at', null)->where('e.eup_estado', 1)
+            ->where('es.deleted_at', null)->where('es.eus_estado', 1)->countAllResults() > 0;
+        if (!$valido) throw new \DomainException('Seleccione un servicio UPSS activo del establecimiento.');
+        $duplicado = $this->db->table('casis_tua_servicio_oficina')->where('oficina_id', $oficina);
+        if ($id) $duplicado->where('id !=', $id);
+        if ($duplicado->countAllResults()) throw new \DomainException('La oficina ya tiene un servicio asignado. Edite la relación existente.');
+        $now = date('Y-m-d H:i:s');
+        $uid = function_exists('auth') && auth()->loggedIn() ? (int)auth()->id() : null;
+        if ($id) {
+            $actual = $this->db->table('casis_tua_servicio_oficina')->where('id', $id)->get()->getRowArray();
+            if (!$actual) throw new \DomainException('La relación no existe.');
+            $this->validarOficinaAsignada((int)$actual['oficina_id']);
+            $this->db->table('casis_tua_servicio_oficina')->where('id', $id)->update(['oficina_id' => $oficina, 'servicio_id' => $servicio, 'updated_at' => $now, 'updated_by' => $uid]);
+            return $id;
+        }
+        $this->db->table('casis_tua_servicio_oficina')->insert(['oficina_id' => $oficina, 'servicio_id' => $servicio, 'created_at' => $now, 'updated_at' => $now, 'created_by' => $uid, 'updated_by' => $uid]);
         return (int)$this->db->insertID();
     }
 
     public function eliminarRelacionServicioOficina(int $id): void
     {
-        $row=$this->db->table('casis_tua_servicio_oficina')->where('id',$id)->get()->getRowArray();
-        if(!$row)throw new \DomainException('La relación ya no existe.');
+        $row = $this->db->table('casis_tua_servicio_oficina')->where('id', $id)->get()->getRowArray();
+        if (!$row) throw new \DomainException('La relación ya no existe.');
         $this->validarOficinaAsignada((int)$row['oficina_id']);
-        $this->db->table('casis_tua_servicio_oficina')->where('id',$id)->delete();
+        $this->db->table('casis_tua_servicio_oficina')->where('id', $id)->delete();
     }
 
     private function validarOficinaAsignada(int $oficinaId): void
     {
-        $row=$this->db->table('casis_oficina')->select('ofi_est_ide')->where('ofi_ide',$oficinaId)->where('deleted_at',null)->get()->getRowArray();
-        if(!$row)throw new \DomainException('La relación está fuera del ámbito disponible.');
+        $row = $this->db->table('casis_oficina')->select('ofi_est_ide')->where('ofi_ide', $oficinaId)->where('deleted_at', null)->get()->getRowArray();
+        if (!$row) throw new \DomainException('La relación está fuera del ámbito disponible.');
         $this->validarEstablecimiento((int)$row['ofi_est_ide']);
     }
 
