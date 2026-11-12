@@ -5,4 +5,13 @@
 <?= view('Modules\Asistencia\Views\calificacion\tabla',['c'=>$c]) ?>
 <p>Horas de presencia dentro del turno programado. Licencias y vacaciones se muestran por separado. Guardias clasificadas por fecha de inicio. No constituye cálculo de descuentos ni remuneraciones. Documento sin firma digital.</p>
 <h2>Observaciones revisadas</h2><?php foreach (json_decode($c['resultado'],true) as $r): if (!$r['observaciones']) continue; ?><p><strong><?= esc($r['personal']['per_numero_documento']) ?></strong>: <?php foreach ($r['observaciones'] as $o): ?><?= esc($o['fecha'].' '.str_replace('_',' ',$o['codigo'])) ?>; <?php endforeach ?></p><?php endforeach ?>
+<?php foreach (json_decode($c['resultado'], true) as $r): ?>
+<?php if (empty($r['clasificaciones_confirmadas'])) continue; ?>
+<h2>Clasificación de marcaciones confirmada · <?= esc($r['personal']['per_numero_documento']) ?></h2>
+<table><thead><tr><th>Marcación</th><th>Tipo confirmado</th><th>Evento posible</th><th>Usuario y fecha</th><th>Sustento</th></tr></thead><tbody>
+<?php foreach ($r['clasificaciones_confirmadas'] as $marcaId => $clasificacion): ?>
+<tr><td>#<?= (int)$marcaId ?></td><td><?= esc($clasificacion['tipo']) ?></td><td><?= esc($clasificacion['evento']) ?></td><td><?= (int)$clasificacion['usuario_id'] ?> · <?= esc($clasificacion['fecha']) ?></td><td><?= esc($clasificacion['sustento']) ?></td></tr>
+<?php endforeach ?>
+</tbody></table>
+<?php endforeach ?>
 </body></html>

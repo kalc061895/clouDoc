@@ -4,10 +4,106 @@
 <div class="container-fluid py-3"><a href="<?= site_url('asistencia/calificacion') ?>">Volver a calificaciones</a>
 <h1 class="h3">Calificación #<?= (int)$c['id'] ?> - <?= esc($c['estado']) ?></h1>
 <?php foreach (['error'=>'danger','success'=>'success'] as $key=>$color): if (session()->getFlashdata($key)): ?><div role="alert" class="alert alert-<?= $color ?>"><?= esc(session()->getFlashdata($key)) ?></div><?php endif; endforeach ?>
-<p>Las horas asistidas se limitan al horario programado. Las licencias y vacaciones no se suman como presencia física. Las papeletas APROBADAS justifican sus intervalos; los demás estados requieren revisión. Los casos ambiguos no reciben horas automáticas. Revisar acepta los resultados con sustento; para corregir cifras, corrija el registro de origen y genere otra versión.</p>
+<p>Las horas asistidas se limitan al horario programado. Las papeletas APROBADAS justifican sus intervalos. Use la clasificación manual para resolver tipos ambiguos o excluir marcaciones y recalcular. Revisar acepta los resultados con sustento.</p>
 <div class="table-responsive"><?= view('Modules\Asistencia\Views\calificacion\tabla',['c'=>$c]) ?></div>
 <h2 class="h5">Observaciones y detalle diario</h2>
-<?php foreach (json_decode($c['resultado'],true) as $r): ?><details class="card card-body mb-2"><summary><?= esc($r['personal']['per_numero_documento'].' - '.$r['personal']['per_paterno']) ?>: <?= count($r['observaciones']) ?> observaciones</summary><ul><?php foreach ($r['observaciones'] as $o): ?><li><?= esc($o['fecha'].' / '.str_replace('_',' ',$o['codigo'])) ?></li><?php endforeach ?></ul><table class="table"><thead><tr><th>Fecha</th><th>Turno</th><th>Minutos asistidos</th><th>Tardanza</th><th>Justificado</th></tr></thead><tbody><?php foreach ($r['detalle'] as $d): ?><tr><td><?= esc($d['fecha']) ?></td><td><?= esc($d['turno']) ?></td><td><?= (int)$d['minutos_asistidos'] ?></td><td><?= (int)$d['minutos_tardanza'] ?></td><td><?= $d['justificado']?'Sí':'No' ?></td></tr><?php endforeach ?></tbody></table></details><?php endforeach ?>
+<p>Las marcas sin tipo reciben una propuesta según su orden dentro del turno. Dos marcas sugieren ingreso y salida. Los pares intermedios sugieren salida y retorno de pausa. El refrigerio requiere corroboración con el trabajador o su horario. Confirme las propuestas para recalcular las horas de esta calificación.</p>
+<p>El tipo indica ENTRADA o SALIDA. El motivo original muestra el sustento registrado en la marcación. Las clasificaciones confirmadas se conservan en esta calificación con su usuario y sustento.</p>
+<?php $fuentesRevision = json_decode($c['fuentes'], true); $editable = !in_array($c['estado'], ['CERRADA', 'ANULADA'], true); ?>
+<?php foreach (json_decode($c['resultado'], true) as $r): ?>
+<details class="card card-body mb-2">
+    <summary><?= esc($r['personal']['per_numero_documento'].' - '.$r['personal']['per_paterno'].' '.($r['personal']['per_nombre'] ?? '')) ?> · <?= count($r['observaciones']) ?> observaciones</summary>
+    <ul><?php foreach ($r['observaciones'] as $o): ?><li><?= esc($o['fecha'].' / '.str_replace('_', ' ', $o['codigo'])) ?></li><?php endforeach ?></ul>
+    <div class="table-responsive"><table class="table">
+        <thead><tr><th>Fecha</th><th>Turno</th><th>Minutos asistidos</th><th>Tardanza</th><th>Justificado</th></tr></thead>
+        <tbody><?php foreach ($r['detalle'] as $d): ?><tr><td><?= esc($d['fecha']) ?></td><td><?= esc($d['turno']) ?></td><td><?= (int)$d['minutos_asistidos'] ?></td><td><?= (int)$d['minutos_tardanza'] ?></td><td><?= $d['justificado'] ? 'Sí' : 'No' ?></td></tr><?php endforeach ?></tbody>
+    </table></div>
+    <?php $hayPropuestas = false; ?>
+    <?php foreach ($r['detalle'] as $d): ?>
+        <?php if (!isset($d['clasificacion'])): ?>
+            <p>Genere una nueva versión para obtener propuestas de clasificación para este turno.</p>
+            <?php continue; ?>
+        <?php endif ?>
+        <?php $clasificacion = $d['clasificacion']; $hayPropuestas = $hayPropuestas || $clasificacion['proponible']; ?>
+        <?php if (!$clasificacion['marcaciones']) continue; ?>
+        <h3 class="h6 mt-3"><?= esc($d['turno'].' · '.$d['horario']) ?></h3>
+        <?php if ($clasificacion['razon']): ?><p class="text-warning"><?= esc($clasificacion['razon']) ?> Revise las marcaciones de origen.</p><?php endif ?>
+        <div class="table-responsive"><table class="table table-sm">
+            <thead><tr><th>Fecha y hora</th><th>Tipo original</th><th>Motivo original</th><th>Tipo propuesto / confirmado</th><th>Evento posible</th><th>Revisión</th></tr></thead>
+            <tbody><?php foreach ($clasificacion['marcaciones'] as $marca): ?>
+                <tr>
+                    <td><?= esc($marca['fecha_hora']) ?></td>
+                    <td><?= esc($marca['tipo_original'] ?: 'Sin identificar') ?></td>
+                    <td><?= esc($marca['motivo_original'] ?: 'Sin motivo registrado') ?></td>
+                    <td><?= esc($marca['confirmada']['tipo'] ?? $marca['tipo_propuesto'] ?? 'Por resolver') ?></td>
+                    <td><?= esc($marca['confirmada']['evento'] ?? $marca['evento']) ?></td>
+                    <td><?php if ($marca['confirmada']): ?>
+                        Confirmada por usuario <?= (int)$marca['confirmada']['usuario_id'] ?> · <?= esc($marca['confirmada']['fecha']) ?><br><?= esc($marca['confirmada']['sustento']) ?>
+                    <?php elseif ($marca['pendiente']): ?>
+                        <?= $clasificacion['proponible'] ? 'Propuesta pendiente' : 'Revisión manual' ?>
+                    <?php else: ?>Tipo registrado<?php endif ?></td>
+                </tr>
+            <?php endforeach ?></tbody>
+        </table></div>
+    <?php endforeach ?>
+    <?php if ($hayPropuestas && !in_array($c['estado'], ['CERRADA', 'ANULADA'], true)): ?>
+        <form method="post" action="<?= site_url('asistencia/calificacion/'.$c['id'].'/clasificar') ?>" class="my-3">
+            <?= csrf_field() ?>
+            <input type="hidden" name="personal_id" value="<?= (int)$r['personal']['perl_ide'] ?>">
+            <label class="d-block">Sustento de clasificación<textarea name="motivo" required minlength="10" maxlength="2000" class="form-control"></textarea></label>
+            <button class="btn btn-outline-primary mt-2">Confirmar propuestas de este trabajador y recalcular</button>
+        </form>
+    <?php endif ?>
+    <?php
+        $personalId = (int)$r['personal']['perl_ide'];
+        $marcasRevision = array_values(array_filter($fuentesRevision['marcas'], static fn($m) => (int)$m['asi_perl_ide'] === $personalId));
+        usort($marcasRevision, static fn($a, $b) => strcmp($a['asi_fecha_hora'], $b['asi_fecha_hora']));
+        $turnosRevision = array_filter($fuentesRevision['turnos'], static fn($t) => (int)$t['prog_perl_ide'] === $personalId);
+    ?>
+    <?php if ($marcasRevision): ?>
+    <details class="mt-3">
+        <summary>Clasificación manual de marcaciones</summary>
+        <p>Seleccione ingreso, salida o no tomar en cuenta. Cuando una marca coincida con varios turnos, seleccione también el turno correspondiente. Guarde las selecciones con un sustento para recalcular.</p>
+        <form method="post" action="<?= site_url('asistencia/calificacion/'.$c['id'].'/clasificar-manual') ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="personal_id" value="<?= $personalId ?>">
+            <div class="table-responsive"><table class="table table-sm">
+                <thead><tr><th>Fecha y hora</th><th>Tipo original</th><th>Clasificación aplicada</th><?php if ($editable): ?><th>Selección manual</th><th>Turno</th><?php endif ?></tr></thead>
+                <tbody><?php foreach ($marcasRevision as $marca): ?>
+                    <?php $marcaId = (int)$marca['asi_ide']; $confirmada = $r['clasificaciones_confirmadas'][$marcaId] ?? null; ?>
+                    <tr>
+                        <td><?= esc($marca['asi_fecha_hora']) ?></td>
+                        <td><?= esc(($marca['asi_tipo'] ?? '') ?: 'Sin identificar') ?></td>
+                        <td><?= esc($confirmada['tipo'] ?? 'Tipo original') ?>
+                            <?php if ($confirmada): ?><br><small><?= esc($confirmada['sustento']) ?> · Usuario <?= (int)$confirmada['usuario_id'] ?> · <?= esc($confirmada['fecha']) ?></small><?php endif ?>
+                        </td>
+                        <?php if ($editable): ?>
+                        <td><select name="marcaciones[<?= $marcaId ?>][tipo]" class="form-select" aria-label="Clasificar marcación <?= $marcaId ?>">
+                            <option value="">Conservar clasificación actual</option>
+                            <option value="ENTRADA">Ingreso</option>
+                            <option value="SALIDA">Salida</option>
+                            <option value="IGNORAR">No tomar en cuenta</option>
+                        </select></td>
+                        <td><select name="marcaciones[<?= $marcaId ?>][turno_id]" class="form-select" aria-label="Turno de marcación <?= $marcaId ?>">
+                            <option value="0">Según horario programado</option>
+                            <?php foreach ($turnosRevision as $turno): ?>
+                                <?php if (empty($turno['prog_ide'])) continue; ?>
+                                <option value="<?= (int)$turno['prog_ide'] ?>" <?= (int)($confirmada['turno_id'] ?? 0) === (int)$turno['prog_ide'] ? 'selected' : '' ?>><?= esc($turno['prog_fecha'].' · '.$turno['tur_codigo'].' · '.$turno['th_hora_ingreso'].' — '.$turno['th_hora_salida']) ?></option>
+                            <?php endforeach ?>
+                        </select></td>
+                        <?php endif ?>
+                    </tr>
+                <?php endforeach ?></tbody>
+            </table></div>
+            <?php if ($editable): ?>
+                <label class="d-block">Sustento de la revisión manual<textarea name="motivo" required minlength="10" maxlength="2000" class="form-control"></textarea></label>
+                <button class="btn btn-primary mt-2">Guardar clasificación manual y recalcular</button>
+            <?php endif ?>
+        </form>
+    </details>
+    <?php endif ?>
+</details>
+<?php endforeach ?>
 <?php if (!in_array($c['estado'],['CERRADA','ANULADA'],true)): ?>
 <form method="post" action="<?= site_url('asistencia/calificacion/'.$c['id'].'/revisar') ?>" class="card card-body my-3"><?= csrf_field() ?><label>Sustento de revisión de todas las observaciones<textarea name="motivo" required minlength="10" maxlength="2000" class="form-control"></textarea></label><button class="btn btn-secondary mt-2">Confirmar revisión de los resultados</button></form>
 <form method="post" action="<?= site_url('asistencia/calificacion/'.$c['id'].'/cerrar') ?>" class="card card-body my-3"><?= csrf_field() ?><label>Sustento de cierre<input name="motivo" required minlength="10" maxlength="2000" class="form-control"></label><button class="btn btn-primary mt-2" <?= $c['estado']==='OBSERVADA'?'disabled':'' ?>>Cerrar definitivamente</button></form>

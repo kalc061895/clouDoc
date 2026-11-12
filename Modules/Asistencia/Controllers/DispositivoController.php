@@ -19,10 +19,36 @@ class DispositivoController extends BaseModuleController
     }
     public function guardar()
     {
+        if (!$this->request->is('post') || service('router')->getMatchedRoute() === null) {
+            return $this->response->setStatusCode(405)->setJSON(['status'=>'error', 'message'=>'Use el formulario de dispositivos.']);
+        }
         try {
-            (new DispositivoService())->guardar($this->request->getPost());
+            $servicio = new DispositivoService();
+            $servicio->guardar($this->request->getPost());
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'=>'success', 'message'=>'Dispositivo guardado.',
+                    'equipos'=>$servicio->listar(), 'csrf'=>['name'=>csrf_token(), 'hash'=>csrf_hash()],
+                ]);
+            }
             return redirect()->to(site_url('asistencia/dispositivos'))->with('success','Dispositivo guardado.');
-        } catch (\DomainException $e) { return redirect()->to(site_url('asistencia/dispositivos'))->with('error',$e->getMessage()); }
+        } catch (\DomainException $e) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'status'=>'error', 'message'=>$e->getMessage(), 'csrf'=>['name'=>csrf_token(), 'hash'=>csrf_hash()],
+                ]);
+            }
+            return redirect()->to(site_url('asistencia/dispositivos'))->with('error',$e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Guardar dispositivo: {error}', ['error'=>$e->getMessage()]);
+            if ($this->request->isAJAX()) {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status'=>'error', 'message'=>'No se pudo completar la operación. Revise el listado antes de reintentar.',
+                    'csrf'=>['name'=>csrf_token(), 'hash'=>csrf_hash()],
+                ]);
+            }
+            return redirect()->to(site_url('asistencia/dispositivos'))->with('error','No se pudo guardar el dispositivo.');
+        }
     }
     public function archivos()
     {

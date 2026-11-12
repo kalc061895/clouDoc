@@ -8,17 +8,34 @@ class DispositivoService
 {
     private $db;
     private PeriodoService $periodos;
-    public function __construct($db = null, ?PeriodoService $periodos = null)
+    private AccesoAsistenciaService $acceso;
+    public function __construct($db = null, ?PeriodoService $periodos = null, ?AccesoAsistenciaService $acceso = null)
     {
         $this->db = $db ?? \Config\Database::connect();
         $this->periodos = $periodos ?? new PeriodoService();
+        $this->acceso = $acceso ?? new AccesoAsistenciaService();
     }
     public function usuario(bool $configurar = false): int
     {
         if (!auth()->loggedIn()) throw new \DomainException('Debe iniciar sesión.');
-        $grupos = $configurar ? ['superadmin', 'asistencia', 'asi_sua', 'asi_adm', 'asi_dm'] : ['superadmin', 'asi_sua', 'asi_adm', 'asi_dm', 'asistencia'];
-        if (!auth()->user()->inGroup(...$grupos)) throw new \DomainException('No tiene permiso para esta operación de dispositivos.');
+        if ($configurar) {
+            if (!$this->acceso->esSuperadministrador()) throw new \DomainException('No tiene permiso para configurar dispositivos.');
+        } else {
+            $perfil = $this->acceso->perfilTerritorial();
+            if (($perfil['modo'] ?? '') !== 'completo') throw new \DomainException('No tiene permiso para importar asistencia.');
+            if (!($perfil['global'] ?? false) && !$this->acceso->establecimientosDelAmbito()) throw new \DomainException('No tiene un ámbito institucional asignado de forma unívoca.');
+        }
         return (int)auth()->id();
+    }
+    private function aplicarAmbito(\CodeIgniter\Database\BaseBuilder $query, string $columna): void
+    {
+        $perfil = $this->acceso->perfilTerritorial();
+        if (($perfil['modo'] ?? '') === 'completo' && ($perfil['global'] ?? false)) return;
+        $query->whereIn($columna, $this->acceso->establecimientosDelAmbito() ?: [0]);
+    }
+    private function exigirEstablecimiento(int $id): void
+    {
+        if ($id < 1 || !$this->acceso->establecimientoDentroAmbito($id)) throw new \DomainException('El establecimiento está fuera de su ámbito de acceso.');
     }
     private function ahora(): string
     {
@@ -27,18 +44,23 @@ class DispositivoService
     public function listar(): array
     {
         $this->usuario();
-        return $this->db->table('casis_dispositivo d')->select('d.*, e.est_nombre')->join('casis_establecimiento e', 'e.est_ide=d.est_id')->orderBy('d.nombre')->get()->getResultArray();
+        $query = $this->db->table('casis_dispositivo d')->select('d.*, e.est_nombre')->join('casis_establecimiento e', 'e.est_ide=d.est_id')->where('e.deleted_at', null);
+        $this->aplicarAmbito($query, 'd.est_id');
+        return $query->orderBy('d.nombre')->get()->getResultArray();
     }
     public function establecimientos(): array
     {
         $this->usuario();
-        return $this->db->table('casis_establecimiento')->where('deleted_at', null)->orderBy('est_nombre')->get()->getResultArray();
+        $query = $this->db->table('casis_establecimiento')->where('deleted_at', null);
+        $this->aplicarAmbito($query, 'est_ide');
+        return $query->orderBy('est_nombre')->get()->getResultArray();
     }
     public function dispositivo(int $id): array
     {
         $this->usuario();
         $row = $this->db->table('casis_dispositivo')->where('id', $id)->get()->getRowArray();
         if (!$row) throw new \DomainException('Dispositivo no encontrado.');
+        $this->exigirEstablecimiento((int)$row['est_id']);
         return $row;
     }
     public function guardar(array $d): void
@@ -80,15 +102,18 @@ class DispositivoService
     public function historial(int $pagina = 1): array
     {
         $this->usuario();
-        return $this->db->table('casis_asistencia_importacion i')->select('i.*, u.username, e.est_nombre')
+        $query = $this->db->table('casis_asistencia_importacion i')->select('i.*, u.username, e.est_nombre')
             ->join('users u', 'u.id=i.imp_user_ide', 'left')->join('casis_establecimiento e', 'e.est_ide=i.imp_est_ide', 'left')
-            ->where('i.imp_codigo !=', null)->orderBy('i.imp_ide', 'DESC')->limit(25, (max(1, $pagina) - 1) * 25)->get()->getResultArray();
+            ->where('i.imp_codigo !=', null);
+        $this->aplicarAmbito($query, 'i.imp_est_ide');
+        return $query->orderBy('i.imp_ide', 'DESC')->limit(25, (max(1, $pagina) - 1) * 25)->get()->getResultArray();
     }
     public function carga(int $id): array
     {
         $this->usuario();
         $row = $this->db->table('casis_asistencia_importacion i')->select('i.*, u.username')->join('users u', 'u.id=i.imp_user_ide', 'left')->where('i.imp_ide', $id)->where('i.imp_codigo !=', null)->get()->getRowArray();
         if (!$row) throw new \DomainException('Carga no encontrada.');
+        $this->exigirEstablecimiento((int)$row['imp_est_ide']);
         return $row;
     }
     public function ruta(array $carga): string
@@ -235,6 +260,7 @@ class DispositivoService
             $bloqueo = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
             $carga = $this->db->query('SELECT * FROM casis_asistencia_importacion WHERE imp_ide = ?' . $bloqueo, [$id])->getRowArray();
             if (!$carga || !$carga['imp_codigo']) throw new \DomainException('Carga no encontrada.');
+            $this->exigirEstablecimiento((int)$carga['imp_est_ide']);
             if ($carga['imp_estado'] === 'PROCESADO') throw new \DomainException('Esta carga ya fue procesada.');
             if (!$this->dispositivo((int)$carga['imp_dispositivo_id'])['activo']) throw new \DomainException('El dispositivo está inactivo.');
             $r = $this->analizar($carga, true);

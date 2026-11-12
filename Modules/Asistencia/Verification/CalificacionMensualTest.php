@@ -55,6 +55,64 @@ final class CalificacionMensualTest extends CIUnitTestCase
         $id=$this->generar(); $this->service->method('exigirOficina')->willThrowException(new DomainException('Sin autorización.'));
         $this->expectException(DomainException::class); $this->service->pdfs($id);
     }
+    public function testConfirmaPropuestasConAuditoriaYConservaFuentes(): void
+    {
+        $this->source['turnos'] = [['prog_perl_ide'=>1, 'prog_fecha'=>'2026-10-04', 'th_hora_ingreso'=>'08:00:00', 'th_hora_salida'=>'14:00:00', 'tur_codigo'=>'M']];
+        $this->source['marcas'] = [
+            ['asi_ide'=>10, 'asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-10-04 08:10:00', 'asi_tipo'=>null],
+            ['asi_ide'=>11, 'asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-10-04 14:00:00', 'asi_tipo'=>null],
+        ];
+        $id = $this->generar();
+        $antes = $this->service->obtener($id);
+        $this->service->aceptarPropuestas($id, 1, 'Horarios corroborados con el responsable.');
+        $despues = $this->service->obtener($id);
+        self::assertSame($antes['fuentes'], $despues['fuentes']);
+        self::assertSame('LISTA', $despues['estado']);
+        $r = json_decode($despues['resultado'], true)[0];
+        self::assertSame(350, $r['minutos_asistidos']);
+        self::assertSame(10, $r['minutos_tardanza']);
+        self::assertSame(9, $r['clasificaciones_confirmadas'][10]['usuario_id']);
+        self::assertSame('', $r['detalle'][0]['clasificacion']['marcaciones'][0]['tipo_original']);
+        self::assertSame('CLASIFICAR', $this->service->eventos($id)[1]['accion']);
+        $this->service->accion($id, 'CERRAR', 'Resultados revisados y confirmados.');
+        $this->expectException(DomainException::class);
+        $this->service->aceptarPropuestas($id, 1, 'Intento de modificar un cierre.');
+    }
+    public function testClasificacionRechazaFuentesModificadas(): void
+    {
+        $id = $this->generar();
+        $this->source['personal'][0]['perl_ofi_ide'] = 8;
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('registros cambiaron');
+        $this->service->aceptarPropuestas($id, 1, 'Revisión documentada del responsable.');
+    }
+    public function testRevisionManualPermiteExcluirYReclasificarConAuditoria(): void
+    {
+        $this->source['turnos'] = [['prog_ide'=>20, 'prog_perl_ide'=>1, 'prog_fecha'=>'2026-10-04', 'th_hora_ingreso'=>'08:00:00', 'th_hora_salida'=>'14:00:00', 'tur_codigo'=>'M']];
+        $this->source['marcas'] = [
+            ['asi_ide'=>10, 'asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-10-04 08:00:00', 'asi_tipo'=>null],
+            ['asi_ide'=>11, 'asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-10-04 14:00:00', 'asi_tipo'=>null],
+        ];
+        $id = $this->generar();
+        $this->service->aceptarPropuestas($id, 1, 'Exclusión revisada de ambas marcas.', [10=>['tipo'=>'IGNORAR'],11=>['tipo'=>'IGNORAR']]);
+        $r = json_decode($this->service->obtener($id)['resultado'], true)[0];
+        self::assertSame(0, $r['minutos_asistidos']);
+        self::assertSame(1, $r['faltas']);
+        $this->service->aceptarPropuestas($id, 1, 'Se corroboró la asistencia del trabajador.', [10=>['tipo'=>'ENTRADA','turno_id'=>20],11=>['tipo'=>'SALIDA','turno_id'=>20]]);
+        $c = $this->service->obtener($id);
+        self::assertSame(360, json_decode($c['resultado'], true)[0]['minutos_asistidos']);
+        self::assertSame('LISTA', $c['estado']);
+        self::assertNull(json_decode($c['fuentes'], true)['marcas'][0]['asi_tipo']);
+        self::assertCount(3, $this->service->eventos($id));
+        foreach ([99=>['tipo'=>'ENTRADA'], 10=>['tipo'=>'ENTRADA','turno_id'=>99]] as $marcaId=>$seleccion) {
+            try {
+                $this->service->aceptarPropuestas($id, 1, 'Intento con datos ajenos al trabajador.', [$marcaId=>$seleccion]);
+                self::fail('Debe rechazar una marca o turno ajeno.');
+            } catch (InvalidArgumentException $e) {
+                self::assertSame($c['resultado'], $this->service->obtener($id)['resultado']);
+            }
+        }
+    }
     public function testPdfSeConservaYRenderiza(): void
     {
         $this->source['personal'][0]+= ['per_numero_documento'=>'12345678','per_paterno'=>'Pérez','per_materno'=>'García','per_nombre'=>'Ana María','est_nombre'=>'Hospital de prueba'];

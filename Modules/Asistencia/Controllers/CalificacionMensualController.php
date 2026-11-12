@@ -29,6 +29,12 @@ class CalificacionMensualController extends BaseModuleController
                 case 'generar': $id=$s->generar($this->request->getPost()); break;
                 case 'criterios': $s->guardarCriterios($this->request->getPost()); break;
                 case 'pdf': $s->generarPdf($id); break;
+                case 'clasificar': $s->aceptarPropuestas($id, (int)$this->request->getPost('personal_id'), (string)$this->request->getPost('motivo')); break;
+                case 'clasificar-manual':
+                    $selecciones = $this->request->getPost('marcaciones');
+                    if (!is_array($selecciones)) throw new \InvalidArgumentException('Seleccione las marcaciones que desea revisar.');
+                    $s->aceptarPropuestas($id, (int)$this->request->getPost('personal_id'), (string)$this->request->getPost('motivo'), $selecciones);
+                    break;
                 default: $s->accion($id,strtoupper($accion),(string)$this->request->getPost('motivo')); break;
             }
             return redirect()->to(site_url('asistencia/calificacion'.($id?'/'.$id:'')))->with('success','Operación completada.');
