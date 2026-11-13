@@ -27,6 +27,29 @@ final class CalificacionMensualTest extends CIUnitTestCase
         $this->service->method('fuentes')->willReturnCallback(fn()=> $this->source);
     }
     private function generar(): int { return $this->service->generar(['periodo_id'=>1,'ambito_tipo'=>'establecimiento','ambito_id'=>1]); }
+    public function testHistorialSoloCargaResumenYReutilizaPermisos(): void
+    {
+        $this->service->expects(self::once())->method('exigirOficina')->with(7, true);
+        $this->source['marcas_no_usadas'] = str_repeat('x', 1000000);
+        $primero = $this->generar();
+        $segundo = $this->generar();
+        $historial = $this->service->historial();
+        self::assertSame([$segundo, $primero], array_map('intval', array_column($historial, 'id')));
+        self::assertSame('2026-10-01', $historial[0]['inicio']);
+        self::assertSame('2026-10-31', $historial[0]['fin']);
+        foreach (['fuentes', 'resultado', 'reglas', 'personal_acceso'] as $campo) self::assertArrayNotHasKey($campo, $historial[0]);
+        self::assertLessThan(2000, strlen(json_encode($historial)));
+    }
+    public function testHistorialNoExponeVersionesConOficinasSinAcceso(): void
+    {
+        $this->service->method('exigirOficina')->willReturnCallback(static function ($oficina) {
+            if ($oficina !== 7) throw new DomainException('Sin acceso.');
+        });
+        $permitido = $this->generar();
+        $this->source['personal'][] = ['perl_ide'=>2, 'perl_ofi_ide'=>8];
+        $this->generar();
+        self::assertSame([$permitido], array_map('intval', array_column($this->service->historial(), 'id')));
+    }
     public function testNoPermiteCerrarObservadaSinRevision(): void
     {
         $id=$this->generar(); self::assertSame('OBSERVADA',$this->service->obtener($id)['estado']);
@@ -64,7 +87,9 @@ final class CalificacionMensualTest extends CIUnitTestCase
         ];
         $id = $this->generar();
         $antes = $this->service->obtener($id);
-        $this->service->aceptarPropuestas($id, 1, 'Horarios corroborados con el responsable.');
+        self::assertSame('LISTA', $antes['estado']);
+        self::assertSame(350, json_decode($antes['resultado'], true)[0]['minutos_asistidos']);
+        $this->service->aceptarPropuestas($id, 1, 'Horarios corroborados con el responsable.', [10=>['tipo'=>'ENTRADA'],11=>['tipo'=>'SALIDA']]);
         $despues = $this->service->obtener($id);
         self::assertSame($antes['fuentes'], $despues['fuentes']);
         self::assertSame('LISTA', $despues['estado']);
@@ -85,6 +110,35 @@ final class CalificacionMensualTest extends CIUnitTestCase
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('registros cambiaron');
         $this->service->aceptarPropuestas($id, 1, 'Revisión documentada del responsable.');
+    }
+    public function testGenerarAplicaPropuestasAunqueHorarioRequieraRevision(): void
+    {
+        foreach (['MANUAL', 'AUTO'] as $modo) {
+            $this->source['turnos'] = [['prog_perl_ide'=>1, 'prog_fecha'=>'2026-10-04',
+                'th_hora_ingreso'=>'08:00:00', 'th_hora_salida'=>'14:00:00', 'tur_codigo'=>'M',
+                'th_interpretacion'=>$modo, 'th_margen_marcacion'=>120, 'th_refrigerio_marcacion'=>'CON_MARCAS',
+                'th_refrigerio_salida'=>'11:00', 'th_refrigerio_retorno'=>'12:00']];
+            $this->source['marcas'] = [
+                ['asi_ide'=>10,'asi_perl_ide'=>1,'asi_fecha_hora'=>'2026-10-04 08:10:00','asi_tipo'=>null],
+                ['asi_ide'=>11,'asi_perl_ide'=>1,'asi_fecha_hora'=>'2026-10-04 14:00:00','asi_tipo'=>null],
+            ];
+            $id = $this->generar();
+            $c = $this->service->obtener($id);
+            $r = json_decode($c['resultado'], true)[0];
+            self::assertSame(350, $r['minutos_asistidos']);
+            self::assertSame(10, $r['minutos_tardanza']);
+            $clasificacion = $r['detalle'][0]['clasificacion'];
+            self::assertTrue($clasificacion['automatica']);
+            self::assertFalse($clasificacion['proponible']);
+            self::assertSame([false, false], array_column($clasificacion['marcaciones'], 'pendiente'));
+            self::assertNotContains('TIPOS_MARCACION_PENDIENTES_DE_CONFIRMAR', array_column($r['observaciones'], 'codigo'));
+            self::assertContains('INTERPRETACION_HORARIO_PENDIENTE', array_column($r['observaciones'], 'codigo'));
+            self::assertNull(json_decode($c['fuentes'], true)['marcas'][0]['asi_tipo']);
+            $this->service->aceptarPropuestas($id, 1, 'Marca excluida por revisión del responsable.', [11=>['tipo'=>'IGNORAR']]);
+            $corregido = json_decode($this->service->obtener($id)['resultado'], true)[0];
+            self::assertSame(0, $corregido['minutos_asistidos']);
+            self::assertSame('IGNORAR', $corregido['clasificaciones_confirmadas'][11]['tipo']);
+        }
     }
     public function testRevisionManualPermiteExcluirYReclasificarConAuditoria(): void
     {

@@ -46,6 +46,8 @@ class TurnoHorarioService
      */
     public function crearHorario(array $datos): bool|array
     {
+        $datos += InterpretacionHorario::DEFAULTS;
+        if ($errores = InterpretacionHorario::validar($datos)) return $errores;
         $datos['created_by'] = session()->get('user_id') ?? 1;
         $datos['th_estado']  = $datos['th_estado'] ?? 1;
 
@@ -73,6 +75,10 @@ class TurnoHorarioService
      */
     public function actualizarHorario(int $id, array $datos): bool|array
     {
+        $actual = $this->turnoHorarioModel->find($id);
+        if (!$actual) return ['horario' => 'Horario no encontrado.'];
+        $datos = array_replace($actual, $datos);
+        if ($errores = InterpretacionHorario::validar($datos)) return $errores;
         $datos['updated_by'] = session()->get('user_id') ?? 1;
 
         $datos['th_refrigerio_salida'] = !empty($datos['th_refrigerio_salida']) ? $datos['th_refrigerio_salida'] : null;

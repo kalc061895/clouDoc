@@ -10,14 +10,17 @@ class CalificacionMotor
     public static function evaluar(array $fuentes, array $reglas, array $clasificaciones = []): array
     {
         $resultado = [];
+        $turnosPorPersonal = $marcasPorPersonal = [];
+        foreach ($fuentes['turnos'] as $turno) $turnosPorPersonal[(int)$turno['prog_perl_ide']][] = $turno;
+        foreach ($fuentes['marcas'] as $marca) $marcasPorPersonal[(int)$marca['asi_perl_ide']][] = $marca;
         foreach ($fuentes['personal'] as $p) {
             $id = $p['perl_ide'];
             $r = ['personal' => $p, 'minutos_programados' => 0, 'minutos_asistidos' => 0, 'minutos_permiso' => 0, 'minutos_tardanza' => 0, 'tardanzas' => 0, 'faltas' => 0, 'dias_licencia' => 0, 'dias_vacacion' => 0, 'guardias' => 0, 'guardias_domingo' => 0, 'guardias_feriado' => 0, 'observaciones' => [], 'detalle' => []];
             $obs = static function ($codigo, $fecha = '') use (&$r) {
                 $r['observaciones'][] = ['codigo' => $codigo, 'fecha' => $fecha];
             };
-            $turnos = array_values(array_filter($fuentes['turnos'], static fn($t) => (int)$t['prog_perl_ide'] === (int)$id));
-            $marcas = array_values(array_filter($fuentes['marcas'], static fn($m) => (int)$m['asi_perl_ide'] === (int)$id));
+            $turnos = $turnosPorPersonal[(int)$id] ?? [];
+            $marcas = $marcasPorPersonal[(int)$id] ?? [];
             $r['clasificaciones_confirmadas'] = [];
             foreach ($marcas as &$marca) {
                 $marca['tipo_original'] = (string)($marca['asi_tipo'] ?? '');
@@ -72,19 +75,21 @@ class CalificacionMotor
                         break;
                     }
                 }
+                $ventana = ($t['th_interpretacion'] ?? 'MANUAL') === 'AUTO' ? (int)$t['th_margen_marcacion'] : (int)$reglas['ventana_minutos'];
                 $candidatas = [];
                 $ambigua = false;
                 foreach ($marcas as $k => $m) {
                     $turnoAsignado = (int)($m['clasificacion_confirmada']['turno_id'] ?? 0);
                     if ($turnoAsignado && $turnoAsignado !== (int)($t['prog_ide'] ?? 0)) continue;
                     $ts = strtotime($m['asi_fecha_hora']);
-                    if ($ts >= $a - 60 * $reglas['ventana_minutos'] && $ts <= $b + 60 * $reglas['ventana_minutos']) {
+                    if ($ts >= $a - 60 * $ventana && $ts <= $b + 60 * $ventana) {
                         $coincidencias = 0;
                         foreach ($turnos as $otro) {
                             $oa = strtotime($otro['prog_fecha'] . ' ' . $otro['th_hora_ingreso']);
                             $ob = strtotime($otro['prog_fecha'] . ' ' . $otro['th_hora_salida']);
                             if ($ob < $oa) $ob += 86400;
-                            if ($ts >= $oa - 60 * $reglas['ventana_minutos'] && $ts <= $ob + 60 * $reglas['ventana_minutos']) $coincidencias++;
+                            $otraVentana = ($otro['th_interpretacion'] ?? 'MANUAL') === 'AUTO' ? (int)$otro['th_margen_marcacion'] : (int)$reglas['ventana_minutos'];
+                            if ($ts >= $oa - 60 * $otraVentana && $ts <= $ob + 60 * $otraVentana) $coincidencias++;
                         }
                         if ($coincidencias > 1 && !$turnoAsignado) $ambigua = true;
                         if (!isset($usadas[$k])) $candidatas[$k] = $m;
@@ -108,7 +113,37 @@ class CalificacionMotor
                 $justificado = isset($lic[$d]) || isset($vac[$d]) || $permisoMin >= ($b - $a) / 60;
                 $min = 0;
                 $tarde = 0;
+                $interpretacion = InterpretacionHorario::interpretar(array_values($candidatas), $t, $a, $b, $ambigua);
+                if ($interpretacion['aplicada']) $candidatas = $interpretacion['marcas'];
                 $clasificacion = self::proponerMarcaciones(array_values($candidatas), $ambigua);
+                // Aplicar exactamente las propuestas que antes requerían confirmación.
+                // Las discrepancias con el horario siguen siendo observaciones independientes.
+                if (!$interpretacion['aplicada'] && $clasificacion['proponible']) {
+                    if ($interpretacion['razon'] === '' && ($t['th_refrigerio_marcacion'] ?? 'NO_DEFINIDO') !== 'NO_DEFINIDO') {
+                        $interpretacion = InterpretacionHorario::interpretar(array_values($candidatas),
+                            array_replace($t, ['th_interpretacion' => 'AUTO']), $a, $b, $ambigua);
+                    }
+                    if (!$interpretacion['aplicada']) {
+                        $identificadas = array_values($candidatas);
+                        foreach ($identificadas as $indice => &$identificada) {
+                            if (!empty($identificada['asi_tipo'])) continue;
+                            $propuesta = $clasificacion['marcaciones'][$indice];
+                            $identificada['asi_tipo'] = $propuesta['tipo_propuesto'];
+                            $identificada['interpretacion_automatica'] = ['tipo' => $propuesta['tipo_propuesto'],
+                                'evento' => $propuesta['evento'], 'regla' => 'PROPUESTA_APLICADA_V1'];
+                        }
+                        unset($identificada);
+                        $interpretacion['aplicada'] = true;
+                        $interpretacion['marcas'] = $identificadas;
+                    }
+                    $candidatas = $interpretacion['marcas'];
+                    $clasificacion = self::proponerMarcaciones(array_values($candidatas), $ambigua);
+                }
+                $clasificacion['automatica'] = $interpretacion['aplicada'];
+                $clasificacion['razon_automatica'] = $interpretacion['razon'];
+                $clasificacion['marcaciones_agrupadas'] = $interpretacion['agrupadas'] ?? [];
+                $presencia = null;
+                if ($interpretacion['razon'] !== '' && !$justificado) $obs('INTERPRETACION_HORARIO_PENDIENTE', $d);
                 if ($ambigua) $obs('MARCACION_COMPARTIDA_ENTRE_TURNOS', $d);
                 elseif ($justificado) {
                     if ($candidatas && (isset($lic[$d]) || isset($vac[$d]))) $obs('ASISTENCIA_CON_LICENCIA_O_VACACION', $d);
@@ -122,14 +157,17 @@ class CalificacionMotor
                     $salida = strtotime($par[count($par) - 1]['asi_fecha_hora']);
                     $valida = true;
                     $intervalos = [];
+                    $intervalosReales = [];
                     for ($j = 0; $j < count($par); $j += 2) {
                         $ea = strtotime($par[$j]['asi_fecha_hora']);
                         $eb = strtotime($par[$j + 1]['asi_fecha_hora']);
                         if (($par[$j]['asi_tipo'] ?? '') !== 'ENTRADA' || ($par[$j + 1]['asi_tipo'] ?? '') !== 'SALIDA' || $eb <= $ea) $valida = false;
+                        $intervalosReales[] = [$ea, $eb];
                         if (min($b, $eb) > max($a, $ea)) $intervalos[] = [max($a, $ea), min($b, $eb)];
                     }
                     if (!$valida) $obs($clasificacion['proponible'] ? 'TIPOS_MARCACION_PENDIENTES_DE_CONFIRMAR' : 'SECUENCIA_MARCACIONES_INVALIDA', $d);
                     else {
+                        $presencia = self::minutosUnion($intervalosReales);
                         $intersecciones = [];
                         $permisoIngreso = [];
                         foreach ($permisos as [$pa, $pb]) {
@@ -147,6 +185,7 @@ class CalificacionMotor
                     }
                 }
                 $r['detalle'][] = ['fecha' => $d, 'turno' => $t['tur_codigo'], 'minutos_asistidos' => $min, 'minutos_tardanza' => $tarde, 'justificado' => $justificado,
+                    'minutos_presencia' => $presencia, 'tipo_jornada' => $t['th_tipo_jornada'] ?? 'NO_DEFINIDA',
                     'horario' => date('Y-m-d H:i', $a) . ' — ' . date('Y-m-d H:i', $b), 'clasificacion' => $clasificacion];
             }
             foreach ($marcas as $k => $m) if (!isset($usadas[$k]) && substr($m['asi_fecha_hora'], 0, 10) >= $fuentes['inicio'] && substr($m['asi_fecha_hora'], 0, 10) <= $fuentes['fin']) $obs('ASISTENCIA_SIN_TURNO', substr($m['asi_fecha_hora'], 0, 10));
@@ -179,6 +218,7 @@ class CalificacionMotor
                 'tipo_original' => $marca['tipo_original'] ?? $marca['asi_tipo'] ?? '', 'motivo_original' => $marca['asi_motivo'] ?? '',
                 'tipo_propuesto' => $esperado, 'evento' => $evento, 'pendiente' => $tipo === '',
                 'confirmada' => $marca['clasificacion_confirmada'] ?? null,
+                'automatica' => $marca['interpretacion_automatica'] ?? null,
             ];
         }
         if ($razon !== '') {

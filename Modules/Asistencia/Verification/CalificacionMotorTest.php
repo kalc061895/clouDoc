@@ -48,12 +48,16 @@ final class CalificacionMotorTest extends TestCase
         $this->marcas($f,[['2026-10-04 08:00:00','ENTRADA'],['2026-10-04 10:00:00','SALIDA'],['2026-10-04 11:00:00','ENTRADA'],['2026-10-04 14:00:00','SALIDA']]);
         $r=M::evaluar($f,M::DEFAULTS)[0]; self::assertSame(300,$r['minutos_asistidos']); self::assertSame(1,$r['guardias_feriado']);
     }
-    public function testNoInfiereHorasDeMarcasSinTipo(): void
+    public function testAplicaIdentificacionInicialSinConfirmacion(): void
     {
         $f=$this->fuentes(); $this->marcas($f,[['2026-10-04 08:00:00',''],['2026-10-04 14:00:00','']]);
-        self::assertSame(0,M::evaluar($f,M::DEFAULTS)[0]['minutos_asistidos']);
+        $r = M::evaluar($f,M::DEFAULTS)[0];
+        self::assertSame(360,$r['minutos_asistidos']);
+        self::assertTrue($r['detalle'][0]['clasificacion']['automatica']);
+        self::assertFalse($r['detalle'][0]['clasificacion']['proponible']);
+        self::assertSame([], $r['observaciones']);
     }
-    public function testProponePausaYCalculaSoloConTiposConfirmados(): void
+    public function testAplicaSecuenciaInicialYPermiteRevisionPosterior(): void
     {
         $f = $this->fuentes();
         $this->marcas($f, [['2026-10-04 08:00:00',''], ['2026-10-04 10:00:00',''], ['2026-10-04 11:00:00',''], ['2026-10-04 14:00:00','']]);
@@ -61,11 +65,12 @@ final class CalificacionMotorTest extends TestCase
         unset($marca);
         $r = M::evaluar($f, M::DEFAULTS)[0];
         $propuesta = $r['detalle'][0]['clasificacion'];
-        self::assertTrue($propuesta['proponible']);
+        self::assertFalse($propuesta['proponible']);
+        self::assertTrue($propuesta['automatica']);
         self::assertSame(['ENTRADA','SALIDA','ENTRADA','SALIDA'], array_column($propuesta['marcaciones'], 'tipo_propuesto'));
         self::assertStringContainsString('pausa', $propuesta['marcaciones'][1]['evento']);
-        self::assertSame(0, $r['minutos_asistidos']);
-        self::assertContains('TIPOS_MARCACION_PENDIENTES_DE_CONFIRMAR', array_column($r['observaciones'], 'codigo'));
+        self::assertSame(300, $r['minutos_asistidos']);
+        self::assertSame([], $r['observaciones']);
         $confirmadas = [];
         foreach ($propuesta['marcaciones'] as $marca) $confirmadas[$marca['asi_ide']] = ['tipo'=>$marca['tipo_propuesto']];
         $r = M::evaluar($f, M::DEFAULTS, $confirmadas)[0];
@@ -90,7 +95,8 @@ final class CalificacionMotorTest extends TestCase
         $f = $this->fuentes('2026-10-31', '20:00:00', '08:00:00');
         $f['marcas'] = [['asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-10-31 20:00:00'], ['asi_perl_ide'=>1, 'asi_fecha_hora'=>'2026-11-01 08:00:00']];
         $propuesta = M::evaluar($f, M::DEFAULTS)[0]['detalle'][0]['clasificacion'];
-        self::assertTrue($propuesta['proponible']);
+        self::assertFalse($propuesta['proponible']);
+        self::assertTrue($propuesta['automatica']);
         self::assertSame(['ENTRADA','SALIDA'], array_column($propuesta['marcaciones'], 'tipo_propuesto'));
     }
     public function testRevisionManualExcluyeMarcaExtraYCorrigeTipoRegistrado(): void
@@ -121,5 +127,28 @@ final class CalificacionMotorTest extends TestCase
         $r = M::evaluar($f, M::DEFAULTS, $confirmadas)[0];
         self::assertSame(540, $r['minutos_asistidos']);
         self::assertSame([], $r['observaciones']);
+    }
+
+    public function testIdentificacionInicialRespetaRefrigerioYCorrecciones(): void
+    {
+        $f = $this->fuentes();
+        $f['turnos'][0] += ['th_interpretacion'=>'MANUAL', 'th_refrigerio_marcacion'=>'CON_MARCAS',
+            'th_refrigerio_salida'=>'11:00', 'th_refrigerio_retorno'=>'12:00'];
+        $f['marcas'] = [
+            ['asi_ide'=>1,'asi_perl_ide'=>1,'asi_fecha_hora'=>'2026-10-04 08:00:00','asi_tipo'=>''],
+            ['asi_ide'=>2,'asi_perl_ide'=>1,'asi_fecha_hora'=>'2026-10-04 14:00:00','asi_tipo'=>''],
+        ];
+        $r = M::evaluar($f, M::DEFAULTS)[0];
+        self::assertSame(360, $r['minutos_asistidos']);
+        self::assertTrue($r['detalle'][0]['clasificacion']['automatica']);
+        self::assertFalse($r['detalle'][0]['clasificacion']['proponible']);
+        self::assertContains('INTERPRETACION_HORARIO_PENDIENTE', array_column($r['observaciones'], 'codigo'));
+
+        unset($f['turnos'][0]['th_refrigerio_marcacion'], $f['turnos'][0]['th_refrigerio_salida'], $f['turnos'][0]['th_refrigerio_retorno']);
+        self::assertSame(360, M::evaluar($f, M::DEFAULTS)[0]['minutos_asistidos']);
+        $r = M::evaluar($f, M::DEFAULTS, [2=>['tipo'=>'IGNORAR']])[0];
+        self::assertSame(0, $r['minutos_asistidos']);
+        self::assertSame('IGNORAR', $r['clasificaciones_confirmadas'][2]['tipo']);
+        self::assertContains('MARCACIONES_INCOMPLETAS_O_MULTIPLES', array_column($r['observaciones'], 'codigo'));
     }
 }

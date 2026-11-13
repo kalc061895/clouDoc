@@ -63,7 +63,7 @@ class CalificacionMensualService extends GestionRolService
             if ((int)($aplicable['per_ide'] ?? 0) !== (int)$periodo['per_ide']) throw new \DomainException('El trabajador ' . $p['per_numero_documento'] . ' tiene otro grupo de corte. Seleccione su periodo o califíquelo individualmente.');
         }
         $ids = array_column($personal, 'perl_ide');
-        $turnos = $this->db->table('casis_programacion pr')->select('pr.*, th.th_hora_ingreso, th.th_hora_salida, t.tur_codigo')->join('casis_turno_horario th', 'th.th_ide=pr.prog_th_ide', 'left')->join('casis_turno t', 't.tur_ide=th.th_tur_ide', 'left')->where('pr.deleted_at', null)->whereIn('pr.prog_perl_ide', $ids)->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->whereNotIn('pr.prog_estado', ['ANULADO', 'CANCELADO'])->orderBy('pr.prog_ide')->get()->getResultArray();
+        $turnos = $this->db->table('casis_programacion pr')->select('pr.*, th.th_hora_ingreso, th.th_hora_salida, th.th_tolerancia_ingreso, th.th_tolerancia_salida, th.th_refrigerio_salida, th.th_refrigerio_retorno, th.th_interpretacion, th.th_tipo_jornada, th.th_refrigerio_marcacion, th.th_margen_marcacion, th.th_margen_refrigerio, t.tur_codigo')->join('casis_turno_horario th', 'th.th_ide=pr.prog_th_ide', 'left')->join('casis_turno t', 't.tur_ide=th.th_tur_ide', 'left')->where('pr.deleted_at', null)->whereIn('pr.prog_perl_ide', $ids)->where('pr.prog_fecha >=', $inicio)->where('pr.prog_fecha <=', $fin)->whereNotIn('pr.prog_estado', ['ANULADO', 'CANCELADO'])->orderBy('pr.prog_ide')->get()->getResultArray();
         $marcas = $this->db->table('casis_asistencia')->where('deleted_at', null)->whereIn('asi_perl_ide', $ids)->where('asi_fecha_hora >=', date('Y-m-d H:i:s', strtotime($inicio . ' -6 hours')))->where('asi_fecha_hora <=', date('Y-m-d H:i:s', strtotime($fin . ' +2 days +6 hours')))->orderBy('asi_ide')->get()->getResultArray();
         $fuentes = compact('personal', 'turnos', 'marcas', 'inicio', 'fin');
         foreach (['licencias' => ['licencia', 'rl'], 'vacaciones' => ['vacacion', 'rv']] as $key => [$table, $pre]) $fuentes[$key] = $this->db->table('casis_registro_' . $table)->where('deleted_at', null)->whereIn($pre . '_perl_ide', $ids)->where($pre . '_estado', 1)->where($pre . '_fecha_inicio <=', $fin)->where($pre . '_fecha_fin >=', $inicio)->orderBy($pre . '_ide')->get()->getResultArray();
@@ -100,12 +100,33 @@ class CalificacionMensualService extends GestionRolService
         $this->usuario();
         $items = $this->tabla('mensual')->select('id')->orderBy('id', 'DESC')->get()->getResultArray();
         $out = [];
+        $accesos = [];
         foreach ($items as $item) {
-            try {
-                $out[] = $this->obtener((int)$item['id']);
-            } catch (\DomainException $e) {
-                continue;
+            // El listado no necesita las marcaciones, resultados ni reglas de cada versión.
+            // Extraer solo el personal permite verificar el ámbito histórico sin traer fuentes completas.
+            $c = $this->tabla('mensual')->select('id, periodo_id, ambito_tipo, ambito_id, estado, created_at')
+                ->select("JSON_EXTRACT(fuentes, '$.personal') AS personal_acceso, JSON_EXTRACT(fuentes, '$.inicio') AS inicio, JSON_EXTRACT(fuentes, '$.fin') AS fin", false)
+                ->where('id', $item['id'])->get()->getRowArray();
+            if (!$c) continue;
+            $personal = json_decode($c['personal_acceso'], true, 512, JSON_THROW_ON_ERROR);
+            $permitido = true;
+            foreach (array_unique(array_map(static fn($p) => (int)($p['perl_ofi_ide'] ?? 0), $personal)) as $oficina) {
+                $oficina = (int)$oficina;
+                if (!array_key_exists($oficina, $accesos)) {
+                    try {
+                        $this->exigirOficina($oficina, true);
+                        $accesos[$oficina] = true;
+                    } catch (\DomainException $e) {
+                        $accesos[$oficina] = false;
+                    }
+                }
+                if (!$accesos[$oficina]) { $permitido = false; break; }
             }
+            if (!$permitido) continue;
+            unset($c['personal_acceso']);
+            // MySQL/MariaDB devuelven cadenas JSON; SQLite devuelve texto directamente.
+            foreach (['inicio', 'fin'] as $campo) $c[$campo] = trim((string)$c[$campo], '"');
+            $out[] = $c;
         }
         return $out;
     }
@@ -195,7 +216,7 @@ class CalificacionMensualService extends GestionRolService
                 $fin = strtotime($turno['prog_fecha'].' '.$turno['th_hora_salida']);
                 if ($fin < $inicio) $fin += 86400;
                 $fecha = strtotime($marcas[$marcaId]['asi_fecha_hora']);
-                $ventana = (int)$reglas['ventana_minutos'] * 60;
+                $ventana = (($turno['th_interpretacion'] ?? 'MANUAL') === 'AUTO' ? (int)$turno['th_margen_marcacion'] : (int)$reglas['ventana_minutos']) * 60;
                 if ($inicio === $fin || $fecha < $inicio - $ventana || $fecha > $fin + $ventana) throw new \InvalidArgumentException('La marcación está fuera del horario y ventana del turno elegido.');
             }
             $nuevas[(int)$marcaId] = [

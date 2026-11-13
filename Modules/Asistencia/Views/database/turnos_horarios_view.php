@@ -82,6 +82,27 @@ Horarios por Turno
                         <hr class="my-2 text-muted">
                         <div class="col-12 py-0"><span class="badge bg-primary-subtle text-primary fw-bold">Jornada General</span></div>
 
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="th_tipo_jornada">Tipo de jornada</label>
+                            <select id="th_tipo_jornada" class="form-select">
+                                <option value="ORDINARIA">Ordinaria</option><option value="GUARDIA_DIURNA">Guardia diurna</option>
+                                <option value="GUARDIA_NOCTURNA">Guardia nocturna</option><option value="OTRA">Otra</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="th_interpretacion">Interpretación de marcaciones</label>
+                            <select id="th_interpretacion" class="form-select"><option value="MANUAL">Identificación inicial de secuencias</option><option value="AUTO">Automática según este horario</option></select>
+                        </div>
+                        <div class="col-12 small text-muted">Una salida anterior al ingreso corresponde al día siguiente. La interpretación automática conserva las marcas originales y deja pendientes los casos ambiguos.</div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="th_margen_marcacion">Margen para identificar ingreso y salida (min)</label>
+                            <input type="number" id="th_margen_marcacion" class="form-control" min="0" max="360" value="120" required>
+                            <small class="text-muted">Antes y después de cada evento. Este margen no elimina tardanzas. En jornadas ordinarias sin refrigerio se agrupan las marcas dentro de estos m?rgenes: se toma el primer ingreso y la ?ltima salida.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold" for="th_margen_refrigerio">Margen para identificar refrigerio (min)</label>
+                            <input type="number" id="th_margen_refrigerio" class="form-control" min="0" max="120" value="30" required>
+                        </div>
                         <!-- Hora Ingreso -->
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">Hora Ingreso</label>
@@ -109,6 +130,16 @@ Horarios por Turno
                             <button type="button" class="btn btn-link btn-xs text-danger p-0 text-decoration-none small" onclick="limpiarRefrigerio()">Limpiar Refrigerio</button>
                         </div>
 
+                        <div class="col-12">
+                            <label class="form-label small fw-bold" for="th_refrigerio_marcacion">Marcación del refrigerio</label>
+                            <select id="th_refrigerio_marcacion" class="form-select">
+                                <option value="NO_DEFINIDO">Pendiente de configurar</option>
+                                <option value="SIN_REFRIGERIO">Jornada sin refrigerio</option>
+                                <option value="SIN_MARCAS">Refrigerio sin marcaciones: solo ingreso y salida</option>
+                                <option value="CON_MARCAS">Exige salida y retorno de refrigerio: cuatro marcas</option>
+                            </select>
+                            <small class="text-muted">La modalidad identifica eventos; no determina descuentos ni si el refrigerio es remunerado.</small>
+                        </div>
                         <!-- Refrigerio Salida -->
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Salida a Refrigerio</label>
@@ -120,6 +151,7 @@ Horarios por Turno
                             <input type="time" class="form-control font-monospace" id="th_refrigerio_retorno">
                         </div>
 
+                        <div class="col-12"><div id="secuenciaHorario" class="alert alert-info mb-0" role="status"></div></div>
                         <div class="col-md-12">
                             <div class="form-check form-switch mt-2">
                                 <input class="form-check-input" type="checkbox" role="switch" id="th_estado" value="1" checked>
@@ -184,7 +216,14 @@ Horarios por Turno
                 },
                 {
                     "data": "th_nombre",
-                    "className": "text-secondary small fw-medium"
+                    "className": "text-secondary small fw-medium",
+                    "render": function(data, type, row) {
+                        if (type !== 'display') return data;
+                        const nombre = $('<span>').text(data).html();
+                        const modo = row.th_interpretacion === 'AUTO' ? 'Según horario' : 'Identificación inicial';
+                        const eventos = row.th_refrigerio_marcacion === 'CON_MARCAS' ? '4 eventos' : (row.th_refrigerio_marcacion === 'NO_DEFINIDO' ? 'Refrigerio por configurar' : '2 eventos');
+                        return `${nombre}<br><small>${modo} ó ${eventos}</small>`;
+                    }
                 },
                 {
                     "data": null,
@@ -273,6 +312,18 @@ Horarios por Turno
         });
     }
 
+    function mostrarSecuenciaHorario() {
+        const refrigerio = $('#th_refrigerio_marcacion').val();
+        const secuencia = refrigerio === 'CON_MARCAS'
+            ? 'Ingreso ó salida a refrigerio ? retorno de refrigerio ó salida del turno.'
+            : refrigerio === 'NO_DEFINIDO' ? 'Defina cómo se registra el refrigerio.' : 'Ingreso ó salida del turno.';
+        const ingreso = $('#th_hora_ingreso').val();
+        const salida = $('#th_hora_salida').val();
+        const nocturno = ingreso && salida && salida < ingreso ? ' La salida corresponde al día siguiente.' : '';
+        const modo = $('#th_interpretacion').val() === 'AUTO' ? 'Identificación automática: ' : 'Identificación inicial: ';
+        $('#secuenciaHorario').text(modo + secuencia + nocturno);
+    }
+
     function limpiarRefrigerio() {
         $('#th_refrigerio_salida').val('');
         $('#th_refrigerio_retorno').val('');
@@ -283,6 +334,7 @@ Horarios por Turno
         $('#th_ide').val('');
         $('#th_estado').prop('checked', true);
         $('#modalTitulo').text('Nuevo Horario de Turno');
+        mostrarSecuenciaHorario();
         modalHorario.show();
     }
 
@@ -300,8 +352,11 @@ Horarios por Turno
         $('#th_refrigerio_salida').val(data.th_refrigerio_salida || '');
         $('#th_refrigerio_retorno').val(data.th_refrigerio_retorno || '');
 
+        const defaults = {th_interpretacion: 'MANUAL', th_tipo_jornada: 'ORDINARIA', th_refrigerio_marcacion: 'NO_DEFINIDO', th_margen_marcacion: 120, th_margen_refrigerio: 30};
+        Object.entries(defaults).forEach(([campo, valor]) => $('#' + campo).val(data[campo] ?? valor));
         $('#th_estado').prop('checked', data.th_estado == 1);
         $('#modalTitulo').text('Editar Horario de Turno');
+        mostrarSecuenciaHorario();
         modalHorario.show();
     }
 
@@ -314,6 +369,11 @@ Horarios por Turno
         $('#btnGuardar').prop('disabled', true).text('Guardando...');
 
         const datos = {
+            th_interpretacion: $('#th_interpretacion').val(),
+            th_tipo_jornada: $('#th_tipo_jornada').val(),
+            th_refrigerio_marcacion: $('#th_refrigerio_marcacion').val(),
+            th_margen_marcacion: $('#th_margen_marcacion').val(),
+            th_margen_refrigerio: $('#th_margen_refrigerio').val(),
             th_tur_ide: $('#th_tur_ide').val(),
             th_codigo: $('#th_codigo').val().toUpperCase(),
             th_nombre: $('#th_nombre').val(),

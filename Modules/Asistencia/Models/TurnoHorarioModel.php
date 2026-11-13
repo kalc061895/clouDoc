@@ -21,6 +21,8 @@ class TurnoHorarioModel extends Model
         'th_tolerancia_salida',
         'th_refrigerio_salida',
         'th_refrigerio_retorno',
+        'th_interpretacion', 'th_tipo_jornada', 'th_refrigerio_marcacion',
+        'th_margen_marcacion', 'th_margen_refrigerio',
         'th_estado'
     ];
 

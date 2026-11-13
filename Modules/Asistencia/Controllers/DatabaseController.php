@@ -1680,6 +1680,10 @@ class DatabaseController extends BaseController
             'th_estado'             => $this->request->getVar('th_estado') ?? 1,
         ];
 
+        foreach (\Modules\Asistencia\Services\InterpretacionHorario::DEFAULTS as $campo => $default) {
+            $datos[$campo] = $this->request->getVar($campo) ?? $default;
+        }
+
         $resultado = $service->crearHorario($datos);
 
         if (is_array($resultado)) {
@@ -1713,6 +1717,10 @@ class DatabaseController extends BaseController
             'th_refrigerio_retorno' => $rawDatos['th_refrigerio_retorno'] ?? null,
             'th_estado'             => isset($rawDatos['th_estado']) ? (int)$rawDatos['th_estado'] : 1,
         ];
+
+        foreach (\Modules\Asistencia\Services\InterpretacionHorario::DEFAULTS as $campo => $default) {
+            if (array_key_exists($campo, $rawDatos)) $datos[$campo] = $rawDatos[$campo];
+        }
 
         $resultado = $service->actualizarHorario((int)$id, $datos);
 
