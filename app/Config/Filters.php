@@ -90,6 +90,7 @@ class Filters extends BaseFilters
                     'tupaexpediente',// TUPA - Listado de procedimientos y requisitos
                                     // de los diferentes tramites
                     '', // pagina principal de tramite
+                    'portal/modulos/*', // Portadas informativas; no expone rutas administrativas.
                     'api/*', // pagina principal de tramite
                 ]
             ]

@@ -29,7 +29,8 @@ service('auth')->routes($routes);
  * 
  * 
  */
-$routes->get('/', 'ExpedienteController::index');
+$routes->get('/', 'PortalController::index');
+$routes->get('portal/modulos/(:segment)', 'PortalController::modulo/$1');
 //$routes->get('/', 'SeederController::index');
 
 $routes->get('/nuevoexpediente', 'ExpedienteController::nuevoexpediente');

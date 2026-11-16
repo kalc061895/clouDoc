@@ -34,9 +34,7 @@ class ExpedienteController extends BaseController
 
     public function index()
     {
-        //$data['expedientes'] = $this->expedienteModel->findAll();
-
-        return view('external/homepage');
+        return redirect()->to(site_url('portal/modulos/tramite-documentario'));
     }
 
     public function nuevoExpediente()
