@@ -9,12 +9,16 @@ use Modules\Asistencia\Services\RolDocumentoService;
 
 class RolEnvioController extends BaseModuleController
 {
-    public function index()
+    public function index(?string $etapa = null)
     {
         try {
+            if ($etapa !== null && (new GestionRolService())->oficinas(true, $etapa) === []) {
+                return $this->response->setStatusCode(403)->setBody('No tiene una designación vigente para esta etapa.');
+            }
             $service = new RolEnvioService();
             return view('Modules\\Asistencia\\Views\\gestion_roles\\envios', [
-                'envios' => $service->listar(),
+                'envios' => $service->listar($etapa),
+                'tituloBandeja' => ['RRHH' => 'Recursos Humanos: visto bueno', 'DIRECCION' => 'Dirección: aprobación final'][$etapa ?? ''] ?? 'Envíos y aprobaciones',
                 'admin' => (new GestionRolService())->administrador(),
             ]);
         } catch (\Throwable $e) {

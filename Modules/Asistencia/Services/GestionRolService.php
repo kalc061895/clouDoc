@@ -39,52 +39,36 @@ class GestionRolService
     public function oficinas(bool $aprobar = false, ?string $etapa = null): ?array
     {
         if ($this->administrador()) return null;
-        if ($this->usuarioTieneGrupo('asi_rol')) {
-            if ($aprobar) return [];
-            $oficina = (new AccesoAsistenciaService())->oficinaActualDeUsuario();
-            return $oficina ? [$oficina] : [];
-        }
-        foreach (['asi_dire' => 'DIRECCION', 'asi_rrhh' => 'RRHH'] as $grupo => $etapaGrupo) {
-            if (!$this->usuarioTieneGrupo($grupo)) continue;
-            if ($aprobar && $etapa !== $etapaGrupo) return [];
-            if (!$aprobar && $etapa !== null) return [];
-            $hoy = substr($this->ahora(), 0, 10);
-            $q = $this->db->table('casis_plan_responsable')->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy)->where('aprobar', 1)->where('etapa', $etapaGrupo);
-            $ids = array_map('intval', array_column($q->get()->getResultArray(), 'oficina_id'));
-            $oficinas = $this->db->table('casis_oficina')->where('deleted_at', null)->where('ofi_estado', 1)->get()->getResultArray();
-            do {
-                $antes = count($ids);
-                foreach ($oficinas as $o) if (in_array((int)$o['ofi_padre_ide'], $ids, true) && !in_array((int)$o['ofi_ide'], $ids, true)) $ids[] = (int)$o['ofi_ide'];
-            } while (count($ids) !== $antes);
-            return array_values(array_unique($ids));
-        }
-        $accesoTerritorial = new AccesoAsistenciaService();
-        $perfil = $accesoTerritorial->perfilTerritorial();
-        if (($perfil['modo'] ?? null) === 'auditoria') return [];
-        if ($perfil && !($perfil['global'] ?? false)) {
-            if (!$accesoTerritorial->permitir('editar_personal')) return [];
-            $estIds = $accesoTerritorial->establecimientosDelAmbito();
-            if (!$estIds) return [];
-            return array_map('intval', array_column($this->db->table('casis_oficina')->select('ofi_ide')->whereIn('ofi_est_ide', $estIds)->where('deleted_at', null)->get()->getResultArray(), 'ofi_ide'));
-        }
+        $etapa = $aprobar ? $etapa : 'PROGRAMACION';
+        if (!in_array($etapa, ['PROGRAMACION', 'RRHH', 'DIRECCION'], true)) return [];
         $hoy = substr($this->ahora(), 0, 10);
-        $q = $this->db->table('casis_plan_responsable')->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy);
-        if ($aprobar) {
-            $q->where('aprobar', 1);
-            if ($etapa !== null) $q->where('etapa', $etapa);
-        } else $q->where('programar', 1);
-        $ids = array_map('intval', array_column($q->get()->getResultArray(), 'oficina_id'));
+        $asignaciones = $this->db->table('casis_plan_responsable')
+            ->where('usuario_id', $this->usuario())->where('desde <=', $hoy)->where('hasta >=', $hoy)
+            ->where('etapa', $etapa)->where($aprobar ? 'aprobar' : 'programar', 1)->get()->getResultArray();
         $oficinas = $this->db->table('casis_oficina')->where('deleted_at', null)->where('ofi_estado', 1)->get()->getResultArray();
-        // El jefe asignado en oficinas programa su oficina; aprobar requiere delegación expresa.
-        if (!$aprobar) {
-            foreach ($oficinas as $o) {
-                if ((int)($o['ofi_responsable_id'] ?? 0) === $this->usuario()) $ids[] = (int)$o['ofi_ide'];
+        return self::resolverOficinas($asignaciones, $oficinas);
+    }
+
+    /** Incluye la oficina designada y sus descendientes activos, sin cruzar establecimientos. */
+    public static function resolverOficinas(array $asignaciones, array $oficinas): array
+    {
+        $map = array_column($oficinas, null, 'ofi_ide');
+        $ids = [];
+        foreach ($asignaciones as $a) {
+            if (!empty($a['oficina_id']) && isset($map[$a['oficina_id']])) $ids[] = (int)$a['oficina_id'];
+            elseif (!empty($a['establecimiento_id']) && empty($a['oficina_id'])) {
+                foreach ($oficinas as $o) if ((int)$o['ofi_est_ide'] === (int)$a['establecimiento_id']) $ids[] = (int)$o['ofi_ide'];
             }
-            $ids = array_values(array_unique($ids));
         }
+        $ids = array_values(array_unique($ids));
         do {
             $antes = count($ids);
-            foreach ($oficinas as $o) if (in_array((int)$o['ofi_padre_ide'], $ids, true) && !in_array((int)$o['ofi_ide'], $ids, true)) $ids[] = (int)$o['ofi_ide'];
+            foreach ($oficinas as $o) {
+                $padre = (int)($o['ofi_padre_ide'] ?? 0);
+                if (in_array($padre, $ids, true) && isset($map[$padre])
+                    && (int)$map[$padre]['ofi_est_ide'] === (int)$o['ofi_est_ide']
+                    && !in_array((int)$o['ofi_ide'], $ids, true)) $ids[] = (int)$o['ofi_ide'];
+            }
         } while (count($ids) !== $antes);
         return $ids;
     }
@@ -94,8 +78,7 @@ class GestionRolService
     }
     public function exigirProgramador(): void
     {
-        if ($this->usuarioTieneGrupo('asi_dire') || $this->usuarioTieneGrupo('asi_rrhh')) throw new \DomainException('Este perfil solo puede revisar roles en su etapa asignada.');
-        if ($this->usuarioTieneGrupo('asi_rol') && !(new AccesoAsistenciaService())->oficinaActualDeUsuario()) throw new \DomainException('El usuario no tiene una oficina activa asignada.');
+        if ($this->oficinas() === []) throw new \DomainException('No tiene una designación vigente para cargar programación.');
     }
     public function exigirOficina(int $id, bool $aprobar = false, ?string $etapa = null): void
     {

@@ -3,7 +3,8 @@
 namespace Modules\Asistencia\Controllers;
 
 use App\Core\Controllers\BaseModuleController;
-use Modules\Asistencia\Services\RolDocumentoData;
+use Modules\Asistencia\Services\RolEnvioService;
+use Modules\Asistencia\Services\GestionRolService;
 use Modules\Asistencia\Services\RolDocumentoService;
 
 class RolDocumentoController extends BaseModuleController
@@ -16,12 +17,12 @@ class RolDocumentoController extends BaseModuleController
 
     public function index()
     {
-        return view('Modules\Asistencia\Views\roles\index', ['catalogos' => (new RolDocumentoService())->catalogos()]);
+        return redirect()->to(site_url('asistencia/gestion-roles/envios'));
     }
 
     public function historial()
     {
-        return view('Modules\Asistencia\Views\roles\historial', ['catalogos' => (new RolDocumentoService())->catalogos()]);
+        return redirect()->to(site_url('asistencia/gestion-roles/envios'));
     }
 
     public function firmar()
@@ -29,45 +30,28 @@ class RolDocumentoController extends BaseModuleController
         return redirect()->to(base_url('firma'));
     }
 
-    public function consultar()
-    {
-        try {
-            $doc = (new RolDocumentoService())->consultar($this->request->getGet());
-            return $this->jsonResponse('success', 'Consulta completada.', [
-                'html' => view('Modules\Asistencia\Views\roles\tabla', ['documento' => $doc]),
-                'cabecera' => $doc['cabecera'],
-                'personal' => count($doc['personal']),
-                'horas' => $doc['total_horas'],
-                'huella' => RolDocumentoData::huella($doc),
-            ]);
-        } catch (\Throwable $e) {
-            return $this->error($e);
-        }
-    }
+    /** Compatibilidad para clientes antiguos: nunca generar documentos fuera del flujo aprobado. */
+    public function consultar() { return $this->retirado(); }
+    public function generar() { return $this->retirado(); }
+    public function listar() { return $this->retirado(); }
+    public function anular(int $id) { return $this->retirado(); }
 
-    public function generar()
+    private function retirado()
     {
-        try {
-            $rol = (new RolDocumentoService())->generar($this->request->getPost(), $this->usuario());
-            $rol['url'] = base_url('asistencia/roles/' . $rol['id'] . '/pdf');
-            return $this->jsonResponse('success', 'PDF generado y guardado en el historial.', $rol, 201);
-        } catch (\Throwable $e) {
-            return $this->error($e);
-        }
-    }
-
-    public function listar()
-    {
-        try {
-            return $this->jsonResponse('success', 'Historial de roles.', (new RolDocumentoService())->historial($this->request->getGet()));
-        } catch (\Throwable $e) {
-            return $this->error($e);
-        }
+        return $this->jsonResponse('error', 'Esta operación fue retirada. Use Envíos y aprobaciones para consultar el rol y generar su PDF oficial.', ['url'=>site_url('asistencia/gestion-roles/envios')], 410);
     }
 
     public function pdf(int $id)
     {
         try {
+            $usuario = $this->usuario();
+            $documento = db_connect()->table('casis_rol_documento')->where('id', $id)->get()->getRowArray();
+            if (!$documento) throw new \OutOfBoundsException('El rol no existe.');
+            if (!empty($documento['envio_id'])) {
+                (new RolEnvioService())->oficial((int)$documento['envio_id']);
+            } elseif (!(new GestionRolService())->administrador() && (int)$documento['created_by'] !== $usuario) {
+                throw new \DomainException('No tiene acceso a este documento.');
+            }
             $archivo = (new RolDocumentoService())->archivo($id);
 
 
@@ -78,30 +62,6 @@ class RolDocumentoController extends BaseModuleController
             ->setHeader('X-Rol-Estado', $archivo['estado'])
             ->setBody(file_get_contents($archivo['ruta']));
 
-               /**
-                * 
-                return $this->response
-                ->download($archivo['ruta'], null)
-                ->setFileName($archivo['nombre'])
-                ->inline()
-                ->setHeader('Cache-Control', 'private, no-store')
-                ->setHeader('X-Rol-Estado', $archivo['estado']);
-
-                */
-              
-
-        } catch (\Throwable $e) {
-            return $this->error($e);
-        }
-    }
-
-    public function anular(int $id)
-    {
-        try {
-            $motivo = $this->request->getPost('motivo');
-            if (! is_string($motivo)) throw new \InvalidArgumentException('Ingrese un motivo de anulación.');
-            (new RolDocumentoService())->anular($id, $motivo, $this->usuario());
-            return $this->jsonResponse('success', 'Rol anulado. El archivo original se conserva en el historial.');
         } catch (\Throwable $e) {
             return $this->error($e);
         }

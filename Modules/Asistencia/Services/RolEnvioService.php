@@ -152,11 +152,12 @@ class RolEnvioService
         });
     }
 
-    public function listar(): array
+    public function listar(?string $soloEtapa = null): array
     {
         $oficinas = [];
         $global = false;
-        foreach ([null, 'RRHH', 'DIRECCION'] as $etapa) {
+        if ($soloEtapa !== null && !in_array($soloEtapa, ['RRHH', 'DIRECCION'], true)) throw new \InvalidArgumentException('Etapa inválida.');
+        foreach ($soloEtapa === null ? [null, 'RRHH', 'DIRECCION'] : [$soloEtapa] as $etapa) {
             $ids = $etapa === null ? $this->gestion->oficinas() : $this->gestion->oficinas(true, $etapa);
             if ($ids === null) {
                 $global = true;
@@ -174,6 +175,7 @@ class RolEnvioService
             if (! $oficinas) return [];
             $q->whereIn('e.id_oficina', $oficinas);
         }
+        if ($soloEtapa !== null) $q->where('e.estado', $soloEtapa === 'RRHH' ? 'PENDIENTE_RRHH' : 'VISTO_BUENO_RRHH');
         return $q->limit(250)->get()->getResultArray();
     }
 
@@ -187,10 +189,8 @@ class RolEnvioService
         $rrhh = $this->gestion->oficinas(true, 'RRHH');
         $direccion = $this->gestion->oficinas(true, 'DIRECCION');
         $usuario = $this->gestion->usuario();
-        $actorAprobado = $envio['estado'] === 'APROBADO_DIRECCION'
-            && in_array($usuario, [(int) $envio['usuario_envio_id'], (int) $envio['usuario_rrhh_id'], (int) $envio['usuario_direccion_id']], true);
         if (
-            ! $actorAprobado && ($local !== null && ! in_array((int) $envio['id_oficina'], $local, true))
+            ($local !== null && ! in_array((int) $envio['id_oficina'], $local, true))
             && ($rrhh !== null && ! in_array((int) $envio['id_oficina'], $rrhh, true))
             && ($direccion !== null && ! in_array((int) $envio['id_oficina'], $direccion, true))
         ) {

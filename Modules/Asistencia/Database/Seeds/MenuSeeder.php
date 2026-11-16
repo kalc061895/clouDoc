@@ -7,6 +7,7 @@ use CodeIgniter\Database\Seeder;
 class MenuSeeder extends Seeder
 {
     /** Opciones reservadas: sin ruta hasta implementar sus pantallas. */
+    public const RETIRED_IDS = [1041, 1042];
     public const PENDING_IDS = [1052, 1053, 1056];
     public const REPORT_IDS = [1050, 1051, 1052, 1053, 1054, 1055, 1056];
 
@@ -38,8 +39,11 @@ class MenuSeeder extends Seeder
             [1081, 1080, 'Períodos de roles', 'asistencia/gestion-roles/periodos', 'calendar-mark-line-duotone'],
             [1082, 1080, 'Plantillas de reglas', 'asistencia/gestion-roles/plantillas', 'settings-line-duotone'],
             [1083, 1080, 'Envíos y aprobaciones', 'asistencia/gestion-roles/envios', 'document-text-line-duotone'],
+            [1098, 1080, 'Recursos Humanos: visto bueno', 'asistencia/gestion-roles/recursos-humanos', 'check-circle-line-duotone'],
+            [1099, 1080, 'Dirección: aprobación final', 'asistencia/gestion-roles/direccion', 'check-circle-line-duotone'],
             [1084, 1080, 'Delegaciones temporales', 'asistencia/gestion-roles/delegaciones', 'users-group-rounded-line-duotone'],
             [1086, 1000, 'Perfiles y accesos', 'asistencia/accesos', 'users-group-rounded-line-duotone'],
+            [1100, 1000, 'Usuarios de Asistencia', 'asistencia/usuarios', 'user-plus-line-duotone'],
             [1087, 1080, 'Grupos de programación', 'asistencia/gestion-roles/grupos', 'network-line-duotone'],
             [1089, 1080, 'Programacion pendiente', 'asistencia/gestion-roles/pendientes', 'list-check-line-duotone'],
             [1050, null, 'REPORTES', null, 'chart-square-line-duotone'],
@@ -87,7 +91,7 @@ class MenuSeeder extends Seeder
                 'id' => $id, 'parent_id' => $parent,
                 'type' => $parent === null ? 'separator' : 'secondary',
                 'name' => $name, 'url' => $url, 'icon' => $icon,
-                'status' => in_array($id, self::PENDING_IDS, true) ? 'inactive' : 'active', 'order' => $order + 1000,
+                'status' => in_array($id, array_merge(self::PENDING_IDS, self::RETIRED_IDS), true) ? 'inactive' : 'active', 'order' => $order + 1000,
                 'separator' => $parent === null ? $name : null,
             ];
         }

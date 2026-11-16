@@ -4,7 +4,7 @@
 <div class="container-fluid py-3" id="accesos-app" data-api="<?= site_url('asistencia/accesos') ?>">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div><h1 class="h3 mb-1">Perfiles y accesos de Asistencia</h1><p class="text-muted mb-0">Administre perfiles, usuarios y los menús disponibles para cada perfil.</p></div>
-        <button class="btn btn-primary" id="crear-perfil"><iconify-icon icon="lucide:plus" class="me-1"></iconify-icon>Crear perfil</button>
+        <div class="d-flex gap-2"><a class="btn btn-outline-primary" href="<?= site_url('asistencia/usuarios') ?>">Usuarios de Asistencia</a><button class="btn btn-primary" id="crear-perfil"><iconify-icon icon="lucide:plus" class="me-1"></iconify-icon>Crear perfil</button></div>
     </div>
     <div class="card border-0 shadow-sm mb-3"><div class="card-body">
         <h2 class="h5">Perfiles de Asistencia</h2>

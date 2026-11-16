@@ -1,5 +1,33 @@
 # Gestión de roles
 
+## Retiro de pantallas anteriores (16/11/2026)
+
+Se retiraron Generación de roles y el antiguo Historial de roles. Sus menús 1041/1042 quedan inactivos y el seeder no los reasigna. Las URL antiguas redirigen a `/asistencia/gestion-roles/envios`; los endpoints anteriores de consulta, listado, generación y anulación devuelven HTTP 410. Firma enlaza ahora al historial de envíos.
+
+El PDF vigente se obtiene desde el detalle de un envío aprobado mediante «Generar / abrir PDF oficial». Sigue utilizando `RolDocumentoService::generarDesdeSnapshot`, `RolPdfRenderer`, las plantillas PDF/tabla, `casis_rol_documento` y los archivos de `writable/asistencia/roles`. Se conserva la descarga por ID con verificación de acceso y la integración con Firma. No se borran documentos ni firmas.
+
+Auditoría local previa al retiro: cuatro documentos generados, todos asociados a envíos aprobados; ningún documento del generador anterior; un documento registrado en Firma. Estos conteos no equivalen a estadísticas de visitas a las pantallas.
+
+## Tres tareas y designaciones por ámbito (16/11/2026)
+
+### Usuarios dentro de Asistencia
+
+El CRUD `/asistencia/usuarios` utiliza las entidades y el modelo de CodeIgniter Shield para crear, editar, activar/inactivar y eliminar lógicamente cuentas con perfiles `asi*`. Busca el DNI exacto de ocho dígitos en `casis_persona` y completa nombres, apellidos, correo y teléfono; no modifica la ficha de persona. Si no encuentra el DNI, permite ingreso manual. Rechaza DNI, usuario y correo duplicados. Al editar, contraseña vacía conserva la actual; las respuestas no incluyen contraseñas ni hashes.
+
+Desde cada cuenta, «Designar tareas» abre las delegaciones con el usuario seleccionado. «Menús por perfil» abre la configuración existente; cambiar esos menús afecta a todos los usuarios del perfil. Las cuentas con perfiles externos o mixtos permanecen a cargo del módulo principal. La migración `2026-11-16-130000` registra el menú sin reiniciar los demás permisos.
+
+Verificación: tres pruebas automatizadas de ámbito y búsqueda DNI; comprobación adicional con una cuenta temporal de creación, identidad Shield, edición, conservación de contraseña, cambio de perfiles y eliminación lógica. La transacción de esa cuenta se revirtió completamente.
+
+- Programación (`asi_rol`): cargar turnos y enviar a Recursos Humanos.
+- Recursos Humanos (`asi_rrhh`): observar o dar visto bueno desde su bandeja.
+- Dirección (`asi_dire`): aprobar, devolver o rechazar después del visto bueno.
+
+Crear las cuentas en Asistencia → Usuarios de Asistencia. En Gestión de roles → Delegaciones temporales, seleccionar usuario, establecimiento, oficina opcional, tarea y vigencia. Dejar la oficina vacía asigna todo el establecimiento; elegir una oficina incluye esa oficina y sus descendientes activos del mismo establecimiento. Al guardar se agrega el perfil de navegación correspondiente. Los perfiles por sí solos no conceden acceso a los roles: la designación debe estar vigente. Al retirar o vencer una designación, el menú puede permanecer visible, pero no permite operar en ese ámbito.
+
+Las bandejas son `/asistencia/gestion-roles/recursos-humanos` y `/asistencia/gestion-roles/direccion`. Muestran pendientes de su etapa y ámbito; el historial conserva el filtro de ámbito. Un perfil territorial o ser jefe de oficina ya no concede programación ni aprobación implícita. Los administradores generales conservan su acceso global. Las cuentas usadas para probar el alcance deben tener únicamente los perfiles operativos, sin perfiles de administración global.
+
+Se aplicaron en la base local las migraciones `2026-11-16-120000` y `2026-11-16-121000`, incluyendo los dos menús sin reiniciar las demás asignaciones de navegación. No se crearon cuentas ni designaciones reales automáticamente. Pruebas de jerarquía, separación de etapas, usuario y vigencia en `Modules/Asistencia/Verification/DesignacionRolTest.php`.
+
 Acceso: `/asistencia/gestion-roles`, también desde Programación.
 
 ## Puesta en marcha

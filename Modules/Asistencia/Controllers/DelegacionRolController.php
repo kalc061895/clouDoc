@@ -18,7 +18,9 @@ class DelegacionRolController extends BaseModuleController
             return view('Modules\\Asistencia\\Views\\gestion_roles\\delegaciones', [
                 'delegaciones' => (new DelegacionRolService())->listar($filtros['buscar'], $filtros['etapa']),
                 'filtros' => $filtros,
+                'usuarioSeleccionado' => (int)$this->request->getGet('usuario_id'),
                 'usuarios' => $db->table(config('Auth')->tables['users'])->select('id, username, nombres, paterno, materno')->where('deleted_at', null)->where('active', 1)->orderBy('nombres')->orderBy('username')->get()->getResultArray(),
+                'establecimientos' => $db->table('casis_establecimiento')->select('est_ide, est_nombre')->where('deleted_at', null)->orderBy('est_nombre')->get()->getResultArray(),
                 'oficinas' => $db->table('casis_oficina')->select('ofi_ide, ofi_nombre, ofi_est_ide')->where('deleted_at', null)->where('ofi_estado', 1)->orderBy('ofi_nombre')->get()->getResultArray(),
             ]);
         } catch (\Throwable $e) {

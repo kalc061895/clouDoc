@@ -3,8 +3,8 @@
 <?= $this->section('content') ?>
 <div class="container-fluid py-3">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <div><h1 class="h3 mb-1"><iconify-icon icon="solar:inbox-in-bold-duotone" class="text-primary me-2"></iconify-icon>Envíos y aprobaciones</h1><p class="text-muted mb-0">Historial versionado de los roles remitidos a Recursos Humanos y Dirección.</p></div>
-        <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles') ?>"><iconify-icon icon="lucide:arrow-left" class="me-1"></iconify-icon>Roles por oficina</a>
+        <div><h1 class="h3 mb-1"><iconify-icon icon="solar:inbox-in-bold-duotone" class="text-primary me-2"></iconify-icon><?= esc($tituloBandeja ?? 'Envíos y aprobaciones') ?></h1><p class="text-muted mb-0">Historial versionado de los roles remitidos a Recursos Humanos y Dirección.</p></div>
+        <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/envios') ?>"><iconify-icon icon="lucide:arrow-left" class="me-1"></iconify-icon>Historial de envíos</a>
     </div>
     <?= view('Modules\Asistencia\Views\gestion_roles\navegacion', ['admin' => $admin ?? false]) ?>
     <?php foreach (['error' => 'error', 'success' => 'success'] as $key => $toast): if ($mensaje = session()->getFlashdata($key)): ?><script>document.addEventListener('DOMContentLoaded',()=>toastr.<?= $toast ?>(<?= json_encode($mensaje, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>));</script><?php endif; endforeach ?>

@@ -17,6 +17,12 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->post('personal/importar/confirmar', 'ImportarPersonalController::confirmar', ['filter' => 'csrf']);
 
     $routes->get('accesos', 'AccesosController::index');
+    $routes->get('usuarios', 'UsuarioController::index');
+    $routes->get('usuarios/datos', 'UsuarioController::datos');
+    $routes->get('usuarios/dni', 'UsuarioController::dni');
+    $routes->get('usuarios/(:num)', 'UsuarioController::detalle/$1');
+    $routes->post('usuarios/guardar', 'UsuarioController::guardar', ['filter'=>'csrf']);
+    $routes->post('usuarios/(:num)/eliminar', 'UsuarioController::eliminar/$1', ['filter'=>'csrf']);
     $routes->get('accesos/datos', 'AccesosController::datos');
     $routes->post('accesos/perfil/guardar', 'AccesosController::guardarPerfil', ['filter'=>'csrf']);
     $routes->post('accesos/menu', 'AccesosController::menu', ['filter'=>'csrf']);
@@ -84,6 +90,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->post('gestion-roles/delegaciones/(:num)/eliminar', 'DelegacionRolController::eliminar/$1', ['filter' => 'csrf']);
     $routes->get('gestion-roles/pendientes/excel', 'PendientesProgramacionRolController::excel');
     $routes->get('gestion-roles/pendientes', 'PendientesProgramacionRolController::index');
+    $routes->get('gestion-roles/recursos-humanos', 'RolEnvioController::index/RRHH');
+    $routes->get('gestion-roles/direccion', 'RolEnvioController::index/DIRECCION');
     $routes->get('gestion-roles/envios', 'RolEnvioController::index');
     $routes->get('gestion-roles/envios/(:num)', 'RolEnvioController::detalle/$1');
     $routes->post('gestion-roles/envios/(:num)/rrhh', 'RolEnvioController::rrhh/$1', ['filter' => 'csrf']);

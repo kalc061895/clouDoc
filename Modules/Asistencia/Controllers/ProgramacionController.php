@@ -32,7 +32,7 @@ class ProgramacionController extends BaseModuleController
     public function index()
     {
         $acceso = new AccesoAsistenciaService();
-        if (!$acceso->permitir('lectura_personal')) return $this->response->setStatusCode(403)->setBody('No tiene acceso a la programación de turnos.');
+        if (!$this->permitirProgramacion(false)) return $this->response->setStatusCode(403)->setBody('No tiene acceso a la programación de turnos.');
         $establecimientos = $this->establecimientoModel
             ->select('est_ide, est_nombre, est_codigo')
             ->where('deleted_at', null)
@@ -403,9 +403,8 @@ class ProgramacionController extends BaseModuleController
 
     private function permitirProgramacion(bool $editar): bool
     {
-        $user = auth()->user();
-        if ($user && $user->inGroup('asi_rol')) return true;
-        return (new AccesoAsistenciaService())->permitir($editar ? 'editar_personal' : 'lectura_personal');
+        $ids = (new GestionRolService())->oficinas();
+        return $ids === null || $ids !== [];
     }
 
 }

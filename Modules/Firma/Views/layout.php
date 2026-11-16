@@ -14,7 +14,7 @@
         <nav class="container-fluid px-4 py-3 d-flex flex-wrap align-items-center gap-3" aria-label="Navegación principal">
             <a class="fs-5 fw-bold text-primary" href="<?= base_url('inicio') ?>">clouDoc</a>
             <a class="btn btn-primary" href="<?= base_url('firma') ?>" aria-current="page">Firma de documentos</a>
-            <a class="btn btn-outline-secondary" href="<?= base_url('asistencia/roles/historial') ?>">Roles de Asistencia</a>
+            <a class="btn btn-outline-secondary" href="<?= base_url('asistencia/gestion-roles/envios') ?>">Roles de Asistencia</a>
             <a class="ms-auto" href="<?= base_url('inicio') ?>">Volver al inicio</a>
         </nav>
     </header>

@@ -10,11 +10,11 @@ class MenuGroupUserSeeder extends Seeder
     public static function asignaciones(): array
     {
         $menus = array_column(MenuSeeder::menus(), null, 'id');
-        $menusTerritoriales = array_values(array_diff(array_keys($menus), [1086, 1094, 1095]));
+        $menusTerritoriales = array_values(array_diff(array_keys($menus), [1086, 1094, 1095, 1098, 1099, 1100]));
         $map = [
             'asistencia' => array_keys($menus), // Compatibilidad con perfiles existentes.
             'asi_sua' => array_keys($menus),
-            'asi_adm' => [1006, 1001, 1002, 1003, 1088, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1052, 1053, 1055, 1056, 1095, 1096, 1097, 1018, 1019, 1025, 1032, 1033, 1061, 1072, 1091, 1092, 1093, 1094],
+            'asi_adm' => [1100, 1098, 1099, 1006, 1001, 1002, 1003, 1088, 1004, 1005, 1041, 1042, 1043, 1044, 1083, 1084, 1085, 1051, 1052, 1053, 1055, 1056, 1095, 1096, 1097, 1018, 1019, 1025, 1032, 1033, 1061, 1072, 1091, 1092, 1093, 1094],
             'asi_apo' => [1006, 1001, 1003, 1005, 1042, 1051, 1061],
             'asi_dm' => array_keys($menus),
             'asi_apoyo' => [1006, 1001, 1003, 1005, 1042, 1051, 1061],
@@ -36,11 +36,12 @@ class MenuGroupUserSeeder extends Seeder
             'asi_est_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
             'asi_auditoria' => [1051, 1094],
             'asi_rol' => [1041, 1042, 1044, 1004, 1083, 1089],
-            'asi_dire' => [1083],
-            'asi_rrhh' => [1083],
+            'asi_dire' => [1099, 1083],
+            'asi_rrhh' => [1098, 1083],
         ];
         $map['asistencia'] = array_values(array_diff(array_keys($menus), [1086, 1087])); // Perfil institucional de compatibilidad.
         foreach ($map as &$ids) {
+            $ids = array_values(array_intersect(array_diff($ids, MenuSeeder::RETIRED_IDS), array_keys($menus)));
             foreach ($ids as $id) {
                 $parent = $menus[$id]['parent_id'];
                 while ($parent !== null) { $ids[] = $parent; $parent = $menus[$parent]['parent_id']; }

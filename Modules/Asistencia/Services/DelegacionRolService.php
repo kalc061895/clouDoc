@@ -18,8 +18,9 @@ class DelegacionRolService
     {
         $this->gestion->exigirAdministrador();
         $q = $this->db->table('casis_plan_responsable r')
-            ->select('r.*, o.ofi_nombre, u.username, u.nombres, u.paterno, u.materno')
-            ->join('casis_oficina o', 'o.ofi_ide = r.oficina_id')
+            ->select('r.*, COALESCE(r.establecimiento_id, o.ofi_est_ide) AS establecimiento_id, o.ofi_nombre, e.est_nombre, u.username, u.nombres, u.paterno, u.materno')
+            ->join('casis_oficina o', 'o.ofi_ide = r.oficina_id', 'left')
+            ->join('casis_establecimiento e', 'e.est_ide = r.establecimiento_id OR e.est_ide = o.ofi_est_ide', 'left')
             ->join(config('Auth')->tables['users'] . ' u', 'u.id = r.usuario_id')
             ->orderBy('r.hasta', 'DESC')->orderBy('r.id', 'DESC');
         if ($etapa !== '' && in_array($etapa, ['PROGRAMACION', 'RRHH', 'DIRECCION'], true)) $q->where('r.etapa', $etapa);
@@ -36,7 +37,8 @@ class DelegacionRolService
         $valorId = $datos['id'] ?? '';
         $id = $valorId === '' || $valorId === '0' || $valorId === 0 ? 0 : $this->entero($valorId, 'delegación');
         $usuarioId = $this->entero($datos['usuario_id'] ?? '', 'usuario');
-        $oficinaId = $this->entero($datos['oficina_id'] ?? '', 'oficina');
+        $establecimientoId = $this->entero($datos['establecimiento_id'] ?? '', 'establecimiento');
+        $oficinaId = empty($datos['oficina_id']) ? null : $this->entero($datos['oficina_id'], 'oficina');
         $etapa = strtoupper(trim((string) ($datos['etapa'] ?? '')));
         if (!in_array($etapa, ['PROGRAMACION', 'RRHH', 'DIRECCION'], true)) throw new \InvalidArgumentException('Seleccione una etapa válida.');
         $desde = $this->fecha((string) ($datos['desde'] ?? ''));
@@ -44,16 +46,17 @@ class DelegacionRolService
         if ($desde > $hasta) throw new \InvalidArgumentException('La fecha Desde debe ser anterior o igual a Hasta.');
         $users = config('Auth')->tables['users'];
         if (!$this->db->table($users)->where('id', $usuarioId)->where('deleted_at', null)->where('active', 1)->countAllResults()) throw new \InvalidArgumentException('El usuario no existe o está desactivado.');
-        if (!$this->db->table('casis_oficina')->where('ofi_ide', $oficinaId)->where('deleted_at', null)->where('ofi_estado', 1)->countAllResults()) throw new \InvalidArgumentException('La oficina no existe o está inactiva.');
+        if (!$this->db->table('casis_establecimiento')->where('est_ide', $establecimientoId)->where('deleted_at', null)->countAllResults()) throw new \InvalidArgumentException('Establecimiento inválido.');
+        if ($oficinaId !== null && !$this->db->table('casis_oficina')->where('ofi_est_ide', $establecimientoId)->where('ofi_ide', $oficinaId)->where('deleted_at', null)->where('ofi_estado', 1)->countAllResults()) throw new \InvalidArgumentException('La oficina no existe o está inactiva.');
         if ($id && !$this->db->table('casis_plan_responsable')->where('id', $id)->countAllResults()) throw new \OutOfBoundsException('La delegación que intenta editar ya no existe.');
         $duplicada = $this->db->table('casis_plan_responsable')->where('usuario_id', $usuarioId)->where('oficina_id', $oficinaId)
-            ->where('etapa', $etapa)->where('desde <=', $hasta)->where('hasta >=', $desde);
+            ->where('establecimiento_id', $oficinaId ? null : $establecimientoId)->where('etapa', $etapa)->where('desde <=', $hasta)->where('hasta >=', $desde);
         if ($id) $duplicada->where('id !=', $id);
         if ($duplicada->countAllResults()) throw new \DomainException('Ya existe una delegación del mismo usuario, oficina y etapa con fechas que se cruzan.');
 
-        return $this->gestion->transaccion(function () use ($id, $usuarioId, $oficinaId, $etapa, $desde, $hasta): int {
+        return $this->gestion->transaccion(function () use ($id, $usuarioId, $oficinaId, $establecimientoId, $etapa, $desde, $hasta): int {
             $data = [
-                'usuario_id' => $usuarioId, 'oficina_id' => $oficinaId, 'desde' => $desde, 'hasta' => $hasta,
+                'usuario_id' => $usuarioId, 'oficina_id' => $oficinaId, 'establecimiento_id' => $oficinaId ? null : $establecimientoId, 'desde' => $desde, 'hasta' => $hasta,
                 'aprobar' => $etapa === 'PROGRAMACION' ? 0 : 1,
                 'programar' => $etapa === 'PROGRAMACION' ? 1 : 0,
                 'etapa' => $etapa,
@@ -67,6 +70,11 @@ class DelegacionRolService
                 $this->db->table('casis_plan_responsable')->insert($data);
                 $id = (int) $this->db->insertID();
                 $accion = 'CREAR_DELEGACION_ROL';
+            }
+            $grupo = ['PROGRAMACION' => 'asi_rol', 'RRHH' => 'asi_rrhh', 'DIRECCION' => 'asi_dire'][$etapa];
+            $membresia = ['user_id' => $usuarioId, 'group' => $grupo];
+            if (!$this->db->table('auth_groups_users')->where($membresia)->countAllResults()) {
+                $this->db->table('auth_groups_users')->insert($membresia + ['created_at' => $this->gestion->ahora()]);
             }
             $this->gestion->evento($accion, ['delegacion_id' => $id] + $data);
             return $id;
