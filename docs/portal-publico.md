@@ -20,7 +20,7 @@ Editar `app/Config/Portal.php` para cambiar la entidad, descripciones, funciones
 
 Cada recurso aparece tanto en el centro de aprendizaje general como en la página de su módulo. Hay filtros por tipo y búsqueda por título o módulo. Mientras no se publiquen materiales se muestran espacios informativos, sin enlaces vacíos. El ejemplo completo está en `public/manuales/README.md`.
 
-La portada utiliza un diseño adaptable y estilos propios en `public/assets/css/portal.css`, sin depender de recursos externos. Incluye navegación por teclado, etiquetas para lectores de pantalla, preguntas frecuentes y acceso al login en todas las páginas.
+El layout compartido `app/Views/layouts/portal.php` reutiliza la estructura de `public/landingpage/index.html` y los recursos existentes: `assets/css/styles.css`, `assets/js/vendor.min.js` y Bootstrap. La portada, las cinco presentaciones y Shield usan contenedores, rejillas, tarjetas, utilidades y el tema Blue_Theme. El listado de materiales se filtra mediante las pestanas nativas de Bootstrap (Todos, Videos y PDF). No requiere CSS ni JavaScript propios del portal. Los enlaces de ayuda y las preguntas frecuentes son accesibles por teclado.
 
 ## Verificación
 

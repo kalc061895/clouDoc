@@ -5,7 +5,7 @@
 <?= $this->section('main') ?>
 
 
-<div class="auth-max-width col-sm-8 col-md-6 col-xl-7 px-4">
+<div class="w-100">
     <h2 class="mb-1 fs-7 fw-bolder"><?= lang('Auth.title') ?></h2>
     <p class="mb-7"><?= lang('Auth.register') ?></p>
 

@@ -4,8 +4,8 @@
 
 <?= $this->section('main') ?>
 
-<div class="container d-flex justify-content-center p-5">
-    <div class="card col-12 col-md-5 shadow-sm">
+<div class="w-100">
+    <div class="card border-0 shadow-none w-100 mb-0">
         <div class="card-body">
             <h5 class="card-title mb-5"><?= lang('Auth.email2FATitle') ?></h5>
 

@@ -1,23 +1,35 @@
+<?php $portal = $portal ?? config('Portal'); ?>
 <!doctype html>
-<html lang="es">
+<html lang="es" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
 <head>
-    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $this->renderSection('title') ?> · <?= esc($portal->nombre) ?></title>
-    <meta name="description" content="Portal de gestión de recursos humanos y administración institucional. Trámite documentario, legajos, selección, asistencia y planillas.">
-    <link rel="icon" href="<?= base_url('assets/images/logos/favicon.png') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/portal.css') ?>">
-    <script src="<?= base_url('assets/js/portal.js') ?>" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title><?= $this->renderSection('title') ?> | <?= esc($portal->nombre) ?></title>
+<link rel="icon" href="<?= base_url('assets/images/logos/favicon.png') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/styles.css') ?>">
+<?= $this->renderSection('pageStyles') ?>
 </head>
 <body>
-<a class="skip-link" href="#contenido">Saltar al contenido</a>
-<header class="portal-header">
-    <div class="shell header-inner">
-        <a class="brand" href="<?= site_url('/') ?>" aria-label="ClouDoc, inicio"><span class="brand-symbol" aria-hidden="true">C<span></span></span><span><?= esc($portal->nombre) ?><small>Gestión institucional</small></span></a>
-        <nav class="main-nav" aria-label="Navegación principal"><a href="<?= site_url('/') ?>#modulos">Módulos</a><a href="#recursos">Manuales y videos</a><a href="#ayuda">Ayuda</a></nav>
-        <a class="button button-dark header-login" href="<?= site_url('login') ?>"><?= view('portal/icono', ['icono'=>'acceso']) ?><span>Iniciar sesión</span></a>
-    </div>
-</header>
+<a class="visually-hidden-focusable btn btn-primary" href="#contenido">Saltar al contenido</a>
+<div class="landingpage"><div class="main-wrapper">
+<header class="topheader py-3" id="top"><div class="container">
+<nav class="navbar navbar-expand-md navbar-light ps-0" aria-label="Principal">
+<a class="navbar-brand fw-bold fs-7 text-dark" href="<?= site_url('/') ?>"><?= esc($portal->nombre) ?></a>
+<button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#portal-menu" aria-controls="portal-menu" aria-label="Abrir menu"><i class="ti ti-menu-2 fs-7" aria-hidden="true"></i></button>
+<div class="collapse navbar-collapse"><ul class="navbar-nav ms-auto stylish-nav align-items-md-center gap-3">
+<li class="nav-item"><a class="nav-link" href="<?= site_url('/') ?>#modulos">M&oacute;dulos</a></li>
+<li class="nav-item"><a class="nav-link" href="<?= site_url('/') ?>#recursos">Manuales y videos</a></li>
+<li class="nav-item"><a class="nav-link" href="<?= site_url('/') ?>#ayuda">Ayuda</a></li>
+<li class="nav-item"><a class="btn btn-primary" href="<?= site_url('login') ?>">Iniciar sesi&oacute;n</a></li>
+</ul></div></nav></div></header>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="portal-menu" aria-labelledby="portal-menu-title">
+<div class="offcanvas-header"><h5 class="offcanvas-title" id="portal-menu-title"><?= esc($portal->nombre) ?></h5><button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Cerrar menu"></button></div>
+<div class="offcanvas-body"><nav class="nav flex-column gap-3" aria-label="Menu movil">
+<a class="nav-link" href="<?= site_url('/') ?>#modulos">M&oacute;dulos</a><a class="nav-link" href="<?= site_url('/') ?>#recursos">Manuales y videos</a><a class="nav-link" href="<?= site_url('/') ?>#ayuda">Ayuda</a><a class="btn btn-primary" href="<?= site_url('login') ?>">Iniciar sesi&oacute;n</a>
+</nav></div></div>
 <main id="contenido"><?= $this->renderSection('content') ?></main>
-<footer class="portal-footer"><div class="shell footer-inner"><div><a class="footer-brand" href="<?= site_url('/') ?>"><?= esc($portal->nombre) ?></a><p>Sistema de gestión de recursos humanos<br>y administración institucional.</p></div><div><strong><?= esc($portal->entidad) ?></strong><p>Una cuenta. Accesos según su perfil.</p><a href="<?= site_url('login') ?>">Iniciar sesión →</a></div><div><strong>Accesos públicos</strong><a href="<?= site_url('portal/modulos/tramite-documentario') ?>">Mesa de partes y trámites</a><a href="<?= site_url('/') ?>#recursos">Centro de aprendizaje</a><a href="<?= site_url('/') ?>#ayuda">Orientación de acceso</a></div></div><div class="shell footer-bottom">Oficina de Tecnología e Informática · <?= esc($portal->entidad) ?></div></footer>
-</body>
-</html>
+<footer class="text-center py-5 border-top"><div class="container"><a class="fw-bold fs-6" href="<?= site_url('/') ?>"><?= esc($portal->nombre) ?></a><p class="mt-2"><?= esc($portal->entidad) ?> &middot; Gesti&oacute;n institucional</p><div class="d-flex justify-content-center flex-wrap gap-4"><a href="<?= site_url('portal/modulos/tramite-documentario') ?>">Mesa de partes y tr&aacute;mites</a><a href="<?= site_url('/') ?>#recursos">Centro de aprendizaje</a><a href="<?= site_url('login') ?>">Iniciar sesi&oacute;n</a></div></div></footer>
+</div></div>
+<script src="<?= base_url('assets/js/vendor.min.js') ?>"></script>
+<script src="<?= base_url('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
+<?= $this->renderSection('pageScripts') ?>
+</body></html>

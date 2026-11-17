@@ -4,7 +4,7 @@
 
 <?= $this->section('main') ?>
 
-<div class="auth-max-width col-sm-8 col-md-6 col-xl-7 px-4">
+<div class="w-100">
     <div class="mb-5">
         <h2 class="fw-bolder fs-7 mb-3"><?= lang('Auth.useMagicLink') ?></h2>
         <p class="mb-0 ">
