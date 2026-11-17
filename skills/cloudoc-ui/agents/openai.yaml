@@ -1,0 +1,4 @@
+interface:
+  display_name: "ClouDoc UI"
+  short_description: "Componentes CI4 con la plantilla Bootstrap de ClouDoc"
+  default_prompt: "Usa $cloudoc-ui para construir esta vista con los componentes y recursos existentes de ClouDoc."

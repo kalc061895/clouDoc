@@ -1705,6 +1705,7 @@ try {
         </div>
 
         <?= view('partials/asistencia/sessionModals', ['perfilAsistencia' => $perfilAsistencia, 'opcionesAsistencia' => $opcionesAsistencia]) ?>
+        <?= view('partials/asistencia/passwordModal', [], ['saveData' => false]) ?>
     </div>
 
     <div class="dark-transparent sidebartoggler"></div>
@@ -1811,6 +1812,7 @@ try {
     </script>
     <script src="<?= base_url('assets/js/asistencia/preferences.js') ?>"></script>
     <script src="<?= base_url('assets/js/asistencia/layout.js') ?>"></script>
+    <?= view('partials/asistencia/passwordScript', [], ['saveData' => false]) ?>
     <?= $this->renderSection('pageScripts'); ?>
 </body>
 

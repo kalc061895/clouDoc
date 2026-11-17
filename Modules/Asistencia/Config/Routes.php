@@ -2,6 +2,8 @@
 
 // Creamos un grupo de rutas bajo el prefijo 'modulo-asistencia'
 $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], function ($routes) {
+    $routes->get('mi-cuenta/password/token', 'PasswordController::token');
+    $routes->post('mi-cuenta/password', 'PasswordController::guardar', ['filter' => 'csrf']);
     $routes->get('auditoria', 'AuditoriaController::index');
     $routes->get('calificacion', 'CalificacionMensualController::index');
     $routes->get('calificacion/(:num)', 'CalificacionMensualController::detalle/$1');

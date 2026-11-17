@@ -18,7 +18,7 @@
   <!-- Owl Carousel  -->
   <link rel="stylesheet" href="assets/libs/aos/dist/aos.css" />
   <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
-  <?= $this->renderSection('pageStyles') ;?>
+  <?= $this->renderSection('pageStyles'); ?>
 
 </head>
 
@@ -123,7 +123,7 @@
   <script src="assets/libs/aos/dist/aos.js"></script>
   <script src="assets/js/landingpage/landingpage.js"></script>
   <script src="assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
-  <?= $this->renderSection('pageScripts') ;?>
+  <?= $this->renderSection('pageScripts'); ?>
 </body>
 
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodeIgniter AJAX y Servicios"
+  short_description: "Controladores delgados, servicios y contratos AJAX"
+  default_prompt: "Usa $codeigniter-ajax-services para implementar este flujo en CI4 con lógica en servicios y un contrato HTTP desacoplado de la vista."

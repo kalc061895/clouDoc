@@ -11,6 +11,7 @@
         </div>
         <div class="p-2"><button type="button" class="dropdown-item rounded d-flex align-items-center gap-2 py-2" data-bs-toggle="modal" data-bs-target="#asis-user-modal"><i class="ti ti-user-circle text-primary" aria-hidden="true"></i>Mi información</button><button type="button" class="dropdown-item rounded d-flex align-items-center gap-2 py-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="ti ti-search text-primary" aria-hidden="true"></i>Buscar una funcionalidad</button></div>
         <div class="px-2 pb-2"><button type="button" class="dropdown-item rounded d-flex align-items-center gap-2 py-2" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"><i class="ti ti-palette text-primary" aria-hidden="true"></i>Mi apariencia</button></div>
+        <div class="px-2 pb-2"><button type="button" class="dropdown-item rounded d-flex align-items-center gap-2 py-2" data-bs-toggle="modal" data-bs-target="#asis-password-modal"><i class="ti ti-lock text-primary" aria-hidden="true"></i>Cambiar contraseña</button></div>
         <div class="border-top p-2"><a class="dropdown-item rounded d-flex align-items-center gap-2 py-2 text-danger" href="<?= base_url('logout') ?>"><i class="ti ti-logout" aria-hidden="true"></i>Cerrar sesión</a></div>
     </div>
 </li>
