@@ -459,7 +459,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
             $routes->get('listar', 'PersonalController::apiListar');
-            $routes->post('guardar-wizard', 'PersonalController::apiGuardarWizard');
+            $routes->get('token-wizard', 'PersonalController::apiTokenWizard');
+            $routes->post('guardar-wizard', 'PersonalController::apiGuardarWizard', ['filter' => 'csrf']);
             $routes->post('actualizar/(:num)', 'PersonalController::apiActualizarPersonal/$1');
             $routes->post('baja/(:num)', 'PersonalController::apiDarDeBaja/$1');
 

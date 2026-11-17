@@ -184,6 +184,19 @@ class PersonalController extends BaseController
         return $this->respond(['status' => 'success', 'data' => $data], 200);
     }
 
+    public function apiTokenWizard()
+    {
+        if (!$this->acceso->permitir('crear_personal')) return $this->failForbidden('No tiene permiso para registrar personal.');
+        return $this->respuestaWizard(['status' => 'success'], 200);
+    }
+
+    private function respuestaWizard(array $payload, int $code)
+    {
+        $payload['csrf'] = ['header' => csrf_header(), 'name' => csrf_token(), 'hash' => csrf_hash()];
+        $this->response->setHeader('Cache-Control', 'private, no-store');
+        return $this->respond($payload, $code);
+    }
+
     public function apiGuardarWizard()
     {
         if (!$this->acceso->permitir('crear_personal')) return $this->failForbidden('No tiene permiso para registrar personal.');
@@ -191,7 +204,7 @@ class PersonalController extends BaseController
         $json = $this->request->getJSON(true);
 
         if (empty($json)) {
-            return $this->respond(['status' => 'error', 'messages' => ['payload' => 'No se recibieron datos válidos.']], 400);
+            return $this->respuestaWizard(['status' => 'error', 'messages' => ['payload' => 'No se recibieron datos válidos.']], 400);
         }
         if (empty($json['perl_est_ide']) || !$this->acceso->establecimientoDentroAmbito((int) $json['perl_est_ide'])) return $this->failForbidden('El establecimiento está fuera de su ámbito.');
 
@@ -202,11 +215,11 @@ class PersonalController extends BaseController
         $resultado = $this->personalService->guardarPersonalWizard($json);
 
         if ($resultado['status'] === 'success') {
-            return $this->respond($resultado, 200);
+            return $this->respuestaWizard($resultado, 200);
         }
 
         // Si falló por validación de base de datos interna, mandamos un código 400
-        return $this->respond(['status' => 'error', 'messages' => ['database' => $resultado['message']]], 400);
+        return $this->respuestaWizard(['status' => 'error', 'messages' => ['database' => $resultado['message']]], 400);
     }
 
     public function apiSelectColegios()
