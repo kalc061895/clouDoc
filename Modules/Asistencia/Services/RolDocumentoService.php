@@ -170,6 +170,7 @@ class RolDocumentoService
         $miembros = json_decode((string) $envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
         $anio = (int) $envio['anio'];
         $mes = (int) $envio['mes'];
+        $miembros = (new AusenciasRolService($this->db))->completarSnapshot($miembros, sprintf('%04d-%02d', $anio, $mes));
         $diasMes = (int) (new \DateTimeImmutable(sprintf('%04d-%02d-01', $anio, $mes)))->format('t');
         $dias = [];
         $tz = new \DateTimeZone('America/Lima');
@@ -182,7 +183,6 @@ class RolDocumentoService
         foreach ($miembros as $miembro) {
             $persona = $miembro['personal'] ?? [];
             $turnos = $miembro['turnos'] ?? [];
-            if (! $turnos) continue;
             $diasPersona = array_fill(1, $diasMes, []);
             foreach ($turnos as $turno) {
                 $fechaTurno = $turno['prog_fecha'] ?? '';
@@ -201,6 +201,7 @@ class RolDocumentoService
                     'duracion_horas' => round(($fin->getTimestamp() - $inicio->getTimestamp()) / 3600, 2),
                 ];
             }
+            $calendario = AusenciasRolService::calendario($miembro['ausencias'], $diasPersona, $diasMes);
             $matriz[] = [
                 'perl_ide' => (int) ($persona['perl_ide'] ?? 0),
                 'dni' => (string) ($persona['documento_snapshot'] ?? ''),
@@ -210,9 +211,10 @@ class RolDocumentoService
                 'dias' => $diasPersona,
                 'total_horas' => 0,
                 'total_turnos' => count($turnos),
+                'ausencias' => $calendario['tramos'],
             ];
         }
-        if (! $matriz) throw new \DomainException('El snapshot aprobado no contiene turnos para imprimir.');
+        if (! $matriz) throw new \DomainException('El envío aprobado no contiene personal para imprimir.');
         $filtros = [
             'anio' => $anio, 
             'mes' => $mes, 

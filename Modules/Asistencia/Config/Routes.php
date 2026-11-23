@@ -92,6 +92,9 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->post('gestion-roles/delegaciones/(:num)/eliminar', 'DelegacionRolController::eliminar/$1', ['filter' => 'csrf']);
     $routes->get('gestion-roles/pendientes/excel', 'PendientesProgramacionRolController::excel');
     $routes->get('gestion-roles/pendientes', 'PendientesProgramacionRolController::index');
+    $routes->get('gestion-roles/presupuesto-guardias', 'PresupuestoGuardiasController::index');
+    $routes->post('gestion-roles/presupuesto-guardias/exportar', 'PresupuestoGuardiasController::exportar', ['filter' => 'csrf']);
+    $routes->get('gestion-roles/presupuesto-guardias/archivo/(:segment)', 'PresupuestoGuardiasController::archivo/$1');
     $routes->get('gestion-roles/recursos-humanos', 'RolEnvioController::index/RRHH');
     $routes->get('gestion-roles/direccion', 'RolEnvioController::index/DIRECCION');
     $routes->get('gestion-roles/envios', 'RolEnvioController::index');

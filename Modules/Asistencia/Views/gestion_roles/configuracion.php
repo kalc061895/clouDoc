@@ -98,6 +98,26 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
                                         <label class="col-md-7">Descripción<input name="descripcion" value="<?= esc($valor('descripcion'), 'attr') ?>" class="form-control"></label>
                                     <?php endif ?>
                                 </div>
+                                <?php if ($esPeriodo): ?>
+                                    <fieldset class="border rounded p-3 mb-3">
+                                        <legend class="float-none w-auto px-2 h6">Advertencias de revisión</legend>
+                                        <p class="small text-muted">Las advertencias son informativas. El cálculo usa los turnos del mes y semanas de lunes a domingo. Deje un campo vacío para desactivar su advertencia.</p>
+                                        <div class="row">
+                                            <?php foreach ([
+                                                'max_dias_sin_turno' => ['Máximo de días consecutivos sin turno', 31, '1', 2],
+                                                'max_horas_semanales' => ['Máximo de horas semanales', 168, '0.01', ''],
+                                            ] as $campo => [$label, $max, $step, $default]): ?>
+                                                <div class="col-md-6">
+                                                    <?= view('components/form_field', [
+                                                        'name' => $campo, 'label' => $label, 'type' => 'number',
+                                                        'value' => old($campo, $editar ? $editar[$campo] : $default, false),
+                                                        'attributes' => ['min' => 0, 'max' => $max, 'step' => $step],
+                                                    ]) ?>
+                                                </div>
+                                            <?php endforeach ?>
+                                        </div>
+                                    </fieldset>
+                                <?php endif ?>
                                 <div class="bg-light rounded p-3 mb-3">
                                     <label for="fuente-reglas" class="form-label">Reutilizar reglas de una plantilla o un período</label>
                                     <div class="d-flex gap-2"><select id="fuente-reglas" class="form-select">
@@ -161,6 +181,10 @@ foreach ($periodos as $p) $fuentes['periodo-' . $p['id']] = ['nombre' => $p['mes
             document.getElementById('tituloModalConfiguracion').textContent = 'Crear <?= $esPeriodo ? 'período' : 'plantilla' ?>';
             document.getElementById('formulario').reset();
             document.querySelector('#formulario [name="id"]').value = '0';
+            <?php if ($esPeriodo): ?>
+            document.querySelector('#formulario [name="max_dias_sin_turno"]').value = '2';
+            document.querySelector('#formulario [name="max_horas_semanales"]').value = '';
+            <?php endif ?>
             box.replaceChildren();
             document.getElementById('reglas-json').value = '[]';
             actualizarVacio();

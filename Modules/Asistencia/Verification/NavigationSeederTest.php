@@ -49,6 +49,36 @@ final class NavigationSeederTest extends CIUnitTestCase
         $db->close();
     }
 
+    public function testAgruparCatalogosConservaRutasYPermisosDePerfilesPersonalizados(): void
+    {
+        $db = $this->database();
+        try {
+            $catalogos = array_filter(MenuSeeder::menus(), static fn(array $menu): bool => in_array($menu['parent_id'], MenuSeeder::GRUPOS_CATALOGOS, true));
+            self::assertCount(26, $catalogos);
+            foreach ($catalogos as $menu) {
+                $db->table('menus')->insert(array_replace($menu, ['parent_id' => 1010]));
+            }
+            $db->table('menu_group_user')->insert(['group_user_id' => 705, 'menu_id' => 1027]);
+            require_once dirname(__DIR__) . '/Database/Migrations/2026-11-23-140000_AgruparCatalogosAsistencia.php';
+            $migracion = new \Modules\Asistencia\Database\Migrations\AgruparCatalogosAsistencia(\Config\Database::forge($db));
+            $migracion->up();
+            $migracion->up();
+
+            $menus = array_column($db->table('menus')->get()->getResultArray(), null, 'id');
+            foreach ($catalogos as $catalogo) {
+                self::assertSame($catalogo['parent_id'], (int) $menus[$catalogo['id']]['parent_id']);
+                self::assertSame($catalogo['url'], $menus[$catalogo['id']]['url']);
+            }
+            $permisos = $db->table('menu_group_user')->where('group_user_id', 705)->orderBy('menu_id')->get()->getResultArray();
+            self::assertSame([1027, 1106], array_map('intval', array_column($permisos, 'menu_id')));
+            $migracion->down();
+            self::assertSame(26, $db->table('menus')->where('parent_id', 1010)->countAllResults());
+            self::assertSame(1, $db->table('menu_group_user')->where('group_user_id', 705)->countAllResults());
+        } finally {
+            $db->close();
+        }
+    }
+
     public function testReportesPendientesConservanJerarquiaYAsignaciones(): void
     {
         $db = $this->database();

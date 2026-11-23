@@ -91,6 +91,14 @@ class RolDocumentoData
                 unset($turno);
             }
             unset($turnos);
+            foreach ($persona['ausencias'] ?? [] as $dia => $tramo) {
+                // Las casillas estrechas conservan el ancho del calendario.
+                if (mb_strlen($tramo['detalle']) > $tramo['dias'] * 4) {
+                    $marca = 'A' . $dia;
+                    $persona['ausencias'][$dia]['marca'] = $marca;
+                    $persona['detalle_ausencias'][] = $marca . ' ' . $tramo['detalle'];
+                }
+            }
             $persona['total_horas'] = round($persona['total_horas'], 2);
             $total += $persona['total_horas'];
         }
@@ -125,6 +133,9 @@ class RolDocumentoData
         foreach ($documento['personal'] as $persona) {
             $turnos = max(array_map('count', $persona['dias']) ?: [0]);
             $altoFila = max(30, ceil(mb_strlen($persona['trabajador']) / 28) * 13 + 8, ceil(mb_strlen($persona['cargo']) / 13) * 12 + 8, $turnos * 23 + 6);
+            if (!empty($persona['detalle_ausencias'])) {
+                $altoFila += 8 + 10 * ceil(mb_strlen(implode(' | ', $persona['detalle_ausencias'])) / 120);
+            }
             if ($filas && $alto + $altoFila > $presupuesto) {
                 $paginas[] = ['filas' => $filas, 'offset' => $offset];
                 $offset += count($filas);

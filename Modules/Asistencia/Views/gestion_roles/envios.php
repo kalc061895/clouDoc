@@ -8,6 +8,15 @@
     </div>
     <?= view('Modules\Asistencia\Views\gestion_roles\navegacion', ['admin' => $admin ?? false]) ?>
     <?php foreach (['error' => 'error', 'success' => 'success'] as $key => $toast): if ($mensaje = session()->getFlashdata($key)): ?><script>document.addEventListener('DOMContentLoaded',()=>toastr.<?= $toast ?>(<?= json_encode($mensaje, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>));</script><?php endif; endforeach ?>
+    <form method="get" class="row align-items-end g-2 mb-3">
+        <div class="col-md-6 col-lg-4">
+            <?= view('components/form_field', [
+                'name' => 'establecimiento', 'label' => 'Establecimiento', 'type' => 'select',
+                'placeholder' => 'Todos', 'options' => $establecimientos, 'value' => $establecimiento,
+            ]) ?>
+        </div>
+        <div class="col-auto mb-3"><button class="btn btn-outline-primary">Filtrar</button></div>
+    </form>
     <div class="card border-0 shadow-sm"><div class="card-body"><div class="table-responsive">
         <table id="tablaEnviosRoles" class="table table-striped table-hover align-middle mb-0">
             <thead class="table-light"><tr><th>Período</th><th>Oficina</th><th>Establecimiento</th><th>Versión</th><th>Estado</th><th>Enviado</th><th>Acción</th></tr></thead>

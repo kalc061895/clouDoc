@@ -6,8 +6,9 @@ $filas = $filas ?? $documento['personal'];
 $offset = $offset ?? 0;
 $numero = static fn($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
 $letras = [1 => 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
-$anchoDia = 55 / $documento['dias_mes'];
-$anchoConteo = 12 / count($documento['codigos']);
+$codigos = count($documento['codigos']);
+$anchoDia = ($codigos ? 55 : 67) / $documento['dias_mes'];
+$anchoConteo = 12 / max(1, $codigos);
 ?>
 <table class="rol-tabla">
     <thead>
@@ -17,7 +18,7 @@ $anchoConteo = 12 / count($documento['codigos']);
             <th rowspan="3" style="width:6%">DNI / Doc.</th>
             <th rowspan="3" style="width:7%">Cargo</th>
             <th colspan="<?= $documento['dias_mes'] ?>">MES Y AÑO: <?= esc($documento['mes_nombre']) ?> <?= (int) $documento['filtros']['anio'] ?></th>
-            <th colspan="<?= count($documento['codigos']) ?>">Nº DE TURNOS</th>
+            <?php if ($codigos): ?><th colspan="<?= $codigos ?>">Nº DE TURNOS</th><?php endif ?>
             <th rowspan="3" style="width:3%">TOTAL<br>HORAS</th>
         </tr>
         <tr>
@@ -33,7 +34,16 @@ $anchoConteo = 12 / count($documento['codigos']);
                 <td class="nombre"><?= esc($persona['trabajador']) ?></td>
                 <td><?= esc($persona['dni']) ?></td>
                 <td class="nombre cargo"><?= esc($persona['cargo']) ?></td>
-                <?php foreach ($documento['dias'] as $dia): ?>
+                <?php $omitirHasta = 0;
+                foreach ($documento['dias'] as $dia):
+                    $numeroDia = (int) $dia['dia'];
+                    if ($numeroDia <= $omitirHasta) continue;
+                    $ausencia = $persona['ausencias'][$numeroDia] ?? null;
+                    if ($ausencia):
+                        $omitirHasta = $numeroDia + $ausencia['dias'] - 1; ?>
+                        <td class="ausencia" colspan="<?= (int) $ausencia['dias'] ?>"><?= esc($ausencia['marca'] ?? $ausencia['detalle']) ?></td>
+                        <?php continue; ?>
+                    <?php endif ?>
                     <td class="dia <?= $dia['es_fin_de_semana'] ? 'fin-semana' : '' ?>">
                         <?php foreach ($persona['dias'][$dia['dia']] ?? [] as $turno): ?>
                             <div class="turno" style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></div>
@@ -43,9 +53,12 @@ $anchoConteo = 12 / count($documento['codigos']);
                 <?php foreach ($documento['codigos'] as $codigo): ?><td><?= (int) ($persona['conteos'][$codigo] ?? 0) ?></td><?php endforeach ?>
                 <td class="horas"><?= $numero($persona['total_horas']) ?></td>
             </tr>
+            <?php if (!empty($persona['detalle_ausencias'])): ?>
+                <tr><td colspan="<?= 5 + $documento['dias_mes'] + $codigos ?>" class="detalle-ausencias"><?= esc(implode(' | ', $persona['detalle_ausencias'])) ?></td></tr>
+            <?php endif ?>
         <?php endforeach ?>
         <?php if (! $filas): ?><tr>
-                <td colspan="<?= 5 + $documento['dias_mes'] + count($documento['codigos']) ?>">No hay turnos programados para los filtros seleccionados.</td>
+                <td colspan="<?= 5 + $documento['dias_mes'] + $codigos ?>">No hay personal para los filtros seleccionados.</td>
             </tr><?php endif ?>
     </tbody>
 </table>

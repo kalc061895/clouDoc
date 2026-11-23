@@ -37,11 +37,38 @@
     $mesRol = (int) $envio['mes'];
     $diasMesRol = (int) (new DateTimeImmutable(sprintf('%04d-%02d-01', $anioRol, $mesRol)))->format('t');
     $miembrosRol = $envio['snapshot'];
+    $jsonAnterior = old('observaciones', '{}', false);
+    $observacionesAnteriores = is_string($jsonAnterior) ? json_decode($jsonAnterior, true) : [];
+    $comentarioAnterior = old('comentario', '', false);
+    $comentarioAnterior = is_string($comentarioAnterior) ? $comentarioAnterior : '';
+    $conAlertas = 0;
+    foreach ($calendarios as $id => $calendario) {
+        if ($calendario['alertas'] || $alertas[$id]) $conAlertas++;
+    }
     ?>
     <h2 class="h5">Programaci&#243;n capturada</h2>
     <p class="small text-muted">Personal incluido: <?= count($miembrosRol) ?>. Los datos corresponden a esta versi&#243;n enviada.</p>
-    <div class="table-responsive border rounded mb-4">
-        <table class="table table-sm table-bordered table-hover align-middle mb-0 text-center rol-revision-tabla">
+    <?php if ($ausenciasPorConsultar): ?>
+        <p class="small text-muted">Para esta versión, las ausencias se consultan en los registros actuales.</p>
+    <?php endif ?>
+    <?php if ($conAlertas): ?>
+        <?= view('components/alert', ['variant' => 'warning', 'message' => "Personal con advertencias: {$conAlertas}. Revise el detalle en la última columna."]) ?>
+    <?php endif ?>
+    <div class="row g-3 mb-3">
+        <?php foreach ([
+            'regimen' => ['Régimen contractual', $regimenes],
+            'modalidad' => ['Tipo de personal', ['ASISTENCIAL' => 'Asistencial', 'ADMINISTRATIVO' => 'Administrativo']],
+        ] as $campo => [$label, $opciones]): ?>
+            <div class="col-md-4">
+                <?= view('components/form_field', [
+                    'id' => 'filtrar-' . $campo, 'name' => $campo, 'label' => $label, 'type' => 'select',
+                    'placeholder' => 'Todos', 'options' => $opciones, 'attributes' => ['disabled' => true],
+                ]) ?>
+            </div>
+        <?php endforeach ?>
+    </div>
+    <div class="table-responsive border rounded mb-4 p-2">
+        <table id="tablaRevisionRol" class="table table-sm table-bordered table-hover align-middle mb-0 text-center rol-revision-tabla">
             <thead class="table-light">
                 <tr>
                     <th scope="col" class="rol-fijo">N.</th>
@@ -51,11 +78,15 @@
                     <?php for ($dia = 1; $dia <= $diasMesRol; $dia++): ?><th scope="col" class="rol-dia"><?= $dia ?></th><?php endfor ?>
                     <th scope="col" class="rol-total">Turnos</th>
                     <th scope="col" class="rol-total">Horas</th>
+                    <th scope="col" class="rol-observaciones">Advertencias y observaciones</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($miembrosRol as $indice => $miembro):
                     $persona = $miembro['personal'] ?? [];
+                    $personalId = (int) ($persona['perl_ide'] ?? 0);
+                    $calendario = $calendarios[$personalId];
+                    $observacionAnterior = $observacionesAnteriores[$personalId] ?? '';
                     $turnosPorDia = [];
                     $totalTurnos = 0;
                     $totalHoras = 0.0;
@@ -73,26 +104,49 @@
                         $totalHoras += $horas;
                     }
                 ?>
-                    <tr>
+                    <tr data-regimen="<?= (int) ($persona['perl_mco_ide'] ?? 0) ?>" data-modalidad="<?= esc(strtoupper((string) ($persona['car_modalidad'] ?? '')), 'attr') ?>">
                         <th scope="row"><?= $indice + 1 ?></th>
                         <td class="text-start font-monospace"><?= esc($persona['documento_snapshot'] ?? '-') ?></td>
                         <td class="text-start fw-semibold"><?= esc($persona['nombre_snapshot'] ?? 'Personal') ?></td>
                         <td class="text-start"><?= esc($persona['cargo_snapshot'] ?? 'Sin cargo') ?></td>
                         <?php for ($dia = 1; $dia <= $diasMesRol; $dia++): ?>
-                            <td class="rol-dia">
+                            <?php
+                            $ausenciasDia = $calendario['dias'][$dia] ?? [];
+                            $hayTurno = !empty($turnosPorDia[$dia]);
+                            $tramo = $calendario['tramos'][$dia] ?? null;
+                            $claseAusencia = $ausenciasDia ? ($hayTurno ? 'table-warning' : 'table-success') : '';
+                            ?>
+                            <td class="rol-dia <?= $claseAusencia ?>" data-dias-ausencia="<?= (int) ($tramo['dias'] ?? 1) ?>">
                                 <?php foreach ($turnosPorDia[$dia] ?? [] as $turnoDia): ?>
                                     <span class="badge text-bg-primary mb-1" title="<?= esc($turnoDia['inicio'] . ' - ' . $turnoDia['fin'] . ' (' . number_format($turnoDia['horas'], 2) . ' h)', 'attr') ?>"><?= esc($turnoDia['codigo'] ?: 'Turno') ?></span>
                                 <?php endforeach ?>
-                                <?php if (empty($turnosPorDia[$dia])): ?><span class="text-muted">-</span><?php endif ?>
+                                <?php if ($ausenciasDia): ?>
+                                    <div class="small rol-ausencia"><?= esc(implode(' / ', $ausenciasDia)) ?></div>
+                                <?php elseif (!$hayTurno): ?><span class="text-muted">-</span><?php endif ?>
                             </td>
                         <?php endfor ?>
                         <td class="fw-semibold"><?= $totalTurnos ?></td>
                         <td class="fw-semibold text-nowrap"><?= number_format($totalHoras, 2) ?> h</td>
+                        <td class="rol-observaciones text-start text-break">
+                            <?php foreach ($calendario['alertas'] as $alerta): ?>
+                                <div class="small text-dark bg-warning-subtle rounded p-1 mb-1"><?= esc($alerta) ?></div>
+                            <?php endforeach ?>
+                            <?php foreach ($alertas[$personalId] ?? [] as $alerta): ?>
+                                <div class="small text-dark bg-warning-subtle rounded p-1 mb-1"><?= esc($alerta) ?></div>
+                            <?php endforeach ?>
+                            <?php foreach (['RR. HH.' => $observacionesRRHH, 'Dirección' => $observacionesDireccion] as $etapa => $notas): ?>
+                                <?php if (isset($notas[$personalId])): ?>
+                                    <div class="small mb-1"><strong><?= esc($etapa) ?></strong><br><?= nl2br(esc($notas[$personalId])) ?></div>
+                                <?php endif ?>
+                            <?php endforeach ?>
+                            <?php if ($puedeRRHH || $puedeDireccion): ?>
+                                <textarea class="form-control form-control-sm" data-observacion-personal="<?= $personalId ?>" rows="2" maxlength="1000"
+                                    aria-label="<?= esc('Observación para ' . ($persona['nombre_snapshot'] ?? 'este trabajador'), 'attr') ?>"
+                                    placeholder="Agregar observación"><?= esc(is_string($observacionAnterior) ? $observacionAnterior : '') ?></textarea>
+                            <?php endif ?>
+                        </td>
                     </tr>
                 <?php endforeach ?>
-                <?php if (!$miembrosRol): ?><tr>
-                        <td colspan="<?= $diasMesRol + 6 ?>" class="text-center text-muted py-4">No hay personal en el snapshot.</td>
-                    </tr><?php endif ?>
             </tbody>
         </table>
     </div>
@@ -129,12 +183,26 @@
         .rol-revision-tabla .rol-total {
             min-width: 75px;
         }
+
+        .rol-revision-tabla .rol-ausencia {
+            max-width: 300px;
+            margin-inline: auto;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .rol-revision-tabla .rol-observaciones {
+            min-width: 260px;
+            max-width: 320px;
+            white-space: normal;
+        }
     </style>
     <?php if ($puedeRRHH): ?>
         <form method="post" action="<?= site_url('asistencia/gestion-roles/envios/' . (int) $envio['id'] . '/rrhh') ?>" class="card card-body mb-3 js-confirmar-revision">
             <?= csrf_field() ?><h2 class="h5">Revisión de Recursos Humanos</h2>
             <label for="comentario-rrhh" class="form-label">Comentario <span class="text-muted">(obligatorio para observar o rechazar)</span></label>
-            <textarea id="comentario-rrhh" name="comentario" rows="3" maxlength="2000" class="form-control mb-3"></textarea>
+            <textarea id="comentario-rrhh" name="comentario" rows="3" maxlength="2000" class="form-control mb-3"><?= esc($comentarioAnterior) ?></textarea>
+            <input type="hidden" name="observaciones" value="{}">
             <div class="d-flex flex-wrap gap-2"><button name="accion" value="VISTO_BUENO" class="btn btn-success"><iconify-icon icon="lucide:check" class="me-1"></iconify-icon>Dar visto bueno</button><button name="accion" value="OBSERVAR" class="btn btn-warning"><iconify-icon icon="lucide:message-square-warning" class="me-1"></iconify-icon>Observar y devolver</button></div>
         </form>
     <?php endif ?>
@@ -142,7 +210,8 @@
         <form method="post" action="<?= site_url('asistencia/gestion-roles/envios/' . (int) $envio['id'] . '/direccion') ?>" class="card card-body mb-3 js-confirmar-revision">
             <?= csrf_field() ?><h2 class="h5">Aprobación de Dirección</h2>
             <label for="comentario-direccion" class="form-label">Comentario <span class="text-muted">(obligatorio al devolver o rechazar)</span></label>
-            <textarea id="comentario-direccion" name="comentario" rows="3" maxlength="2000" class="form-control mb-3"></textarea>
+            <textarea id="comentario-direccion" name="comentario" rows="3" maxlength="2000" class="form-control mb-3"><?= esc($comentarioAnterior) ?></textarea>
+            <input type="hidden" name="observaciones" value="{}">
             <div class="d-flex flex-wrap gap-2"><button name="accion" value="APROBAR" class="btn btn-success"><iconify-icon icon="lucide:check-check" class="me-1"></iconify-icon>Aprobar rol</button><button name="accion" value="DEVOLVER" class="btn btn-warning"><iconify-icon icon="lucide:corner-up-left" class="me-1"></iconify-icon>Devolver para corregir</button><button name="accion" value="RECHAZAR" class="btn btn-outline-danger"><iconify-icon icon="lucide:x" class="me-1"></iconify-icon>Rechazar definitivamente</button></div>
         </form>
     <?php endif ?>
@@ -169,6 +238,44 @@
     <?php endif ?>
 </div>
 <?= $this->section('pageScripts') ?><script>
+    const tablaRevision = document.getElementById('tablaRevisionRol');
+    const camposObservacion = tablaRevision.querySelectorAll('[data-observacion-personal]');
+    const celdasCalendario = tablaRevision.querySelectorAll('[data-dias-ausencia]');
+    if (window.jQuery?.fn.DataTable) {
+        const regimen = document.getElementById('filtrar-regimen');
+        const modalidad = document.getElementById('filtrar-modalidad');
+        $.fn.dataTable.ext.search.push((settings, data, index) => {
+            if (settings.nTable !== tablaRevision) return true;
+            const fila = settings.aoData[index].nTr;
+            return (!regimen.value || fila.dataset.regimen === regimen.value)
+                && (!modalidad.value || fila.dataset.modalidad === modalidad.value);
+        });
+        const tabla = $(tablaRevision).DataTable({
+            order: [], pageLength: 25, autoWidth: false,
+            language: {
+                emptyTable: 'No hay personal en el envío', zeroRecords: 'No se encontró personal',
+                info: 'Mostrando _START_ a _END_ de _TOTAL_ trabajadores', infoEmpty: 'Mostrando 0 trabajadores',
+                infoFiltered: '(de _MAX_ trabajadores)', lengthMenu: 'Mostrar _MENU_ trabajadores', search: 'Buscar:',
+                paginate: { next: 'Siguiente', previous: 'Anterior' }
+            },
+            columnDefs: [{ targets: -1, orderable: false }]
+        });
+        [regimen, modalidad].forEach(filtro => {
+            filtro.disabled = false;
+            filtro.addEventListener('change', () => tabla.draw());
+        });
+    }
+    // DataTables lee una celda por día; la agrupación visual se aplica después.
+    celdasCalendario.forEach(celda => {
+        const dias = Number(celda.dataset.diasAusencia);
+        if (dias <= 1) return;
+        celda.colSpan = dias;
+        let cubierta = celda.nextElementSibling;
+        for (let i = 1; i < dias; i++) {
+            cubierta.hidden = true;
+            cubierta = cubierta.nextElementSibling;
+        }
+    });
     document.querySelectorAll('.js-confirmar-revision').forEach(form => form.addEventListener('submit', async event => {
         event.preventDefault();
         const accion = event.submitter?.value || '';
@@ -199,6 +306,11 @@
             confirmButtonColor: accion === 'RECHAZAR' ? '#d33' : undefined
         });
         if (result.isConfirmed) {
+            const observaciones = {};
+            camposObservacion.forEach(campo => {
+                if (campo.value.trim()) observaciones[campo.dataset.observacionPersonal] = campo.value;
+            });
+            form.elements.observaciones.value = JSON.stringify(observaciones);
             const actionInput = document.createElement("input");
             actionInput.type = "hidden";
             actionInput.name = "accion";

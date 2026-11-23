@@ -40,6 +40,7 @@ class RolEnvioService
                 ->where('perl_ofi_ide', (int) $rol['oficina_id'])
                 ->where('deleted_at', null)->orderBy('perl_ide')->get()->getResultArray();
             $cabecera = $this->cabeceraSnapshot($establecimientoId, (int) $rol['oficina_id']);
+            $ausencias = (new AusenciasRolService($this->db))->porPersonal(array_column($personal, 'perl_ide'), $periodo['mes']);
             $snapshot = [];
             foreach ($personal as $trabajador) {
                 $id = (int) $trabajador['perl_ide'];
@@ -57,6 +58,7 @@ class RolEnvioService
                     'perl_ofi_ide',
                     'perl_car_ide',
                     'perl_mco_ide',
+                    'perl_nivel',
                     'perl_codigo',
                     'car_modalidad',
                     'car_nombre',
@@ -68,10 +70,11 @@ class RolEnvioService
                 ])));
                 $perfil['documento_snapshot'] = $persona['per_numero_documento'] ?? '';
                 $perfil['cargo_snapshot'] = $perfil['car_nombre'] ?? 'Sin Cargo';
-                $snapshot[] = ['personal' => $perfil, 'turnos' => $turnos];
+                $snapshot[] = ['personal' => $perfil, 'turnos' => $turnos, 'ausencias' => $ausencias[$id] ?? []];
             }
-            if (! array_filter($snapshot, static fn(array $miembro): bool => count($miembro['turnos']) > 0)) {
-                throw new \DomainException('No hay turnos programados en esta oficina para el período.');
+            if (!array_filter($snapshot, static fn(array $miembro): bool => $miembro['turnos']
+                || array_filter($miembro['ausencias'], static fn(array $ausencia): bool => !$ausencia['por_horas']))) {
+                throw new \DomainException('No hay turnos programados ni ausencias de día completo en esta oficina para el período.');
             }
 
             $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
@@ -101,12 +104,12 @@ class RolEnvioService
         });
     }
 
-    public function revisarRRHH(int $envioId, string $accion, string $comentario = ''): void
+    public function revisarRRHH(int $envioId, string $accion, string $comentario = '', array $observaciones = []): void
     {
         $accion = strtoupper(trim($accion));
         if (! in_array($accion, ['OBSERVAR', 'VISTO_BUENO'], true)) throw new \InvalidArgumentException('Acción de RR. HH. inválida.');
         $comentario = $this->comentario($comentario, $accion === 'OBSERVAR');
-        $this->gestion->transaccion(function () use ($envioId, $accion, $comentario): void {
+        $this->gestion->transaccion(function () use ($envioId, $accion, $comentario, $observaciones): void {
             $envio = $this->obtenerBloqueado($envioId);
             if ($envio['estado'] !== 'PENDIENTE_RRHH') throw new \DomainException('El envío ya no está pendiente de revisión de RR. HH.');
             if (GestionRolService::etapa($this->periodoEnvio($envio), $this->gestion->ahora()) === 'CERRADO') throw new \DomainException('El período cerró y ya no admite revisiones.');
@@ -119,18 +122,19 @@ class RolEnvioService
                 'usuario_rrhh_id' => $uid,
                 'rrhh_at' => $this->gestion->ahora(),
                 'comentario_rrhh' => $comentario ?: null,
+                'observaciones_rrhh' => $this->observaciones($envio, $observaciones),
             ]);
             $this->db->table('casis_plan_rol')->where('id', (int) $envio['rol_id'])->update(['estado' => $estado]);
             $this->gestion->evento('RRHH_' . $accion, ['envio_id' => $envioId, 'estado' => $estado, 'comentario' => $comentario], (int) $envio['rol_id']);
         });
     }
 
-    public function revisarDireccion(int $envioId, string $accion, string $comentario = ''): void
+    public function revisarDireccion(int $envioId, string $accion, string $comentario = '', array $observaciones = []): void
     {
         $accion = strtoupper(trim($accion));
         if (! in_array($accion, ['APROBAR', 'DEVOLVER', 'RECHAZAR'], true)) throw new \InvalidArgumentException('Acción de Dirección inválida.');
         $comentario = $this->comentario($comentario, $accion !== 'APROBAR');
-        $this->gestion->transaccion(function () use ($envioId, $accion, $comentario): void {
+        $this->gestion->transaccion(function () use ($envioId, $accion, $comentario, $observaciones): void {
             $envio = $this->obtenerBloqueado($envioId);
             if ($envio['estado'] !== 'VISTO_BUENO_RRHH') throw new \DomainException('El envío aún no tiene el visto bueno de RR. HH.');
             if (GestionRolService::etapa($this->periodoEnvio($envio), $this->gestion->ahora()) !== 'APROBACION') throw new \DomainException('Dirección puede resolver el rol durante el plazo de aprobación configurado.');
@@ -146,13 +150,31 @@ class RolEnvioService
                 'usuario_direccion_id' => $uid,
                 'direccion_at' => $this->gestion->ahora(),
                 'comentario_direccion' => $comentario ?: null,
+                'observaciones_direccion' => $this->observaciones($envio, $observaciones),
             ]);
             $this->db->table('casis_plan_rol')->where('id', (int) $envio['rol_id'])->update(['estado' => $estado]);
             $this->gestion->evento('DIRECCION_' . $accion, ['envio_id' => $envioId, 'estado' => $estado, 'comentario' => $comentario], (int) $envio['rol_id']);
         });
     }
 
-    public function listar(?string $soloEtapa = null): array
+    public function listar(?string $soloEtapa = null, ?int $establecimiento = null): array
+    {
+        $q = $this->consultaBandeja($soloEtapa)
+            ->select('e.id, e.rol_id, e.version, e.anio, e.mes, e.id_oficina, e.id_establecimiento, e.estado, e.usuario_envio_id, e.enviado_at, e.usuario_rrhh_id, e.rrhh_at, e.comentario_rrhh, e.usuario_direccion_id, e.direccion_at, e.comentario_direccion, o.ofi_nombre, es.est_nombre')
+            ->join('casis_oficina o', 'o.ofi_ide = e.id_oficina')
+            ->orderBy('e.id', 'DESC');
+        if ($establecimiento !== null) $q->where('e.id_establecimiento', $establecimiento);
+        return $q->limit(250)->get()->getResultArray();
+    }
+
+    public function establecimientosBandeja(?string $soloEtapa): array
+    {
+        $filas = $this->consultaBandeja($soloEtapa)
+            ->select('e.id_establecimiento, es.est_nombre')->distinct()->orderBy('es.est_nombre')->get()->getResultArray();
+        return array_column($filas, 'est_nombre', 'id_establecimiento');
+    }
+
+    private function consultaBandeja(?string $soloEtapa): \CodeIgniter\Database\BaseBuilder
     {
         $oficinas = [];
         $global = false;
@@ -166,17 +188,13 @@ class RolEnvioService
             $oficinas = array_merge($oficinas, $ids);
         }
         $q = $this->db->table('casis_rol_envio e')
-            ->select('e.id, e.rol_id, e.version, e.anio, e.mes, e.id_oficina, e.id_establecimiento, e.estado, e.usuario_envio_id, e.enviado_at, e.usuario_rrhh_id, e.rrhh_at, e.comentario_rrhh, e.usuario_direccion_id, e.direccion_at, e.comentario_direccion, o.ofi_nombre, es.est_nombre')
-            ->join('casis_oficina o', 'o.ofi_ide = e.id_oficina')
-            ->join('casis_establecimiento es', 'es.est_ide = e.id_establecimiento')
-            ->orderBy('e.id', 'DESC');
+            ->join('casis_establecimiento es', 'es.est_ide = e.id_establecimiento');
         if (! $global) {
             $oficinas = array_values(array_unique(array_map('intval', $oficinas)));
-            if (! $oficinas) return [];
-            $q->whereIn('e.id_oficina', $oficinas);
+            $q->whereIn('e.id_oficina', $oficinas ?: [0]);
         }
         if ($soloEtapa !== null) $q->where('e.estado', $soloEtapa === 'RRHH' ? 'PENDIENTE_RRHH' : 'VISTO_BUENO_RRHH');
-        return $q->limit(250)->get()->getResultArray();
+        return $q;
     }
 
     public function detalle(int $envioId): array
@@ -207,6 +225,51 @@ class RolEnvioService
         $envio = $this->detalle($envioId);
         if ($envio['estado'] !== 'APROBADO_DIRECCION') throw new \DomainException('El PDF oficial se habilita después de la aprobación de Dirección.');
         return $envio;
+    }
+
+    public function datosRevision(array $envio): array
+    {
+        $periodo = $this->periodoEnvio($envio, false);
+        $inicio = new \DateTimeImmutable($periodo['mes'] . '-01', new \DateTimeZone('America/Lima'));
+        $dias = $periodo['max_dias_sin_turno'];
+        $horas = $periodo['max_horas_semanales'];
+        $idsRegimen = array_filter(array_unique(array_map(
+            static fn(array $miembro): int => (int) ($miembro['personal']['perl_mco_ide'] ?? 0),
+            $envio['snapshot']
+        )));
+        $regimenes = $idsRegimen ? array_column($this->db->table('casis_modalidad_contrato')
+            ->select('mco_ide, mco_nombre')->whereIn('mco_ide', $idsRegimen)->orderBy('mco_nombre')
+            ->get()->getResultArray(), 'mco_nombre', 'mco_ide') : [];
+        $alertas = [];
+        $calendarios = [];
+        $ausenciasPorConsultar = count(array_filter($envio['snapshot'], static fn(array $miembro): bool => !array_key_exists('ausencias', $miembro))) > 0;
+        $miembros = (new AusenciasRolService($this->db))->completarSnapshot($envio['snapshot'], $periodo['mes']);
+        $diasMes = (int) $inicio->format('t');
+        foreach ($miembros as $miembro) {
+            $id = (int) $miembro['personal']['perl_ide'];
+            $turnos = $miembro['turnos'] ?? [];
+            $turnosPorDia = [];
+            foreach ($turnos as $turno) {
+                $turnosPorDia[(int) substr($turno['prog_fecha'], 8, 2)] = true;
+            }
+            $calendario = AusenciasRolService::calendario($miembro['ausencias'], $turnosPorDia, $diasMes);
+            $calendarios[$id] = $calendario;
+            $alertas[$id] = AdvertenciasRol::evaluar(
+                $turnos, $inicio, $dias === null ? null : (int) $dias, $horas === null ? null : (float) $horas, $calendario['cubiertos']
+            );
+            if (!$turnos && !$calendario['cubiertos'] && !$alertas[$id]) {
+                $alertas[$id][] = 'Sin turnos programados ni ausencias de día completo en el mes.';
+            }
+        }
+        return [
+            'alertas' => $alertas,
+            'calendarios' => $calendarios,
+            'ausenciasPorConsultar' => $ausenciasPorConsultar,
+            'regimenes' => $regimenes,
+            'etapaPeriodo' => GestionRolService::etapa($periodo, $this->gestion->ahora()),
+            'observacionesRRHH' => json_decode($envio['observaciones_rrhh'] ?? '{}', true, 512, JSON_THROW_ON_ERROR),
+            'observacionesDireccion' => json_decode($envio['observaciones_direccion'] ?? '{}', true, 512, JSON_THROW_ON_ERROR),
+        ];
     }
 
     public function validarProgramacionActual(array $envio): void
@@ -318,10 +381,10 @@ class RolEnvioService
         return $this->db->query($query, [$documentoId])->getRowArray() ?: null;
     }
 
-    private function periodoEnvio(array $envio): array
+    private function periodoEnvio(array $envio, bool $bloquear = true): array
     {
         $periodo = $this->db->query(
-            'SELECT p.* FROM casis_plan_rol r JOIN casis_plan_periodo p ON p.id = r.periodo_id WHERE r.id = ? FOR UPDATE',
+            'SELECT p.* FROM casis_plan_rol r JOIN casis_plan_periodo p ON p.id = r.periodo_id WHERE r.id = ?' . ($bloquear ? ' FOR UPDATE' : ''),
             [(int) $envio['rol_id']]
         )->getRowArray();
         if (! $periodo) throw new \DomainException('No se encontró el período de este envío.');
@@ -372,5 +435,21 @@ class RolEnvioService
         $largo = mb_strlen($comentario);
         if (($obligatorio && $largo < 5) || $largo > 2000) throw new \InvalidArgumentException('El comentario debe tener entre 5 y 2000 caracteres cuando la acción lo requiere.');
         return $comentario;
+    }
+
+    private function observaciones(array $envio, array $observaciones): ?string
+    {
+        if (!$observaciones) return null;
+        $snapshot = json_decode($envio['datos_json'], true, 512, JSON_THROW_ON_ERROR);
+        $ids = array_column(array_column($snapshot, 'personal'), 'perl_ide');
+        $permitidos = array_fill_keys($ids, true);
+        $resultado = [];
+        foreach ($observaciones as $id => $texto) {
+            if (!isset($permitidos[$id]) || !is_string($texto) || mb_strlen($texto) > 1000) {
+                throw new \InvalidArgumentException('Revise las observaciones del personal. Cada una admite hasta 1000 caracteres.');
+            }
+            if (trim($texto) !== '') $resultado[$id] = trim($texto);
+        }
+        return $resultado ? json_encode((object) $resultado, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE) : null;
     }
 }

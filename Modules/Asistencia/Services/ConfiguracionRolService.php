@@ -115,6 +115,16 @@ class ConfiguracionRolService extends GestionRolService
         if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $d['mes'] ?? '')) throw new \DomainException('Mes inválido.');
         $data = ['grupo_id' => (int)($d['grupo_id'] ?? 0), 'est_id' => null, 'mes' => $d['mes'], 'reglas' => $d['reglas'] ?? '[]'];
         if ($data['grupo_id'] < 1) throw new \DomainException('Seleccione el grupo de programación.');
+        $dias = array_key_exists('max_dias_sin_turno', $d) ? $d['max_dias_sin_turno'] : 2;
+        $horas = $d['max_horas_semanales'] ?? '';
+        if ($dias !== '' && $dias !== null && ((!is_string($dias) && !is_int($dias)) || !preg_match('/^(?:[0-9]|[12][0-9]|3[01])$/D', (string) $dias))) {
+            throw new \DomainException('Indique entre 0 y 31 días consecutivos sin turno.');
+        }
+        if ($horas !== '' && ((!is_string($horas) && !is_numeric($horas)) || !preg_match('/^\d{1,3}(?:\.\d{1,2})?$/D', (string) $horas) || (float) $horas > 168)) {
+            throw new \DomainException('Indique entre 0 y 168 horas semanales, con hasta dos decimales.');
+        }
+        $data['max_dias_sin_turno'] = $dias === '' || $dias === null ? null : (int) $dias;
+        $data['max_horas_semanales'] = $horas === '' ? null : (float) $horas;
         foreach (['apertura', 'aprobacion', 'cierre'] as $campo) {
             $valor = str_replace('T', ' ', $d[$campo] ?? '');
             if (strlen($valor) === 16) $valor .= ':00';

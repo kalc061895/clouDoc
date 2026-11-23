@@ -116,6 +116,19 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
             background: #f2f4f6;
         }
 
+        .rol-tabla .ausencia {
+            background: #e7f1ed;
+            color: #174e3c;
+            font-size: 7px;
+            font-weight: bold;
+        }
+
+        .rol-tabla .detalle-ausencias {
+            text-align: left;
+            font-size: 7px;
+            padding: 2px 4px;
+        }
+
         .rol-tabla .horas {
             background: #eaf0f5;
             font-weight: bold;
@@ -250,7 +263,7 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
             <?= view('Modules\Asistencia\Views\roles\tabla', ['documento' => $documento, 'filas' => $filas, 'offset' => $pagina['offset']]) ?>
             <div class="resumen">Personal en esta hoja: <?= count($filas) ?> · Total personal del rol: <?= count($documento['personal']) ?> · Total horas del rol: <?= $numero($documento['total_horas']) ?></div>
 
-            <div class="leyenda"><b>LEYENDA DE TURNOS:</b>
+            <div class="leyenda"><?php if ($documento['leyenda']): ?><b>LEYENDA DE TURNOS:</b><?php endif ?>
                 <?php foreach ($documento['leyenda'] as $turno): ?>
                     <span><b style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></b> <?= esc($turno['tur_nombre']) ?> (<?= esc($turno['th_hora_ingreso']) ?>–<?= esc($turno['th_hora_salida']) ?>; <?= $numero($turno['duracion_horas']) ?> h)</span>
                 <?php endforeach ?> Una casilla vacía indica que no hay turno programado.

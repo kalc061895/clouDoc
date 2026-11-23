@@ -10,7 +10,7 @@ class MenuGroupUserSeeder extends Seeder
     public static function asignaciones(): array
     {
         $menus = array_column(MenuSeeder::menus(), null, 'id');
-        $menusTerritoriales = array_values(array_diff(array_keys($menus), [1086, 1094, 1095, 1098, 1099, 1100]));
+        $menusTerritoriales = array_values(array_diff(array_keys($menus), [1086, 1094, 1095, 1098, 1099, 1100, 1104]));
         $map = [
             'asistencia' => array_keys($menus), // Compatibilidad con perfiles existentes.
             'asi_sua' => array_keys($menus),
@@ -36,9 +36,10 @@ class MenuGroupUserSeeder extends Seeder
             'asi_est_consulta' => [1006, 1001, 1003, 1042, 1051, 1061],
             'asi_auditoria' => [1051, 1094],
             'asi_rol' => [1041, 1042, 1044, 1004, 1083, 1089],
-            'asi_dire' => [1099, 1083],
-            'asi_rrhh' => [1098, 1083],
+            'asi_dire' => [1099, 1083, 1104],
+            'asi_rrhh' => [1098, 1083, 1104],
         ];
+        $map['asi_adm'][] = 1104;
         $map['asistencia'] = array_values(array_diff(array_keys($menus), [1086, 1087])); // Perfil institucional de compatibilidad.
         foreach ($map as &$ids) {
             $ids = array_values(array_intersect(array_diff($ids, MenuSeeder::RETIRED_IDS), array_keys($menus)));

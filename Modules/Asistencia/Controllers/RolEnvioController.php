@@ -16,8 +16,12 @@ class RolEnvioController extends BaseModuleController
                 return $this->response->setStatusCode(403)->setBody('No tiene una designación vigente para esta etapa.');
             }
             $service = new RolEnvioService();
+            $filtro = $this->request->getGet('establecimiento');
+            $establecimiento = is_string($filtro) && ctype_digit($filtro) && (int) $filtro > 0 ? (int) $filtro : null;
             return view('Modules\\Asistencia\\Views\\gestion_roles\\envios', [
-                'envios' => $service->listar($etapa),
+                'envios' => $service->listar($etapa, $establecimiento),
+                'establecimientos' => $service->establecimientosBandeja($etapa),
+                'establecimiento' => $establecimiento,
                 'tituloBandeja' => ['RRHH' => 'Recursos Humanos: visto bueno', 'DIRECCION' => 'Dirección: aprobación final'][$etapa ?? ''] ?? 'Envíos y aprobaciones',
                 'admin' => (new GestionRolService())->administrador(),
             ]);
@@ -31,6 +35,7 @@ class RolEnvioController extends BaseModuleController
         try {
             $service = new RolEnvioService();
             $envio = $service->detalle($id);
+            $revision = $service->datosRevision($envio);
             $firma = \Config\Database::connect()->table('casis_rol_documento')->where('envio_id', $id)->get()->getRowArray();
             $gestion = new GestionRolService();
             return view('Modules\\Asistencia\\Views\\gestion_roles\\envio_detalle', [
@@ -38,9 +43,9 @@ class RolEnvioController extends BaseModuleController
                 'firmaDocumentoId' => $firma ? (int) $firma['id'] : null,
                 'admin' => $gestion->administrador(),
                 'puedeFirmar' => $firma && $envio['estado'] === 'APROBADO_DIRECCION' && $service->puedeFirmarDocumento((int) $firma['id'], (int) auth()->id()),
-                'puedeRRHH' => $envio['estado'] === 'PENDIENTE_RRHH' && $this->tieneEtapa($gestion, 'RRHH', (int) $envio['id_oficina']) && (int) $envio['usuario_envio_id'] !== (int) auth()->id(),
-                'puedeDireccion' => $envio['estado'] === 'VISTO_BUENO_RRHH' && $this->tieneEtapa($gestion, 'DIRECCION', (int) $envio['id_oficina']) && !in_array((int) auth()->id(), [(int) $envio['usuario_envio_id'], (int) $envio['usuario_rrhh_id']], true),
-            ]);
+                'puedeRRHH' => $revision['etapaPeriodo'] !== 'CERRADO' && $envio['estado'] === 'PENDIENTE_RRHH' && $this->tieneEtapa($gestion, 'RRHH', (int) $envio['id_oficina']) && (int) $envio['usuario_envio_id'] !== (int) auth()->id(),
+                'puedeDireccion' => $revision['etapaPeriodo'] === 'APROBACION' && $envio['estado'] === 'VISTO_BUENO_RRHH' && $this->tieneEtapa($gestion, 'DIRECCION', (int) $envio['id_oficina']) && !in_array((int) auth()->id(), [(int) $envio['usuario_envio_id'], (int) $envio['usuario_rrhh_id']], true),
+            ] + $revision);
         } catch (\Throwable $e) {
             return redirect()->to(site_url('asistencia/gestion-roles/envios'))->with('error', $this->mensaje($e));
         }
@@ -59,20 +64,20 @@ class RolEnvioController extends BaseModuleController
     public function rrhh(int $id)
     {
         try {
-            (new RolEnvioService())->revisarRRHH($id, (string) $this->request->getPost('accion'), (string) $this->request->getPost('comentario'));
+            (new RolEnvioService())->revisarRRHH($id, (string) $this->request->getPost('accion'), (string) $this->request->getPost('comentario'), $this->observaciones());
             return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->with('success', 'La revisión de Recursos Humanos quedó registrada.');
         } catch (\Throwable $e) {
-            return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->with('error', $this->mensaje($e));
+            return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->withInput()->with('error', $this->mensaje($e));
         }
     }
 
     public function direccion(int $id)
     {
         try {
-            (new RolEnvioService())->revisarDireccion($id, (string) $this->request->getPost('accion'), (string) $this->request->getPost('comentario'));
+            (new RolEnvioService())->revisarDireccion($id, (string) $this->request->getPost('accion'), (string) $this->request->getPost('comentario'), $this->observaciones());
             return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->with('success', 'La decisión de Dirección quedó registrada.');
         } catch (\Throwable $e) {
-            return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->with('error', $this->mensaje($e));
+            return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->withInput()->with('error', $this->mensaje($e));
         }
     }
 
@@ -100,6 +105,16 @@ class RolEnvioController extends BaseModuleController
         } catch (\Throwable $e) {
             return redirect()->to(site_url('asistencia/gestion-roles/envios/' . $id))->with('error', $this->mensaje($e));
         }
+    }
+
+    private function observaciones(): array
+    {
+        $json = $this->request->getPost('observaciones') ?? '{}';
+        $datos = is_string($json) ? json_decode($json) : null;
+        if (!$datos instanceof \stdClass) {
+            throw new \InvalidArgumentException('El formato de las observaciones del personal es inválido.');
+        }
+        return (array) $datos;
     }
 
     private function tieneEtapa(GestionRolService $gestion, string $etapa, int $oficinaId): bool
