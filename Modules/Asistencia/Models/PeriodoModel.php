@@ -150,7 +150,7 @@ class PeriodoModel extends Model
     public function resolverPeriodoPorPersonalYFecha(int $personalId, string $fecha): ?array
     {
         // 1. Obtener la ubicación llamando al PersonalModel
-        $personalModel = new PersonalModel();
+        $personalModel = new PersonalModel($this->db);
         $personal = $personalModel->obtenerUbicacionInstitucional($personalId);
 
         if (!$personal || empty($personal['perl_est_ide'])) {
@@ -165,7 +165,7 @@ class PeriodoModel extends Model
             ['diresa_id', $personal['diresa_id'] ?? null],
         ];
         $modalidadId = !empty($personal['perl_mco_ide']) ? (int) $personal['perl_mco_ide'] : null;
-        $grupoCorteModel = new GrupoCorteModel();
+        $grupoCorteModel = new GrupoCorteModel($this->db);
 
         foreach ($niveles as [$campo, $valor]) {
             if (empty($valor)) {

@@ -2,6 +2,7 @@
 
 namespace Modules\Asistencia\Services;
 
+use CodeIgniter\Database\BaseConnection;
 use Modules\Asistencia\Models\PeriodoModel;
 use Modules\Asistencia\Models\GrupoCorteModel;
 
@@ -11,10 +12,10 @@ class PeriodoService
     protected $periodoModel;
     protected $grupoCorteModel;
 
-    public function __construct()
+    public function __construct(?BaseConnection $db = null)
     {
-        $this->grupoCorteModel = new GrupoCorteModel();
-        $this->periodoModel = new PeriodoModel();
+        $this->grupoCorteModel = new GrupoCorteModel($db);
+        $this->periodoModel = new PeriodoModel($db);
     }
 
     public function listarPeriodos($search = null, $grupoIde = null, $estado = null)
@@ -177,8 +178,7 @@ class PeriodoService
     {
 
         // 1. Resolver el período jerárquico
-        $periodoModel = new PeriodoModel();
-        $periodo = $periodoModel->resolverPeriodoPorPersonalYFecha($personalId, $fecha);
+        $periodo = $this->periodoModel->resolverPeriodoPorPersonalYFecha($personalId, $fecha);
 
         // 2. Escenario A: No existe ningún período aperturado en la jerarquía
         if (!$periodo) {

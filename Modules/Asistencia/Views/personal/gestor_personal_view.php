@@ -38,7 +38,7 @@
 
 <!-- Modal Unificado de Gestión del Trabajador -->
 <div class="modal fade" id="modalGestionPersonal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-fullscreen modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light">
                 <div>
@@ -348,5 +348,5 @@
     }
 </script>
 <script src="<?= base_url('assets/js/asistencia-cambio-turno.js') ?>"></script>
-<script src="<?= base_url('assets/js/asistencia-vacaciones.js') ?>"></script>
+<script src="<?= base_url('assets/js/asistencia-vacaciones.js') . '?v=' . filemtime(FCPATH . 'assets/js/asistencia-vacaciones.js') ?>"></script>
 <?= $this->endSection() ?>

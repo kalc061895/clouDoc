@@ -457,8 +457,9 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('incidencias/(:num)', 'RegistroLicenciaController::getPaneIncidencias/$1');
         $routes->get('permisos/(:num)', 'RegistroPermisoController::getPanePermisos/$1');
         $routes->get('vacaciones/(:num)', 'VacacionController::getPaneVacaciones/$1');
-        $routes->post('vacaciones/(:num)/usos', 'VacacionController::registrarUso/$1');
-        $routes->post('vacaciones/(:num)/usos/(:num)/eliminar', 'VacacionController::eliminarUso/$1/$2');
+        $routes->post('vacaciones/(:num)/usos', 'VacacionController::registrarUso/$1', ['filter' => 'csrf']);
+        $routes->post('vacaciones/(:num)/usos/(:num)/editar', 'VacacionController::editarUso/$1/$2', ['filter' => 'csrf']);
+        $routes->post('vacaciones/(:num)/usos/(:num)/eliminar', 'VacacionController::eliminarUso/$1/$2', ['filter' => 'csrf']);
         // 2. Operaciones de Guardado / Modificación (JSON)
         $routes->group('api', function ($routes) {
             $routes->get('listar', 'PersonalController::apiListar');
