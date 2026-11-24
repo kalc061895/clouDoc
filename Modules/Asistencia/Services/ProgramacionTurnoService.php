@@ -86,21 +86,43 @@ class ProgramacionTurnoService
         $g = $this->gestionRoles;
         try {
             return $g->transaccion(function() use ($g, $registrosValidos, $reemplazarExistentes, $estIde, $upsIde, $ussIde) {
-                $validar=[];
+                $validar = [];
                 foreach ($registrosValidos as &$reg) {
-                    foreach ($reg['turnos'] as &$t) {
-                        $p=$g->editable((int)$reg['perl_ide'],$t['fecha']);
-                        $clave = $reg['perl_ide'].':'.$p['id'];
-                        $validar[$clave] = [
-                            'personal_id' => (int) $reg['perl_ide'],
-                            'periodo' => $p,
+                    $personalId = (int) $reg['perl_ide'];
+                    $turnosABorrar = $reg['borrados'] ?? [];
+                    if ($turnosABorrar && $estIde && (int) $g->personal($personalId)['perl_est_ide'] !== $estIde) {
+                        throw new \DomainException('El trabajador cambió de establecimiento. Vuelva a analizar el archivo.');
+                    }
+                    $fechas = array_merge(array_column($turnosABorrar, 'fecha'), array_column($reg['turnos'], 'fecha'));
+                    foreach ($fechas as $fecha) {
+                        $clave = $personalId . ':' . substr($fecha, 0, 7);
+                        $validar[$clave] ??= [
+                            'personal_id' => $personalId,
+                            'periodo' => $g->editable($personalId, $fecha),
                             'fila' => $reg['fila'] ?? '?',
                             'dni' => $reg['dni'] ?? '-',
                             'trabajador' => $reg['trabajador'] ?? 'Trabajador',
                         ];
-                        $existentes=$this->programacionModel->where('prog_perl_ide',$reg['perl_ide'])->where('prog_fecha',$t['fecha'])->findAll();
-                        if ($reemplazarExistentes && count($existentes)>1) throw new \DomainException('Hay varios turnos en el mismo d?a. Modif?quelos individualmente.');
-                        $t['ya_existe']=!empty($existentes);
+                    }
+                    foreach ($turnosABorrar as $borrado) {
+                        $actuales = $this->db->query(
+                            'SELECT prog_ide, prog_th_ide, updated_at FROM casis_programacion
+                             WHERE prog_perl_ide = ? AND prog_fecha = ? AND deleted_at IS NULL ORDER BY prog_ide FOR UPDATE',
+                            [$personalId, $borrado['fecha']]
+                        )->getResultArray();
+                        if ($this->huellaTurnosParaBorrar($actuales) !== $borrado['huella']) {
+                            throw new \DomainException(sprintf(
+                                'La programación de %s cambió el %s. Vuelva a analizar el archivo antes de aplicar.',
+                                $reg['trabajador'], $borrado['fecha']
+                            ));
+                        }
+                    }
+                    foreach ($reg['turnos'] as &$t) {
+                        $existentes = $this->programacionModel->where('prog_perl_ide', $personalId)->where('prog_fecha', $t['fecha'])->findAll();
+                        if ($reemplazarExistentes && count($existentes) > 1) {
+                            throw new \DomainException('Hay varios turnos en el mismo día. Modifíquelos individualmente.');
+                        }
+                        $t['ya_existe'] = !empty($existentes);
                     }
                     unset($t);
                 }
@@ -780,11 +802,11 @@ class ProgramacionTurnoService
             '2. La columna "DNI" debe conservarse en formato Texto para preservar ceros a la izquierda.',
             '3. Las columnas "ANIO" y "MES" indican el periodo a programar (ej. 2026 y 9).',
             '4. En cada celda de día (DIA_01 a DIA_31), ingrese el CÓDIGO DEL TURNO deseado según la hoja "Catalogo_Turnos".',
-            '5. Las celdas en blanco NO borran la programación previa existente.',
+            '5. Las casillas en blanco conservan los turnos, salvo que active «Las casillas en blanco borran turnos».',
             '6. Si el mes tiene menos de 31 días (ej. febrero 28 días, o meses de 30 días), deje en blanco las columnas de días sobrantes.',
             '7. Para turnos de guardia que cruzan medianoche, el sistema calculará automáticamente la duración y validará cruces.',
             '8. Antes de aplicar cambios definitivos, el sistema mostrará una previsualización con registros válidos y errores detallados.',
-            '9. Durante la confirmación, usted podrá decidir si desea sobreescribir la programación existente o solo llenar días libres.',
+            '9. Antes de analizar el archivo, elija si desea reemplazar los turnos de las casillas con código y borrar los de las casillas en blanco.',
         ];
 
         $instRow = 3;
@@ -847,7 +869,7 @@ class ProgramacionTurnoService
     /**
      * Valida el archivo Excel subido y genera una previsualización interactiva completa
      */
-    public function previsualizarImportacionExcel(string $rutaArchivo, int $anioEsperado, int $mesEsperado, ?int $estIde = null, bool $reemplazarExistentes = false): array
+    public function previsualizarImportacionExcel(string $rutaArchivo, int $anioEsperado, int $mesEsperado, ?int $estIde = null, bool $reemplazarExistentes = false, bool $borrarVacios = false): array
     {
         try {
             $spreadsheet = IOFactory::load($rutaArchivo);
@@ -861,7 +883,6 @@ class ProgramacionTurnoService
         // Buscar hoja de Programación
         $sheet = $spreadsheet->getSheetByName('Programacion') ?? $spreadsheet->getActiveSheet();
         $highestRow = $sheet->getHighestDataRow();
-        $highestCol = $sheet->getHighestDataColumn();
 
         if ($highestRow < 2) {
             return [
@@ -884,6 +905,14 @@ class ProgramacionTurnoService
 
         $mapaTurnos = $this->obtenerMapaCodigosTurno();
         $diasMes    = $this->obtenerDiasDelMes($anioEsperado, $mesEsperado);
+        if ($borrarVacios) {
+            for ($dia = 1; $dia <= $diasMes; $dia++) {
+                $columna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($dia + 3);
+                if (strtoupper(trim((string) $sheet->getCell($columna . '1')->getValue())) !== sprintf('DIA_%02d', $dia)) {
+                    return ['status' => false, 'message' => 'Para borrar turnos con casillas en blanco, use la plantilla con todas las columnas de días del mes en su orden original.'];
+                }
+            }
+        }
 
         // Pre-cargar trabajadores indexados por DNI
         $consultaPersonal = $this->db->table('casis_personal p')
@@ -911,25 +940,24 @@ class ProgramacionTurnoService
         $fechaFinMes    = sprintf('%04d-%02d-%02d', $anioEsperado, $mesEsperado, $diasMes);
 
         $existentes = $this->db->table('casis_programacion pr')
-            ->select('pr.prog_ide, pr.prog_perl_ide, pr.prog_fecha, th.th_codigo, t.tur_codigo')
+            ->select('pr.prog_ide, pr.prog_perl_ide, pr.prog_fecha, pr.prog_th_ide, pr.updated_at')
             ->join('casis_turno_horario th', 'th.th_ide = pr.prog_th_ide', 'inner')
             ->join('casis_turno t', 't.tur_ide = th.th_tur_ide', 'inner')
             ->where('pr.prog_fecha >=', $fechaInicioMes)
             ->where('pr.prog_fecha <=', $fechaFinMes)
             ->where('pr.deleted_at', null)
+            ->orderBy('pr.prog_ide')
             ->get()
             ->getResultArray();
 
         $progExistenteIndex = [];
         foreach ($existentes as $ex) {
-            $progExistenteIndex[$ex['prog_perl_ide']][$ex['prog_fecha']] = $ex;
+            $progExistenteIndex[$ex['prog_perl_ide']][$ex['prog_fecha']][] = $ex;
         }
 
         $registrosValidos   = [];
         $errores            = [];
         $dnisProcesados     = [];
-        $totalCeldasTurnos  = 0;
-        $totalExistentes    = 0;
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $dni = trim((string) $sheet->getCell("A{$row}")->getValue());
@@ -1013,13 +1041,25 @@ class ProgramacionTurnoService
 
             // Procesar cada día de DIA_01 a DIA_31
             $turnosFilaTrabajador = [];
+            $borrados = [];
 
             for ($d = 1; $d <= 31; $d++) {
                 $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($d + 3);
                 $codTurno  = strtoupper(trim((string) $sheet->getCell("{$colLetter}{$row}")->getValue()));
 
-                if (empty($codTurno)) {
-                    continue; // Celda vacía, no se procesa
+                if ($codTurno === '') {
+                    if ($borrarVacios && $d <= $diasMes) {
+                        $fecha = sprintf('%04d-%02d-%02d', $anioEsperado, $mesEsperado, $d);
+                        $actuales = $progExistenteIndex[$perlIde][$fecha] ?? [];
+                        if ($actuales) {
+                            $borrados[] = [
+                                'dia' => $d, 'fecha' => $fecha,
+                                'ids' => array_map('intval', array_column($actuales, 'prog_ide')),
+                                'huella' => $this->huellaTurnosParaBorrar($actuales),
+                            ];
+                        }
+                    }
+                    continue;
                 }
 
                 // Validar día real del mes
@@ -1053,9 +1093,6 @@ class ProgramacionTurnoService
 
                 // Detectar si ya existe programación en ese día
                 $existeProg = isset($progExistenteIndex[$perlIde][$fechaDia]);
-                if ($existeProg) {
-                    $totalExistentes++;
-                }
 
                 $turnosFilaTrabajador[$d] = [
                     'dia'               => $d,
@@ -1067,9 +1104,8 @@ class ProgramacionTurnoService
                     'tur_color'         => $infoTurno['tur_color'],
                     'duracion_horas'    => $infoTurno['duracion_horas'],
                     'ya_existe'         => $existeProg,
-                    'prog_ide_existente'=> $existeProg ? $progExistenteIndex[$perlIde][$fechaDia]['prog_ide'] : null,
+                    'prog_ide_existente'=> $existeProg ? $progExistenteIndex[$perlIde][$fechaDia][0]['prog_ide'] : null,
                 ];
-                $totalCeldasTurnos++;
             }
 
             // Validar cruces de horarios entre turnos consecutivos de la misma fila
@@ -1106,23 +1142,38 @@ class ProgramacionTurnoService
                 }
             }
 
-            if (!empty($turnosFilaTrabajador)) {
+            if ($turnosFilaTrabajador || $borrados) {
                 $registrosValidos[] = [
                     'fila'        => $row,
                     'perl_ide'    => $perlIde,
                     'dni'         => $dni,
                     'trabajador'  => $nombreTrab,
                     'turnos'      => $turnosFilaTrabajador,
+                    'borrados'    => $borrados,
                     'total_turnos'=> count($turnosFilaTrabajador),
                 ];
             }
         }
 
+        if ($borrarVacios && $errores) {
+            $dnisConErrores = array_fill_keys(array_column($errores, 'dni'), true);
+            $registrosValidos = array_values(array_filter(
+                $registrosValidos, static fn(array $registro): bool => !isset($dnisConErrores[$registro['dni']])
+            ));
+        }
         $this->validarReglasImportacion($registrosValidos, $errores, $anioEsperado, $mesEsperado, $reemplazarExistentes);
         $totalCeldasTurnos = array_sum(array_map(
             static fn(array $registro): int => count($registro['turnos']),
             $registrosValidos
         ));
+        $totalBorrados = 0;
+        $totalExistentes = 0;
+        foreach ($registrosValidos as $registro) {
+            $totalExistentes += count(array_filter($registro['turnos'], static fn(array $t): bool => $t['ya_existe']));
+            foreach ($registro['borrados'] as $borrado) {
+                $totalBorrados += count($borrado['ids']);
+            }
+        }
 
         return [
             'status'            => true,
@@ -1132,6 +1183,7 @@ class ProgramacionTurnoService
             'total_filas'       => count($dnisProcesados),
             'total_turnos'      => $totalCeldasTurnos,
             'total_existentes'  => $totalExistentes,
+            'total_borrados'    => $totalBorrados,
             'total_errores'     => count($errores),
             'registros_validos' => $registrosValidos,
             'errores'           => $errores,
@@ -1152,17 +1204,13 @@ class ProgramacionTurnoService
             }
         }
         $idsHorarios = array_values(array_unique($idsHorarios));
-        if (!$idsHorarios) {
-            return;
-        }
-
-        $horarios = $this->db->table('casis_turno_horario h')
+        $horarios = $idsHorarios ? $this->db->table('casis_turno_horario h')
             ->select('h.th_ide, h.th_hora_ingreso, h.th_hora_salida')
             ->join('casis_turno t', 't.tur_ide = h.th_tur_ide')
             ->whereIn('h.th_ide', $idsHorarios)
             ->where('h.deleted_at', null)
             ->where('t.deleted_at', null)
-            ->get()->getResultArray();
+            ->get()->getResultArray() : [];
         $horarioPorId = array_column($horarios, null, 'th_ide');
 
         $registrosValidos = [];
@@ -1181,14 +1229,19 @@ class ProgramacionTurnoService
                 if (GestionRolService::etapa($periodo, $this->gestionRoles->ahora()) !== 'PROGRAMACION') {
                     throw new \DomainException('El periodo no está abierto para modificaciones.');
                 }
+                if ($registro['borrados']) {
+                    $this->gestionRoles->editable($perlIde, $registro['borrados'][0]['fecha'], true);
+                }
 
                 $reglas = json_decode($periodo['reglas'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
                 $turnosActuales = $this->gestionRoles->turnos($perlIde);
                 $fechasArchivo = array_fill_keys(array_column($registro['turnos'], 'fecha'), true);
-                if ($reemplazarExistentes) {
+                $fechasBorradas = array_fill_keys(array_column($registro['borrados'], 'fecha'), true);
+                if ($reemplazarExistentes || $fechasBorradas) {
                     $turnosActuales = array_values(array_filter(
                         $turnosActuales,
-                        static fn(array $t): bool => !isset($fechasArchivo[$t['prog_fecha']])
+                        static fn(array $t): bool => !isset($fechasBorradas[$t['prog_fecha']])
+                            && (!$reemplazarExistentes || !isset($fechasArchivo[$t['prog_fecha']]))
                     ));
                 }
 
@@ -1243,6 +1296,12 @@ class ProgramacionTurnoService
         $registros = $registrosValidos;
     }
 
+    private function huellaTurnosParaBorrar(array $turnos): string
+    {
+        $datos = array_map(static fn(array $t): array => [(int) $t['prog_ide'], (int) $t['prog_th_ide'], $t['updated_at']], $turnos);
+        return hash('sha256', json_encode($datos, JSON_THROW_ON_ERROR));
+    }
+
     /**
      * Aplica la importación masiva definitiva dentro de una transacción de base de datos
      */
@@ -1262,14 +1321,27 @@ class ProgramacionTurnoService
             }
         }
 
-        $this->db->transStart();
-
         $insertados   = 0;
         $actualizados = 0;
         $omitidos     = 0;
+        $borrados     = 0;
 
         foreach ($registrosValidos as $reg) {
             $perlIde = (int) $reg['perl_ide'];
+
+            foreach ($reg['borrados'] ?? [] as $borrado) {
+                $this->db->table('casis_programacion')->where('prog_perl_ide', $perlIde)
+                    ->where('prog_fecha', $borrado['fecha'])->where('deleted_at', null)
+                    ->whereIn('prog_ide', $borrado['ids'])->update([
+                        'deleted_by' => $usuarioId,
+                        'deleted_at' => $this->gestionRoles->ahora(),
+                    ]);
+                $afectados = $this->db->affectedRows();
+                if ($afectados !== count($borrado['ids'])) {
+                    throw new \DomainException('Cambió la programación que se iba a borrar. Vuelva a analizar el archivo.');
+                }
+                $borrados += $afectados;
+            }
 
             foreach ($reg['turnos'] as $t) {
                 $fecha  = $t['fecha'];
@@ -1314,8 +1386,6 @@ class ProgramacionTurnoService
             }
         }
 
-        $this->db->transComplete();
-
         if ($this->db->transStatus() === false) {
             return [
                 'status'  => false,
@@ -1326,14 +1396,16 @@ class ProgramacionTurnoService
         return [
             'status'       => true,
             'message'      => sprintf(
-                'Importación completada con éxito: %d turnos creados, %d actualizados, %d conservados sin cambios.',
+                'Importación completada: %d turnos creados, %d actualizados, %d conservados y %d borrados.',
                 $insertados,
                 $actualizados,
-                $omitidos
+                $omitidos,
+                $borrados
             ),
             'insertados'   => $insertados,
             'actualizados' => $actualizados,
             'omitidos'     => $omitidos,
+            'borrados'     => $borrados,
         ];
     }
 

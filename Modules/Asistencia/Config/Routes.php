@@ -124,8 +124,8 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
         $routes->get('turnos-permitidos', 'ProgramacionController::apiTurnosPermitidos');
         $routes->post('guardar', 'ProgramacionController::apiGuardarIndividual');
         $routes->post('eliminar/(:num)', 'ProgramacionController::apiEliminarIndividual/$1');
-        $routes->post('previsualizar-excel', 'ProgramacionController::apiPrevisualizarExcel');
-        $routes->post('procesar-importacion', 'ProgramacionController::apiProcesarImportacion');
+        $routes->post('previsualizar-excel', 'ProgramacionController::apiPrevisualizarExcel', ['filter' => 'csrf']);
+        $routes->post('procesar-importacion', 'ProgramacionController::apiProcesarImportacion', ['filter' => 'csrf']);
     });
     $routes->get('programacion/descargar-plantilla', 'ProgramacionController::descargarPlantilla');
     $routes->get('programacion/descargar-reporte-errores', 'ProgramacionController::descargarReporteErrores');

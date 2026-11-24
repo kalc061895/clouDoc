@@ -471,6 +471,13 @@ Programación Mensual de Turnos
                         </div>
                     </div>
 
+                    <p id="prev_borrados" class="text-danger fw-semibold d-none" role="status">
+                        Turnos que se borrarán: <span id="prev_total_borrados">0</span>
+                    </p>
+                    <p id="prev_importacion_bloqueada" class="text-danger fw-semibold d-none" role="status">
+                        Corrija todas las observaciones y vuelva a analizar el Excel para habilitar la importación.
+                    </p>
+
                     <!-- Pestañas de Detalle -->
                     <ul class="nav nav-tabs nav-tabs-custom mb-3" role="tablist">
                         <li class="nav-item">
@@ -497,8 +504,8 @@ Programación Mensual de Turnos
                                             <th style="width: 50px;">Fila</th>
                                             <th style="width: 100px;">DNI</th>
                                             <th>Trabajador</th>
-                                            <th>Turnos a Registrar en el Mes</th>
-                                            <th style="width: 80px;" class="text-center">Total</th>
+                                            <th>Cambios en el mes</th>
+                                            <th style="width: 80px;" class="text-center">A cargar</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbodyPrevValidos"></tbody>
@@ -542,8 +549,17 @@ Programación Mensual de Turnos
                             </label>
                         </div>
                         <div class="form-text small text-muted">
-                            Si esta opción está desactivada, el sistema conservará los turnos ya existentes y solo llenará los días libres.
-                            <strong>Nota:</strong> Las celdas vacías del archivo nunca borrarán información existente.
+                            Si esta opción está desactivada, los códigos del Excel solo se cargarán en días libres.
+                        </div>
+                        <div class="mt-3">
+                            <?php helper('ui'); ?>
+                            <?= ui_switch('borrar_vacios', false, [
+                                'id' => 'check_borrar_vacios', 'label' => 'Las casillas en blanco borran turnos',
+                                'uncheckedValue' => false, 'attrs' => ['aria-describedby' => 'ayuda_borrar_vacios'],
+                            ]) ?>
+                            <div id="ayuda_borrar_vacios" class="form-text small text-muted">
+                                Borra los turnos en los días vacíos del mes para los trabajadores incluidos en el Excel.
+                            </div>
                         </div>
                     </div>
 
@@ -1001,15 +1017,31 @@ Programación Mensual de Turnos
     // ==========================================
     // IMPORTACIÓN MASIVA EXCEL
     // ==========================================
+    let vistaPreviaImportacion = null;
+    const camposImportacion = '#archivo_excel, #check_reemplazar_existentes, #check_borrar_vacios';
+
+    function ocultarPrevisualizacion() {
+        vistaPreviaImportacion = null;
+        $('#seccionPrevisualizacion, #btnConfirmarImportacion').addClass('d-none');
+    }
+
+    function actualizarCsrfImportacion(xhr) {
+        csrfHash = xhr.getResponseHeader('X-CSRF-Hash') || csrfHash;
+    }
+
+    function puedeConfirmarImportacion(datos) {
+        return datos?.total_errores === 0 && datos.registros_validos?.length > 0;
+    }
+
     function abrirModalImportar() {
         $('#archivo_excel').val('');
-        $('#check_reemplazar_existentes').prop('checked', false);
-        $('#seccionPrevisualizacion').addClass('d-none');
-        $('#btnConfirmarImportacion').addClass('d-none');
+        $('#check_reemplazar_existentes, #check_borrar_vacios').prop('checked', false);
+        ocultarPrevisualizacion();
         $('#modalImportarExcel').modal('show');
     }
 
     function analizarArchivoExcel() {
+        if ($('#btnAnalizarExcel').prop('disabled')) return;
         let fileInput = document.getElementById('archivo_excel');
         if (!fileInput.files.length) {
             Swal.fire({
@@ -1026,10 +1058,13 @@ Programación Mensual de Turnos
         formData.append('mes', $('#filtro_mes').val());
         formData.append('est_ide', $('#filtro_est_ide').val());
         formData.append('reemplazar_existentes', $('#check_reemplazar_existentes').is(':checked') ? 1 : 0);
+        formData.append('borrar_vacios', $('#check_borrar_vacios').is(':checked') ? 1 : 0);
         formData.append(csrfToken, csrfHash);
 
         let btn = $('#btnAnalizarExcel');
         let spn = $('#spnAnalizarExcel');
+        ocultarPrevisualizacion();
+        $(camposImportacion).prop('disabled', true);
         btn.prop('disabled', true);
         spn.removeClass('d-none');
 
@@ -1041,11 +1076,8 @@ Programación Mensual de Turnos
             contentType: false,
             dataType: 'json',
             success: function(res) {
-                btn.prop('disabled', false);
-                spn.addClass('d-none');
-
                 if (res.status === 'success' && res.data) {
-                    $('#seccionPrevisualizacion').data('reemplazar', $('#check_reemplazar_existentes').is(':checked'));
+                    vistaPreviaImportacion = res.data;
                     mostrarPrevisualizacion(res.data);
                 } else {
                     Swal.fire({
@@ -1056,14 +1088,18 @@ Programación Mensual de Turnos
                 }
             },
             error: function(xhr) {
-                btn.prop('disabled', false);
-                spn.addClass('d-none');
                 let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error al procesar el archivo Excel.';
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: msg
                 });
+            },
+            complete: function(xhr) {
+                actualizarCsrfImportacion(xhr);
+                $(camposImportacion).prop('disabled', false);
+                btn.prop('disabled', false);
+                spn.addClass('d-none');
             }
         });
     }
@@ -1072,6 +1108,8 @@ Programación Mensual de Turnos
         $('#prev_total_filas').text(data.total_filas);
         $('#prev_total_turnos').text(data.total_turnos);
         $('#prev_total_existentes').text(data.total_existentes);
+        $('#prev_total_borrados').text(data.total_borrados);
+        $('#prev_borrados').toggleClass('d-none', !data.total_borrados);
         $('#prev_total_errores').text(data.total_errores);
         $('#prev_badge_errores').text(data.total_errores);
 
@@ -1082,22 +1120,27 @@ Programación Mensual de Turnos
                 let turnosBadge = '';
                 for (const dia in v.turnos) {
                     let t = v.turnos[dia];
-                    let c = t.tur_color || '#3b82f6';
+                    let c = /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(t.tur_color) ? t.tur_color : '#3b82f6';
                     let clsBorder = t.ya_existe ? 'border border-warning' : '';
-                    turnosBadge += `<span class="badge ${clsBorder} me-1 mb-1" style="background-color: ${c}" title="Día ${t.dia}: ${t.tur_codigo} - ${t.tur_nombre} (${t.duracion_horas}h)">d${t.dia}:${t.tur_codigo}</span>`;
+                    const codigo = escapeHtml(String(t.tur_codigo));
+                    const nombre = escapeHtml(String(t.tur_nombre));
+                    turnosBadge += `<span class="badge ${clsBorder} me-1 mb-1" style="background-color: ${c}" title="Día ${Number(t.dia)}: ${codigo} - ${nombre} (${Number(t.duracion_horas)}h)">d${Number(t.dia)}:${codigo}</span>`;
+                }
+                for (const borrado of v.borrados ?? []) {
+                    turnosBadge += `<span class="badge text-bg-danger me-1 mb-1">Día ${Number(borrado.dia)} · Borrar ${borrado.ids.length}</span>`;
                 }
                 tbodyValidos += `
                     <tr>
                         <td class="text-center text-muted">${v.fila}</td>
-                        <td class="font-monospace text-center">${v.dni}</td>
-                        <td class="fw-semibold text-dark">${v.trabajador}</td>
+                        <td class="font-monospace text-center">${escapeHtml(String(v.dni))}</td>
+                        <td class="fw-semibold text-dark">${escapeHtml(String(v.trabajador))}</td>
                         <td>${turnosBadge}</td>
                         <td class="text-center fw-bold text-success">${v.total_turnos}</td>
                     </tr>
                 `;
             });
         } else {
-            tbodyValidos = '<tr><td colspan="5" class="text-center py-3 text-muted">No se detectaron asignaciones válidas.</td></tr>';
+            tbodyValidos = '<tr><td colspan="5" class="text-center py-3 text-muted">No se detectaron cambios válidos.</td></tr>';
         }
         $('#tbodyPrevValidos').html(tbodyValidos);
 
@@ -1125,11 +1168,8 @@ Programación Mensual de Turnos
 
         $('#seccionPrevisualizacion').removeClass('d-none');
 
-        if (data.registros_validos && data.registros_validos.length > 0) {
-            $('#btnConfirmarImportacion').removeClass('d-none');
-        } else {
-            $('#btnConfirmarImportacion').addClass('d-none');
-        }
+        $('#prev_importacion_bloqueada').toggleClass('d-none', data.total_errores === 0);
+        $('#btnConfirmarImportacion').toggleClass('d-none', !puedeConfirmarImportacion(data));
     }
 
     function descargarReporteErrores() {
@@ -1137,10 +1177,14 @@ Programación Mensual de Turnos
     }
 
     function aplicarImportacionDefinitiva() {
-        let reemplazar = $('#check_reemplazar_existentes').is(':checked') ? 1 : 0;
-        let advertencia = reemplazar ?
+        const vistaPrevia = vistaPreviaImportacion;
+        if (!puedeConfirmarImportacion(vistaPrevia)) return;
+        let advertencia = vistaPrevia.reemplazar_existentes ?
             'Se sobreescribirán los turnos existentes en las fechas especificadas en el archivo.' :
-            'Se conservarán los turnos existentes y solo se insertarán turnos en días libres.';
+            'Los días con un código en el Excel solo recibirán turnos si están libres.';
+        if (vistaPrevia.total_borrados) {
+            advertencia += ` Las casillas en blanco borrarán ${vistaPrevia.total_borrados} turno(s) indicados en la vista previa.`;
+        }
 
         Swal.fire({
             title: '¿Confirmar Importación?',
@@ -1151,26 +1195,24 @@ Programación Mensual de Turnos
             cancelButtonText: 'Revisar más',
             confirmButtonColor: '#10b981'
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (result.isConfirmed && vistaPreviaImportacion === vistaPrevia) {
                 let btn = $('#btnConfirmarImportacion');
                 let spn = $('#spnConfirmarImportacion');
                 btn.prop('disabled', true);
                 spn.removeClass('d-none');
+                $('#btnAnalizarExcel').prop('disabled', true);
+                $(camposImportacion).prop('disabled', true);
 
                 $.ajax({
                     url: '<?= base_url('asistencia/programacion/api/procesar-importacion') ?>',
                     type: 'POST',
                     data: {
-                        reemplazar_existentes: reemplazar,
-                        est_ide: $('#filtro_est_ide').val(),
+                        preview_id: vistaPrevia.preview_id,
                         ups_ide: $('#filtro_ups_ide').val(),
                         [csrfToken]: csrfHash
                     },
                     dataType: 'json',
                     success: function(res) {
-                        btn.prop('disabled', false);
-                        spn.addClass('d-none');
-
                         if (res.status === 'success') {
                             $('#modalImportarExcel').modal('hide');
                             Swal.fire({
@@ -1188,23 +1230,29 @@ Programación Mensual de Turnos
                         }
                     },
                     error: function(xhr) {
-                        btn.prop('disabled', false);
-                        spn.addClass('d-none');
                         let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Error en el servidor al importar.';
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
                             text: msg
                         });
+                    },
+                    complete: function(xhr) {
+                        actualizarCsrfImportacion(xhr);
+                        ocultarPrevisualizacion();
+                        $(camposImportacion).prop('disabled', false);
+                        $('#btnAnalizarExcel').prop('disabled', false);
+                        btn.prop('disabled', false);
+                        spn.addClass('d-none');
                     }
                 });
             }
         });
     }
 
-    $('#check_reemplazar_existentes').on('change', function() {
-        if (!$('#seccionPrevisualizacion').hasClass('d-none') &&
-            $('#seccionPrevisualizacion').data('reemplazar') !== $(this).is(':checked')) {
+    $('#archivo_excel').on('change', ocultarPrevisualizacion);
+    $('#check_reemplazar_existentes, #check_borrar_vacios').on('change', function() {
+        if (vistaPreviaImportacion) {
             analizarArchivoExcel();
         }
     });

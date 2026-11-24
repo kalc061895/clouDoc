@@ -98,11 +98,11 @@ class GestionRolService
         return $p;
     }
     /** Debe ejecutarse dentro de la misma transacción que la escritura. */
-    public function editable(int $id, string $fecha): array
+    public function editable(int $id, string $fecha, bool $soloConsultar = false): array
     {
         $this->exigirProgramador();
         $p = $this->personal($id);
-        $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo((int)$p['perl_est_ide'], substr($fecha, 0, 7), true);
+        $periodo = (new GrupoProgramacionRolService($this->db))->resolverPeriodo((int)$p['perl_est_ide'], substr($fecha, 0, 7), !$soloConsultar);
         if (!$periodo) throw new \DomainException('No existe un periodo de programación aplicable al establecimiento ni a sus niveles superiores.');
         $etapaPeriodo = self::etapa($periodo, $this->ahora());
         $rol = $this->db->table('casis_plan_rol')->where('periodo_id', $periodo['id'])->where('oficina_id', $p['perl_ofi_ide'])->get()->getRowArray();
@@ -116,7 +116,7 @@ class GestionRolService
             }
         }
         if ($rol && !in_array($rol['estado'], ['BORRADOR', 'OBSERVADO'], true)) throw new \DomainException('El rol está presentado o aprobado y no admite modificaciones.');
-        if (!$rol) {
+        if (!$rol && !$soloConsultar) {
             $this->db->table('casis_plan_rol')->insert(['periodo_id' => $periodo['id'], 'oficina_id' => $p['perl_ofi_ide'], 'estado' => 'BORRADOR', 'created_by' => $this->usuario(), 'created_at' => $this->ahora()]);
         }
         return $periodo;

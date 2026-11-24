@@ -246,12 +246,14 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiPrevisualizarExcel()
     {
+        $this->response->setHeader('X-CSRF-Hash', csrf_hash());
         if (!$this->permitirProgramacion(false)) return $this->jsonResponse('error', 'No tiene acceso a la programación de turnos.', [], 403);
         $archivo = $this->request->getFile('archivo_excel');
         $anio    = (int) $this->request->getPost('anio');
         $mes     = (int) $this->request->getPost('mes');
         $estIde  = !empty($this->request->getPost('est_ide')) ? (int) $this->request->getPost('est_ide') : null;
-        $reemplazar = (bool) $this->request->getPost('reemplazar_existentes');
+        $reemplazar = $this->request->getPost('reemplazar_existentes') === '1';
+        $borrarVacios = $this->request->getPost('borrar_vacios') === '1';
 
         if (!$archivo || !$archivo->isValid()) {
             return $this->jsonResponse('error', 'Debe seleccionar un archivo Excel válido (.xlsx).', [], 400);
@@ -266,7 +268,20 @@ class ProgramacionController extends BaseModuleController
         $rutaTemp = WRITEPATH . 'uploads/' . $archivo->getRandomName();
         $archivo->move(WRITEPATH . 'uploads', basename($rutaTemp));
 
-        $resultado = $this->service->previsualizarImportacionExcel($rutaTemp, $anio, $mes, $estIde, $reemplazar);
+        $resultado = $this->service->previsualizarImportacionExcel($rutaTemp, $anio, $mes, $estIde, $reemplazar, $borrarVacios);
+
+        if (!$resultado['status']) {
+            if (is_file($rutaTemp)) {
+                unlink($rutaTemp);
+            }
+            return $this->jsonResponse('error', $resultado['message'], [], 400);
+        }
+
+        $anterior = session()->get('temp_import_programacion')['ruta_archivo'] ?? null;
+        if ($anterior && is_file($anterior)) {
+            unlink($anterior);
+        }
+        $previewId = bin2hex(random_bytes(16));
 
         // Guardar temporalmente en sesión para procesar o descargar reporte de errores
         session()->set('temp_import_programacion', [
@@ -275,18 +290,16 @@ class ProgramacionController extends BaseModuleController
             'mes'               => $mes,
             'est_ide'           => $estIde,
             'reemplazar_existentes' => $reemplazar,
+            'borrar_vacios'     => $borrarVacios,
+            'preview_id'       => $previewId,
             'registros_validos' => $resultado['registros_validos'] ?? [],
             'errores'           => $resultado['errores'] ?? [],
         ]);
 
-        if (!$resultado['status']) {
-            if (file_exists($rutaTemp)) {
-                @unlink($rutaTemp);
-            }
-            return $this->jsonResponse('error', $resultado['message'], [], 400);
-        }
-
-        return $this->jsonResponse('success', 'Archivo analizado correctamente.', $resultado);
+        return $this->jsonResponse('success', 'Archivo analizado correctamente.', $resultado + [
+            'preview_id' => $previewId,
+            'reemplazar_existentes' => $reemplazar,
+        ]);
     }
 
     /**
@@ -294,14 +307,22 @@ class ProgramacionController extends BaseModuleController
      */
     public function apiProcesarImportacion()
     {
+        $this->response->setHeader('X-CSRF-Hash', csrf_hash());
         if (!$this->permitirProgramacion(true)) return $this->jsonResponse('error', 'No tiene permiso para importar turnos.', [], 403);
         $datosSesion = session()->get('temp_import_programacion');
-        if (empty($datosSesion) || empty($datosSesion['registros_validos'])) {
+        if (!empty($datosSesion['errores'])) {
+            return $this->jsonResponse('error', 'Corrija todas las observaciones y vuelva a analizar el Excel antes de importar.', [], 422);
+        }
+        if (empty($datosSesion['registros_validos'])) {
             return $this->jsonResponse('error', 'No hay datos validados pendientes de importación. Suba el archivo nuevamente.', [], 400);
         }
 
-        $reemplazar = (bool) $this->request->getPost('reemplazar_existentes');
-        $estIde     = !empty($this->request->getPost('est_ide')) ? (int) $this->request->getPost('est_ide') : $datosSesion['est_ide'];
+        $previewId = $this->request->getPost('preview_id');
+        if (($previewId !== null || !empty($datosSesion['borrar_vacios'])) && $previewId !== ($datosSesion['preview_id'] ?? null)) {
+            return $this->jsonResponse('error', 'La vista previa cambió. Vuelva a analizar el archivo antes de aplicar.', [], 409);
+        }
+        $reemplazar = (bool) ($datosSesion['reemplazar_existentes'] ?? false);
+        $estIde     = $datosSesion['est_ide'];
         $upsIde     = !empty($this->request->getPost('ups_ide')) ? (int) $this->request->getPost('ups_ide') : null;
         $ussIde     = !empty($this->request->getPost('uss_ide')) ? (int) $this->request->getPost('uss_ide') : null;
         $usuarioId  = $this->getAuditUserId();
