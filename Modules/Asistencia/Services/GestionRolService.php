@@ -6,9 +6,9 @@ namespace Modules\Asistencia\Services;
 class GestionRolService
 {
     protected $db;
-    public function __construct()
+    public function __construct($db = null)
     {
-        $this->db = \Config\Database::connect();
+        $this->db = $db ?? \Config\Database::connect();
     }
     public function usuario(): int
     {

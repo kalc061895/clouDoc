@@ -14,7 +14,9 @@ class GestionRolController extends BaseModuleController
         $g->exigirProgramador();
         $db = \Config\Database::connect();
         $ids = $g->oficinas();
-        $roles = $db->table('casis_plan_rol r')->select('r.*, p.mes, p.apertura, p.aprobacion, p.cierre, o.ofi_nombre')->join('casis_plan_periodo p', 'p.id=r.periodo_id')->join('casis_oficina o', 'o.ofi_ide=r.oficina_id');
+        $roles = $db->table('casis_plan_rol r')->select('r.*, p.mes, p.apertura, p.aprobacion, p.cierre, o.ofi_nombre')
+            ->select("(SELECT MAX(e.id) FROM casis_rol_envio e WHERE e.rol_id = r.id AND e.estado = 'APROBADO_DIRECCION') AS envio_aprobado_id", false)
+            ->join('casis_plan_periodo p', 'p.id=r.periodo_id')->join('casis_oficina o', 'o.ofi_ide=r.oficina_id');
         if ($ids !== null) $roles->whereIn('r.oficina_id', $ids ?: [0]);
         return view('Modules\Asistencia\Views\gestion_roles\index', [
             'admin' => $g->administrador(),

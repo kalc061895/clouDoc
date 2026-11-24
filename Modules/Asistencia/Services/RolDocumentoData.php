@@ -129,7 +129,7 @@ class RolDocumentoData
         $filas = [];
         $alto = 0;
         $offset = 0;
-        $presupuesto = max(170, 350 - max(0, count($documento['leyenda']) - 6) * 8);
+        $presupuesto = max(170, 380 - max(0, count($documento['leyenda']) - 6) * 8);
         foreach ($documento['personal'] as $persona) {
             $turnos = max(array_map('count', $persona['dias']) ?: [0]);
             $altoFila = max(30, ceil(mb_strlen($persona['trabajador']) / 28) * 13 + 8, ceil(mb_strlen($persona['cargo']) / 13) * 12 + 8, $turnos * 23 + 6);

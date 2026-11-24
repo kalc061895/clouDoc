@@ -17,6 +17,11 @@
         </div>
         <div class="col-auto mb-3"><button class="btn btn-outline-primary">Filtrar</button></div>
     </form>
+    <?php if (isset($ampliacionesPendientes)): ?>
+        <?= view('Modules\Asistencia\Views\gestion_roles\ampliaciones_tabla', [
+            'ampliaciones' => $ampliacionesPendientes, 'bandeja' => true,
+        ], ['saveData' => false]) ?>
+    <?php endif ?>
     <div class="card border-0 shadow-sm"><div class="card-body"><div class="table-responsive">
         <table id="tablaEnviosRoles" class="table table-striped table-hover align-middle mb-0">
             <thead class="table-light"><tr><th>Período</th><th>Oficina</th><th>Establecimiento</th><th>Versión</th><th>Estado</th><th>Enviado</th><th>Acción</th></tr></thead>

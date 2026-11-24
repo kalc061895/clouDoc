@@ -3,6 +3,7 @@
 namespace Modules\Asistencia\Controllers;
 
 use App\Core\Controllers\BaseModuleController;
+use Modules\Asistencia\Services\AmpliacionRolService;
 use Modules\Asistencia\Services\GestionRolService;
 use Modules\Asistencia\Services\RolEnvioService;
 use Modules\Asistencia\Services\RolDocumentoService;
@@ -18,10 +19,21 @@ class RolEnvioController extends BaseModuleController
             $service = new RolEnvioService();
             $filtro = $this->request->getGet('establecimiento');
             $establecimiento = is_string($filtro) && ctype_digit($filtro) && (int) $filtro > 0 ? (int) $filtro : null;
+            $establecimientos = $service->establecimientosBandeja($etapa);
+            $ampliaciones = null;
+            if ($etapa === 'DIRECCION') {
+                $ampliaciones = (new AmpliacionRolService())->pendientesDireccion();
+                $establecimientos += array_column($ampliaciones, 'est_nombre', 'id_establecimiento');
+                asort($establecimientos);
+                if ($establecimiento !== null) {
+                    $ampliaciones = array_filter($ampliaciones, static fn(array $a): bool => (int) $a['id_establecimiento'] === $establecimiento);
+                }
+            }
             return view('Modules\\Asistencia\\Views\\gestion_roles\\envios', [
                 'envios' => $service->listar($etapa, $establecimiento),
-                'establecimientos' => $service->establecimientosBandeja($etapa),
+                'establecimientos' => $establecimientos,
                 'establecimiento' => $establecimiento,
+                'ampliacionesPendientes' => $ampliaciones,
                 'tituloBandeja' => ['RRHH' => 'Recursos Humanos: visto bueno', 'DIRECCION' => 'Dirección: aprobación final'][$etapa ?? ''] ?? 'Envíos y aprobaciones',
                 'admin' => (new GestionRolService())->administrador(),
             ]);

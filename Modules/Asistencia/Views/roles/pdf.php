@@ -24,17 +24,27 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
         }
 
         body {
+            margin: 0;
             font-family: "DejaVu Sans", sans-serif;
             font-size: 9px;
             color: #17212b;
         }
 
         .pagina {
+            position: relative;
+            height: 540pt;
             page-break-after: always;
         }
 
         .pagina:last-child {
             page-break-after: auto;
+        }
+
+        .pie-rol {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
 
         .institucion {
@@ -165,14 +175,16 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
 
         .firmas {
             width: 100%;
-            margin-top: 30px;
+            margin-top: 8px;
             border-collapse: collapse;
+            table-layout: fixed;
+            page-break-inside: avoid;
         }
 
         .firmas td {
-            width: 33.33%;
+            width: 20%;
             text-align: center;
-            padding: 0 36px;
+            padding: 18mm 16px 0;
         }
 
         .linea {
@@ -261,29 +273,37 @@ $logoDerecha = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOj
             </table>
             <!--div class="ambito"><b>Ámbito:</b> <?= esc($cab['ambito']) ?></div-->
             <?= view('Modules\Asistencia\Views\roles\tabla', ['documento' => $documento, 'filas' => $filas, 'offset' => $pagina['offset']]) ?>
-            <div class="resumen">Personal en esta hoja: <?= count($filas) ?> · Total personal del rol: <?= count($documento['personal']) ?> · Total horas del rol: <?= $numero($documento['total_horas']) ?></div>
+            <div class="pie-rol">
+                <div class="resumen">Personal en esta hoja: <?= count($filas) ?> · Total personal del rol: <?= count($documento['personal']) ?> · Total horas del rol: <?= $numero($documento['total_horas']) ?></div>
 
-            <div class="leyenda"><?php if ($documento['leyenda']): ?><b>LEYENDA DE TURNOS:</b><?php endif ?>
-                <?php foreach ($documento['leyenda'] as $turno): ?>
-                    <span><b style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></b> <?= esc($turno['tur_nombre']) ?> (<?= esc($turno['th_hora_ingreso']) ?>–<?= esc($turno['th_hora_salida']) ?>; <?= $numero($turno['duracion_horas']) ?> h)</span>
-                <?php endforeach ?> Una casilla vacía indica que no hay turno programado.
+                <div class="leyenda"><?php if ($documento['leyenda']): ?><b>LEYENDA DE TURNOS:</b><?php endif ?>
+                    <?php foreach ($documento['leyenda'] as $turno): ?>
+                        <span><b style="background-color:<?= RolDocumentoData::color($turno['tur_color']) ?>;color:<?= RolDocumentoData::tinta($turno['tur_color']) ?>"><?= esc($turno['tur_codigo']) ?></b> <?= esc($turno['tur_nombre']) ?> (<?= esc($turno['th_hora_ingreso']) ?>–<?= esc($turno['th_hora_salida']) ?>; <?= $numero($turno['duracion_horas']) ?> h)</span>
+                    <?php endforeach ?> Una casilla vacía indica que no hay turno programado.
+                </div>
+
+
+                <table class="firmas">
+                    <tr>
+                        <td>
+                            <div class="linea">Elaborado por</div>
+                        </td>
+                        <td>
+                            <div class="linea">Revisado por</div>
+                        </td>
+                        <td>
+                            <div class="linea">Revisado Por</div>
+                        </td>
+                        <td>
+                            <div class="linea">Revisado por</div>
+                        </td>
+                        <td>
+                            <div class="linea">Visado por</div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="identidad"><?= esc($documento['codigo']) ?> · Generado: <?= esc($documento['generado_at']) ?> </div>
             </div>
-            
-            
-            <table class="firmas">
-                <tr>
-                    <td>
-                        <div class="linea">Elaborado por</div>
-                    </td>
-                    <td>
-                        <div class="linea">Revisado por</div>
-                    </td>
-                    <td>
-                        <div class="linea">Aprobado por</div>
-                    </td>
-                </tr>
-            </table>
-            <div class="identidad"><?= esc($documento['codigo']) ?> · Generado: <?= esc($documento['generado_at']) ?> </div>
         </div>
     <?php endforeach ?>
 </body>

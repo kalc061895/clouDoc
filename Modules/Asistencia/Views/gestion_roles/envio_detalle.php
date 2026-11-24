@@ -7,7 +7,12 @@
             <h1 class="h3 mb-1"><iconify-icon icon="solar:document-text-bold-duotone" class="text-primary me-2"></iconify-icon>Revisión del rol</h1>
             <p class="text-muted mb-0">Versión <?= (int) $envio['version'] ?> · <?= sprintf('%02d/%04d', (int) $envio['mes'], (int) $envio['anio']) ?> · Estado: <span class="badge text-bg-primary"><?= esc(str_replace('_', ' ', $envio['estado'])) ?></span></p>
         </div>
-        <a class="btn btn-outline-secondary" href="<?= site_url('asistencia/gestion-roles/envios') ?>"><iconify-icon icon="lucide:arrow-left" class="me-1"></iconify-icon>Volver a envíos</a>
+        <div class="d-flex flex-wrap gap-2">
+            <?php if ($envio['estado'] === 'APROBADO_DIRECCION'): ?>
+                <a class="btn btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/envios/' . (int) $envio['id'] . '/ampliaciones') ?>">Ampliaciones</a>
+            <?php endif ?>
+            <a class="btn btn-outline-secondary" href="<?= site_url('asistencia/gestion-roles/envios') ?>"><iconify-icon icon="lucide:arrow-left" class="me-1"></iconify-icon>Volver a envíos</a>
+        </div>
     </div>
     <?= view('Modules\Asistencia\Views\gestion_roles\navegacion', ['admin' => $admin ?? false]) ?>
     <?php foreach (['error' => 'error', 'success' => 'success'] as $key => $toast): if ($mensaje = session()->getFlashdata($key)): ?><script>

@@ -38,6 +38,9 @@
                                 <td class="text-end text-nowrap">
                                     <?php if (in_array($r['estado'], ['BORRADOR', 'OBSERVADO'], true)): ?><form method="post" action="<?= site_url('asistencia/gestion-roles/' . (int) $r['id'] . '/enviar') ?>" class="d-inline js-enviar-rol"><?= csrf_field() ?><button class="btn btn-sm btn-primary"><iconify-icon icon="lucide:send" class="me-1"></iconify-icon>Enviar a RR. HH.</button></form><?php endif ?>
                                     <a class="btn btn-sm btn-outline-secondary" href="<?= site_url('asistencia/gestion-roles/envios') ?>"><iconify-icon icon="lucide:history" class="me-1"></iconify-icon>Envíos</a>
+                                    <?php if ($r['estado'] === 'APROBADO_DIRECCION' && $r['envio_aprobado_id']): ?>
+                                        <a class="btn btn-sm btn-outline-primary" href="<?= site_url('asistencia/gestion-roles/envios/' . (int) $r['envio_aprobado_id'] . '/ampliaciones') ?>">Ampliaciones</a>
+                                    <?php endif ?>
                                 </td>
                             </tr>
                         <?php endforeach ?>

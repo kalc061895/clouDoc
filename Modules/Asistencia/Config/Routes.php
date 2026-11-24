@@ -99,6 +99,10 @@ $routes->group('asistencia', ['namespace' => 'Modules\Asistencia\Controllers'], 
     $routes->get('gestion-roles/direccion', 'RolEnvioController::index/DIRECCION');
     $routes->get('gestion-roles/envios', 'RolEnvioController::index');
     $routes->get('gestion-roles/envios/(:num)', 'RolEnvioController::detalle/$1');
+    $routes->get('gestion-roles/envios/(:num)/ampliaciones', 'AmpliacionRolController::index/$1');
+    $routes->post('gestion-roles/envios/(:num)/ampliaciones', 'AmpliacionRolController::solicitar/$1', ['filter' => 'csrf']);
+    $routes->get('gestion-roles/ampliaciones/(:num)', 'AmpliacionRolController::detalle/$1');
+    $routes->post('gestion-roles/ampliaciones/(:num)/resolver', 'AmpliacionRolController::resolver/$1', ['filter' => 'csrf']);
     $routes->post('gestion-roles/envios/(:num)/rrhh', 'RolEnvioController::rrhh/$1', ['filter' => 'csrf']);
     $routes->post('gestion-roles/envios/(:num)/direccion', 'RolEnvioController::direccion/$1', ['filter' => 'csrf']);
     $routes->post('gestion-roles/envios/(:num)/pdf', 'RolEnvioController::pdf/$1', ['filter' => 'csrf']);
